@@ -12,11 +12,13 @@ import {
     ShieldCheck,
     ListChecks,
     Target,
-    Zap,
     Users,
     ArrowRight,
     ArrowLeft,
-    Check
+    Check,
+    DollarSign,
+    FileText,
+    Hash
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,10 +29,10 @@ export default function CreateVaultPage() {
     ]);
 
     const steps = [
-        { id: 1, name: "Core Parameters", icon: Target },
-        { id: 2, name: "Execution Path", icon: ListChecks },
-        { id: 3, name: "Talent Assignment", icon: Users },
-        { id: 4, name: "Review & Deploy", icon: ShieldCheck },
+        { id: 1, name: "Basics", icon: Hash },
+        { id: 2, name: "Milestones", icon: ListChecks },
+        { id: 3, name: "Assign", icon: Users },
+        { id: 4, name: "Review", icon: ShieldCheck },
     ];
 
     const addMilestone = () => {
@@ -42,25 +44,34 @@ export default function CreateVaultPage() {
     };
 
     return (
-        <div className="min-h-[calc(100vh-80px)] bg-[#050505] p-6 lg:p-12 font-['Poppins',_sans-serif]">
-            <div className="max-w-4xl mx-auto">
+        <div className="min-h-[calc(100vh-80px)]bg-[#0A0A0A] font-sans">
+            <div className="max-w-3xl mx-auto">
 
-                {/* PROGRESS TRACKER */}
+                {/* Header */}
+                <div className="mb-12 text-center">
+                    <h1 className="text-3xl font-semibold text-white mb-3">Create New Vault</h1>
+                    <p className="text-gray-400 text-sm">Secure capital release with milestone-based execution</p>
+                </div>
+
+                {/* Minimal Progress Tracker */}
                 <div className="flex items-center justify-between mb-16 relative">
                     <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 -translate-y-1/2 z-0" />
                     {steps.map((s, i) => (
                         <div key={s.id} className="relative z-10 flex flex-col items-center gap-3">
-                            <div className={cn(
-                                "w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-500",
-                                step === s.id ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.4)]" :
-                                    step > s.id ? "bg-emerald-500/20 border-emerald-500 text-emerald-500" :
-                                        "bg-[#080808] border-white/10 text-slate-600"
-                            )}>
-                                {step > s.id ? <Check className="w-6 h-6" /> : <s.icon className="w-5 h-5" />}
-                            </div>
+                            <button
+                                onClick={() => setStep(s.id)}
+                                className={cn(
+                                    "w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-300",
+                                    step === s.id ? "bg-white border-white text-black shadow-lg" :
+                                        step > s.id ? "bg-emerald-500 border-emerald-500 text-white" :
+                                            "bg-black border-gray-800 text-gray-500 hover:border-gray-600"
+                                )}
+                            >
+                                {step > s.id ? <Check className="w-4 h-4" /> : <s.icon className="w-4 h-4" />}
+                            </button>
                             <span className={cn(
-                                "text-[10px] font-black uppercase tracking-[0.2em] absolute -bottom-8 whitespace-nowrap",
-                                step === s.id ? "text-white" : "text-slate-600"
+                                "text-xs font-medium absolute -bottom-8 whitespace-nowrap",
+                                step === s.id ? "text-white" : "text-gray-500"
                             )}>
                                 {s.name}
                             </span>
@@ -68,31 +79,32 @@ export default function CreateVaultPage() {
                     ))}
                 </div>
 
-                {/* FORM CONTAINER */}
-                <div className="bg-[#0A0A0A] border border-white/5 rounded-[40px] p-8 md:p-12 shadow-2xl relative">
+                {/* Form Container */}
+                <div className="bg-[#0A0A0A] rounded-2xl p-6 md:p-8 border border-gray-900">
 
                     {/* STEP 1: CORE PARAMETERS */}
                     {step === 1 && (
-                        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="space-y-3">
-                                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Identity & Scope</h2>
-                                <p className="text-slate-500 text-base font-medium">Define the high-level identity of this financial vault.</p>
+                        <div className="space-y-8 animate-in fade-in duration-300">
+                            <div className="space-y-2">
+                                <h2 className="text-2xl font-semibold text-white">Vault Details</h2>
+                                <p className="text-gray-400 text-sm">Define the purpose and scope of this vault</p>
                             </div>
 
-                            <div className="space-y-8">
-                                <div className="space-y-3">
-                                    <Label className="text-xs font-black uppercase tracking-widest text-emerald-500/70 ml-1">Contract Title</Label>
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium text-gray-300">Vault Title</Label>
                                     <Input
-                                        placeholder="e.g. Q1 Infrastructure Expansion"
-                                        className="!bg-[#0a0a0a] border-white/10 h-20 rounded-2xl px-8 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-xl placeholder:text-slate-600 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
+                                        placeholder="Q1 Infrastructure Expansion"
+                                        className="bg-white border-gray-300 h-12 rounded-lg px-4 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-black placeholder:text-gray-500"
                                     />
                                 </div>
-                                <div className="space-y-3">
-                                    <Label className="text-xs font-black uppercase tracking-widest text-emerald-500/70 ml-1">Technical Summary</Label>
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium text-gray-300">Description</Label>
                                     <Textarea
-                                        placeholder="Describe the objective of this vault..."
-                                        className="!bg-[#0a0a0a] border-white/10 rounded-2xl p-8 text-white min-h-[200px] focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all text-lg placeholder:text-slate-600"
+                                        placeholder="Describe the objective, deliverables, and success criteria..."
+                                        className="bg-white border-gray-300 rounded-lg p-4 text-black min-h-[120px] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-500 text-sm"
                                     />
+                                    <p className="text-xs text-gray-500 mt-2">Keep it concise. You can add detailed specifications later.</p>
                                 </div>
                             </div>
                         </div>
@@ -100,133 +112,191 @@ export default function CreateVaultPage() {
 
                     {/* STEP 2: MILESTONES */}
                     {step === 2 && (
-                        <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
-                            <div className="space-y-3">
-                                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Execution Roadmap</h2>
-                                <p className="text-slate-500 text-base font-medium">Break down the capital release triggers.</p>
+                        <div className="space-y-8 animate-in fade-in duration-300">
+                            <div className="space-y-2">
+                                <h2 className="text-2xl font-semibold text-white">Payment Milestones</h2>
+                                <p className="text-gray-400 text-sm">Define release triggers and amounts</p>
                             </div>
 
-                            <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 custom-scrollbar">
+                            <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-2">
                                 {milestones.map((m, i) => (
-                                    <div key={i} className="p-8 bg-black/40 border border-white/5 rounded-[32px] space-y-6 relative group hover:border-emerald-500/20 transition-all">
+                                    <div key={i} className="p-6 bg-black/40 border border-gray-800 rounded-xl space-y-4 hover:border-gray-700 transition-all">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xs font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/10">Node 0{i + 1}</span>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                                    <span className="text-emerald-500 text-sm font-medium">{i + 1}</span>
+                                                </div>
+                                                <h3 className="text-sm font-medium text-gray-300">Milestone {i + 1}</h3>
+                                            </div>
                                             {milestones.length > 1 && (
-                                                <button onClick={() => removeMilestone(i)} className="opacity-0 group-hover:opacity-100 text-red-500 p-2 hover:bg-red-500/10 rounded-lg transition-all">
-                                                    <Trash2 className="w-5 h-5" />
+                                                <button
+                                                    onClick={() => removeMilestone(i)}
+                                                    className="text-gray-500 hover:text-red-500 p-1.5 hover:bg-red-500/10 rounded transition-all"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
                                                 </button>
                                             )}
                                         </div>
-                                        <div className="grid md:grid-cols-2 gap-6">
+
+                                        <div className="grid gap-4">
                                             <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Title</Label>
+                                                <Label className="text-xs font-medium text-gray-400">Title</Label>
                                                 <Input
-                                                    placeholder="Milestone Title"
-                                                    className="!bg-[#0a0a0a] border-white/10 h-16 rounded-xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-slate-600"
+                                                    placeholder="e.g., Initial Setup Complete"
+                                                    className="bg-white border-gray-300 h-10 rounded-lg px-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-black placeholder:text-gray-500 text-sm"
                                                 />
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Value</Label>
-                                                <div className="relative">
-                                                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-500 font-bold text-lg">$</span>
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs font-medium text-gray-400">Amount</Label>
+                                                    <div className="relative">
+                                                        {/* <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" /> */}
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="0.00"
+                                                            className="bg-white border-gray-300 h-10 rounded-lg pl-9 pr-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all text-black text-sm"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs font-medium text-gray-400">Due Date</Label>
                                                     <Input
-                                                        type="number"
-                                                        placeholder="0.00"
-                                                        className="!bg-[#0a0a0a] border-white/10 h-16 rounded-xl pl-10 px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg font-mono placeholder:text-slate-600"
+                                                        type="date"
+                                                        className="bg-white border-gray-300 h-10 rounded-lg px-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald500/20 transition-all text-black text-sm"
                                                     />
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Verification Logic</Label>
-                                            <Textarea
-                                                placeholder="Verification requirements..."
-                                                className="!bg-[#0a0a0a] border-white/10 rounded-xl p-6 text-white min-h-[100px] focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all text-base placeholder:text-slate-600"
-                                            />
+
+                                            <div className="space-y-2">
+                                                <Label className="text-xs font-medium text-gray-400">Verification Requirements</Label>
+                                                <Textarea
+                                                    placeholder="What needs to be delivered or verified..."
+                                                    className="bg-white border-gray-300 rounded-lg p-3 text-black min-h-[80px] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-500 text-sm"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
                             <Button
-                                variant="ghost"
+                                variant="outline"
                                 onClick={addMilestone}
-                                className="w-full h-20 rounded-[24px] border-2 border-dashed border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/5 text-slate-400 hover:text-emerald-500 font-black uppercase tracking-widest text-xs gap-3 transition-all"
+                                className="w-full h-12 rounded-lg border-dashed border-gray-700 hover:border-emerald-500 bg-emerald-500 text-black font-medium transition-all"
                             >
-                                <Plus className="w-5 h-5" /> Append Protocol Node
+                                <Plus className="w-4 h-4 mr-2" /> Add Milestone
                             </Button>
                         </div>
                     )}
 
                     {/* STEP 3: TALENT */}
                     {step === 3 && (
-                        <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
-                            <div className="space-y-3 text-center py-10">
-                                <div className="w-24 h-24 bg-emerald-500/10 rounded-[32px] flex items-center justify-center mx-auto mb-8 border border-emerald-500/20">
-                                    <Users className="w-12 h-12 text-emerald-500" />
-                                </div>
-                                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Assign Counterparty</h2>
-                                <p className="text-slate-500 text-lg font-medium max-w-md mx-auto mt-4">Enter the email of the service provider who will fulfill the milestones.</p>
+                        <div className="space-y-8 animate-in fade-in duration-300">
+                            <div className="space-y-2">
+                                <h2 className="text-2xl font-semibold text-white">Assign Counterparty</h2>
+                                <p className="text-gray-400 text-sm">Who will receive payments upon milestone completion</p>
                             </div>
 
-                            <div className="max-w-xl mx-auto pb-10">
-                                <Input
-                                    placeholder="talent@workspace.com"
-                                    className="!bg-[#0a0a0a] border-white/10 h-24 rounded-[32px] px-8 text-center text-2xl !text-white focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all placeholder:text-slate-700"
-                                />
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium text-gray-300">Recipient Email</Label>
+                                    <Input
+                                        placeholder="contractor@example.com"
+                                        className="bg-white border-gray-300 h-12 rounded-lg px-4 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-black placeholder:text-gray-500"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium text-gray-300">Wallet Address (Optional)</Label>
+                                    <Input
+                                        placeholder="0x..."
+                                        className="bg-white border-gray-300 h-12 rounded-lg px-4 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-black placeholder:text-gray-500 font-mono text-sm"
+                                    />
+                                    <p className="text-xs text-gray-500">For direct crypto payments. Leave empty for email notifications only.</p>
+                                </div>
                             </div>
                         </div>
                     )}
 
                     {/* STEP 4: REVIEW */}
                     {step === 4 && (
-                        <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500 text-center py-6">
-                            <div className="w-32 h-32 bg-emerald-500 rounded-[40px] flex items-center justify-center mx-auto mb-10 shadow-[0_0_80px_rgba(16,185,129,0.4)] animate-pulse">
-                                <Lock className="w-16 h-16 text-black stroke-[3px]" />
-                            </div>
-                            <div className="space-y-4">
-                                <h2 className="text-5xl font-black text-white uppercase tracking-tighter">Ready for Deployment</h2>
-                                <p className="text-slate-500 text-lg font-medium">Review the protocol parameters before locking capital.</p>
+                        <div className="space-y-8 animate-in fade-in duration-300">
+                            <div className="space-y-2 text-center">
+                                <div className="w-16 h-16 bg-emerald-500/10 rounded-xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
+                                    <Lock className="w-8 h-8 text-emerald-500" />
+                                </div>
+                                <h2 className="text-2xl font-semibold text-white">Review & Deploy</h2>
+                                <p className="text-gray-400 text-sm">Confirm details before locking funds</p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-6 text-left mt-16 max-w-2xl mx-auto">
-                                <div className="p-8 bg-white/5 rounded-[32px] border border-white/5 hover:bg-white/10 transition-colors">
-                                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-3">Total Capital</p>
-                                    <p className="text-4xl font-black text-white tracking-tighter">$1,500.00</p>
+                            <div className="space-y-4 bg-black/40 rounded-xl p-6 border border-gray-800">
+                                <div className="flex items-center justify-between py-3 border-b border-gray-800">
+                                    <span className="text-sm text-gray-400">Total Capital</span>
+                                    <span className="text-xl font-semibold text-white">$1,500.00</span>
                                 </div>
-                                <div className="p-8 bg-white/5 rounded-[32px] border border-white/5 hover:bg-white/10 transition-colors">
-                                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-3">Milestone Nodes</p>
-                                    <p className="text-4xl font-black text-white tracking-tighter">{milestones.length}</p>
+                                <div className="flex items-center justify-between py-3 border-b border-gray-800">
+                                    <span className="text-sm text-gray-400">Milestones</span>
+                                    <span className="text-xl font-semibold text-white">{milestones.length}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-3">
+                                    <span className="text-sm text-gray-400">Escrow Fee</span>
+                                    <span className="text-xl font-semibold text-emerald-500">1.5%</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex items-start gap-3 p-4 bg-black/30 rounded-lg border border-gray-800">
+                                    <div className="w-6 h-6 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <FileText className="w-3 h-3 text-blue-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-300 font-medium">Terms & Conditions</p>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            By deploying, you agree to the escrow terms. Funds will be locked until milestones are verified.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* NAVIGATION BUTTONS */}
-                    <div className="flex items-center justify-between mt-16 pt-12 border-t border-white/5">
+                    {/* Navigation Buttons */}
+                    <div className="flex items-center justify-between mt-12 pt-6 border-t border-gray-900">
                         <Button
                             variant="ghost"
                             onClick={() => setStep(s => Math.max(1, s - 1))}
-                            className={cn("text-slate-500 hover:text-white font-bold uppercase tracking-widest text-xs h-14 px-6 rounded-xl hover:bg-white/5", step === 1 && "invisible")}
+                            className={cn(
+                                "text-gray-400 hover:text-white font-medium h-11 px-5 rounded-lg hover:bg-white/5 transition-all",
+                                step === 1 && "invisible"
+                            )}
                         >
-                            <ArrowLeft className="w-5 h-5 mr-3" /> Back
+                            <ArrowLeft className="w-4 h-4 mr-2" /> Back
                         </Button>
 
                         {step < 4 ? (
                             <Button
                                 onClick={() => setStep(s => Math.min(4, s + 1))}
-                                className="bg-white text-black hover:bg-emerald-500 hover:text-black transition-all px-10 h-16 rounded-2xl font-black uppercase tracking-widest text-sm group shadow-lg shadow-white/5"
+                                className="bg-white text-black hover:bg-gray-200 px-8 h-11 rounded-lg font-medium transition-all"
                             >
-                                Continue <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
+                                Continue <ArrowRight className="w-4 h-4 ml-2" />
                             </Button>
                         ) : (
                             <Button
-                                className="bg-emerald-500 text-black hover:bg-emerald-400 px-12 h-20 rounded-2xl font-black uppercase tracking-widest text-base shadow-[0_0_40px_rgba(16,185,129,0.4)] hover:shadow-[0_0_60px_rgba(16,185,129,0.6)] transition-all transform hover:-translate-y-1"
+                                className="bg-emerald-500 text-black hover:bg-emerald-400 px-10 h-12 rounded-lg font-medium shadow-lg shadow-emerald-500/20 transition-all"
                             >
-                                Fund & Deploy Vault
+                                Deploy Vault
                             </Button>
                         )}
                     </div>
+                </div>
+
+                {/* Footer Note */}
+                <div className="mt-8 text-center">
+                    <p className="text-xs text-gray-600">
+                        Funds are held in secure escrow. All transactions are recorded on-chain.
+                    </p>
                 </div>
             </div>
         </div>

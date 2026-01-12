@@ -3,100 +3,185 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Shield, LayoutDashboard, Plus, Wallet, LogOut, Settings, Bell } from 'lucide-react';
+import { Shield, LayoutDashboard, Plus, Wallet, LogOut, Settings, Bell, Search, ChevronDown, PieChart, FileText, Users, CreditCard, Lock, HelpCircle } from 'lucide-react';
 import { useUser } from '@/lib/store/user-context';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 const navigation = [
-    { name: 'Dashboard', href: '/client', icon: LayoutDashboard },
-    { name: 'Create Vault', href: '/client/create-vault', icon: Plus },
-    { name: 'Wallet', href: '/client/wallet', icon: Wallet },
-    { name: 'Settings', href: '/client/settings', icon: Settings },
+    { name: 'Overview', href: '/client', icon: LayoutDashboard, badge: null },
+    { name: 'Vaults', href: '/client/vaults', icon: Lock, badge: '3' },
+    { name: 'Create Vault', href: '/client/create-vault', icon: Plus, badge: null },
+    { name: 'Transactions', href: '/client/transactions', icon: CreditCard, badge: null },
+    // { name: 'Team', href: '/client/team', icon: Users, badge: null },
+    // { name: 'Documents', href: '/client/documents', icon: FileText, badge: null },
 ];
 
 export default function ClientLayout({ children }) {
     const pathname = usePathname();
     const { user, logout } = useUser();
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-[#050505] text-slate-200 font-['Poppins',_sans-serif] flex">
-
-            {/* Sidebar Navigation */}
-            <aside className="w-72 border-r border-white/5 bg-[#080808] hidden lg:flex flex-col sticky top-0 h-screen">
-                <div className="p-8">
+        <div className="min-h-screen bg-[#0A0A0A] text-gray-200 flex">
+            {/* Left Sidebar - Professional Dark Theme */}
+            <aside className="w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col sticky top-0 h-screen">
+                {/* Logo & Brand */}
+                <div className="p-6 pb-4">
                     <Link href="/client" className="flex items-center gap-3 group">
-                        <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 transition-transform group-hover:scale-105">
-                            <Shield className="w-6 h-6 text-black stroke-[3px]" />
+                        <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-emerald-500/20">
+                            <Shield className="w-5 h-5 text-black" strokeWidth={2.5} />
                         </div>
-                        <span className="font-black tracking-tighter text-white text-xl uppercase">SKENTRAL</span>
+                        <div>
+                            <h1 className="text-2xl text-white tracking-tight">Cleard</h1>
+                        </div>
                     </Link>
                 </div>
 
-                <nav className="flex-1 px-4 space-y-2">
-                    <div className="px-4 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Protocol Menu</div>
+                {/* Navigation */}
+                <nav className="flex-1 px-4 py-6 space-y-1">
                     {navigation.map((item) => {
                         const isActive = pathname === item.href;
                         return (
                             <Link key={item.name} href={item.href}>
                                 <div className={cn(
-                                    "flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold uppercase tracking-widest transition-all group",
+                                    "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                                     isActive
-                                        ? "bg-emerald-500 text-black shadow-lg shadow-emerald-500/10"
-                                        : "text-slate-500 hover:text-white hover:bg-white/5"
+                                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                        : "text-gray-400 hover:bg-white/5 hover:text-white"
                                 )}>
-                                    <item.icon className={cn("w-5 h-5", isActive ? "text-black" : "text-emerald-500")} />
-                                    <span>{item.name}</span>
+                                    <div className="flex items-center gap-3">
+                                        <item.icon className={cn(
+                                            "w-4 h-4 transition-colors",
+                                            isActive ? "text-emerald-400" : "text-gray-500 group-hover:text-gray-300"
+                                        )} />
+                                        <span>{item.name}</span>
+                                    </div>
+                                    {item.badge && (
+                                        <span className={cn(
+                                            "text-xs px-2 py-0.5 rounded-full font-medium",
+                                            isActive
+                                                ? "bg-emerald-500/20 text-emerald-400"
+                                                : "bg-gray-800 text-gray-400"
+                                        )}>
+                                            {item.badge}
+                                        </span>
+                                    )}
                                 </div>
                             </Link>
                         );
                     })}
                 </nav>
 
-                <div className="p-4 border-t border-white/5">
-                    <Button
-                        variant="ghost"
-                        onClick={logout}
-                        className="w-full justify-start gap-4 px-4 py-6 rounded-2xl text-slate-500 hover:text-red-400 hover:bg-red-400/5 transition-all text-sm font-bold uppercase tracking-widest"
-                    >
-                        <LogOut className="w-5 h-5" />
-                        Sign Out
-                    </Button>
+                {/* User Section */}
+                <div className="p-4 border-t border-gray-900 mt-auto">
+                    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center text-white font-medium text-sm border border-gray-700">
+                                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-white">{user?.name || 'Alex Johnson'}</p>
+                                <p className="text-xs text-gray-500">Administrator</p>
+                            </div>
+                        </div>
+                        <ChevronDown className="w-4 h-4 text-gray-500 group-hover:text-gray-400" />
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="grid grid-cols-2 gap-2 mt-4">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-9 text-xs border-gray-800 bg-black/30 hover:bg-gray-800 hover:border-gray-700 text-gray-300"
+                        >
+                            <Settings className="w-3.5 h-3.5 mr-2" />
+                            Settings
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={logout}
+                            className="h-9 text-xs border-gray-800 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
+                        >
+                            <LogOut className="w-3.5 h-3.5 mr-2" />
+                            Sign out
+                        </Button>
+                    </div>
                 </div>
             </aside>
 
-            {/* Main Content Area */}
+            {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
-                {/* Mobile/Top Header */}
-                <header className="h-20 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md sticky top-0 z-40 px-8 flex items-center justify-between">
-                    <div className="lg:hidden flex items-center gap-3">
-                        <Shield className="w-6 h-6 text-emerald-500" />
-                        <span className="font-black text-white text-lg uppercase tracking-tighter">SKENTRAL</span>
-                    </div>
+                {/* Top Bar - Professional Dark */}
+                <header className="sticky top-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-sm border-b border-gray-900">
+                    <div className="h-16 px-8 flex items-center justify-between">
+                        {/* Breadcrumb */}
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-lg font-semibold text-white">
+                                {navigation.find(item => item.href === pathname)?.name || 'Dashboard'}
+                            </h2>
+                            <div className="w-1 h-1 bg-gray-700 rounded-full mx-2"></div>
+                            <span className="text-sm text-gray-500">Active vaults: 3</span>
+                        </div>
 
-                    <div className="hidden lg:block text-sm font-medium text-slate-500 uppercase tracking-widest">
-                        System Status: <span className="text-emerald-500">Secure Mode</span>
-                    </div>
+                        {/* Actions */}
+                        <div className="flex items-center gap-4">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-9 px-3 border-gray-800 bg-black/30 text-gray-400 hover:text-white hover:border-gray-700"
+                            >
+                                <HelpCircle className="w-4 h-4 mr-2" />
+                                Help
+                            </Button>
 
-                    <div className="flex items-center gap-6">
-                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white relative">
-                            <Bell className="w-5 h-5" />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full border-2 border-[#050505]"></span>
-                        </Button>
-                        <div className="flex items-center gap-3 pl-6 border-l border-white/10">
-                            <div className="text-right hidden sm:block">
-                                <p className="text-xs font-black text-white uppercase tracking-tight leading-none">{user?.name || 'Authorized User'}</p>
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Client Node</p>
-                            </div>
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-black font-black">
-                                {user?.name?.charAt(0) || 'U'}
-                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="relative w-9 h-9 text-gray-400 hover:text-white hover:bg-white/5"
+                            >
+                                <Bell className="w-4.5 h-4.5" />
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full border border-[#0A0A0A]"></span>
+                            </Button>
+
+                            {/* Create Button */}
+                            <Link href="/client/create-vault">
+                                <Button className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20">
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    New Vault
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-y-auto">
-                    {children}
+                {/* Content Area */}
+                <main className="flex-1 overflow-y-auto bg-[#0A0A0A]">
+                    <div className="p-8">
+                        <div className="max-w-7xl mx-auto">
+                            {children}
+                        </div>
+                    </div>
                 </main>
+
+                {/* Footer */}
+                <footer className="border-t border-gray-900 bg-[#111111] px-8 py-4">
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                        <div className="flex items-center gap-6">
+                            <span>© 2024 Skentral Inc.</span>
+                            <span className="flex items-center gap-1.5">
+                                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                System: <span className="font-medium text-gray-300">Operational</span>
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-6">
+                            <button className="hover:text-gray-300 transition-colors">Privacy</button>
+                            <button className="hover:text-gray-300 transition-colors">Terms</button>
+                            <button className="hover:text-gray-300 transition-colors">Support</button>
+                        </div>
+                    </div>
+                </footer>
             </div>
         </div>
     );
