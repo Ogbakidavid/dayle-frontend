@@ -113,49 +113,6 @@ export default function ClientLayout({ children }) {
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
-                {/* Top Bar - Professional Dark */}
-                <header className="sticky top-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-sm border-b border-gray-900">
-                    <div className="h-16 px-8 flex items-center justify-between">
-                        {/* Breadcrumb */}
-                        <div className="flex items-center gap-2">
-                            <h2 className="text-lg font-semibold text-white">
-                                {navigation.find(item => item.href === pathname)?.name || 'Dashboard'}
-                            </h2>
-                            <div className="w-1 h-1 bg-gray-700 rounded-full mx-2"></div>
-                            <span className="text-sm text-gray-500">Active vaults: 3</span>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-4">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-9 px-3 border-gray-800 bg-black/30 text-gray-400 hover:text-white hover:border-gray-700"
-                            >
-                                <HelpCircle className="w-4 h-4 mr-2" />
-                                Help
-                            </Button>
-
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="relative w-9 h-9 text-gray-400 hover:text-white hover:bg-white/5"
-                            >
-                                <Bell className="w-4.5 h-4.5" />
-                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full border border-[#0A0A0A]"></span>
-                            </Button>
-
-                            {/* Create Button */}
-                            <Link href="/client/create-vault">
-                                <Button className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20">
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    New Vault
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
-                </header>
-
                 {/* Content Area */}
                 <main className="flex-1 overflow-y-auto bg-[#0A0A0A]">
                     <div className="p-8">
@@ -164,24 +121,6 @@ export default function ClientLayout({ children }) {
                         </div>
                     </div>
                 </main>
-
-                {/* Footer */}
-                <footer className="border-t border-gray-900 bg-[#111111] px-8 py-4">
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center gap-6">
-                            <span>© 2024 Skentral Inc.</span>
-                            <span className="flex items-center gap-1.5">
-                                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                                System: <span className="font-medium text-gray-300">Operational</span>
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-6">
-                            <button className="hover:text-gray-300 transition-colors">Privacy</button>
-                            <button className="hover:text-gray-300 transition-colors">Terms</button>
-                            <button className="hover:text-gray-300 transition-colors">Support</button>
-                        </div>
-                    </div>
-                </footer>
             </div>
         </div>
     );

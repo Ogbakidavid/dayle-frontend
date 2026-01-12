@@ -95,14 +95,14 @@ export default function CreateVaultPage() {
                                     <Label className="text-sm font-medium text-gray-300">Vault Title</Label>
                                     <Input
                                         placeholder="Q1 Infrastructure Expansion"
-                                        className="bg-white border-gray-300 h-12 rounded-lg px-4 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-black placeholder:text-gray-500"
+                                        className="bg-transparent border-white h-12 rounded-lg px-4 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-white placeholder:text-gray-400"
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium text-gray-300">Description</Label>
                                     <Textarea
                                         placeholder="Describe the objective, deliverables, and success criteria..."
-                                        className="bg-white border-gray-300 rounded-lg p-4 text-black min-h-[120px] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-500 text-sm"
+                                        className="bg-transparent border-white rounded-lg p-4 text-white min-h-[120px] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-400 text-sm"
                                     />
                                     <p className="text-xs text-gray-500 mt-2">Keep it concise. You can add detailed specifications later.</p>
                                 </div>
@@ -143,7 +143,7 @@ export default function CreateVaultPage() {
                                                 <Label className="text-xs font-medium text-gray-400">Title</Label>
                                                 <Input
                                                     placeholder="e.g., Initial Setup Complete"
-                                                    className="bg-white border-gray-300 h-10 rounded-lg px-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-black placeholder:text-gray-500 text-sm"
+                                                    className="bg-transparent border-white h-10 rounded-lg px-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-white placeholder:text-gray-400 text-sm"
                                                 />
                                             </div>
 
@@ -155,7 +155,7 @@ export default function CreateVaultPage() {
                                                         <Input
                                                             type="number"
                                                             placeholder="0.00"
-                                                            className="bg-white border-gray-300 h-10 rounded-lg pl-9 pr-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all text-black text-sm"
+                                                            className="bg-transparent border-white h-10 rounded-lg pl-9 pr-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all text-white placeholder:text-gray-400 text-sm"
                                                         />
                                                     </div>
                                                 </div>
@@ -164,7 +164,7 @@ export default function CreateVaultPage() {
                                                     <Label className="text-xs font-medium text-gray-400">Due Date</Label>
                                                     <Input
                                                         type="date"
-                                                        className="bg-white border-gray-300 h-10 rounded-lg px-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald500/20 transition-all text-black text-sm"
+                                                        className="bg-transparent border-white h-10 rounded-lg px-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-white text-sm [color-scheme:dark] placeholder:text-gray-400"
                                                     />
                                                 </div>
                                             </div>
@@ -173,7 +173,7 @@ export default function CreateVaultPage() {
                                                 <Label className="text-xs font-medium text-gray-400">Verification Requirements</Label>
                                                 <Textarea
                                                     placeholder="What needs to be delivered or verified..."
-                                                    className="bg-white border-gray-300 rounded-lg p-3 text-black min-h-[80px] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-500 text-sm"
+                                                    className="bg-transparent border-white rounded-lg p-3 text-white min-h-[80px] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-400 text-sm"
                                                 />
                                             </div>
                                         </div>
@@ -204,7 +204,7 @@ export default function CreateVaultPage() {
                                     <Label className="text-sm font-medium text-gray-300">Recipient Email</Label>
                                     <Input
                                         placeholder="contractor@example.com"
-                                        className="bg-white border-gray-300 h-12 rounded-lg px-4 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-black placeholder:text-gray-500"
+                                        className="bg-transparent border-white h-12 rounded-lg px-4 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-white placeholder:text-gray-400"
                                     />
                                 </div>
 
@@ -212,7 +212,7 @@ export default function CreateVaultPage() {
                                     <Label className="text-sm font-medium text-gray-300">Wallet Address (Optional)</Label>
                                     <Input
                                         placeholder="0x..."
-                                        className="bg-white border-gray-300 h-12 rounded-lg px-4 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-black placeholder:text-gray-500 font-mono text-sm"
+                                        className="bg-transparent border-white h-12 rounded-lg px-4 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-white placeholder:text-gray-400 font-mono text-sm"
                                     />
                                     <p className="text-xs text-gray-500">For direct crypto payments. Leave empty for email notifications only.</p>
                                 </div>
