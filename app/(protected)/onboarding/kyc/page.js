@@ -163,7 +163,7 @@ export default function KYCPage() {
 
         setLoading(true);
         try {
-            await api.users.updateProfile({ kycStatus: 'approved', ...formData });
+            await api.auth.updateProfile({ kycStatus: 'approved', ...formData });
             await refreshUser();
             const dashboardPath = isClient ? '/client' : '/freelancer';
             router.push(dashboardPath);
@@ -532,7 +532,8 @@ export default function KYCPage() {
                                         >
                                             {loading ? (
                                                 <span className="flex items-center gap-3">
-                                                    <Loader2 className="w-6 h-6 animate-spin" /> Finalizing
+                                                    {/* <Loader2 className="w-6 h-6 animate-spin" />  */}
+                                                    Finalizing
                                                 </span>
                                             ) : (
                                                 <span className="flex items-center justify-center gap-3">

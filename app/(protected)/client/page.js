@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { AmountDisplay } from '@/components/ui/amount-display';
-import { StatusBadge } from '@/components/ui/status-badge';
 import { useVault } from '@/lib/store/vault-context';
 import { useWallet } from '@/lib/store/wallet-context';
-import { Wallet, Plus, ArrowRight, Shield } from 'lucide-react';
+import {
+    Wallet, Plus, Shield, Activity,
+    ArrowUpRight, LayoutGrid, Zap
+} from 'lucide-react';
 
 export default function ClientDashboard() {
     const { vaults, loading } = useVault();
@@ -16,107 +16,108 @@ export default function ClientDashboard() {
     const activeVaults = vaults.filter(v => v.status !== 'completed' && v.status !== 'cancelled');
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            {/* Header */}
-            <div className="bg-white border-b border-slate-200">
-                <div className="container-custom py-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Client Dashboard</h1>
-                            <p className="text-sm text-slate-500 mt-1">Manage your workforce settlements</p>
+        <div className="p-8 md:p-12 space-y-12 max-w-7xl">
+
+            {/* Financial Overview Section */}
+            <div className="grid md:grid-cols-3 gap-8">
+                <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-[32px] hover:border-emerald-500/20 transition-all">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                            <Wallet className="w-5 h-5 text-emerald-500" />
                         </div>
-                        <div className="flex items-center gap-6">
-                            <div className="text-right">
-                                <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Wallet Balance</div>
-                                <AmountDisplay amount={balance?.available || 0} size="medium" />
-                            </div>
-                            <Link href="/client/create-vault">
-                                <Button size="lg" className="gap-2 shadow-md">
-                                    <Plus className="w-4 h-4" />
-                                    New Vault
-                                </Button>
-                            </Link>
+                        <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Wallet Balance</span>
+                    </div>
+                    <div className="space-y-1">
+                        <h2 className="text-5xl font-black text-white tracking-tighter">
+                            ${balance?.available?.toLocaleString() || '0.00'}
+                        </h2>
+                        <p className="text-emerald-500/70 text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
+                            <Zap className="w-3 h-3" /> Fully Liquid
+                        </p>
+                    </div>
+                </div>
+
+                <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-[32px] hover:border-emerald-500/20 transition-all">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                            <Shield className="w-5 h-5 text-emerald-500" />
+                        </div>
+                        <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Locked in Vaults</span>
+                    </div>
+                    <div className="space-y-1">
+                        <h2 className="text-5xl font-black text-white tracking-tighter">
+                            ${activeVaults.reduce((acc, v) => acc + (v.totalAmount || v.amount), 0).toLocaleString()}
+                        </h2>
+                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{activeVaults.length} Active Contracts</p>
+                    </div>
+                </div>
+
+                <div className="bg-emerald-500 p-8 rounded-[32px] flex flex-col justify-between group cursor-pointer hover:bg-emerald-400 transition-all">
+                    <div className="flex justify-between items-start text-black">
+                        <Plus className="w-10 h-10 stroke-[3px]" />
+                        <div className="w-12 h-12 bg-black/10 rounded-full flex items-center justify-center">
+                            <ArrowUpRight className="w-6 h-6" />
                         </div>
                     </div>
+                    <Link href="/client/create-vault">
+                        <h3 className="text-2xl font-black text-black uppercase tracking-tighter leading-tight">
+                            Build New <br /> Project Vault
+                        </h3>
+                    </Link>
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div className="container-custom py-10 space-y-10">
-                {/* Active Vaults Section */}
-                <section>
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-slate-400" />
-                            Active Project Vaults
-                        </h2>
+            {/* Vault List Section */}
+            <div className="space-y-8">
+                <div className="flex items-center justify-between border-b border-white/5 pb-6">
+                    <div className="flex items-center gap-4">
+                        <LayoutGrid className="w-6 h-6 text-emerald-500" />
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tight">Active Pipelines</h2>
                     </div>
+                </div>
 
-                    {loading ? (
-                        <div className="flex items-center justify-center py-20">
-                            <div className="spinner w-8 h-8" />
-                        </div>
-                    ) : activeVaults.length === 0 ? (
-                        <Card className="border-2 border-dashed border-slate-300 bg-slate-50">
-                            <CardContent className="py-20 text-center">
-                                <div className="max-w-md mx-auto">
-                                    <Shield className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                                    <h3 className="text-base font-bold text-slate-900 mb-2">No active vaults</h3>
-                                    <p className="text-sm text-slate-500 mb-8">
-                                        Secure your project capital and eliminate non-payment risk by creating your first work vault.
-                                    </p>
-                                    <Link href="/client/create-vault">
-                                        <Button variant="outline" className="gap-2">
-                                            <Plus className="w-4 h-4" />
-                                            Build a Project Vault
-                                        </Button>
-                                    </Link>
+                {loading ? (
+                    <div className="space-y-4">
+                        {[1, 2].map(i => <div key={i} className="h-28 bg-white/5 animate-pulse rounded-[32px]" />)}
+                    </div>
+                ) : activeVaults.length === 0 ? (
+                    <div className="py-24 text-center bg-[#080808] border border-dashed border-white/10 rounded-[40px]">
+                        <Activity className="w-16 h-16 text-slate-800 mx-auto mb-6" />
+                        <p className="text-slate-500 font-bold uppercase tracking-widest">No active protocols detected</p>
+                    </div>
+                ) : (
+                    <div className="grid gap-4">
+                        {activeVaults.map((vault) => (
+                            <Link
+                                key={vault.id}
+                                href={`/client/vault/${vault.id}`}
+                                className="group flex flex-col md:flex-row md:items-center justify-between p-8 bg-[#0A0A0A] border border-white/5 rounded-[32px] hover:border-emerald-500/50 hover:bg-[#0c0c0c] transition-all"
+                            >
+                                <div>
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <h4 className="text-xl font-black text-white uppercase tracking-tight">{vault.title}</h4>
+                                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest rounded-lg border border-emerald-500/10">
+                                            {vault.status}
+                                        </span>
+                                    </div>
+                                    <p className="text-slate-500 text-sm font-medium">{vault.freelancerEmail || 'Unassigned Talent'}</p>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                            <table className="w-full">
-                                <thead className="bg-slate-50 border-b border-slate-200">
-                                    <tr>
-                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Project</th>
-                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Contractor</th>
-                                        <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                                        <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Value</th>
-                                        <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {activeVaults.map((vault) => (
-                                        <tr key={vault.id} className="hover:bg-slate-50 transition-colors group">
-                                            <td className="px-6 py-4">
-                                                <div className="font-bold text-slate-900">{vault.title}</div>
-                                                <div className="text-slate-500 text-xs mt-0.5 truncate max-w-xs">{vault.description}</div>
-                                            </td>
-                                            <td className="px-6 py-4 text-slate-600 text-sm">
-                                                {vault.freelancerEmail || 'Unassigned'}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <StatusBadge status={vault.status} />
-                                            </td>
-                                            <td className="px-6 py-4 text-right font-bold text-slate-900 tabular-nums">
-                                                <AmountDisplay amount={vault.totalAmount || vault.amount} size="small" />
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <Link href={`/client/vault/${vault.id}`}>
-                                                    <Button variant="ghost" size="sm" className="gap-2 group-hover:text-blue-600">
-                                                        Details
-                                                        <ArrowRight className="w-4 h-4" />
-                                                    </Button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </section>
+
+                                <div className="flex items-center gap-12 mt-6 md:mt-0">
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-1">Contract Value</p>
+                                        <p className="text-2xl font-black text-white tabular-nums">
+                                            ${(vault.totalAmount || vault.amount).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-emerald-500 transition-all">
+                                        <ArrowUpRight className="w-6 h-6 text-slate-400 group-hover:text-black transition-colors" />
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
