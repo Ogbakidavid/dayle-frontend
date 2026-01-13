@@ -89,8 +89,40 @@ export default function BankTransferPage() {
     };
 
     const handleOtpKeyDown = (index, e) => {
-        if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            document.getElementById(`otp-${index - 1}`)?.focus();
+        if (e.key === 'Backspace') {
+            if (otp[index]) {
+                // If current box has value, clear it
+                const newOtp = [...otp];
+                newOtp[index] = '';
+                setOtp(newOtp);
+            } else if (index > 0) {
+                // If current box is empty, move to previous and clear it
+                const newOtp = [...otp];
+                newOtp[index - 1] = '';
+                setOtp(newOtp);
+                document.getElementById(`otp-${index - 1}`)?.focus();
+            }
+            e.preventDefault();
+        } else if (e.key === 'Delete') {
+            // Delete key clears current box
+            const newOtp = [...otp];
+            newOtp[index] = '';
+            setOtp(newOtp);
+            e.preventDefault();
+        }
+    };
+
+    const handleOtpPaste = (e) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text');
+        const cleaned = pastedData.replace(/\D/g, '').slice(0, 6);
+
+        if (cleaned.length === 6) {
+            const newOtp = cleaned.split('');
+            setOtp(newOtp);
+            setOtpError('');
+            // Focus the last input
+            document.getElementById('otp-5')?.focus();
         }
     };
 
@@ -156,6 +188,7 @@ export default function BankTransferPage() {
                                     otpError={otpError}
                                     onOtpChange={handleOtpChange}
                                     onOtpKeyDown={handleOtpKeyDown}
+                                    onOtpPaste={handleOtpPaste}
                                     onVerify={handleVerifyOtp}
                                     onResend={() => setOtpError('')}
                                 />
@@ -248,7 +281,7 @@ function Sidebar({ amount, onBack, showBackButton, transactionId, step }) {
     );
 }
 
-function VerificationScreen({ otp, otpError, onOtpChange, onOtpKeyDown, onVerify, onResend }) {
+function VerificationScreen({ otp, otpError, onOtpChange, onOtpKeyDown, onOtpPaste, onVerify, onResend }) {
     return (
         <motion.div key="verification" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md mx-auto space-y-8">
             <div className="text-center space-y-3">
@@ -266,10 +299,12 @@ function VerificationScreen({ otp, otpError, onOtpChange, onOtpKeyDown, onVerify
                             key={index}
                             id={`otp-${index}`}
                             type="text"
+                            inputMode="numeric"
                             maxLength={1}
                             value={digit}
                             onChange={(e) => onOtpChange(index, e.target.value)}
                             onKeyDown={(e) => onOtpKeyDown(index, e)}
+                            onPaste={index === 0 ? onOtpPaste : undefined}
                             className={`w-14 h-16 bg-white/[0.03] border ${otpError ? 'border-red-500' : 'border-white/10'} rounded-2xl text-center text-2xl font-bold text-white focus:border-emerald-500/50 outline-none transition-all`}
                         />
                     ))}
