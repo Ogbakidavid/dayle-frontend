@@ -90,14 +90,16 @@ export default function ClientLayout({ children }) {
 
                     {/* Quick Actions */}
                     <div className="grid grid-cols-2 gap-2 mt-4">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-9 text-xs border-gray-800 bg-black/30 hover:bg-gray-800 hover:border-gray-700 text-gray-300"
-                        >
-                            <Settings className="w-3.5 h-3.5 mr-2" />
-                            Settings
-                        </Button>
+                        <Link href="/settings">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-9 w-full text-xs border-gray-800 bg-black/30 hover:bg-gray-800 hover:border-gray-700 text-gray-300"
+                            >
+                                <Settings className="w-3.5 h-3.5 mr-2" />
+                                Settings
+                            </Button>
+                        </Link>
                         <Button
                             variant="outline"
                             size="sm"
