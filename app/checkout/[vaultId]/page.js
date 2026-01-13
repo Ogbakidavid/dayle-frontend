@@ -66,10 +66,27 @@ export default function PremiumDepositPage() {
 
     const handleCardSubmit = () => {
         const cleanNum = cardDetails.number.replace(/\D/g, "");
+        const newErrors = {};
+
         if (!validateCardNumber(cleanNum)) {
-            setErrors({ number: "Invalid card number" });
+            newErrors.number = "Invalid card number";
+        }
+        if (!cardDetails.name.trim()) {
+            newErrors.name = "Required";
+        }
+        if (!cardDetails.expiry || cardDetails.expiry.length < 5) {
+            newErrors.expiry = "Invalid date";
+        }
+        if (!cardDetails.cvc || cardDetails.cvc.length < 3) {
+            newErrors.cvc = "Invalid CVC";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             return;
         }
+
+        setErrors({}); // Clear errors if valid
         setIsProcessing(true);
         setTimeout(() => {
             if (cleanNum.endsWith("0000")) {
@@ -100,7 +117,7 @@ export default function PremiumDepositPage() {
                             <span className="text-white font-bold tracking-tighter text-lg uppercase">Skentral</span>
                         </div>
                         <div className="space-y-6">
-                            {step !== 'selection' && (
+                            {step !== 'selection' && step !== 'success' && (
                                 <button onClick={() => setStep('selection')} className="flex items-center gap-2 text-slate-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest">
                                     <ArrowLeft className="w-3.5 h-3.5" /> Change Method
                                 </button>
@@ -173,10 +190,10 @@ export default function PremiumDepositPage() {
                                     <div className="space-y-6">
                                         <div className="space-y-4">
                                             <InputField label="Card Number" value={cardDetails.number} error={errors.number} onChange={(e) => handleInputChange("number", e.target.value)} placeholder="0000 0000 0000 0000" />
-                                            <InputField label="Cardholder Name" onChange={(e) => handleInputChange("name", e.target.value.toUpperCase())} placeholder="JOHN DOE" />
+                                            <InputField label="Cardholder Name" value={cardDetails.name} error={errors.name} onChange={(e) => handleInputChange("name", e.target.value.toUpperCase())} placeholder="JOHN DOE" />
                                             <div className="grid grid-cols-2 gap-4">
-                                                <InputField label="Expiry" value={cardDetails.expiry} onChange={(e) => handleInputChange("expiry", e.target.value)} placeholder="MM/YY" />
-                                                <InputField label="CVC" type="password" onChange={(e) => handleInputChange("cvc", e.target.value)} placeholder="•••" />
+                                                <InputField label="Expiry" value={cardDetails.expiry} error={errors.expiry} onChange={(e) => handleInputChange("expiry", e.target.value)} placeholder="MM/YY" />
+                                                <InputField label="CVC" type="password" value={cardDetails.cvc} error={errors.cvc} onChange={(e) => handleInputChange("cvc", e.target.value)} placeholder="•••" />
                                             </div>
                                         </div>
                                         <button onClick={handleCardSubmit} className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-lg rounded-2xl shadow-xl transition-all active:scale-[0.98]">Deposit ${amount}</button>
