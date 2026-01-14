@@ -3,24 +3,20 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Shield, LayoutDashboard, Plus, Wallet, LogOut, Settings, Bell, Search, ChevronDown, PieChart, FileText, Users, CreditCard, Lock, HelpCircle } from 'lucide-react';
+import { Shield, LayoutDashboard, Briefcase, Wallet, LogOut, Settings, Bell, Search, ChevronDown, PieChart, FileText, CheckCircle } from 'lucide-react';
 import { useUser } from '@/lib/store/user-context';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 const navigation = [
-    { name: 'Overview', href: '/client', icon: LayoutDashboard, badge: null },
-    { name: 'Vaults', href: '/client/vaults', icon: Lock, badge: '3' },
-    { name: 'Create Vault', href: '/client/create-vault', icon: Plus, badge: null },
-    { name: 'Transactions', href: '/client/transactions', icon: CreditCard, badge: null },
-    // { name: 'Team', href: '/client/team', icon: Users, badge: null },
-    // { name: 'Documents', href: '/client/documents', icon: FileText, badge: null },
+    { name: 'Overview', href: '/freelancer', icon: LayoutDashboard, badge: null },
+    { name: 'Active Work', href: '/freelancer/active-work', icon: Briefcase, badge: '2' },
+    { name: 'Wallet', href: '/freelancer/wallet', icon: Wallet, badge: null },
 ];
 
-export default function ClientLayout({ children }) {
+export default function FreelancerLayout({ children }) {
     const pathname = usePathname();
     const { user, logout } = useUser();
-    const [userMenuOpen, setUserMenuOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-[#0A0A0A] text-gray-200 flex">
@@ -28,7 +24,7 @@ export default function ClientLayout({ children }) {
             <aside className="w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col sticky top-0 h-screen">
                 {/* Logo & Brand */}
                 <div className="p-6 pb-4">
-                    <Link href="/client" className="flex items-center gap-3 group">
+                    <Link href="/freelancer" className="flex items-center gap-3 group">
                         <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-emerald-500/20">
                             <Shield className="w-5 h-5 text-black" strokeWidth={2.5} />
                         </div>
@@ -73,6 +69,14 @@ export default function ClientLayout({ children }) {
                     })}
                 </nav>
 
+                {/* Status Indicator (Activated) */}
+                <div className="px-6 py-4 mx-4 mb-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
+                    <div className="flex items-center gap-2 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-1">
+                        <CheckCircle className="w-3 h-3" /> Activated
+                    </div>
+                    <p className="text-[10px] text-gray-500 leading-tight">Approved for Active Vault Access</p>
+                </div>
+
                 {/* User Section */}
                 <div className="p-4 border-t border-gray-900 mt-auto">
                     <div className="flex items-center gap-3 p-3 rounded-lg">
@@ -80,18 +84,18 @@ export default function ClientLayout({ children }) {
                             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-white">{user?.name || 'Alex Johnson'}</p>
-                            <p className="text-xs text-gray-500">Administrator</p>
+                            <p className="text-sm font-medium text-white">{user?.name || 'Jane Smith'}</p>
+                            <p className="text-xs text-gray-500 italic">Freelancer</p>
                         </div>
                     </div>
 
                     {/* Quick Actions */}
                     <div className="grid grid-cols-2 gap-2 mt-4">
-                        <Link href="/settings">
+                        <Link href="/freelancer/settings">
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-full text-xs border-gray-800 bg-black/30 hover:bg-gray-800 hover:border-gray-700 text-gray-300"
+                                className="h-9 w-full text-xs border-gray-800 bg-black/30 hover:bg-gray-800 hover:border-gray-800 text-gray-300 font-medium"
                             >
                                 <Settings className="w-3.5 h-3.5 mr-2" />
                                 Settings
@@ -101,7 +105,7 @@ export default function ClientLayout({ children }) {
                             variant="outline"
                             size="sm"
                             onClick={logout}
-                            className="h-9 text-xs border-gray-800 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
+                            className="h-9 text-xs border-gray-800 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 font-medium"
                         >
                             <LogOut className="w-3.5 h-3.5 mr-2" />
                             Sign out

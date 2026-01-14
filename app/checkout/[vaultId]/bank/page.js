@@ -170,8 +170,6 @@ export default function BankTransferPage() {
                 {/* LEFT SIDEBAR */}
                 <Sidebar
                     amount={amount}
-                    onBack={() => router.push(`/checkout/${params.vaultId}`)}
-                    showBackButton={step === 'verification' || step === 'instructions'}
                     transactionId={transactionId}
                     step={step}
                 />
@@ -179,6 +177,17 @@ export default function BankTransferPage() {
                 {/* RIGHT CONTENT AREA */}
                 <main className="flex-1 p-8 lg:p-20 flex items-center justify-center">
                     <div className="max-w-5xl w-full">
+                        {/* Back Button */}
+                        {(step === 'verification' || step === 'instructions') && (
+                            <button
+                                onClick={() => router.push(`/checkout/${params.vaultId}`)}
+                                className="flex items-center gap-2 text-slate-500 hover:text-emerald-500 transition-all text-sm font-medium mb-8 group"
+                            >
+                                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                                Change Payment Method
+                            </button>
+                        )}
+
                         <AnimatePresence mode="wait">
 
                             {/* VERIFICATION SCREEN */}
@@ -243,7 +252,7 @@ export default function BankTransferPage() {
 
 // --- COMPONENTS ---
 
-function Sidebar({ amount, onBack, showBackButton, transactionId, step }) {
+function Sidebar({ amount, transactionId, step }) {
     return (
         <section className="w-full lg:w-[25%] bg-[#080808] p-10 border-r border-white/5 flex flex-col justify-between">
             <div className="space-y-12">
@@ -251,14 +260,9 @@ function Sidebar({ amount, onBack, showBackButton, transactionId, step }) {
                     <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
                         <Lock className="w-4 h-4 text-black" />
                     </div>
-                    <span className="text-white font-bold tracking-tighter text-lg uppercase">Skentral</span>
+                    <span className="text-white font-bold tracking-tighter text-lg uppercase">Cleard</span>
                 </div>
                 <div className="space-y-6">
-                    {showBackButton && (
-                        <button onClick={onBack} className="flex items-center gap-2 text-slate-500 hover:text-white transition-all text-xs font-black uppercase tracking-widest">
-                            <ArrowLeft className="w-3.5 h-3.5" /> Change Method
-                        </button>
-                    )}
                     <div className="space-y-1">
                         <p className="text-xs font-black uppercase text-slate-600 tracking-[0.2em]">Payable Amount</p>
                         <h1 className="text-5xl font-bold text-white tracking-tighter">${amount.toLocaleString()}</h1>
@@ -266,7 +270,7 @@ function Sidebar({ amount, onBack, showBackButton, transactionId, step }) {
                     {step !== 'verification' && (
                         <div className="pt-4 border-t border-white/5">
                             <p className="text-xs font-black uppercase text-slate-600 tracking-[0.2em] mb-1">Transaction ID</p>
-                            <p className="text-xs font-mono text-slate-400">{transactionId}</p>
+                            <p className="text-xs text-slate-400">{transactionId}</p>
                         </div>
                     )}
                 </div>
@@ -326,7 +330,7 @@ function VerificationScreen({ otp, otpError, onOtpChange, onOtpKeyDown, onOtpPas
             </div>
 
             <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-                <p className="text-xs text-blue-400 text-center font-bold">💡 Demo: Use code <span className="font-mono">123456</span></p>
+                <p className="text-xs text-blue-400 text-center font-bold">💡 Demo: Use code <span className="font-bold">123456</span></p>
             </div>
         </motion.div>
     );
@@ -340,7 +344,7 @@ function PaymentInstructionsScreen({ amount, transactionId, timeRemaining, forma
                 <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20">
                     <Building2 className="text-emerald-500 w-8 h-8" />
                 </div>
-                <h4 className="text-2xl font-bold text-white">Wire Instructions</h4>
+                <h4 className="text-2xl font-bold text-white">Transfer Instructions</h4>
                 <p className="text-sm text-slate-500 leading-relaxed font-medium">
                     Transfer the exact amount to the virtual account below. Include the reference code to ensure automatic processing.
                 </p>
@@ -358,7 +362,7 @@ function PaymentInstructionsScreen({ amount, transactionId, timeRemaining, forma
             {/* BANK DETAILS */}
             <div className="space-y-6">
                 <div className="bg-white/[0.02] border border-white/5 rounded-3xl divide-y divide-white/5 overflow-hidden">
-                    <BankInfo label="Bank Name" value="Skentral Trust Bank" />
+                    <BankInfo label="Bank Name" value="Cleard Trust Bank" />
                     <BankInfo label="Account Number" value="9920 1120 4452" copy onCopy={() => onCopy("9920 1120 4452", "account")} copied={copied === "account"} />
                     <BankInfo label="Routing Number" value="121000358" copy onCopy={() => onCopy("121000358", "routing")} copied={copied === "routing"} />
                     <BankInfo label="Amount" value={`$${amount.toLocaleString()}`} highlight />
@@ -537,7 +541,7 @@ function ProcessingStatusScreen({ status, transactionId, amount }) {
                                         {step.label}
                                     </h4>
                                     {step.timestamp && (
-                                        <span className="text-xs text-slate-500 font-mono whitespace-nowrap">{step.timestamp}</span>
+                                        <span className="text-xs text-slate-500 whitespace-nowrap">{step.timestamp}</span>
                                     )}
                                 </div>
                                 <p className={`text-sm transition-colors ${step.status === 'completed' || step.status === 'current' ? 'text-slate-400' : 'text-slate-600'
@@ -609,7 +613,7 @@ function SuccessScreen({ amount, transactionId, onContinue }) {
                 <div className="pt-4 border-t border-white/5">
                     <div className="flex justify-between items-center">
                         <span className="text-xs text-slate-600 font-bold uppercase tracking-widest">Transaction ID</span>
-                        <span className="text-xs font-mono text-slate-400">{transactionId}</span>
+                        <span className="text-xs text-slate-400">{transactionId}</span>
                     </div>
                 </div>
             </div>
@@ -669,7 +673,7 @@ function BankInfo({ label, value, copy, onCopy, copied, highlight }) {
         <div className="p-5 flex justify-between items-center">
             <div>
                 <p className="text-xs font-black uppercase text-slate-600 tracking-widest mb-1">{label}</p>
-                <p className={`font-mono text-sm ${highlight ? 'text-emerald-500 font-bold' : 'text-white'}`}>{value}</p>
+                <p className={`text-sm ${highlight ? 'text-emerald-500 font-bold' : 'text-white'}`}>{value}</p>
             </div>
             {copy && (
                 <button onClick={onCopy} className="group relative">

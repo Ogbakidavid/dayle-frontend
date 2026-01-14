@@ -97,11 +97,22 @@ export default function CardPaymentPage() {
 
             <div className="flex flex-col lg:flex-row min-h-screen">
                 {/* LEFT SIDEBAR */}
-                <Sidebar amount={amount} onBack={() => router.push(`/checkout/${params.vaultId}`)} showBackButton={step === 'form'} />
+                <Sidebar amount={amount} />
 
                 {/* RIGHT CONTENT AREA */}
                 <main className="flex-1 p-8 lg:p-20 flex items-center justify-center">
                     <div className="max-w-5xl w-full">
+                        {/* Back Button */}
+                        {step === 'form' && (
+                            <button
+                                onClick={() => router.push(`/checkout/${params.vaultId}`)}
+                                className="flex items-center gap-2 text-slate-500 hover:text-emerald-500 transition-all text-sm font-medium mb-8 group"
+                            >
+                                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                                Change Payment Method
+                            </button>
+                        )}
+
                         <AnimatePresence mode="wait">
                             {step === 'form' && (
                                 <motion.div key="card" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="grid lg:grid-cols-2 gap-20 items-center">
@@ -127,7 +138,7 @@ export default function CardPaymentPage() {
                                                 {!cardDetails.type && <span className="font-black italic text-xl opacity-80">CARD</span>}
                                             </div>
                                             <div className="space-y-6">
-                                                <p className="text-2xl font-mono tracking-[0.2em]">{cardDetails.number || "•••• •••• •••• ••••"}</p>
+                                                <p className="text-2xl tracking-[0.2em]">{cardDetails.number || "•••• •••• •••• ••••"}</p>
                                                 <div className="flex justify-between text-xs font-black uppercase tracking-widest">
                                                     <div><p className="opacity-50 mb-1">Holder</p><p className="text-sm tracking-normal">{cardDetails.name || "YOUR NAME"}</p></div>
                                                     <div className="text-right"><p className="opacity-50 mb-1">Expiry</p><p className="text-sm tracking-normal">{cardDetails.expiry || "MM/YY"}</p></div>
@@ -162,7 +173,7 @@ export default function CardPaymentPage() {
 
 // --- COMPONENTS ---
 
-function Sidebar({ amount, onBack, showBackButton }) {
+function Sidebar({ amount }) {
     return (
         <section className="w-full lg:w-[25%] bg-[#080808] p-10 border-r border-white/5 flex flex-col justify-between">
             <div className="space-y-12">
@@ -170,14 +181,9 @@ function Sidebar({ amount, onBack, showBackButton }) {
                     <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
                         <Lock className="w-4 h-4 text-black" />
                     </div>
-                    <span className="text-white font-bold tracking-tighter text-lg uppercase">Skentral</span>
+                    <span className="text-white font-bold tracking-tighter text-lg uppercase">Cleard</span>
                 </div>
                 <div className="space-y-6">
-                    {showBackButton && (
-                        <button onClick={onBack} className="flex items-center gap-2 text-slate-500 hover:text-white transition-all text-xs font-black uppercase tracking-widest">
-                            <ArrowLeft className="w-3.5 h-3.5" /> Change Method
-                        </button>
-                    )}
                     <div className="space-y-1">
                         <p className="text-xs font-black uppercase text-slate-600 tracking-[0.2em]">Payable Amount</p>
                         <h1 className="text-5xl font-bold text-white tracking-tighter">${amount.toLocaleString()}</h1>
@@ -196,9 +202,9 @@ function Sidebar({ amount, onBack, showBackButton }) {
 
 function InputField({ label, error, ...props }) {
     return (
-        <div className="space-y-1.5">
+        <div className="space-y-3">
             <label className="text-xs font-black uppercase text-slate-600 tracking-widest ml-1">{label}</label>
-            <input {...props} className={`w-full bg-white/[0.03] border ${error ? 'border-red-500' : 'border-white/10'} h-14 rounded-2xl px-5 text-white focus:border-emerald-500/50 outline-none transition-all`} />
+            <input {...props} className={`w-full bg-white/[0.03] border ${error ? 'border-red-500' : 'border-white/10'} h-14 rounded-2xl px-4 text-white focus:border-emerald-500/50 outline-none transition-all`} />
             {error && <p className="text-xs text-red-500 font-bold ml-1">{error}</p>}
         </div>
     );
@@ -246,7 +252,7 @@ function SuccessScreen({ onContinue }) {
             </div>
             <div className="space-y-2">
                 <h2 className="text-4xl font-bold text-white tracking-tight">Deposit Locked</h2>
-                <p className="text-slate-500">Milestone #1 is now fully funded. Funds are held securely in Skentral Escrow.</p>
+                <p className="text-slate-500">Milestone #1 is now fully funded. Funds are held securely in Cleard Escrow.</p>
             </div>
             <button onClick={onContinue} className="w-full h-16 bg-white text-black font-bold text-lg rounded-2xl hover:bg-slate-200 transition-all shadow-xl">Continue to Dashboard</button>
         </motion.div>

@@ -84,7 +84,7 @@ export default function InteractiveCard({
                         <div className="space-y-6">
                             <div className="space-y-1">
                                 <motion.p
-                                    className="text-2xl text-white font-mono tracking-[0.15em] drop-shadow-md min-h-[32px]"
+                                    className="text-2xl text-white tracking-[0.15em] drop-shadow-md min-h-[32px]"
                                     key={cardNumber}
                                     initial={{ opacity: 0.5, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -127,7 +127,7 @@ export default function InteractiveCard({
                                 <span className="text-xs text-gray-400 mr-2 uppercase">Security Code</span>
                             </div>
                             <div className="h-10 bg-white flex items-center justify-end px-3 rounded-sm">
-                                <span className="text-black font-mono font-bold tracking-widest text-lg">
+                                <span className="text-black font-bold tracking-widest text-lg">
                                     {cvc || '•••'}
                                 </span>
                             </div>
