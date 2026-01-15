@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Shield, Clock, DollarSign, Lock, AlertTriangle, FileText, Cpu, Scale, History,
-    ExternalLink, Flag, CheckCircle2, XCircle, Orbit, ArrowLeft, TrendingUp, Sparkles, X
+    ExternalLink, Flag, CheckCircle2, XCircle, Orbit, ArrowLeft, TrendingUp, Sparkles, X, ChevronRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
@@ -102,10 +102,6 @@ const milestonesInitial = [
     }
 ];
 
-function CheckIcon({ passed }) {
-    return passed ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-red-500" />;
-}
-
 export default function ClientVaultPage() {
     const router = useRouter();
     const [expandedId, setExpandedId] = useState(3);
@@ -114,6 +110,19 @@ export default function ClientVaultPage() {
 
     const handleRaiseDispute = (id) => {
         setMilestones(ms => ms.map(m => m.id === id ? { ...m, disputeRaised: true, status: 'DISPUTED' } : m));
+    };
+
+    const handleApprove = (id) => {
+        setMilestones(ms => ms.map(m =>
+            m.id === id
+                ? {
+                    ...m,
+                    status: 'RELEASED',
+                    timestamp: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) + ' UTC',
+                    notes: 'Capital released manually by client approval.'
+                }
+                : m
+        ));
     };
 
     const releasedCapital = milestones
@@ -125,278 +134,278 @@ export default function ClientVaultPage() {
         .reduce((sum, m) => sum + m.amount, 0);
 
     return (
-        <div className="max-w-7xl mx-auto p-6 space-y-10 font-sans selection:bg-emerald-500/30">
-            {/* COMPACT DASHBOARD HEADER */}
-            <div className="flex justify-between items-end border-b border-white/5 pb-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-4">
+        <div className="min-h-screen text-white font-sans selection:bg-emerald-500/30">
+            <div className="max-w-[1400px] mx-auto p-6 space-y-8">
+
+                {/* COMPACT HEADER */}
+                <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/5 pb-6">
+                    <div className="flex items-center gap-5">
                         <button
                             onClick={() => router.push('/client')}
-                            className="bg-white/5 hover:bg-white/10 p-2 rounded-lg transition-colors group"
+                            className="h-10 w-10 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
                         >
-                            <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-white" />
+                            <ArrowLeft className="w-5 h-5 text-gray-400" />
                         </button>
-                        <h1 className="text-3xl font-bold tracking-tighter text-white">
-                            {VAULT_DATA.title}
-                        </h1>
-                        <span className="px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
-                            {VAULT_DATA.status}
-                        </span>
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-bold text-emerald-500 uppercase">Vault Protocol</span>
+                                <div className="h-1 w-1 rounded-full bg-white/20" />
+                                <span className="text-xs font-bold text-gray-500 uppercase">{VAULT_DATA.id}</span>
+                            </div>
+                            <h1 className="text-2xl font-bold tracking-tight">{VAULT_DATA.title}</h1>
+                        </div>
                     </div>
-                    <p className="text-sm text-gray-500 font-medium ml-14">
-                        Managed by <span className="text-gray-200 font-semibold">{VAULT_DATA.custodian}</span> • <span className="font-mono text-[10px] opacity-60">ID: {VAULT_DATA.id}</span>
-                    </p>
-                </div>
-            </div>
 
-            <div className="grid lg:grid-cols-12 gap-8">
-                {/* LEDGER */}
-                <div className="lg:col-span-8 space-y-10">
-                    <div className="space-y-6">
+                    <div className="flex items-center gap-6 bg-white/5 border border-white/10 p-2 pl-5 rounded-full">
+                        <div className="text-right">
+                            <p className="text-[10px] font-bold text-gray-500 uppercase">Custodian Agency</p>
+                            <p className="text-sm font-semibold">{VAULT_DATA.custodian}</p>
+                        </div>
+                        <div className="h-9 w-9 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                            <Shield className="w-4 h-4 text-emerald-500" />
+                        </div>
+                    </div>
+                </header>
+
+                <div className="grid lg:grid-cols-12 gap-8">
+                    {/* LEFT COLUMN: SETTLEMENT LEDGER */}
+                    <div className="lg:col-span-8 space-y-6">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                                <Orbit className="w-5 h-5 text-emerald-500 animate-pulse" />
+                            <h2 className="text-sm font-bold uppercase flex items-center gap-3 text-white">
+                                <Orbit className="w-4 h-4 text-emerald-500" />
                                 Settlement Ledger
                             </h2>
+                            <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-[10px] font-bold text-gray-400 uppercase">Live Sync</span>
+                            </div>
                         </div>
 
-                        {milestones.map(m => (
-                            <div key={m.id} className={cn(
-                                "group border rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl",
-                                m.status === 'RELEASED' ? "bg-[#0A0F0A] border-emerald-500/10" : "bg-[#111111] border-white/5",
-                                expandedId === m.id ? "ring-1 ring-white/10" : "hover:border-white/10"
-                            )}>
+                        <div className="space-y-4">
+                            {milestones.map((m, index) => (
                                 <div
-                                    onClick={() => setExpandedId(expandedId === m.id ? null : m.id)}
-                                    className="p-5 flex justify-between cursor-pointer items-center"
+                                    key={m.id}
+                                    className={cn(
+                                        "group relative rounded-xl transition-all duration-300 border shadow-sm",
+                                        m.status === 'RELEASED' ? "bg-emerald-500/[0.02] border-emerald-500/20" : "bg-[#111111] border-white/5",
+                                        expandedId === m.id && "bg-[#161616] border-white/10 ring-1 ring-white/5 shadow-xl"
+                                    )}
                                 >
-                                    <div className="flex items-center gap-5">
-                                        <div className={cn(
-                                            "w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs border transition-all duration-500",
-                                            m.status === 'RELEASED' ? "bg-emerald-500 border-emerald-400 text-black translate-x-1" : "bg-black/40 border-white/5 text-gray-400"
-                                        )}>
-                                            {m.status === 'RELEASED' ? <CheckCircle2 className="w-5 h-5" /> : `0${m.id}`}
+                                    <div
+                                        onClick={() => setExpandedId(expandedId === m.id ? null : m.id)}
+                                        className="p-5 cursor-pointer flex items-center justify-between"
+                                    >
+                                        <div className="flex items-center gap-5">
+                                            <div className={cn(
+                                                "w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border transition-all duration-300",
+                                                m.status === 'RELEASED' ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500" : "bg-black/40 border-white/10 text-gray-500"
+                                            )}>
+                                                {m.status === 'RELEASED' ? <CheckCircle2 className="w-5 h-5" /> : <span className="font-mono text-sm">0{index + 1}</span>}
+                                            </div>
+                                            <div>
+                                                <h3 className={cn("text-base font-bold tracking-tight mb-0.5", m.status === 'RELEASED' ? "text-emerald-400" : "text-white")}>{m.title}</h3>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-xs font-bold text-white bg-white/5 px-2 py-0.5 rounded border border-white/5">${m.amount.toLocaleString()}</span>
+                                                    <span className="text-[10px] font-bold text-gray-500 uppercase">{m.authority.replace('AI + ', '')}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className={cn(
-                                                "text-base font-bold tracking-tight transition-colors",
-                                                m.status === 'RELEASED' ? "text-emerald-500" : "text-white"
-                                            )}>{m.title}</p>
-                                            <p className="text-xs text-gray-500 font-medium mt-0.5">${m.amount.toLocaleString()} Allocation</p>
+                                        <div className="flex items-center gap-4">
+                                            <span className={cn(
+                                                "text-[10px] font-bold uppercase px-3 py-1 rounded-full border",
+                                                m.status === 'RELEASED' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                                                    m.status === 'UNDER_REVIEW' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" : "bg-white/5 text-gray-500 border-white/10"
+                                            )}>
+                                                {m.status.replace('_', ' ')}
+                                            </span>
+                                            <ChevronRight className={cn("w-4 h-4 text-gray-600 transition-transform duration-300", expandedId === m.id && "rotate-90 text-white")} />
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-6">
-                                        <span className={cn(
-                                            "text-[10px] font-black uppercase tracking-[0.25em] px-3 py-1 rounded-full border shadow-sm",
-                                            m.status === 'RELEASED' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-white/5 text-gray-500 border-white/5"
-                                        )}>
-                                            {m.status.replace('_', ' ')}
-                                        </span>
-                                    </div>
-                                </div>
 
-                                {expandedId === m.id && (
-                                    <div className="p-6 border-t border-white/5 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
-                                        <div className="flex gap-4">
-                                            <div className="flex-1 space-y-4">
-                                                <div className="flex gap-3">
-                                                    <Cpu className="w-4 h-4 text-emerald-500" />
-                                                    <div>
-                                                        <p className="text-[10px] uppercase text-gray-500 font-black tracking-widest">Verification Authority</p>
-                                                        <p className="text-sm text-white font-semibold">{m.authority}</p>
+                                    {expandedId === m.id && (
+                                        <div className="px-5 pb-5 pt-0 animate-in fade-in slide-in-from-top-2">
+                                            <div className="h-px w-full bg-white/5 mb-5" />
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                                <div className="space-y-4">
+                                                    {m.aiChecks && m.aiChecks.length > 0 && (
+                                                        <div className="bg-black/40 border border-white/5 rounded-xl p-4">
+                                                            <div className="flex items-center justify-between mb-4">
+                                                                <div className="flex items-center gap-2">
+                                                                    <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                                                                    <span className="text-[10px] font-bold uppercase text-white">Objective AI Audit</span>
+                                                                </div>
+                                                                <span className="text-[9px] text-emerald-500 font-bold px-1.5 py-0.5 bg-emerald-500/10 rounded">v2.4 Ready</span>
+                                                            </div>
+                                                            <div className="space-y-3">
+                                                                {m.aiChecks.map((c, i) => (
+                                                                    <div key={i} className="flex justify-between items-center group/check">
+                                                                        <span className={cn("text-xs font-medium transition-colors", c.passed ? 'text-gray-300' : 'text-red-400')}>{c.label}</span>
+                                                                        <div className={cn("w-4 h-4 rounded flex items-center justify-center border", c.passed ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500" : "bg-red-500/10 border-red-500/30 text-red-500")}>
+                                                                            {c.passed ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
+                                                        <p className="text-xs text-gray-400 leading-relaxed font-medium">"{m.notes}"</p>
                                                     </div>
                                                 </div>
 
-                                                {m.aiChecks && m.aiChecks.length > 0 && (
-                                                    <div className="bg-black/40 border border-white/5 rounded-xl p-4 space-y-2">
-                                                        <p className="text-[10px] uppercase text-gray-600 font-black tracking-[0.2em] mb-3 flex items-center gap-2">
-                                                            <Sparkles className="w-3 h-3" /> Audit Criteria
-                                                        </p>
-                                                        {m.aiChecks.map((c, i) => (
-                                                            <div key={i} className="flex items-center gap-2 text-sm">
-                                                                <CheckIcon passed={c.passed} />
-                                                                <span className={cn("font-medium", c.passed ? 'text-gray-300' : 'text-red-400')}>{c.label}</span>
-                                                            </div>
-                                                        ))}
+                                                <div className="space-y-4">
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        {(m.status === 'UNDER_REVIEW' || m.status === 'SUBMITTED' || m.status === 'RELEASED') && (
+                                                            <Button variant="outline" className="rounded-xl border-white/10 bg-white/5 h-10 text-[10px] font-bold uppercase hover:bg-white/10 hover:text-white transition-all" onClick={() => setViewingEvidence(m)}>
+                                                                <FileText className="w-3.5 h-3.5 mr-2" /> Evidence
+                                                            </Button>
+                                                        )}
+                                                        {(m.status === 'UNDER_REVIEW' || m.status === 'SUBMITTED') && (
+                                                            <Button
+                                                                className={cn("rounded-xl h-10 text-[10px] font-bold uppercase", m.aiChecks.every(c => c.passed) ? "bg-emerald-500 text-black hover:bg-emerald-400" : "bg-white/5 text-gray-500 pointer-events-none")}
+                                                                onClick={() => handleApprove(m.id)}
+                                                            >
+                                                                <Shield className="w-3.5 h-3.5 mr-2" /> Release
+                                                            </Button>
+                                                        )}
                                                     </div>
-                                                )}
 
-                                                <div className="text-xs text-gray-400 font-medium leading-relaxed italic">{m.notes}</div>
-
-                                                <div className="flex gap-3 pt-2">
-                                                    {(m.status === 'UNDER_REVIEW' || m.status === 'SUBMITTED' || m.status === 'RELEASED') && (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            className="rounded-xl border-white/10 hover:bg-white/5 h-10 px-6 text-[10px] font-black uppercase tracking-widest"
-                                                            onClick={() => setViewingEvidence(m)}
-                                                        >
-                                                            <FileText className="w-3 h-3 mr-2" />
-                                                            View Evidence
-                                                        </Button>
-                                                    )}
-                                                    {m.status === 'UNDER_REVIEW' && !m.disputeRaised && (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-xl h-10 px-6 text-[10px] font-black uppercase tracking-widest"
-                                                            onClick={() => handleRaiseDispute(m.id)}
-                                                        >
-                                                            <Flag className="w-3 h-3 mr-2" />
-                                                            Raise Dispute
-                                                        </Button>
-                                                    )}
                                                     {m.status === 'UNDER_REVIEW' && (
-                                                        <div className="text-[10px] text-gray-500 flex items-center gap-1.5 font-bold uppercase tracking-widest bg-white/5 px-3 rounded-xl h-10">
-                                                            <Clock className="w-3 h-3" /> Dispute window: {m.disputeWindowHours}h
+                                                        <div className="space-y-3">
+                                                            <div className="bg-[#120f0a] border border-amber-500/20 p-4 rounded-xl relative overflow-hidden">
+                                                                <div className="relative z-10 mb-3">
+                                                                    <p className="text-[10px] font-bold text-amber-500 uppercase mb-1">Auto-Settlement</p>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <Clock className="w-3.5 h-3.5 text-amber-500" />
+                                                                        <span className="text-xl font-bold text-amber-500 tracking-tight tabular-nums">47H 59M</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="h-1 bg-amber-500/10 rounded-full overflow-hidden relative z-10">
+                                                                    <div className="h-full bg-amber-500 w-[65%]" />
+                                                                </div>
+                                                            </div>
+
+                                                            <Button
+                                                                onClick={() => handleRaiseDispute(m.id)}
+                                                                className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 hover:border-red-500/30 h-10 rounded-xl text-[10px] font-bold uppercase transition-all"
+                                                            >
+                                                                <Flag className="w-3.5 h-3.5 mr-2" />
+                                                                Raise Dispute & Halt Release
+                                                            </Button>
+                                                        </div>
+                                                    )}
+
+                                                    {m.status === 'RELEASED' && (
+                                                        <div className="flex items-center gap-3 p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
+                                                            <div className="h-8 w-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                                                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-[10px] font-bold text-emerald-500 uppercase">Settlement Finalized</p>
+                                                                <p className="text-[10px] text-gray-400 font-medium opacity-80">{m.timestamp}</p>
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-                                        {m.status === 'RELEASED' && (
-                                            <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl flex gap-3 shadow-lg">
-                                                <Shield className="w-5 h-5 text-emerald-500 shrink-0" />
-                                                <p className="text-[10px] text-emerald-500 leading-relaxed font-bold uppercase tracking-tight">
-                                                    Capital released on {m.timestamp}. Action is final and irreversible via Cleard Protocol.
-                                                </p>
-                                            </div>
-                                        )}
+                    {/* RIGHT COLUMN: FINANCIAL STATS */}
+                    <aside className="lg:col-span-4 space-y-6">
+                        <div className="bg-[#111111] border border-white/5 rounded-2xl p-6 space-y-8 shadow-xl sticky top-6">
+                            <div>
+                                <h3 className="text-[10px] font-bold uppercase text-gray-500 mb-4 flex items-center gap-2">
+                                    <DollarSign className="w-4 h-4 text-emerald-500" /> Capital Summary
+                                </h3>
+                                <div className="space-y-1 mb-6">
+                                    <p className="text-4xl font-bold tracking-tight text-white">${releasedCapital.toLocaleString()}</p>
+                                    <p className="text-[10px] font-bold text-emerald-500 uppercase">Total Settled Capital</p>
+                                </div>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center text-[10px] font-bold uppercase">
+                                        <span className="text-gray-500">Pipeline Flow</span>
+                                        <span className="text-white">${pendingCapital.toLocaleString()}</span>
                                     </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* PREMIUM SUMMARY BAR */}
-                <div className="lg:col-span-4 space-y-6">
-                    <div className="bg-[#111111] border border-white/5 p-6 rounded-3xl space-y-8 shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-1000">
-                            <TrendingUp className="w-24 h-24 text-emerald-500" />
-                        </div>
-
-                        <div className="space-y-2">
-                            <h3 className="text-[10px] uppercase text-gray-500 font-black tracking-[0.3em] flex items-center gap-2">
-                                <DollarSign className="w-4 h-4 text-emerald-500" /> Capital Summary
-                            </h3>
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-3xl font-black text-white tracking-tighter">${releasedCapital.toLocaleString()}</span>
-                                <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Settled</span>
-                            </div>
-                        </div>
-
-                        <div className="space-y-6 pt-6 border-t border-white/5">
-                            <div className="flex justify-between items-center group/item cursor-help">
-                                <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Vault Pipeline</span>
-                                <span className="text-lg font-bold text-gray-200 group-hover/item:text-emerald-500 transition-colors">${pendingCapital.toLocaleString()}</span>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                                    <span className="text-gray-600">Total Escrowed</span>
-                                    <span className="text-white">${VAULT_DATA.totalCapital.toLocaleString()}</span>
-                                </div>
-                                <div className="h-1.5 bg-black rounded-full overflow-hidden shadow-inner border border-white/5">
-                                    <div
-                                        className="h-full bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all duration-[2000ms] ease-out rounded-full"
-                                        style={{ width: `${(releasedCapital / VAULT_DATA.totalCapital) * 100}%` }}
-                                    />
+                                    <div className="h-1.5 bg-black rounded-full overflow-hidden border border-white/5">
+                                        <div
+                                            className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all duration-1000"
+                                            style={{ width: `${(releasedCapital / VAULT_DATA.totalCapital) * 100}%` }}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between items-center text-[10px] font-bold uppercase pt-1">
+                                        <span className="text-gray-500">Vault Capacity</span>
+                                        <span className="text-white">${VAULT_DATA.totalCapital.toLocaleString()}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl flex gap-3 mt-6 shadow-lg">
-                            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-                            <p className="text-[10px] text-amber-500 leading-relaxed font-bold uppercase tracking-tight">
-                                AI-Driven Release: Funds are released automatically upon verification. Manual approval is disabled.
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* COMPLIANCE NODE */}
-                    <div className="bg-[#111111] border border-white/5 p-6 rounded-3xl space-y-6">
-                        <h3 className="text-[10px] uppercase text-gray-500 font-black tracking-[0.3em] flex items-center gap-2">
-                            <Scale className="w-4 h-4 text-gray-600" /> Compliance Node
-                        </h3>
-                        <div className="space-y-5">
-                            <div className="group">
-                                <p className="text-[10px] uppercase text-gray-700 font-black tracking-widest mb-1 group-hover:text-emerald-500 transition-colors">Protocol</p>
-                                <p className="text-sm text-gray-200 font-bold">Objective AI v2.4 <span className="text-[10px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded ml-2 uppercase">Online</span></p>
-                            </div>
-                            <div className="group">
-                                <p className="text-[10px] uppercase text-gray-700 font-black tracking-widest mb-1 group-hover:text-amber-500 transition-colors">Custodian</p>
-                                <p className="text-sm text-gray-200 font-bold">{VAULT_DATA.custodian}</p>
+                            <div className="pt-6 border-t border-white/5 space-y-4">
+                                <div className="flex items-start gap-3">
+                                    <Scale className="w-4 h-4 text-gray-400 mt-0.5" />
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase text-white mb-1">Compliance Engine</p>
+                                        <p className="text-[11px] text-gray-500 leading-relaxed font-medium">The vault operates under Cleard Protocol v2.4. All releases are subject to automated verification logs.</p>
+                                    </div>
+                                </div>
+                                <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 hover:text-white transition-all rounded-xl h-10 font-bold uppercase text-[10px]">
+                                    <ExternalLink className="w-3.5 h-3.5 mr-2" /> Public Ledger
+                                </Button>
                             </div>
                         </div>
-                        <Button variant="outline" className="w-full border-white/5 bg-white/5 rounded-2xl h-12 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/10 transition-all mt-4 shadow-sm">
-                            <ExternalLink className="w-4 h-4 mr-3 opacity-50" /> Settlement Log
-                        </Button>
-                    </div>
+                    </aside>
                 </div>
             </div>
 
-            {/* EVIDENCE SIDE PANEL */}
+            {/* AUDIT EVIDENCE PANEL (SIDE DRAWER) */}
             {viewingEvidence && (
                 <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="w-full max-w-md bg-[#0D0D0D] border-l border-white/5 p-8 shadow-2xl animate-in slide-in-from-right duration-500">
+                    <div className="w-full max-w-md bg-[#111111] border-l border-white/10 p-8 shadow-2xl animate-in slide-in-from-right duration-300 overflow-y-auto">
                         <div className="flex justify-between items-center mb-10">
-                            <div className="space-y-1">
-                                <h2 className="text-xl font-bold text-white tracking-tight">Audit Evidence</h2>
-                                <p className="text-[10px] uppercase text-gray-500 font-black tracking-[0.2em]">Verification Log Trace</p>
+                            <div>
+                                <p className="text-[10px] font-bold text-emerald-500 uppercase mb-1">Verification Trace</p>
+                                <h2 className="text-xl font-bold tracking-tight text-white">Audit Evidence</h2>
                             </div>
-                            <Button variant="ghost" size="sm" onClick={() => setViewingEvidence(null)} className="text-gray-500 hover:text-white hover:bg-white/5 rounded-xl">
-                                <X className="w-5 h-5" />
-                            </Button>
+                            <button onClick={() => setViewingEvidence(null)} className="h-9 w-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                                <X className="w-4 h-4 text-gray-400" />
+                            </button>
                         </div>
 
                         <div className="space-y-8">
-                            <div className="space-y-1">
-                                <label className="text-[10px] uppercase tracking-widest text-gray-600 font-black mb-1 block">Selected Milestone</label>
-                                <p className="text-lg text-white font-bold tracking-tight">{viewingEvidence.title}</p>
-                            </div>
-
-                            <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-6 opacity-[0.03]">
-                                    <Shield className="w-24 h-24 text-emerald-500" />
+                            <div className="p-5 bg-emerald-500/[0.03] border border-emerald-500/10 rounded-2xl space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4 text-emerald-500" />
+                                    <span className="text-[10px] font-bold uppercase text-white">System Diagnostics</span>
                                 </div>
-                                <div className="relative z-10">
-                                    <div className="flex items-center gap-2 mb-6">
-                                        <Sparkles className="w-4 h-4 text-emerald-500" />
-                                        <span className="text-[10px] uppercase font-black text-emerald-500 tracking-widest">Automated Diagnostics</span>
-                                    </div>
-                                    <div className="space-y-5">
-                                        {Object.entries(viewingEvidence.evidence).map(([key, value]) => (
-                                            <div key={key} className="group">
-                                                <p className="text-[10px] uppercase text-gray-550 font-black mb-1.5 opacity-40 group-hover:text-emerald-500/50 transition-colors uppercase tracking-widest">{key}</p>
-                                                <p className="text-sm text-gray-200 font-medium break-all leading-relaxed">
-                                                    {Array.isArray(value) ? value.join(', ') : value}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
+                                <div className="space-y-4">
+                                    {Object.entries(viewingEvidence.evidence).map(([key, value]) => (
+                                        <div key={key}>
+                                            <p className="text-[9px] font-bold text-gray-500 uppercase mb-1.5">{key.replace(/([A-Z])/g, ' $1')}</p>
+                                            <p className="text-xs font-bold text-white break-all bg-black/40 p-2 rounded border border-white/5">{Array.isArray(value) ? value.join(', ') : value}</p>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
-                            <div className="space-y-6">
-                                <h4 className="text-[10px] uppercase font-black text-gray-500 tracking-[0.2em]">Full Audit Trail</h4>
-                                <div className="border-l border-white/5 ml-2 space-y-8 pl-6">
+                            <div className="space-y-4">
+                                <h4 className="text-[10px] font-bold uppercase text-gray-500">Milestone History</h4>
+                                <div className="border-l border-white/10 ml-1.5 space-y-6 pl-6">
                                     <div className="relative">
-                                        <div className="absolute -left-[28.5px] top-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                                        <p className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Automated Release</p>
-                                        <p className="text-xs text-gray-400 mt-1 font-medium">AI verified criteria. Payout triggered via Cleard Protocol.</p>
+                                        <div className="absolute -left-[29px] top-1 w-3 h-3 rounded-full bg-emerald-500/20 border-2 border-[#111111]" />
+                                        <p className="text-[10px] font-bold text-emerald-500 uppercase">Protocol Released</p>
+                                        <p className="text-[11px] text-gray-400 mt-1 font-medium">Cleard automated verified tranches successfully.</p>
                                     </div>
                                     <div className="relative">
-                                        <div className="absolute -left-[28.5px] top-1 w-1.5 h-1.5 rounded-full bg-gray-700" />
-                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Work Submitted</p>
-                                        <p className="text-xs text-gray-500 mt-1 font-medium italic">Freelancer linked external performance assets.</p>
+                                        <div className="absolute -left-[29px] top-1 w-3 h-3 rounded-full bg-white/10 border-2 border-[#111111]" />
+                                        <p className="text-[10px] font-bold text-white uppercase">Submission Received</p>
+                                        <p className="text-[11px] text-gray-400 mt-1 font-medium">External assets linked via cryptographic hash.</p>
                                     </div>
                                 </div>
                             </div>
-
-                            <Button className="w-full bg-white text-black hover:bg-emerald-500 hover:text-white transition-all font-bold rounded-2xl h-14 mt-8 shadow-xl active:scale-95" onClick={() => setViewingEvidence(null)}>
-                                Close Audit View
-                            </Button>
                         </div>
                     </div>
                 </div>

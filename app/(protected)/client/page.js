@@ -31,17 +31,17 @@ export default function ClientDashboard() {
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
                     <h1 className="text-3xl font-bold tracking-tight text-white">Overview</h1>
-                    <p className="text-sm text-slate-500 font-medium">Welcome back to your client dashboard</p>
+                    <p className="text-sm text-white font-medium">Welcome back to your client dashboard</p>
                 </div>
             </header>
             {/* Stats Cards - Cleaner */}
             <div className="grid md:grid-cols-3 gap-6">
-                <div className="bg-[#111111] border border-gray-900 p-6 rounded-sm hover:border-gray-800 transition-colors">
+                <div className="bg-[#111111] border border-white/10 p-6 rounded-sm hover:border-white/20 transition-colors">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
                             <Wallet className="w-4 h-4 text-emerald-500" />
                         </div>
-                        <span className="text-sm font-medium uppercase tracking-wider text-gray-300">Available Balance</span>
+                        <span className="text-sm font-medium uppercase tracking-wider text-white">Available Balance</span>
                     </div>
                     <div className="space-y-2">
                         <h2 className="text-4xl font-bold text-white">
@@ -54,18 +54,18 @@ export default function ClientDashboard() {
                     </div>
                 </div>
 
-                <div className="bg-[#111111] border border-gray-900 p-6 rounded-sm hover:border-gray-800 transition-colors">
+                <div className="bg-[#111111] border border-white/10 p-6 rounded-sm hover:border-white/20 transition-colors">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
                             <Shield className="w-4 h-4 text-emerald-500" />
                         </div>
-                        <span className="text-sm font-medium uppercase tracking-wider text-gray-300">Locked in Vaults</span>
+                        <span className="text-sm font-medium uppercase tracking-wider text-white">Locked in Vaults</span>
                     </div>
                     <div className="space-y-2">
                         <h2 className="text-4xl font-bold text-white">
                             ${totalLocked.toLocaleString()}
                         </h2>
-                        <p className="text-gray-300 text-sm font-medium">
+                        <p className="text-white text-sm font-medium">
                             {activeVaults.length} Active Contracts
                         </p>
                     </div>
@@ -96,7 +96,7 @@ export default function ClientDashboard() {
                         <LayoutGrid className="w-5 h-5 text-emerald-500" />
                         <h2 className="text-xl font-semibold text-white">Active Vaults</h2>
                     </div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-white">
                         {activeVaults.length} active
                     </div>
                 </div>
@@ -108,10 +108,10 @@ export default function ClientDashboard() {
                         ))}
                     </div>
                 ) : activeVaults.length === 0 ? (
-                    <div className="py-16 text-center bg-[#111111] border border-gray-900 rounded-sm">
-                        <Activity className="w-12 h-12 text-gray-700 mx-auto mb-4" />
-                        <p className="text-gray-400 font-medium">No active vaults</p>
-                        <p className="text-sm text-gray-500 mt-2">Get started by creating your first vault</p>
+                    <div className="py-16 text-center bg-[#111111] border border-white/10 rounded-sm">
+                        <Activity className="w-12 h-12 text-white/20 mx-auto mb-4" />
+                        <p className="text-white font-medium">No active vaults</p>
+                        <p className="text-sm text-white mt-2">Get started by creating your first vault</p>
                         <Link href="/client/create-vault">
                             <Button className="mt-6 bg-emerald-600 hover:bg-emerald-700">
                                 <Plus className="w-4 h-4 mr-2" />
@@ -125,7 +125,7 @@ export default function ClientDashboard() {
                             <Link
                                 key={vault.id}
                                 href={`/client/vault/${vault.id}`}
-                                className="group flex items-center justify-between p-5 bg-[#111111] border border-gray-900 rounded-sm hover:border-gray-800 transition-colors"
+                                className="group flex items-center justify-between p-5 bg-[#111111] border border-white/10 rounded-sm hover:border-white/20 transition-colors"
                             >
                                 <div>
                                     <div className="flex items-center gap-3 mb-2">
@@ -134,20 +134,20 @@ export default function ClientDashboard() {
                                             {vault.status}
                                         </span>
                                     </div>
-                                    <p className="text-sm text-gray-400">
+                                    <p className="text-sm text-white">
                                         {vault.freelancerEmail || 'Unassigned'}
                                     </p>
                                 </div>
 
                                 <div className="flex items-center gap-6">
                                     <div className="text-right">
-                                        <p className="text-xs text-gray-400 mb-1">Value</p>
+                                        <p className="text-xs text-white mb-1">Value</p>
                                         <p className="text-lg font-semibold text-white">
                                             ${(vault.totalAmount || vault.amount).toLocaleString()}
                                         </p>
                                     </div>
-                                    <div className="w-10 h-10 rounded-sm bg-gray-900 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
-                                        <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                                    <div className="w-10 h-10 rounded-sm bg-white/5 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                                        <ArrowUpRight className="w-4 h-4 text-white group-hover:text-white transition-colors" />
                                     </div>
                                 </div>
                             </Link>
@@ -156,7 +156,7 @@ export default function ClientDashboard() {
                         {/* Pagination Controls */}
                         {totalPages > 1 && (
                             <div className="mt-6 flex items-center justify-between px-2">
-                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                                <p className="text-[10px] font-black text-white uppercase tracking-widest">
                                     Page {currentPage} of {totalPages}
                                 </p>
                                 <div className="flex gap-2">
@@ -165,7 +165,7 @@ export default function ClientDashboard() {
                                         size="sm"
                                         disabled={currentPage === 1}
                                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                        className="h-8 px-3 text-[10px] border-gray-800 bg-transparent hover:bg-gray-800 text-gray-400"
+                                        className="h-8 px-3 text-[10px] border-white/10 bg-transparent hover:bg-white/5 text-white"
                                     >
                                         Previous
                                     </Button>
@@ -174,7 +174,7 @@ export default function ClientDashboard() {
                                         size="sm"
                                         disabled={currentPage === totalPages}
                                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                        className="h-8 px-3 text-[10px] border-gray-800 bg-transparent hover:bg-gray-800 text-gray-400"
+                                        className="h-8 px-3 text-[10px] border-white/10 bg-transparent hover:bg-white/5 text-white"
                                     >
                                         Next
                                     </Button>

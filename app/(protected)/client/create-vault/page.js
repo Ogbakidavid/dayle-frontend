@@ -20,7 +20,14 @@ import {
   Sparkles,
   Code,
   Palette,
-  FileJson
+  FileJson,
+  Smartphone,
+  Link2,
+  Music,
+  Clapperboard,
+  DollarSign,
+  TrendingDown,
+  AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,23 +40,27 @@ const VAULT_PURPOSE_MAPPING = {
     icon: Code,
     deliverables: [
       { id: "github_repo", label: "GitHub Repository", rules: ["Repository exists", "Commit after vault date", "Source code detected"] },
-      { id: "api_endpoint", label: "Live API Endpoint", rules: ["URL reachable", "Returns 200 OK", "JSON schema valid"] }
+      { id: "live_webapp", label: "Deployed Web App (URL)", rules: ["Hosted URL reachable", "SSL certificate valid", "Dynamic content detected"] },
+      { id: "api_endpoint", label: "Live API Endpoint", rules: ["Returns 200 OK", "JSON schema valid", "Uptime verification"] },
+      { id: "mobile_app", label: "Mobile App (Link/Build)", rules: ["TestFlight/Play Store link valid", "App package detected", "Bundle ID verification"] }
     ]
   },
   design: {
-    label: "Design",
+    label: "Creative & Design",
     icon: Palette,
     deliverables: [
-      { id: "figma_link", label: "Figma File", rules: ["Link is valid", "Access granted", "Last modified after vault date"] },
-      { id: "asset_pack", label: "Design Assets (ZIP)", rules: ["File uploaded", "Minimum size 5MB", "PDF/SVG/PNG detected"] }
+      { id: "figma_link", label: "Figma File", rules: ["Link is valid", "Access granted", "Last modified check"] },
+      { id: "design_handoff", label: "Design System / Handoff", rules: ["Documentation detected", "Assets linked", "Specs defined"] },
+      { id: "asset_pack", label: "Design Assets (ZIP)", rules: ["Minimum size 5MB", "High-res formats (SVG/PNG)", "Corrupt file check"] }
     ]
   },
   content_ai: {
-    label: "Content & AI",
+    label: "Media, Content & AI",
     icon: Sparkles,
     deliverables: [
-      { id: "doc_submission", label: "Technical Document", rules: ["Word count > 500", "No plagiarism detected", "English language"] },
-      { id: "ai_dataset", label: "JSON Dataset", rules: ["Valid JSON format", "Minimum entries detected"] }
+      { id: "doc_submission", label: "Technical Document", rules: ["Word count > 500", "No plagiarism detected", "Formatting check"] },
+      { id: "audio_video", label: "Media Assets (Audio/Video)", rules: ["Media duration detected", "Codec validation (MP4/WAV)", "Resolution > 720p"] },
+      { id: "ai_dataset", label: "JSON/CSV Dataset", rules: ["Valid format", "Minimum 100 entries", "Data structure integrity"] }
     ]
   }
 };
@@ -61,6 +72,7 @@ export default function CreateVaultPage() {
   const [vaultPurpose, setVaultPurpose] = useState("");
   const [vaultTitle, setVaultTitle] = useState("");
   const [vaultDescription, setVaultDescription] = useState("");
+  const [budgetAmount, setBudgetAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState(0);
 
   // Step 3 State
@@ -82,11 +94,11 @@ export default function CreateVaultPage() {
   /* -----------------------------
      VALIDATION LOGIC
   --------------------------------*/
-  const isStep1Complete = vaultTitle.trim() !== "" && vaultPurpose !== "" && vaultDescription.trim() !== "";
+  const isStep1Complete = vaultTitle.trim() !== "" && vaultPurpose !== "" && vaultDescription.trim() !== "" && budgetAmount > 0;
 
   const isStep2Complete = milestones.length > 0 && milestones.every(m =>
     m.title.trim() !== "" && m.amount !== "" && m.deliverableType !== ""
-  );
+  ) && totalAmount <= budgetAmount;
 
   const isStep3Complete = freelancerEmail.trim() !== "" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(freelancerEmail);
 
@@ -182,6 +194,19 @@ export default function CreateVaultPage() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label className="text-sm text-gray-200">Contract Budget (Target) *</Label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                    <Input
+                      type="number"
+                      value={budgetAmount}
+                      onChange={(e) => setBudgetAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="bg-black border-gray-800 h-12 pl-10 focus:border-emerald-500 text-white font-bold"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
                   <Label className="text-sm text-gray-200">Brief Description *</Label>
                   <Textarea
                     value={vaultDescription}
@@ -201,6 +226,43 @@ export default function CreateVaultPage() {
                 <h2 className="text-xl font-medium text-white underline decoration-emerald-500/50 underline-offset-8">
                   {VAULT_PURPOSE_MAPPING[vaultPurpose]?.label} Milestones
                 </h2>
+              </div>
+
+              {/* BUDGET TRACKER */}
+              <div className="bg-[#0A0A0A] border border-gray-800 p-5 rounded-xl space-y-3">
+                <div className="flex justify-between items-end">
+                  <div className="space-y-1">
+                    <p className="text-[10px] uppercase text-gray-500 font-black tracking-widest">Allocation Tracker</p>
+                    <p className={cn(
+                      "text-lg font-bold tracking-tight",
+                      totalAmount > budgetAmount ? "text-red-500" : "text-white"
+                    )}>
+                      ${totalAmount.toLocaleString()} <span className="text-gray-600 font-medium text-sm">/ ${Number(budgetAmount).toLocaleString()}</span>
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    {totalAmount > budgetAmount ? (
+                      <div className="flex items-center gap-1.5 text-red-500 animate-pulse">
+                        <AlertCircle className="w-3 h-3" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Over Budget</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-emerald-500">
+                        <TrendingDown className="w-3 h-3" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">${(budgetAmount - totalAmount).toLocaleString()} Remaining</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="h-1.5 bg-gray-900 rounded-full overflow-hidden shadow-inner">
+                  <div
+                    className={cn(
+                      "h-full transition-all duration-500 ease-out rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]",
+                      totalAmount > budgetAmount ? "bg-red-500" : "bg-emerald-500"
+                    )}
+                    style={{ width: `${Math.min((totalAmount / budgetAmount) * 100, 100)}%` }}
+                  />
+                </div>
               </div>
 
               {milestones.map((m, i) => (
