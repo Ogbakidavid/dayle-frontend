@@ -8,23 +8,26 @@ import {
     TrendingUp, MoreHorizontal, Filter
 } from 'lucide-react';
 import { useState } from 'react';
+import { useVault } from '@/lib/store/vault-context';
 import { cn } from '@/lib/utils';
 
-const mockVaults = [
-    { id: '1', title: 'Mobile App Development', freelancerEmail: 'alex@devstudio.com', status: 'active', amount: 25000, description: 'Complete mobile application for iOS and Android', date: 'Oct 12, 2025' },
-    { id: '2', title: 'Website Redesign', freelancerEmail: 'sarah@design.co', status: 'pending', amount: 15000, description: 'Modern responsive website with CMS', date: 'Oct 14, 2025' },
-    { id: '3', title: 'Marketing Campaign', freelancerEmail: 'mike@marketing.pro', status: 'completed', amount: 35000, description: 'Q1 digital marketing strategy', date: 'Sep 28, 2025' },
-    { id: '4', title: 'API Integration', freelancerEmail: 'jane@tech.dev', status: 'active', amount: 12000, description: 'Third-party API integration', date: 'Oct 01, 2025' },
-    { id: '5', title: 'Brand Identity', freelancerEmail: 'tom@brand.studio', status: 'completed', amount: 8000, description: 'Complete brand guidelines', date: 'Aug 15, 2025' },
-    { id: '6', title: 'E-commerce Platform', freelancerEmail: 'unassigned@vault.io', status: 'pending', amount: 45000, description: 'Online store with payment processing', date: 'Oct 20, 2025' }
-];
+// Local mock data removed in favor of central vault-context
 
 export default function VaultsPage() {
+    const { vaults, loading } = useVault();
     const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
 
-    const filteredVaults = mockVaults.filter(vault =>
+    const filteredVaults = (vaults || []).filter(vault =>
         vault.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        vault.freelancerEmail.toLowerCase().includes(searchQuery.toLowerCase())
+        (vault.freelancerEmail && vault.freelancerEmail.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    const totalPages = Math.ceil(filteredVaults.length / itemsPerPage);
+    const paginatedVaults = filteredVaults.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     const stats = [
@@ -102,8 +105,8 @@ export default function VaultsPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
-                                {filteredVaults.map((vault) => (
-                                    <tr key={vault.id} className="group hover:bg-white/[0.02] transition-colors cursor-pointer">
+                                {paginatedVaults.map((vault) => (
+                                    <tr key={vault.id} className="group hover:bg-white/[0.02] transition-colors cursor-pointer" onClick={() => window.location.href = `/client/vault/${vault.id}`}>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 group-hover:border-emerald-500/20 transition-all">
@@ -111,16 +114,16 @@ export default function VaultsPage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">{vault.title}</p>
-                                                    <p className="text-xs text-slate-500 mt-0.5 font-medium">{vault.date}</p>
+                                                    <p className="text-xs text-slate-500 mt-0.5 font-medium">{new Date(vault.createdAt || Date.now()).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-emerald-500">
-                                                    {vault.freelancerEmail[0].toUpperCase()}
+                                                    {(vault.freelancerEmail || 'U')[0].toUpperCase()}
                                                 </div>
-                                                <span className="text-sm text-slate-400 font-medium">{vault.freelancerEmail}</span>
+                                                <span className="text-sm text-slate-400 font-medium">{vault.freelancerEmail || 'Unassigned'}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
@@ -138,17 +141,17 @@ export default function VaultsPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 text-right">
-                                            <p className="text-sm font-bold text-white tracking-tight">${vault.amount.toLocaleString()}</p>
+                                            <p className="text-sm font-bold text-white tracking-tight">${(vault.totalAmount || vault.amount).toLocaleString()}</p>
                                             <p className="text-[10px] text-slate-600 font-bold uppercase">USDC / USDT</p>
                                         </td>
                                         <td className="px-6 py-5 text-right">
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Link href={`/client/vault/${vault.id}`}>
+                                                <Link href={`/client/vault/${vault.id}`} onClick={(e) => e.stopPropagation()}>
                                                     <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-500 hover:text-white hover:bg-white/10 rounded-lg">
                                                         <ArrowUpRight className="w-4 h-4" />
                                                     </Button>
                                                 </Link>
-                                                <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-500 hover:text-white hover:bg-white/10 rounded-lg">
+                                                <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-500 hover:text-white hover:bg-white/10 rounded-lg" onClick={(e) => e.stopPropagation()}>
                                                     <MoreHorizontal className="w-4 h-4" />
                                                 </Button>
                                             </div>
@@ -161,16 +164,52 @@ export default function VaultsPage() {
                 </div>
 
                 {/* 5. FOOTER SUMMARY */}
-                <footer className="flex items-center justify-between py-2">
-                    <p className="text-xs text-slate-600 font-medium italic">
-                        Secured by Multi-Sig Protocol v2.4.0
+                <footer className="flex items-center justify-between py-6 border-t border-white/5">
+                    <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                        Displaying {paginatedVaults.length} of {filteredVaults.length} smart-vaults
                     </p>
                     <div className="flex gap-2">
-                        {[1, 2, 3].map(p => (
-                            <button key={p} className={cn("w-8 h-8 rounded-lg text-xs font-bold transition-all", p === 1 ? "bg-white text-black" : "bg-white/5 text-slate-500 hover:bg-white/10")}>
-                                {p}
-                            </button>
-                        ))}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={currentPage === 1}
+                            onClick={() => {
+                                setCurrentPage(prev => Math.max(1, prev - 1));
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="h-9 px-4 text-xs border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                        >
+                            Previous
+                        </Button>
+                        <div className="flex items-center gap-1 px-2">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                                <button
+                                    key={p}
+                                    onClick={() => {
+                                        setCurrentPage(p);
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }}
+                                    className={cn(
+                                        "w-8 h-8 rounded-lg text-xs font-bold transition-all",
+                                        p === currentPage ? "bg-white text-black shadow-lg" : "bg-white/5 text-slate-500 hover:bg-white/10"
+                                    )}
+                                >
+                                    {p}
+                                </button>
+                            ))}
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={currentPage === totalPages}
+                            onClick={() => {
+                                setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="h-9 px-4 text-xs border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                        >
+                            Next
+                        </Button>
                     </div>
                 </footer>
             </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useVault } from '@/lib/store/vault-context';
@@ -12,9 +13,17 @@ import {
 export default function ClientDashboard() {
     const { vaults, loading } = useVault();
     const { balance } = useWallet();
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3;
 
     const activeVaults = vaults.filter(v => v.status !== 'completed' && v.status !== 'cancelled');
     const totalLocked = activeVaults.reduce((acc, v) => acc + (v.totalAmount || v.amount), 0);
+
+    const totalPages = Math.ceil(activeVaults.length / itemsPerPage);
+    const paginatedVaults = activeVaults.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     return (
         <div className=" space-y-8 max-w-6xl mx-auto">
@@ -112,7 +121,7 @@ export default function ClientDashboard() {
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        {activeVaults.map((vault) => (
+                        {paginatedVaults.map((vault) => (
                             <Link
                                 key={vault.id}
                                 href={`/client/vault/${vault.id}`}
@@ -121,7 +130,7 @@ export default function ClientDashboard() {
                                 <div>
                                     <div className="flex items-center gap-3 mb-2">
                                         <h4 className="font-medium text-white">{vault.title}</h4>
-                                        <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-medium rounded-sm border border-emerald-500/20">
+                                        <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest rounded-sm border border-emerald-500/20">
                                             {vault.status}
                                         </span>
                                     </div>
@@ -143,6 +152,35 @@ export default function ClientDashboard() {
                                 </div>
                             </Link>
                         ))}
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="mt-6 flex items-center justify-between px-2">
+                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                                    Page {currentPage} of {totalPages}
+                                </p>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={currentPage === 1}
+                                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                        className="h-8 px-3 text-[10px] border-gray-800 bg-transparent hover:bg-gray-800 text-gray-400"
+                                    >
+                                        Previous
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={currentPage === totalPages}
+                                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                        className="h-8 px-3 text-[10px] border-gray-800 bg-transparent hover:bg-gray-800 text-gray-400"
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

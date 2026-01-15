@@ -6,10 +6,10 @@ import { Lock, TrendingUp } from 'lucide-react';
 
 export function VaultCard({ vault, isClient }) {
     return (
-        <Card className="card-interactive group">
+        <Card className="bg-[#111111] border-white/5 card-interactive group">
             <CardHeader>
                 <div className="flex items-start justify-between gap-3">
-                    <CardTitle className="text-base font-semibold text-gray-900 line-clamp-1 flex-1">
+                    <CardTitle className="text-base font-bold text-white line-clamp-1 flex-1">
                         {vault.title}
                     </CardTitle>
                     <StatusBadge status={vault.status} />
@@ -19,10 +19,10 @@ export function VaultCard({ vault, isClient }) {
                 {/* Amount Display */}
                 <div className="flex items-baseline justify-between">
                     <div>
-                        <div className="flex items-center gap-2 text-3xl font-bold text-gray-900 amount-display">
+                        <div className="flex items-center gap-2 text-3xl font-bold text-white amount-display">
                             ${vault.amount.toLocaleString()}
                         </div>
-                        <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500">
+                        <div className="flex items-center gap-1.5 mt-1 text-xs text-white/40 font-bold uppercase tracking-widest">
                             <Lock className="w-3.5 h-3.5" />
                             <span>Locked in vault</span>
                         </div>
@@ -30,21 +30,21 @@ export function VaultCard({ vault, isClient }) {
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
+                <p className="text-sm text-white/60 line-clamp-2 min-h-[2.5rem]">
                     {vault.description}
                 </p>
 
                 {/* Milestones Preview */}
                 {vault.milestones && vault.milestones.length > 0 && (
-                    <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t border-gray-100">
-                        <TrendingUp className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-2 text-xs text-white/40 font-bold uppercase tracking-widest pt-4 border-t border-white/5 transform transition-all">
+                        <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                         <span>{vault.milestones.length} milestone{vault.milestones.length > 1 ? 's' : ''}</span>
                     </div>
                 )}
             </CardContent>
             <CardFooter className="pt-0">
                 <Link href={`/${isClient ? 'client' : 'freelancer'}/vault/${vault.id}`} className="w-full">
-                    <Button variant="outline" className="w-full group-hover:border-gray-400">
+                    <Button variant="outline" className="w-full border-white/10 hover:border-white/20 hover:bg-white/5 text-white/80">
                         View Details
                     </Button>
                 </Link>

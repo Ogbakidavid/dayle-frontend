@@ -40,7 +40,7 @@ function VerificationStatusContent() {
                     <Shield className="w-8 h-8 text-emerald-500 stroke-[2.5px] relative z-10" />
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">Querying Network</p>
+                    <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-500">Querying Network</p>
                     <div className="h-0.5 w-24 bg-white/5 rounded-full overflow-hidden">
                         <div className="h-full bg-emerald-500 w-1/3 rounded-full animate-[loading_1.5s_infinite_ease-in-out]"></div>
                     </div>
@@ -54,7 +54,7 @@ function VerificationStatusContent() {
             <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
                 <AlertCircle className="w-16 h-16 text-red-500/50 mb-6" />
                 <h1 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Verification Link Invalid</h1>
-                <p className="text-slate-500 max-w-sm font-medium mb-12">The specific vault node could not be located on the Cleard protocol.</p>
+                <p className="text-white/40 max-w-sm font-bold uppercase tracking-widest text-xs mb-12">The specific vault node could not be located on the Cleard protocol.</p>
                 <Button onClick={() => router.push('/')} variant="ghost" className="text-emerald-500 font-black uppercase tracking-widest text-xs gap-2">
                     <ArrowLeft className="w-4 h-4" /> Return to Protocol
                 </Button>
@@ -78,15 +78,15 @@ function VerificationStatusContent() {
                     <div className="flex justify-center mb-8">
                         <div className="group relative">
                             <div className={`w-20 h-20 rounded-3xl flex items-center justify-center relative z-10 border transition-all duration-500 ${isVerified ? 'bg-emerald-500/10 border-emerald-500/50' :
-                                    isReview ? 'bg-blue-500/10 border-blue-500/50' :
-                                        'bg-white/5 border-white/10'
+                                isReview ? 'bg-blue-500/10 border-blue-500/50' :
+                                    'bg-white/5 border-white/10'
                                 }`}>
                                 {isVerified ? (
                                     <CheckCircle2 className="w-10 h-10 text-emerald-500" />
                                 ) : isReview ? (
                                     <Clock className="w-10 h-10 text-blue-500 animate-pulse" />
                                 ) : (
-                                    <Clock className="w-10 h-10 text-slate-400" />
+                                    <Clock className="w-10 h-10 text-white/20" />
                                 )}
                             </div>
                         </div>
@@ -94,9 +94,9 @@ function VerificationStatusContent() {
                     <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-4">
                         {isVerified ? 'Capital <span className="text-emerald-500 italic">Released.</span>' :
                             isReview ? 'Verification <span className="text-blue-500 italic">Active.</span>' :
-                                'Vault <span className="text-slate-400 italic">Awaits.</span>'}
+                                'Vault <span className="text-white/20 italic">Awaits.</span>'}
                     </h1>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-white/40">
                         <Lock className="w-3 h-3 text-emerald-500" /> Node ID: {vault.id}
                     </div>
                 </div>
@@ -107,22 +107,22 @@ function VerificationStatusContent() {
 
                     <div className="space-y-8 relative z-10">
                         <div className="space-y-2">
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active Project</p>
+                            <p className="text-xs font-black text-white/20 uppercase tracking-widest">Active Project</p>
                             <h3 className="text-2xl font-black text-white uppercase tracking-tight leading-tight">{vault.title}</h3>
                         </div>
 
                         <div className="py-8 border-y border-white/5 grid grid-cols-2 gap-8">
                             <div>
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Status</p>
+                                <p className="text-xs font-black text-white/20 uppercase tracking-widest mb-1">Status</p>
                                 <p className={`text-sm font-black uppercase tracking-wider ${isVerified ? 'text-emerald-500' :
-                                        isReview ? 'text-blue-500' :
-                                            'text-slate-400'
+                                    isReview ? 'text-blue-500' :
+                                        'text-white/40'
                                     }`}>
                                     {vault.status.replace(/_/g, ' ')}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Identity</p>
+                                <p className="text-xs font-black text-white/20 uppercase tracking-widest mb-1">Identity</p>
                                 <p className="text-sm font-black text-white uppercase tracking-wider truncate">
                                     {vault.clientName || 'Cleard Native Client'}
                                 </p>
@@ -132,17 +132,17 @@ function VerificationStatusContent() {
                         {isVerified ? (
                             <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center">
                                 <p className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-2 font-['Poppins']">Financial Finality Reached</p>
-                                <p className="text-sm font-medium text-slate-400">The objective requirements have been validated. Funds have been distributed to the recipient node.</p>
+                                <p className="text-sm font-bold text-white/40 uppercase tracking-widest leading-relaxed">The objective requirements have been validated. Funds have been distributed to the recipient node.</p>
                             </div>
                         ) : isReview ? (
                             <div className="p-6 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-center">
                                 <p className="text-xs font-black text-blue-500 uppercase tracking-widest mb-2">Computational Review</p>
-                                <p className="text-sm font-medium text-slate-400">Our protocol is currently verifying the submitted evidence against the vault requirements.</p>
+                                <p className="text-sm font-bold text-white/40 uppercase tracking-widest leading-relaxed">Our protocol is currently verifying the submitted evidence against the vault requirements.</p>
                             </div>
                         ) : (
                             <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
-                                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Waiting for Submission</p>
-                                <p className="text-sm font-medium text-slate-500">Payment is locked and secured. Recipient has not yet submitted work for verification.</p>
+                                <p className="text-xs font-black text-white/40 uppercase tracking-widest mb-2">Waiting for Submission</p>
+                                <p className="text-sm font-bold text-white/40 uppercase tracking-widest leading-relaxed">Payment is locked and secured. Recipient has not yet submitted work for verification.</p>
                             </div>
                         )}
 
@@ -158,12 +158,12 @@ function VerificationStatusContent() {
                 {/* Footer Badges */}
                 <div className="mt-12 flex justify-center gap-8 opacity-40">
                     <div className="flex items-center gap-2">
-                        <Globe className="w-3 h-3 text-slate-500" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Global Settlement</span>
+                        <Globe className="w-3 h-3 text-white/20" />
+                        <span className="text-xs font-black uppercase tracking-widest text-white/20">Global Settlement</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Lock className="w-3 h-3 text-slate-500" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Audit-Proof Ledger</span>
+                        <Lock className="w-3 h-3 text-white/20" />
+                        <span className="text-xs font-black uppercase tracking-widest text-white/20">Audit-Proof Ledger</span>
                     </div>
                 </div>
             </div>

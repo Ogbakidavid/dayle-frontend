@@ -22,9 +22,9 @@
   --spacing-20: 5rem;
   --spacing-24: 6rem;
 
-  /* Neutrals (Slate - Stripe-inspired) */
-  --color-slate-50: #f8fafc;
-  --color-slate-100: #f1f5f9;
+  /* Neutrals (Slate - Stripe-inspired, modified for dark theme) */
+  --color-slate-50: #ffffff;
+  --color-slate-100: #f8fafc;
   --color-slate-200: #e2e8f0;
   --color-slate-300: #cbd5e1;
   --color-slate-400: #94a3b8;
@@ -64,12 +64,12 @@
   --color-red-700: #b91c1c;
 
   /* Semantic Tokens */
-  --color-background: #ffffff;
-  --color-foreground: var(--color-slate-900);
-  --color-muted: var(--color-slate-100);
-  --color-muted-foreground: var(--color-slate-600);
-  --color-border: var(--color-slate-200);
-  --color-input-border: var(--color-slate-300);
+  --color-background: #0A0A0A;
+  --color-foreground: #ffffff;
+  --color-muted: #111111;
+  --color-muted-foreground: rgba(255, 255, 255, 0.4);
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-input-border: rgba(255, 255, 255, 0.1);
   --color-ring: var(--color-blue-600);
 
   /* Shadows (Minimal, Stripe-inspired) */
@@ -108,8 +108,8 @@
   }
 
   body {
-    background-color: white;
-    color: var(--color-slate-900);
+    background-color: #0A0A0A;
+    color: white;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -117,15 +117,15 @@
   }
 
   h1 {
-    @apply text-3xl font-semibold tracking-tight text-slate-900;
+    @apply text-3xl font-semibold tracking-tight text-white;
   }
 
   h2 {
-    @apply text-2xl font-semibold tracking-tight text-slate-900;
+    @apply text-2xl font-semibold tracking-tight text-white;
   }
 
   h3 {
-    @apply text-lg font-medium text-slate-900;
+    @apply text-lg font-medium text-white;
   }
 
   *:focus-visible {
@@ -156,7 +156,7 @@
   }
 
   .badge-pending {
-    @apply bg-slate-100 text-slate-700 border-slate-200;
+    @apply bg-white/5 text-white/60 border-white/10;
   }
 
   .badge-active {
@@ -168,18 +168,18 @@
   }
 
   .badge-cancelled {
-    @apply bg-slate-100 text-slate-600 border-slate-200;
+    @apply bg-white/5 text-white/40 border-white/10;
   }
 
   .card {
-    background-color: white;
-    border: 1px solid var(--color-slate-200);
+    background-color: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-lg);
   }
 
   .card-interactive {
-    background-color: white;
-    border: 1px solid var(--color-slate-200);
+    background-color: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-lg);
     transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
@@ -191,19 +191,19 @@
   }
 
   .amount-large {
-    @apply text-3xl font-semibold tabular-nums text-slate-900;
+    @apply text-3xl font-semibold tabular-nums text-white;
   }
 
   .amount-medium {
-    @apply text-xl font-semibold tabular-nums text-slate-900;
+    @apply text-xl font-semibold tabular-nums text-white;
   }
 
   .amount-small {
-    @apply text-base font-medium tabular-nums text-slate-900;
+    @apply text-base font-medium tabular-nums text-white;
   }
 
   .amount-muted {
-    @apply text-sm font-medium tabular-nums text-slate-600;
+    @apply text-sm font-medium tabular-nums text-white/40;
   }
 
   .btn-lift {
@@ -211,9 +211,9 @@
   }
 
   .input-base {
-    @apply w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-400;
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent;
-    @apply disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed;
+    @apply w-full px-3 py-2 bg-transparent border border-white/10 rounded-md text-white placeholder:text-white/20;
+    @apply focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50;
+    @apply disabled:bg-white/5 disabled:text-white/20 disabled:cursor-not-allowed;
     @apply transition-colors duration-150;
   }
 

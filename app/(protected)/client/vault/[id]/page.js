@@ -3,235 +3,266 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
-    Shield, Clock, CheckCircle2, DollarSign,
-    MessageSquare, Send, Lock, AlertTriangle, FileText,
-    Cpu, UserCheck, Scale, History, ExternalLink, ArrowUpRight
+    Shield, Clock, DollarSign, Lock, AlertTriangle, FileText, Cpu, Scale, History,
+    ExternalLink, Flag, CheckCircle2, XCircle, Orbit, ArrowLeft, TrendingUp, Sparkles, X
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 const VAULT_DATA = {
-    id: 'SK-VLT-2024-00812',
+    id: 'SK-VLT-2026-00812',
     title: 'Enterprise E-commerce Architecture',
     status: 'ACTIVE',
     createdAt: 'Jan 12, 2026',
     totalCapital: 65000,
-    releasedCapital: 26000,
-    security: 'Multi-Sig AI-Escrow'
+    custodian: 'Cleard Clearing House'
 };
 
-const initialMilestones = [
+const milestonesInitial = [
     {
         id: 1,
         title: 'System Architecture & Schema Design',
         amount: 13000,
         status: 'RELEASED',
-        timestamp: 'Feb 10, 2024 14:30 UTC',
-        txId: 'TX-88210944',
-        authority: 'AI + Human Advisor',
-        comments: [{ id: 1, user: 'System', text: 'Capital released following verified audit.', time: '2 days ago' }]
+        authority: 'AI + Clearing Review',
+        aiChecks: [
+            { label: 'GitHub repo exists', passed: true },
+            { label: 'Architecture docs present', passed: true },
+            { label: 'Commits after vault creation', passed: true }
+        ],
+        notes: 'Capital released automatically after AI verification.',
+        timestamp: 'Feb 10, 2026 14:30 UTC',
+        evidence: {
+            repo: 'https://github.com/Cleard/ecommerce-core',
+            deployment: 'https://arch.Cleard.io',
+            lastCommit: '7a2b5c1'
+        }
     },
     {
         id: 2,
         title: 'Core Authentication Engine',
         amount: 13000,
         status: 'RELEASED',
-        timestamp: 'Mar 05, 2024 09:12 UTC',
-        txId: 'TX-88299102',
         authority: 'AI Verification',
-        comments: []
+        aiChecks: [
+            { label: 'Endpoints reachable', passed: true },
+            { label: 'Unit tests passing', passed: true },
+            { label: 'Live deployment verified', passed: true }
+        ],
+        notes: 'Capital released automatically after AI verification.',
+        timestamp: 'Mar 05, 2026 09:12 UTC',
+        evidence: {
+            endpoints: ['/auth/login', '/auth/signup', '/auth/mfa'],
+            testCoverage: '98%',
+            logs: 'All verification probes returned 200 OK'
+        }
     },
     {
         id: 3,
         title: 'Payment Gateway Protocol',
         amount: 13000,
-        status: 'SUBMITTED',
-        description: 'Implementation of Stripe Connect and automated tax reconciliation.',
-        authority: 'AI + Human Advisor',
-        comments: [{ id: 102, user: 'Contractor', text: 'Protocols submitted. Documentation attached.', time: '1 hour ago' }]
+        status: 'UNDER_REVIEW',
+        authority: 'AI + Human Audit',
+        aiChecks: [
+            { label: 'GitHub repo linked', passed: true },
+            { label: 'Live deployment reachable', passed: true },
+            { label: 'Webhook events active', passed: false }
+        ],
+        notes: 'Under AI review. Client cannot manually release funds yet.',
+        disputeRaised: false,
+        timestamp: 'Mar 10, 2026 10:00 UTC',
+        disputeWindowHours: 48,
+        evidence: {
+            repo: 'https://github.com/Cleard/payments-svc',
+            deployment: 'https://pay-stg.Cleard.io',
+            issues: 'Webhook handshake failing intermittently'
+        }
     },
     {
         id: 4,
         title: 'Analytics & Reporting Suite',
         amount: 13000,
+        status: 'SUBMITTED',
+        authority: 'AI Audit Pending',
+        aiChecks: [],
+        notes: 'Freelancer submitted work. AI audit starting shortly.',
+        evidence: {
+            submission: 'archive_v2.zip',
+            size: '12.4MB'
+        }
+    },
+    {
+        id: 5,
+        title: 'Final Documentation & Handover',
+        amount: 13000,
         status: 'LOCKED',
-        description: 'Real-time data visualization and automated monthly exports.',
-        authority: 'AI Verification',
-        comments: []
+        authority: 'Pending Sequence',
+        aiChecks: [],
+        notes: 'This milestone unlocks after prior tranche release.',
     }
 ];
 
-export default function SkentralVaultPage() {
-    const [milestones] = useState(initialMilestones);
-    const [expandedId, setExpandedId] = useState(3);
+function CheckIcon({ passed }) {
+    return passed ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-red-500" />;
+}
 
-    const getStatusStyles = (status) => {
-        switch (status) {
-            case 'RELEASED': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
-            case 'SUBMITTED': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-            case 'LOCKED': return 'text-gray-500 bg-gray-900 border-gray-800';
-            default: return 'text-gray-400 bg-gray-800 border-gray-700';
-        }
+export default function ClientVaultPage() {
+    const router = useRouter();
+    const [expandedId, setExpandedId] = useState(3);
+    const [milestones, setMilestones] = useState(milestonesInitial);
+    const [viewingEvidence, setViewingEvidence] = useState(null);
+
+    const handleRaiseDispute = (id) => {
+        setMilestones(ms => ms.map(m => m.id === id ? { ...m, disputeRaised: true, status: 'DISPUTED' } : m));
     };
 
-    return (
-        <div className="flex flex-col h-full w-full max-w-7xl mx-auto p-6 animate-in fade-in duration-500 space-y-8">
+    const releasedCapital = milestones
+        .filter(m => m.status === 'RELEASED')
+        .reduce((sum, m) => sum + m.amount, 0);
 
-            {/* 1️⃣ Institutional Header */}
-            <header className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-semibold rounded-full">
-                            <Shield className="w-3.5 h-3.5" /> {VAULT_DATA.status}
-                        </span>
-                        <span className="text-xs text-gray-500 font-medium">
-                            ID: {VAULT_DATA.id}
-                        </span>
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-semibold text-white tracking-tight mb-2">
+    const pendingCapital = milestones
+        .filter(m => ['SUBMITTED', 'UNDER_REVIEW', 'DISPUTED'].includes(m.status))
+        .reduce((sum, m) => sum + m.amount, 0);
+
+    return (
+        <div className="max-w-7xl mx-auto p-6 space-y-10 font-sans selection:bg-emerald-500/30">
+            {/* COMPACT DASHBOARD HEADER */}
+            <div className="flex justify-between items-end border-b border-white/5 pb-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => router.push('/client')}
+                            className="bg-white/5 hover:bg-white/10 p-2 rounded-lg transition-colors group"
+                        >
+                            <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-white" />
+                        </button>
+                        <h1 className="text-3xl font-bold tracking-tighter text-white">
                             {VAULT_DATA.title}
                         </h1>
-                        <p className="text-sm text-gray-400">
-                            Protocol initialized by <span className="text-gray-300 font-medium">Skentral Clearing House</span> • {VAULT_DATA.createdAt}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="flex flex-col items-end gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                            <Lock className="w-3.5 h-3.5 text-amber-500" />
-                            <span className="text-xs font-medium text-amber-500">Capital Locked</span>
-                        </div>
-                        <Button variant="outline" size="sm" className="h-8 border-gray-800 bg-[#111111] hover:bg-gray-800 text-gray-300 hover:text-white rounded-lg text-xs">
-                            <ExternalLink className="w-3.5 h-3.5 mr-2" /> View Contract
-                        </Button>
-                    </div>
-                </div>
-            </header>
-
-            <div className="grid lg:grid-cols-12 gap-8">
-
-                {/* 3️⃣ Milestone Ledger (CORE) */}
-                <div className="lg:col-span-8 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                            <History className="w-5 h-5 text-gray-400" /> Capital Tranche Ledger
-                        </h2>
-                        <span className="text-xs text-gray-500 font-medium bg-[#111111] px-3 py-1 rounded-full border border-gray-900">
-                            Compliance Verified: 2/4
+                        <span className="px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+                            {VAULT_DATA.status}
                         </span>
                     </div>
+                    <p className="text-sm text-gray-500 font-medium ml-14">
+                        Managed by <span className="text-gray-200 font-semibold">{VAULT_DATA.custodian}</span> • <span className="font-mono text-[10px] opacity-60">ID: {VAULT_DATA.id}</span>
+                    </p>
+                </div>
+            </div>
 
-                    <div className="space-y-4">
-                        {milestones.map((m) => (
-                            <div key={m.id} className={`rounded-2xl transition-all duration-300 border overflow-hidden ${expandedId === m.id
-                                    ? 'bg-[#111111] border-gray-800 ring-1 ring-white/5'
-                                    : 'bg-[#111111] border-gray-900 hover:border-gray-800'
-                                }`}>
+            <div className="grid lg:grid-cols-12 gap-8">
+                {/* LEDGER */}
+                <div className="lg:col-span-8 space-y-10">
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-lg font-bold text-white uppercase tracking-widest flex items-center gap-3">
+                                <Orbit className="w-5 h-5 text-emerald-500 animate-pulse" />
+                                Settlement Ledger
+                            </h2>
+                        </div>
+
+                        {milestones.map(m => (
+                            <div key={m.id} className={cn(
+                                "group border rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl",
+                                m.status === 'RELEASED' ? "bg-[#0A0F0A] border-emerald-500/10" : "bg-[#111111] border-white/5",
+                                expandedId === m.id ? "ring-1 ring-white/10" : "hover:border-white/10"
+                            )}>
                                 <div
-                                    className="p-5 flex items-center justify-between cursor-pointer group"
                                     onClick={() => setExpandedId(expandedId === m.id ? null : m.id)}
+                                    className="p-5 flex justify-between cursor-pointer items-center"
                                 >
                                     <div className="flex items-center gap-5">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border ${m.status === 'RELEASED'
-                                                ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                                : m.status === 'LOCKED' ? 'bg-gray-800 text-gray-500 border-gray-700' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                                            }`}>
-                                            {m.id}
+                                        <div className={cn(
+                                            "w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs border transition-all duration-500",
+                                            m.status === 'RELEASED' ? "bg-emerald-500 border-emerald-400 text-black translate-x-1" : "bg-black/40 border-white/5 text-gray-400"
+                                        )}>
+                                            {m.status === 'RELEASED' ? <CheckCircle2 className="w-5 h-5" /> : `0${m.id}`}
                                         </div>
                                         <div>
-                                            <h3 className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">{m.title}</h3>
-                                            <p className="text-xs text-gray-500 mt-0.5">
-                                                Amount: <span className="text-gray-300 font-medium">${m.amount.toLocaleString()}</span>
-                                            </p>
+                                            <p className={cn(
+                                                "text-base font-bold tracking-tight transition-colors",
+                                                m.status === 'RELEASED' ? "text-emerald-500" : "text-white"
+                                            )}>{m.title}</p>
+                                            <p className="text-xs text-gray-500 font-medium mt-0.5">${m.amount.toLocaleString()} Allocation</p>
                                         </div>
                                     </div>
-                                    <div className={`px-2.5 py-1 rounded-md text-[10px] font-semibold border ${getStatusStyles(m.status)}`}>
-                                        {m.status}
+                                    <div className="flex items-center gap-6">
+                                        <span className={cn(
+                                            "text-[10px] font-black uppercase tracking-[0.25em] px-3 py-1 rounded-full border shadow-sm",
+                                            m.status === 'RELEASED' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-white/5 text-gray-500 border-white/5"
+                                        )}>
+                                            {m.status.replace('_', ' ')}
+                                        </span>
                                     </div>
                                 </div>
 
                                 {expandedId === m.id && (
-                                    <div className="px-5 pb-6 space-y-6 animate-in slide-in-from-top-2 duration-300">
-                                        <div className="h-px bg-gray-800 w-full" />
-
-                                        {/* 5️⃣ Verification Logic Display */}
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="bg-gray-900/50 p-3 rounded-xl flex items-center gap-3 border border-gray-800">
-                                                <Cpu className="w-4 h-4 text-blue-400" />
-                                                <div>
-                                                    <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">Verification Engine</p>
-                                                    <p className="text-xs text-white font-medium">{m.authority}</p>
+                                    <div className="p-6 border-t border-white/5 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                                        <div className="flex gap-4">
+                                            <div className="flex-1 space-y-4">
+                                                <div className="flex gap-3">
+                                                    <Cpu className="w-4 h-4 text-emerald-500" />
+                                                    <div>
+                                                        <p className="text-[10px] uppercase text-gray-500 font-black tracking-widest">Verification Authority</p>
+                                                        <p className="text-sm text-white font-semibold">{m.authority}</p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="bg-gray-900/50 p-3 rounded-xl flex items-center gap-3 border border-gray-800">
-                                                <Clock className="w-4 h-4 text-amber-500" />
-                                                <div>
-                                                    <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">Release Window</p>
-                                                    <p className="text-xs text-white font-medium">48H Auto-Finalize</p>
+
+                                                {m.aiChecks && m.aiChecks.length > 0 && (
+                                                    <div className="bg-black/40 border border-white/5 rounded-xl p-4 space-y-2">
+                                                        <p className="text-[10px] uppercase text-gray-600 font-black tracking-[0.2em] mb-3 flex items-center gap-2">
+                                                            <Sparkles className="w-3 h-3" /> Audit Criteria
+                                                        </p>
+                                                        {m.aiChecks.map((c, i) => (
+                                                            <div key={i} className="flex items-center gap-2 text-sm">
+                                                                <CheckIcon passed={c.passed} />
+                                                                <span className={cn("font-medium", c.passed ? 'text-gray-300' : 'text-red-400')}>{c.label}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                <div className="text-xs text-gray-400 font-medium leading-relaxed italic">{m.notes}</div>
+
+                                                <div className="flex gap-3 pt-2">
+                                                    {(m.status === 'UNDER_REVIEW' || m.status === 'SUBMITTED' || m.status === 'RELEASED') && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="rounded-xl border-white/10 hover:bg-white/5 h-10 px-6 text-[10px] font-black uppercase tracking-widest"
+                                                            onClick={() => setViewingEvidence(m)}
+                                                        >
+                                                            <FileText className="w-3 h-3 mr-2" />
+                                                            View Evidence
+                                                        </Button>
+                                                    )}
+                                                    {m.status === 'UNDER_REVIEW' && !m.disputeRaised && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-xl h-10 px-6 text-[10px] font-black uppercase tracking-widest"
+                                                            onClick={() => handleRaiseDispute(m.id)}
+                                                        >
+                                                            <Flag className="w-3 h-3 mr-2" />
+                                                            Raise Dispute
+                                                        </Button>
+                                                    )}
+                                                    {m.status === 'UNDER_REVIEW' && (
+                                                        <div className="text-[10px] text-gray-500 flex items-center gap-1.5 font-bold uppercase tracking-widest bg-white/5 px-3 rounded-xl h-10">
+                                                            <Clock className="w-3 h-3" /> Dispute window: {m.disputeWindowHours}h
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* 4️⃣ Interaction Panel */}
-                                        {m.status === 'SUBMITTED' ? (
-                                            <div className="border border-blue-500/20 bg-blue-500/5 p-5 rounded-xl">
-                                                <div className="flex gap-4">
-                                                    <div className="p-2 bg-blue-500/10 rounded-lg h-fit">
-                                                        <FileText className="w-5 h-5 text-blue-400 shrink-0" />
-                                                    </div>
-                                                    <div className="space-y-3">
-                                                        <h4 className="text-sm font-semibold text-white">Verification Underway</h4>
-                                                        <p className="text-xs text-gray-400 leading-relaxed">
-                                                            Objective AI analysis active. Institutional human review window expires in 42 hours. Capital remains locked until 100% confirmation.
-                                                        </p>
-                                                        <Button size="sm" className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium">
-                                                            Review Audit Documents
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : m.status === 'LOCKED' ? (
-                                            <div className="py-8 flex flex-col items-center justify-center border border-dashed border-gray-800 rounded-xl text-gray-600 bg-gray-900/20">
-                                                <Lock className="w-5 h-5 mb-2 opacity-50" />
-                                                <p className="text-xs font-medium">Tranche Sequence Locked</p>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center justify-between bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl">
-                                                <div className="flex items-center gap-3">
-                                                    <UserCheck className="w-4 h-4 text-emerald-500" />
-                                                    <span className="text-xs text-emerald-500 font-medium">Finalized & Capital Released</span>
-                                                </div>
-                                                <span className="text-xs text-gray-500 font-medium">{m.timestamp}</span>
+                                        {m.status === 'RELEASED' && (
+                                            <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl flex gap-3 shadow-lg">
+                                                <Shield className="w-5 h-5 text-emerald-500 shrink-0" />
+                                                <p className="text-[10px] text-emerald-500 leading-relaxed font-bold uppercase tracking-tight">
+                                                    Capital released on {m.timestamp}. Action is final and irreversible via Cleard Protocol.
+                                                </p>
                                             </div>
                                         )}
-
-                                        {/* 6️⃣ Chat & Context Log */}
-                                        <div className="pt-2">
-                                            <p className="text-xs font-medium text-gray-500 mb-4 uppercase tracking-wide">Immutable Context Log</p>
-                                            <div className="space-y-4 mb-5 pl-2 border-l border-gray-800 ml-1">
-                                                {m.comments.map(c => (
-                                                    <div key={c.id} className="flex gap-3 items-start relative left-[-5px]">
-                                                        <div className="w-2 h-2 rounded-full bg-gray-700 mt-1.5 ring-4 ring-[#111111]" />
-                                                        <div>
-                                                            <p className="text-sm text-gray-300 leading-tight">"{c.text}"</p>
-                                                            <p className="text-[10px] text-gray-500 mt-1 font-medium">{c.user} • {c.time}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            {m.status !== 'RELEASED' && (
-                                                <div className="flex gap-2">
-                                                    <input
-                                                        className="flex-1 bg-[#0A0A0A] border border-gray-800 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-gray-600 transition-colors placeholder:text-gray-600"
-                                                        placeholder="Enter protocol log entry..."
-                                                    />
-                                                    <Button size="sm" className="bg-gray-800 hover:bg-gray-700 rounded-lg px-4 text-white border border-gray-700">
-                                                        <Send className="w-3.5 h-3.5" />
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -239,61 +270,137 @@ export default function SkentralVaultPage() {
                     </div>
                 </div>
 
-                {/* Right Column: Capital Summary */}
+                {/* PREMIUM SUMMARY BAR */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="bg-[#111111] border border-gray-900 p-6 rounded-2xl space-y-6 sticky top-24">
-                        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-emerald-500" /> Capital Summary
-                        </h3>
+                    <div className="bg-[#111111] border border-white/5 p-6 rounded-3xl space-y-8 shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-1000">
+                            <TrendingUp className="w-24 h-24 text-emerald-500" />
+                        </div>
 
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-end pb-4 border-b border-gray-800">
-                                <span className="text-xs text-gray-500 font-medium">Initial Escrowed</span>
-                                <span className="text-xl font-semibold text-white">${VAULT_DATA.totalCapital.toLocaleString()}</span>
+                        <div className="space-y-2">
+                            <h3 className="text-[10px] uppercase text-gray-500 font-black tracking-[0.3em] flex items-center gap-2">
+                                <DollarSign className="w-4 h-4 text-emerald-500" /> Capital Summary
+                            </h3>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-3xl font-black text-white tracking-tighter">${releasedCapital.toLocaleString()}</span>
+                                <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Settled</span>
                             </div>
-                            <div className="flex justify-between items-end text-emerald-500 pb-4 border-b border-gray-800">
-                                <span className="text-xs font-medium">Verified Release</span>
-                                <span className="text-lg font-semibold">-${VAULT_DATA.releasedCapital.toLocaleString()}</span>
+                        </div>
+
+                        <div className="space-y-6 pt-6 border-t border-white/5">
+                            <div className="flex justify-between items-center group/item cursor-help">
+                                <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Vault Pipeline</span>
+                                <span className="text-lg font-bold text-gray-200 group-hover/item:text-emerald-500 transition-colors">${pendingCapital.toLocaleString()}</span>
                             </div>
-                            <div className="flex justify-between items-end pt-2">
-                                <span className="text-xs text-gray-400 font-medium">Current Locked</span>
-                                <div className="text-right">
-                                    <span className="text-2xl font-bold text-white block">${(VAULT_DATA.totalCapital - VAULT_DATA.releasedCapital).toLocaleString()}</span>
-                                    <span className="text-[10px] text-gray-500">Secured via Multi-Sig</span>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                    <span className="text-gray-600">Total Escrowed</span>
+                                    <span className="text-white">${VAULT_DATA.totalCapital.toLocaleString()}</span>
+                                </div>
+                                <div className="h-1.5 bg-black rounded-full overflow-hidden shadow-inner border border-white/5">
+                                    <div
+                                        className="h-full bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all duration-[2000ms] ease-out rounded-full"
+                                        style={{ width: `${(releasedCapital / VAULT_DATA.totalCapital) * 100}%` }}
+                                    />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl flex gap-3">
+                        <div className="bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl flex gap-3 mt-6 shadow-lg">
                             <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-                            <p className="text-xs text-amber-500 font-medium leading-relaxed">
-                                Automated capital release protocol active. Funds bypass client manual approval following 100% verification success.
+                            <p className="text-[10px] text-amber-500 leading-relaxed font-bold uppercase tracking-tight">
+                                AI-Driven Release: Funds are released automatically upon verification. Manual approval is disabled.
                             </p>
                         </div>
                     </div>
 
-                    <div className="bg-[#111111] border border-gray-900 p-6 rounded-2xl space-y-4">
-                        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                            <Scale className="w-4 h-4 text-gray-400" /> Compliance Protocol
+                    {/* COMPLIANCE NODE */}
+                    <div className="bg-[#111111] border border-white/5 p-6 rounded-3xl space-y-6">
+                        <h3 className="text-[10px] uppercase text-gray-500 font-black tracking-[0.3em] flex items-center gap-2">
+                            <Scale className="w-4 h-4 text-gray-600" /> Compliance Node
                         </h3>
-                        <div className="space-y-3">
-                            <div className="flex justify-between text-xs font-medium">
-                                <span className="text-gray-600">Dispute Authority</span>
-                                <span className="text-gray-300">Skentral Clearing</span>
+                        <div className="space-y-5">
+                            <div className="group">
+                                <p className="text-[10px] uppercase text-gray-700 font-black tracking-widest mb-1 group-hover:text-emerald-500 transition-colors">Protocol</p>
+                                <p className="text-sm text-gray-200 font-bold">Objective AI v2.4 <span className="text-[10px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded ml-2 uppercase">Online</span></p>
                             </div>
-                            <div className="flex justify-between text-xs font-medium">
-                                <span className="text-gray-600">Verification Engine</span>
-                                <span className="text-gray-300">V.2.4 Objective AI</span>
+                            <div className="group">
+                                <p className="text-[10px] uppercase text-gray-700 font-black tracking-widest mb-1 group-hover:text-amber-500 transition-colors">Custodian</p>
+                                <p className="text-sm text-gray-200 font-bold">{VAULT_DATA.custodian}</p>
                             </div>
                         </div>
-                        <div className="pt-4 border-t border-gray-800">
-                            <p className="text-[10px] leading-relaxed text-gray-500">
-                                This vault is a binding financial record. All interactions and capital movements are cryptographically logged.
-                            </p>
-                        </div>
+                        <Button variant="outline" className="w-full border-white/5 bg-white/5 rounded-2xl h-12 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/10 transition-all mt-4 shadow-sm">
+                            <ExternalLink className="w-4 h-4 mr-3 opacity-50" /> Settlement Log
+                        </Button>
                     </div>
                 </div>
             </div>
+
+            {/* EVIDENCE SIDE PANEL */}
+            {viewingEvidence && (
+                <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="w-full max-w-md bg-[#0D0D0D] border-l border-white/5 p-8 shadow-2xl animate-in slide-in-from-right duration-500">
+                        <div className="flex justify-between items-center mb-10">
+                            <div className="space-y-1">
+                                <h2 className="text-xl font-bold text-white tracking-tight">Audit Evidence</h2>
+                                <p className="text-[10px] uppercase text-gray-500 font-black tracking-[0.2em]">Verification Log Trace</p>
+                            </div>
+                            <Button variant="ghost" size="sm" onClick={() => setViewingEvidence(null)} className="text-gray-500 hover:text-white hover:bg-white/5 rounded-xl">
+                                <X className="w-5 h-5" />
+                            </Button>
+                        </div>
+
+                        <div className="space-y-8">
+                            <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-widest text-gray-600 font-black mb-1 block">Selected Milestone</label>
+                                <p className="text-lg text-white font-bold tracking-tight">{viewingEvidence.title}</p>
+                            </div>
+
+                            <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-6 opacity-[0.03]">
+                                    <Shield className="w-24 h-24 text-emerald-500" />
+                                </div>
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-2 mb-6">
+                                        <Sparkles className="w-4 h-4 text-emerald-500" />
+                                        <span className="text-[10px] uppercase font-black text-emerald-500 tracking-widest">Automated Diagnostics</span>
+                                    </div>
+                                    <div className="space-y-5">
+                                        {Object.entries(viewingEvidence.evidence).map(([key, value]) => (
+                                            <div key={key} className="group">
+                                                <p className="text-[10px] uppercase text-gray-550 font-black mb-1.5 opacity-40 group-hover:text-emerald-500/50 transition-colors uppercase tracking-widest">{key}</p>
+                                                <p className="text-sm text-gray-200 font-medium break-all leading-relaxed">
+                                                    {Array.isArray(value) ? value.join(', ') : value}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <h4 className="text-[10px] uppercase font-black text-gray-500 tracking-[0.2em]">Full Audit Trail</h4>
+                                <div className="border-l border-white/5 ml-2 space-y-8 pl-6">
+                                    <div className="relative">
+                                        <div className="absolute -left-[28.5px] top-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                        <p className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Automated Release</p>
+                                        <p className="text-xs text-gray-400 mt-1 font-medium">AI verified criteria. Payout triggered via Cleard Protocol.</p>
+                                    </div>
+                                    <div className="relative">
+                                        <div className="absolute -left-[28.5px] top-1 w-1.5 h-1.5 rounded-full bg-gray-700" />
+                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Work Submitted</p>
+                                        <p className="text-xs text-gray-500 mt-1 font-medium italic">Freelancer linked external performance assets.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Button className="w-full bg-white text-black hover:bg-emerald-500 hover:text-white transition-all font-bold rounded-2xl h-14 mt-8 shadow-xl active:scale-95" onClick={() => setViewingEvidence(null)}>
+                                Close Audit View
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

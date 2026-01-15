@@ -7,9 +7,9 @@ export function AmountDisplay({ amount, size = "medium", currency = "USD", class
     });
 
     const sizes = {
-        small: "text-base font-medium tabular-nums text-slate-900",
-        medium: "text-xl font-semibold tabular-nums text-slate-900",
-        large: "text-3xl font-bold tabular-nums text-slate-900",
+        small: "text-base font-medium tabular-nums text-white/60",
+        medium: "text-xl font-semibold tabular-nums text-white/80",
+        large: "text-3xl font-bold tabular-nums text-white",
     };
 
     return (

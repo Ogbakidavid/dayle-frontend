@@ -41,8 +41,8 @@ export default function RoleSelectionPage() {
                     <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">
                         Identify Your <span className="text-emerald-500">Node.</span>
                     </h1>
-                    <p className="text-slate-400 text-xl font-medium max-w-xl mx-auto">
-                        Choose how you will interact with the Skentral protocol to begin setup.
+                    <p className="text-white/40 text-xl font-bold max-w-xl mx-auto uppercase tracking-tight">
+                        Choose how you will interact with the Cleard protocol to begin setup.
                     </p>
                 </div>
 
@@ -60,7 +60,7 @@ export default function RoleSelectionPage() {
                                 <Users className="w-8 h-8 text-emerald-500" />
                             </div>
                             <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-4">I'm a Client</h3>
-                            <p className="text-slate-400 text-lg font-medium leading-relaxed mb-10">
+                            <p className="text-white/40 text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
                                 I want to hire talent, create secure payment vaults, and release funds only after work is verified.
                             </p>
                             <Button
@@ -83,7 +83,7 @@ export default function RoleSelectionPage() {
                                 <Briefcase className="w-8 h-8 text-emerald-500" />
                             </div>
                             <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-4">I'm a Talent</h3>
-                            <p className="text-slate-400 text-lg font-medium leading-relaxed mb-10">
+                            <p className="text-white/40 text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
                                 I want to work with verified clients and receive guaranteed, milestone-based payouts for my projects.
                             </p>
                             <Button
@@ -99,7 +99,7 @@ export default function RoleSelectionPage() {
 
                 {/* Footer Metadata */}
                 <div className="mt-20 flex flex-col items-center gap-4">
-                    <div className="flex gap-8 text-[11px] font-black text-slate-600 uppercase tracking-[0.3em]">
+                    <div className="flex gap-8 text-[11px] font-black text-white/10 uppercase tracking-[0.3em]">
                         <span>Secure Selection</span>
                         <span>•</span>
                         <span>Identity Verification Next</span>

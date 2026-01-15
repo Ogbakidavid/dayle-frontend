@@ -81,7 +81,7 @@ export default function SignupPage() {
                                 </div>
                                 <div>
                                     <h4 className="text-white font-black uppercase text-sm tracking-widest mb-1">{item.title}</h4>
-                                    <p className="text-slate-500 font-medium text-lg leading-snug">{item.text}</p>
+                                    <p className="text-white/40 font-bold text-lg leading-snug">{item.text}</p>
                                 </div>
                             </div>
                         ))}
@@ -97,7 +97,7 @@ export default function SignupPage() {
                 <div className="w-full max-w-[440px] relative z-10">
                     <div className="mb-10">
                         <h2 className="text-4xl font-black text-white tracking-tight uppercase leading-none">Create Account</h2>
-                        <p className="text-slate-500 mt-4 text-lg font-medium leading-relaxed">Start securing your professional engagements today.</p>
+                        <p className="text-white/40 mt-4 text-xs font-bold uppercase tracking-widest leading-relaxed">Start securing your professional engagements today.</p>
                     </div>
 
                     <div className="space-y-6">
@@ -132,13 +132,13 @@ export default function SignupPage() {
                                 <span className="w-full border-t border-white/5"></span>
                             </div>
                             <div className="relative flex justify-center text-xs uppercase tracking-widest">
-                                <span className="bg-[#050505] px-4 text-slate-500 font-bold">Or continue with email</span>
+                                <span className="bg-[#050505] px-4 text-white/20 font-black">Or continue with email</span>
                             </div>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="email" className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Email Address</Label>
+                                <Label htmlFor="email" className="text-xs font-black uppercase tracking-[0.2em] text-white/20 ml-1">Email Address</Label>
                                 <div className="relative group">
                                     <Input
                                         id="email"
@@ -146,14 +146,14 @@ export default function SignupPage() {
                                         type="email"
                                         placeholder="name@company.com"
                                         required
-                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-slate-600 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
+                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-white/10 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
                                     />
-                                    <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                                    <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/10 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="password" className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Password</Label>
+                                <Label htmlFor="password" className="text-xs font-black uppercase tracking-[0.2em] text-white/20 ml-1">Password</Label>
                                 <div className="relative group">
                                     <Input
                                         id="password"
@@ -161,14 +161,14 @@ export default function SignupPage() {
                                         type="password"
                                         placeholder="••••••••"
                                         required
-                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-slate-600 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
+                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-white/10 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
                                     />
-                                    <Lock className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                                    <Lock className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/10 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="confirmPassword" className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Confirm Password</Label>
+                                <Label htmlFor="confirmPassword" className="text-xs font-black uppercase tracking-[0.2em] text-white/20 ml-1">Confirm Password</Label>
                                 <div className="relative group">
                                     <Input
                                         id="confirmPassword"
@@ -176,9 +176,9 @@ export default function SignupPage() {
                                         type="password"
                                         placeholder="••••••••"
                                         required
-                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-slate-600 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
+                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-white/10 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
                                     />
-                                    <Lock className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                                    <Lock className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/10 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                                 </div>
                             </div>
 
@@ -209,7 +209,7 @@ export default function SignupPage() {
                         </form>
                     </div>
 
-                    <p className="mt-12 text-center text-slate-500 text-base font-medium">
+                    <p className="mt-12 text-center text-white/40 text-xs font-bold uppercase tracking-widest">
                         Already have an account?{' '}
                         <Link href="/login" className="text-white hover:text-emerald-500 font-black transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-emerald-500/50">
                             Sign In
@@ -220,10 +220,10 @@ export default function SignupPage() {
                 {/* Technical Metadata Footer */}
                 <div className="absolute bottom-10 left-10 md:left-auto md:right-10 flex items-center gap-8">
                     <div className="flex flex-col gap-1">
-                        <span className="text-[9px] font-black text-slate-700 uppercase tracking-[0.3em]">Status</span>
+                        <span className="text-xs font-black text-white/10 uppercase tracking-[0.3em]">Status</span>
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active</span>
+                            <span className="text-xs font-bold text-white/20 uppercase tracking-widest">Active</span>
                         </div>
                     </div>
                 </div>

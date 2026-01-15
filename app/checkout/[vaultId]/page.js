@@ -12,7 +12,7 @@ export default function CheckoutSelectionPage() {
     const amount = 1522.50; // Mock amount
 
     return (
-        <div className="min-h-screen bg-[#050505] text-slate-300 font-sans antialiased">
+        <div className="min-h-screen bg-[#050505] text-white/80 font-sans antialiased">
             <div className="flex flex-col lg:flex-row min-h-screen">
                 {/* LEFT SIDEBAR (25%) */}
                 <section className="w-full lg:w-[25%] bg-[#080808] p-10 border-r border-white/5 flex flex-col justify-between">
@@ -25,7 +25,7 @@ export default function CheckoutSelectionPage() {
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-1">
-                                <p className="text-xs font-black uppercase text-slate-600 tracking-[0.2em]">Payable Amount</p>
+                                <p className="text-xs font-black uppercase text-white/20 tracking-[0.2em]">Payable Amount</p>
                                 <h1 className="text-5xl font-bold text-white tracking-tighter">${amount.toLocaleString()}</h1>
                             </div>
                         </div>
@@ -34,7 +34,7 @@ export default function CheckoutSelectionPage() {
                         <div className="flex items-center gap-2 text-emerald-500 text-xs font-black uppercase tracking-widest mb-2">
                             <ShieldCheck className="w-4 h-4" /> Vault Escrow Active
                         </div>
-                        <p className="text-xs text-slate-500 leading-relaxed font-bold">Funds are held in a secure multi-sig vault until milestone approval.</p>
+                        <p className="text-xs text-white/40 leading-relaxed font-bold">Funds are held in a secure multi-sig vault until milestone approval.</p>
                     </div>
                 </section>
 
@@ -44,7 +44,7 @@ export default function CheckoutSelectionPage() {
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                             <div className="text-center space-y-2">
                                 <h2 className="text-3xl font-bold text-white tracking-tight">Payment Method</h2>
-                                <p className="text-slate-500">Select how you want to fund this project</p>
+                                <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Select how you want to fund this project</p>
                             </div>
                             <div className="grid gap-4">
                                 <MethodBtn
@@ -73,12 +73,12 @@ export default function CheckoutSelectionPage() {
 function MethodBtn({ icon, title, desc, onClick }) {
     return (
         <button onClick={onClick} className="w-full p-6 bg-white/[0.03] border border-white/5 rounded-3xl flex items-center gap-6 group hover:bg-emerald-500/5 hover:border-emerald-500/30 transition-all text-left">
-            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-slate-500 group-hover:bg-emerald-500 group-hover:text-black transition-all">{icon}</div>
+            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-white/40 group-hover:bg-emerald-500 group-hover:text-black transition-all">{icon}</div>
             <div className="flex-1">
                 <p className="text-white font-bold text-lg">{title}</p>
-                <p className="text-sm text-slate-500">{desc}</p>
+                <p className="text-sm text-white/40 font-bold">{desc}</p>
             </div>
-            <ChevronRight className="w-5 h-5 text-slate-700 group-hover:text-white group-hover:translate-x-1 transition-all" />
+            <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-white group-hover:translate-x-1 transition-all" />
         </button>
     );
 }

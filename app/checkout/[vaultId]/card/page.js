@@ -140,8 +140,8 @@ export default function CardPaymentPage() {
                                             <div className="space-y-6">
                                                 <p className="text-2xl tracking-[0.2em]">{cardDetails.number || "•••• •••• •••• ••••"}</p>
                                                 <div className="flex justify-between text-xs font-black uppercase tracking-widest">
-                                                    <div><p className="opacity-50 mb-1">Holder</p><p className="text-sm tracking-normal">{cardDetails.name || "YOUR NAME"}</p></div>
-                                                    <div className="text-right"><p className="opacity-50 mb-1">Expiry</p><p className="text-sm tracking-normal">{cardDetails.expiry || "MM/YY"}</p></div>
+                                                    <div><p className="text-white/50 mb-1">Holder</p><p className="text-sm tracking-normal">{cardDetails.name || "YOUR NAME"}</p></div>
+                                                    <div className="text-right"><p className="text-white/50 mb-1">Expiry</p><p className="text-sm tracking-normal">{cardDetails.expiry || "MM/YY"}</p></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -185,16 +185,16 @@ function Sidebar({ amount }) {
                 </div>
                 <div className="space-y-6">
                     <div className="space-y-1">
-                        <p className="text-xs font-black uppercase text-slate-600 tracking-[0.2em]">Payable Amount</p>
+                        <p className="text-sm font-black uppercase text-white/40 tracking-[0.2em]">Payable Amount</p>
                         <h1 className="text-5xl font-bold text-white tracking-tighter">${amount.toLocaleString()}</h1>
                     </div>
                 </div>
             </div>
             <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                <div className="flex items-center gap-2 text-emerald-500 text-xs font-black uppercase tracking-widest mb-2">
+                <div className="flex items-center gap-2 text-emerald-500 text-sm font-black uppercase tracking-widest mb-2">
                     <Lock className="w-4 h-4" /> Vault Escrow Active
                 </div>
-                <p className="text-xs text-slate-500 leading-relaxed font-bold">Funds are held in a secure multi-sig vault until milestone approval.</p>
+                <p className="text-sm text-white/50 leading-relaxed font-bold">Funds are held in a secure multi-sig vault until milestone approval.</p>
             </div>
         </section>
     );
@@ -203,9 +203,9 @@ function Sidebar({ amount }) {
 function InputField({ label, error, ...props }) {
     return (
         <div className="space-y-3">
-            <label className="text-xs font-black uppercase text-slate-600 tracking-widest ml-1">{label}</label>
-            <input {...props} className={`w-full bg-white/[0.03] border ${error ? 'border-red-500' : 'border-white/10'} h-14 rounded-2xl px-4 text-white focus:border-emerald-500/50 outline-none transition-all`} />
-            {error && <p className="text-xs text-red-500 font-bold ml-1">{error}</p>}
+            <label className="text-sm font-black uppercase text-white/40 tracking-widest ml-1">{label}</label>
+            <input {...props} className={`w-full bg-white/[0.03] border ${error ? 'border-red-500' : 'border-white/10'} h-14 rounded-2xl px-4 text-white focus:border-emerald-500/50 outline-none transition-all placeholder:text-slate-600`} />
+            {error && <p className="text-sm text-red-500 font-bold ml-1">{error}</p>}
         </div>
     );
 }
@@ -237,7 +237,7 @@ function FailureModal({ message, onClose }) {
             <div className="bg-[#0D0D0D] border border-white/5 w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl">
                 <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6"><XCircle className="w-8 h-8 text-red-500" /></div>
                 <h3 className="text-xl font-bold text-white mb-2">Failed</h3>
-                <p className="text-slate-500 text-sm mb-8 leading-relaxed">{message}</p>
+                <p className="text-white/50 text-sm mb-8 leading-relaxed">{message}</p>
                 <button onClick={onClose} className="w-full bg-white text-black h-14 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-all"><RefreshCcw className="w-4 h-4" /> Try Again</button>
             </div>
         </motion.div>
@@ -252,7 +252,7 @@ function SuccessScreen({ onContinue }) {
             </div>
             <div className="space-y-2">
                 <h2 className="text-4xl font-bold text-white tracking-tight">Deposit Locked</h2>
-                <p className="text-slate-500">Milestone #1 is now fully funded. Funds are held securely in Cleard Escrow.</p>
+                <p className="text-white/50">Milestone #1 is now fully funded. Funds are held securely in Cleard Escrow.</p>
             </div>
             <button onClick={onContinue} className="w-full h-16 bg-white text-black font-bold text-lg rounded-2xl hover:bg-slate-200 transition-all shadow-xl">Continue to Dashboard</button>
         </motion.div>

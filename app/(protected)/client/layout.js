@@ -23,7 +23,7 @@ export default function ClientLayout({ children }) {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A] text-gray-200 flex">
+        <div className="min-h-screen bg-[#0A0A0A] text-white flex">
             {/* Left Sidebar - Professional Dark Theme */}
             <aside className="w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col sticky top-0 h-screen">
                 {/* Logo & Brand */}
@@ -48,12 +48,12 @@ export default function ClientLayout({ children }) {
                                     "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                                     isActive
                                         ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                        : "text-gray-400 hover:bg-white/5 hover:text-white"
+                                        : "text-white/60 hover:bg-white/5 hover:text-white"
                                 )}>
                                     <div className="flex items-center gap-3">
                                         <item.icon className={cn(
                                             "w-4 h-4 transition-colors",
-                                            isActive ? "text-emerald-400" : "text-gray-500 group-hover:text-gray-300"
+                                            isActive ? "text-emerald-400" : "text-white/40 group-hover:text-white/80"
                                         )} />
                                         <span>{item.name}</span>
                                     </div>
@@ -62,7 +62,7 @@ export default function ClientLayout({ children }) {
                                             "text-xs px-2 py-0.5 rounded-full font-medium",
                                             isActive
                                                 ? "bg-emerald-500/20 text-emerald-400"
-                                                : "bg-gray-800 text-gray-400"
+                                                : "bg-white/5 text-white/40"
                                         )}>
                                             {item.badge}
                                         </span>
@@ -81,7 +81,7 @@ export default function ClientLayout({ children }) {
                         </div>
                         <div>
                             <p className="text-sm font-medium text-white">{user?.name || 'Alex Johnson'}</p>
-                            <p className="text-xs text-gray-500">Administrator</p>
+                            <p className="text-xs text-white/40 font-bold uppercase tracking-wider">Administrator</p>
                         </div>
                     </div>
 
@@ -91,7 +91,7 @@ export default function ClientLayout({ children }) {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-full text-xs border-gray-800 bg-black/30 hover:bg-gray-800 hover:border-gray-700 text-gray-300"
+                                className="h-9 w-full text-xs border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80"
                             >
                                 <Settings className="w-3.5 h-3.5 mr-2" />
                                 Settings
@@ -101,7 +101,7 @@ export default function ClientLayout({ children }) {
                             variant="outline"
                             size="sm"
                             onClick={logout}
-                            className="h-9 text-xs border-gray-800 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
+                            className="h-9 text-xs border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
                         >
                             <LogOut className="w-3.5 h-3.5 mr-2" />
                             Sign out

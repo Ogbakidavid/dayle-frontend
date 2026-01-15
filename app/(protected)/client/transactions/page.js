@@ -18,14 +18,26 @@ const mockTransactions = [
     { id: 'TX-98231', type: 'withdrawal', counterparty: 'Bank Account ****4532', status: 'processing', amount: 10000, date: 'Oct 20, 2025', method: 'Wire Transfer' },
     { id: 'TX-98230', type: 'deposit', counterparty: 'External Wallet', status: 'completed', amount: 20000, date: 'Oct 15, 2025', method: 'USDT' },
     { id: 'TX-98229', type: 'payment', counterparty: 'mike@marketing.pro', status: 'failed', amount: 3500, date: 'Oct 12, 2025', method: 'Escrow Release' },
+    { id: 'TX-98228', type: 'deposit', counterparty: 'External Wallet', status: 'completed', amount: 1200, date: 'Oct 10, 2025', method: 'USDC' },
+    { id: 'TX-98227', type: 'payment', counterparty: 'jane@dev.io', status: 'completed', amount: 4200, date: 'Oct 08, 2025', method: 'Escrow Release' },
+    { id: 'TX-98226', type: 'withdrawal', counterparty: 'Bank Account ****4532', status: 'completed', amount: 5000, date: 'Oct 05, 2025', method: 'Wire Transfer' },
+    { id: 'TX-98225', type: 'deposit', counterparty: 'External Wallet', status: 'completed', amount: 8000, date: 'Oct 01, 2025', method: 'USDC' },
 ];
 
 export default function TransactionsPage() {
     const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
 
     const filteredTransactions = mockTransactions.filter(tx =>
         tx.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tx.counterparty.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+    const paginatedTransactions = filteredTransactions.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -93,7 +105,7 @@ export default function TransactionsPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
-                                {filteredTransactions.map((tx) => (
+                                {paginatedTransactions.map((tx) => (
                                     <tr key={tx.id} className="group hover:bg-white/[0.02] transition-colors">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
@@ -141,6 +153,41 @@ export default function TransactionsPage() {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="px-6 py-5 border-t border-white/5 flex items-center justify-between bg-white/[0.01]">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                Page {currentPage} of {totalPages}
+                            </p>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={currentPage === 1}
+                                    onClick={() => {
+                                        setCurrentPage(prev => Math.max(1, prev - 1));
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }}
+                                    className="h-9 px-4 text-xs border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                                >
+                                    Previous
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={currentPage === totalPages}
+                                    onClick={() => {
+                                        setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }}
+                                    className="h-9 px-4 text-xs border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
