@@ -3,38 +3,31 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
-  Lock,
   Plus,
-  Clock,
-  CheckCircle,
   Search,
   ArrowUpRight,
   Zap,
   Shield,
-  Users,
-  FileText,
   TrendingUp,
   MoreHorizontal,
   Filter,
+  FileText,
 } from "lucide-react";
 import { useState } from "react";
 import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 
-// Local mock data removed in favor of central vault-context
-
-export default function VaultsPage() {
+export default function FreelancerVaultsPage() {
   const { vaults, loading } = useVault();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
   const filteredVaults = (vaults || []).filter((vault) => {
-    const freelancerEmail =
-      vault.freelancerEmail || vault.freelancer?.email || "";
+    const clientEmail = vault.clientEmail || vault.client?.email || "";
     return (
       vault.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      freelancerEmail.toLowerCase().includes(searchQuery.toLowerCase())
+      clientEmail.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
 
@@ -46,23 +39,23 @@ export default function VaultsPage() {
 
   const stats = [
     {
-      label: "Total Value",
-      value: "$140,000",
-      change: "+12.5%",
+      label: "Total Earnings",
+      value: "$45,000",
+      change: "+8.5%",
       icon: Shield,
       color: "text-emerald-500",
     },
     {
-      label: "Active Vaults",
-      value: "12",
-      change: "+2",
+      label: "Active Jobs",
+      value: "5",
+      change: "+1",
       icon: Zap,
       color: "text-blue-500",
     },
     {
-      label: "Completion Rate",
-      value: "94%",
-      change: "+0.4%",
+      label: "Success Rate",
+      value: "98%",
+      change: "+0.2%",
       icon: TrendingUp,
       color: "text-purple-500",
     },
@@ -75,10 +68,10 @@ export default function VaultsPage() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <h1 className="text-4xl font-black tracking-tighter text-white uppercase">
-              Financial Vaults
+              Your Vaults
             </h1>
-            <p className="text-sm text-slate-500 font-bold uppercase tracking-widest">
-              Overview of your smart-escrow deployments
+            <p className="text-sm text-white/40 font-bold uppercase tracking-widest">
+              Manage your active contracts and milestones
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -89,12 +82,6 @@ export default function VaultsPage() {
               <Filter className="w-4 h-4 mr-2 text-slate-400" />
               Filters
             </Button>
-            <Link href="/client/create-vault">
-              <Button className="bg-white text-black hover:bg-emerald-400 hover:text-black h-11 px-6 rounded-xl font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all lg:hidden">
-                <Plus className="w-4 h-4 mr-2" strokeWidth={3} />
-                New Vault
-              </Button>
-            </Link>
           </div>
         </header>
 
@@ -119,7 +106,7 @@ export default function VaultsPage() {
                   {stat.change}
                 </span>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2">
                 {stat.label}
               </p>
               <h2 className="text-3xl font-black text-white tracking-tighter">
@@ -134,10 +121,10 @@ export default function VaultsPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
           <input
             type="search"
-            placeholder="Search assets, emails, or transaction IDs..."
+            placeholder="Search vaults, clients, or milestones..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner font-bold uppercase tracking-wider"
+            className="w-full pl-12 pr-4 py-4 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner"
           />
         </div>
 
@@ -147,16 +134,16 @@ export default function VaultsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
-                  <th className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                     Vault Detail
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                    Counterparty
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                    Client
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">
                     Value
                   </th>
                   <th className="px-6 py-4"></th>
@@ -168,7 +155,7 @@ export default function VaultsPage() {
                     key={vault.id}
                     className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
                     onClick={() =>
-                      (window.location.href = `/client/vault/${vault.id}`)
+                      (window.location.href = `/freelancer/vault/${vault.id}`)
                     }
                   >
                     <td className="px-6 py-5">
@@ -177,10 +164,10 @@ export default function VaultsPage() {
                           <FileText className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="text-sm font-black text-white uppercase tracking-wider group-hover:text-emerald-400 transition-colors">
+                          <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                             {vault.title}
                           </p>
-                          <p className="text-sm text-slate-500 mt-0.5 font-bold uppercase tracking-wider">
+                          <p className="text-sm text-slate-500 mt-0.5 font-medium">
                             {new Date(
                               vault.createdAt || Date.now()
                             ).toLocaleDateString()}
@@ -191,14 +178,14 @@ export default function VaultsPage() {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-emerald-500">
-                          {(vault.freelancerEmail ||
-                            vault.freelancer?.email ||
-                            "U")[0].toUpperCase()}
+                          {(vault.clientEmail ||
+                            vault.client?.email ||
+                            "C")[0].toUpperCase()}
                         </div>
-                        <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">
-                          {vault.freelancerEmail ||
-                            vault.freelancer?.email ||
-                            "Unassigned"}
+                        <span className="text-sm text-slate-400 font-medium">
+                          {vault.clientEmail ||
+                            vault.client?.email ||
+                            "Unknown Client"}
                         </span>
                       </div>
                     </td>
@@ -227,17 +214,17 @@ export default function VaultsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-5 text-right">
-                      <p className="text-sm font-bold text-white tracking-wider">
+                      <p className="text-sm font-black text-white tracking-widest">
                         ${(vault.totalAmount || vault.amount).toLocaleString()}
                       </p>
-                      <p className="text-[10px] text-slate-600 font-bold uppercase tracking-wider">
+                      <p className="text-[10px] text-slate-600 font-bold uppercase">
                         USD
                       </p>
                     </td>
                     <td className="px-6 py-5 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Link
-                          href={`/client/vault/${vault.id}`}
+                          href={`/freelancer/vault/${vault.id}`}
                           onClick={(e) => e.stopPropagation()}
                         >
                           <Button

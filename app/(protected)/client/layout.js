@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Shield, LayoutDashboard, Plus, Wallet, LogOut, Settings, Bell, Search, ChevronDown, PieChart, FileText, Users, CreditCard, Lock, HelpCircle } from 'lucide-react';
+import { Shield, LayoutDashboard, Plus, Wallet, LogOut, Settings, Bell, Search, ChevronDown, PieChart, FileText, Users, CreditCard, Lock, HelpCircle, Gavel } from 'lucide-react';
 import { useUser } from '@/lib/store/user-context';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -12,9 +12,9 @@ const navigation = [
     { name: 'Overview', href: '/client', icon: LayoutDashboard, badge: null },
     { name: 'Vaults', href: '/client/vaults', icon: Lock, badge: '3' },
     { name: 'Create Vault', href: '/client/create-vault', icon: Plus, badge: null },
+    { name: 'Ledger', href: '/client/ledger', icon: PieChart, badge: null },
+    { name: 'Disputes', href: '/client/disputes', icon: Gavel, badge: null },
     { name: 'Transactions', href: '/client/transactions', icon: CreditCard, badge: null },
-    // { name: 'Team', href: '/client/team', icon: Users, badge: null },
-    // { name: 'Documents', href: '/client/documents', icon: FileText, badge: null },
 ];
 
 export default function ClientLayout({ children }) {
@@ -33,7 +33,7 @@ export default function ClientLayout({ children }) {
                             <Shield className="w-5 h-5 text-black" strokeWidth={2.5} />
                         </div>
                         <div>
-                            <h1 className="text-2xl text-white tracking-tight">Cleard</h1>
+                            <h1 className="text-2xl text-white tracking-tight font-bold uppercase">Cleard</h1>
                         </div>
                     </Link>
                 </div>
@@ -47,13 +47,13 @@ export default function ClientLayout({ children }) {
                                 <div className={cn(
                                     "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                                     isActive
-                                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                        : "text-white/60 hover:bg-white/5 hover:text-white"
+                                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider"
+                                        : "text-white/60 hover:bg-white/5 hover:text-white font-bold uppercase tracking-wider"
                                 )}>
                                     <div className="flex items-center gap-3">
                                         <item.icon className={cn(
-                                            "w-4 h-4 transition-colors",
-                                            isActive ? "text-emerald-400" : "text-white/40 group-hover:text-white/80"
+                                            "w-4 h-4 transition-colors font-bold uppercase",
+                                            isActive ? "text-emerald-400" : "text-white/40 group-hover:text-white/80 font-bold uppercase"
                                         )} />
                                         <span>{item.name}</span>
                                     </div>
@@ -61,8 +61,8 @@ export default function ClientLayout({ children }) {
                                         <span className={cn(
                                             "text-sm px-2 py-0.5 rounded-full font-medium",
                                             isActive
-                                                ? "bg-emerald-500/20 text-emerald-400"
-                                                : "bg-white/5 text-white/40"
+                                                ? "bg-emerald-500/20 text-emerald-400 font-bold uppercase"
+                                                : "bg-white/5 text-white/40 font-bold uppercase"
                                         )}>
                                             {item.badge}
                                         </span>

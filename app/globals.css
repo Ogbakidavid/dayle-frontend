@@ -4,7 +4,7 @@
 
 @theme {
   /* Typography Scale */
-  --font-sans: var(--font-poppins), sans-serif;
+  --font-sans: var(--font-poppins);
 
   /* Spacing Scale (4px base) */
   --spacing-0\.5: 0.125rem;
@@ -108,24 +108,16 @@
   }
 
   body {
-    background-color: #0A0A0A;
-    color: white;
-    font-family: var(--font-sans);
+    background-color: #050505;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: var(--font-poppins);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     @apply antialiased;
   }
 
-  h1 {
-    @apply text-3xl font-semibold tracking-tight text-white;
-  }
-
-  h2 {
-    @apply text-2xl font-semibold tracking-tight text-white;
-  }
-
-  h3 {
-    @apply text-lg font-medium text-white;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-black uppercase tracking-tight text-white;
   }
 
   *:focus-visible {
