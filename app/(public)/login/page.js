@@ -87,12 +87,12 @@ export default function LoginPage() {
         <div className="w-full max-w-[440px] relative z-10">
           <div className="mb-12">
             <h2 className="text-4xl font-black text-white tracking-tight uppercase leading-none">Sign In</h2>
-            <p className="text-white/40 mt-4 text-xs font-bold uppercase tracking-widest leading-relaxed">Access your secure financial workspace.</p>
+            <p className="text-white/40 mt-4 text-sm font-bold uppercase tracking-widest leading-relaxed">Access your secure financial workspace.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-3">
-              <Label htmlFor="email" className="text-xs font-black uppercase tracking-[0.2em] text-white/20 ml-1">Email Address</Label>
+              <Label htmlFor="email" className="text-sm font-black uppercase tracking-[0.2em] text-white/20 ml-1">Email Address</Label>
               <div className="relative group">
                 <Input
                   id="email"
@@ -108,8 +108,8 @@ export default function LoginPage() {
 
             <div className="space-y-3">
               <div className="flex justify-between items-center px-1">
-                <Label htmlFor="password" className="text-xs font-black uppercase tracking-[0.2em] text-white/20">Password</Label>
-                <Link href="#" className="text-xs text-emerald-500 hover:text-emerald-400 font-black uppercase tracking-widest transition-colors">Forgot password?</Link>
+                <Label htmlFor="password" className="text-sm font-black uppercase tracking-[0.2em] text-white/20">Password</Label>
+                <Link href="#" className="text-sm text-emerald-500 hover:text-emerald-400 font-black uppercase tracking-widest transition-colors">Forgot password?</Link>
               </div>
               <div className="relative group">
                 <Input
@@ -126,7 +126,7 @@ export default function LoginPage() {
 
             {error && (
               <div className="flex items-center gap-3 text-red-400 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
-                <p className="text-xs font-bold uppercase tracking-wider leading-relaxed">
+                <p className="text-sm font-bold uppercase tracking-wider leading-relaxed">
                   {error}
                 </p>
               </div>
@@ -153,7 +153,7 @@ export default function LoginPage() {
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-white/10" />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
+              <div className="relative flex justify-center text-sm uppercase">
                 <span className="bg-[#050505] px-2 text-white/20 font-black tracking-widest">Or continue with</span>
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="mt-12 text-center text-white/40 text-xs font-bold uppercase tracking-widest">
+          <p className="mt-12 text-center text-white/40 text-sm font-bold uppercase tracking-widest">
             Don't have an account?{' '}
             <Link href="/signup" className="text-white hover:text-emerald-500 font-black transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-emerald-500/50">
               Create account
@@ -195,10 +195,10 @@ export default function LoginPage() {
         {/* Technical Metadata Footer */}
         <div className="absolute bottom-10 left-10 md:left-auto md:right-10 flex items-center gap-8">
           <div className="flex flex-col gap-1">
-            <span className="text-xs font-black text-white/10 uppercase tracking-[0.3em]">Status</span>
+            <span className="text-sm font-black text-white/10 uppercase tracking-[0.3em]">Status</span>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-              <span className="text-xs font-bold text-white/20 uppercase tracking-widest">Active</span>
+              <span className="text-sm font-bold text-white/20 uppercase tracking-widest">Active</span>
             </div>
           </div>
         </div>

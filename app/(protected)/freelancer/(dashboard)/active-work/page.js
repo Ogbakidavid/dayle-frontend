@@ -23,7 +23,7 @@ export default function ActiveWorkPage() {
         <div className="space-y-8 max-w-6xl mx-auto">
             {/* Breadcrumbs / Header */}
             <div className="space-y-4">
-                <div className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-500 uppercase tracking-widest">
                     <Link href="/freelancer" className="hover:text-white transition-colors">Dashboard</Link>
                     <span>/</span>
                     <span className="text-gray-400">Active Work</span>
@@ -107,7 +107,7 @@ export default function ActiveWorkPage() {
                                         size="sm"
                                         disabled={currentPage === 1}
                                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                        className="h-9 px-4 text-xs border-gray-800 bg-transparent hover:bg-gray-800 text-gray-400 font-bold uppercase tracking-widest hover:text-white transition-all"
+                                        className="h-9 px-4 text-sm border-gray-800 bg-transparent hover:bg-gray-800 text-gray-400 font-bold uppercase tracking-widest hover:text-white transition-all"
                                     >
                                         Previous
                                     </Button>
@@ -116,7 +116,7 @@ export default function ActiveWorkPage() {
                                         size="sm"
                                         disabled={currentPage === totalPages}
                                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                        className="h-9 px-4 text-xs border-gray-800 bg-transparent hover:bg-gray-800 text-gray-400 font-bold uppercase tracking-widest hover:text-white transition-all"
+                                        className="h-9 px-4 text-sm border-gray-800 bg-transparent hover:bg-gray-800 text-gray-400 font-bold uppercase tracking-widest hover:text-white transition-all"
                                     >
                                         Next
                                     </Button>

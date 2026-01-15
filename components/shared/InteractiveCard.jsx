@@ -95,13 +95,13 @@ export default function InteractiveCard({
 
                             <div className="flex justify-between items-end">
                                 <div className="space-y-1">
-                                    <span className="text-xs text-gray-400 uppercase tracking-wider block">Card Holder</span>
+                                    <span className="text-sm text-gray-400 uppercase tracking-wider block">Card Holder</span>
                                     <p className="text-sm text-white font-medium uppercase tracking-widest truncate max-w-[200px]">
                                         {cardHolder || 'YOUR NAME'}
                                     </p>
                                 </div>
                                 <div className="space-y-1">
-                                    <span className="text-xs text-gray-400 uppercase tracking-wider block text-right">Expires</span>
+                                    <span className="text-sm text-gray-400 uppercase tracking-wider block text-right">Expires</span>
                                     <p className="text-sm text-white font-medium tracking-widest">
                                         {expiry || 'MM/YY'}
                                     </p>
@@ -124,7 +124,7 @@ export default function InteractiveCard({
                     <div className="mt-6 px-6">
                         <div className="space-y-1">
                             <div className="flex items-center justify-end">
-                                <span className="text-xs text-gray-400 mr-2 uppercase">Security Code</span>
+                                <span className="text-sm text-gray-400 mr-2 uppercase">Security Code</span>
                             </div>
                             <div className="h-10 bg-white flex items-center justify-end px-3 rounded-sm">
                                 <span className="text-black font-bold tracking-widest text-lg">

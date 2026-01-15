@@ -59,7 +59,7 @@ export default function ClientLayout({ children }) {
                                     </div>
                                     {item.badge && (
                                         <span className={cn(
-                                            "text-xs px-2 py-0.5 rounded-full font-medium",
+                                            "text-sm px-2 py-0.5 rounded-full font-medium",
                                             isActive
                                                 ? "bg-emerald-500/20 text-emerald-400"
                                                 : "bg-white/5 text-white/40"
@@ -81,7 +81,7 @@ export default function ClientLayout({ children }) {
                         </div>
                         <div>
                             <p className="text-sm font-medium text-white">{user?.name || 'Alex Johnson'}</p>
-                            <p className="text-xs text-white/40 font-bold uppercase tracking-wider">Administrator</p>
+                            <p className="text-sm text-white/40 font-bold uppercase tracking-wider">Administrator</p>
                         </div>
                     </div>
 
@@ -91,7 +91,7 @@ export default function ClientLayout({ children }) {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-full text-xs border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80"
+                                className="h-9 w-full text-sm border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80"
                             >
                                 <Settings className="w-3.5 h-3.5 mr-2" />
                                 Settings
@@ -101,7 +101,7 @@ export default function ClientLayout({ children }) {
                             variant="outline"
                             size="sm"
                             onClick={logout}
-                            className="h-9 text-xs border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
+                            className="h-9 text-sm border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
                         >
                             <LogOut className="w-3.5 h-3.5 mr-2" />
                             Sign out

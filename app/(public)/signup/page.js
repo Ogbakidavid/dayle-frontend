@@ -97,7 +97,7 @@ export default function SignupPage() {
                 <div className="w-full max-w-[440px] relative z-10">
                     <div className="mb-10">
                         <h2 className="text-4xl font-black text-white tracking-tight uppercase leading-none">Create Account</h2>
-                        <p className="text-white/40 mt-4 text-xs font-bold uppercase tracking-widest leading-relaxed">Start securing your professional engagements today.</p>
+                        <p className="text-white/40 mt-4 text-sm font-bold uppercase tracking-widest leading-relaxed">Start securing your professional engagements today.</p>
                     </div>
 
                     <div className="space-y-6">
@@ -131,14 +131,14 @@ export default function SignupPage() {
                             <div className="absolute inset-0 flex items-center">
                                 <span className="w-full border-t border-white/5"></span>
                             </div>
-                            <div className="relative flex justify-center text-xs uppercase tracking-widest">
+                            <div className="relative flex justify-center text-sm uppercase tracking-widest">
                                 <span className="bg-[#050505] px-4 text-white/20 font-black">Or continue with email</span>
                             </div>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="email" className="text-xs font-black uppercase tracking-[0.2em] text-white/20 ml-1">Email Address</Label>
+                                <Label htmlFor="email" className="text-sm font-black uppercase tracking-[0.2em] text-white/20 ml-1">Email Address</Label>
                                 <div className="relative group">
                                     <Input
                                         id="email"
@@ -153,7 +153,7 @@ export default function SignupPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="password" className="text-xs font-black uppercase tracking-[0.2em] text-white/20 ml-1">Password</Label>
+                                <Label htmlFor="password" className="text-sm font-black uppercase tracking-[0.2em] text-white/20 ml-1">Password</Label>
                                 <div className="relative group">
                                     <Input
                                         id="password"
@@ -168,7 +168,7 @@ export default function SignupPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="confirmPassword" className="text-xs font-black uppercase tracking-[0.2em] text-white/20 ml-1">Confirm Password</Label>
+                                <Label htmlFor="confirmPassword" className="text-sm font-black uppercase tracking-[0.2em] text-white/20 ml-1">Confirm Password</Label>
                                 <div className="relative group">
                                     <Input
                                         id="confirmPassword"
@@ -184,7 +184,7 @@ export default function SignupPage() {
 
                             {error && (
                                 <div className="flex items-center gap-3 text-red-400 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
-                                    <p className="text-xs font-bold uppercase tracking-wider leading-relaxed">
+                                    <p className="text-sm font-bold uppercase tracking-wider leading-relaxed">
                                         {error}
                                     </p>
                                 </div>
@@ -209,7 +209,7 @@ export default function SignupPage() {
                         </form>
                     </div>
 
-                    <p className="mt-12 text-center text-white/40 text-xs font-bold uppercase tracking-widest">
+                    <p className="mt-12 text-center text-white/40 text-sm font-bold uppercase tracking-widest">
                         Already have an account?{' '}
                         <Link href="/login" className="text-white hover:text-emerald-500 font-black transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-emerald-500/50">
                             Sign In
@@ -220,10 +220,10 @@ export default function SignupPage() {
                 {/* Technical Metadata Footer */}
                 <div className="absolute bottom-10 left-10 md:left-auto md:right-10 flex items-center gap-8">
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-black text-white/10 uppercase tracking-[0.3em]">Status</span>
+                        <span className="text-sm font-black text-white/10 uppercase tracking-[0.3em]">Status</span>
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                            <span className="text-xs font-bold text-white/20 uppercase tracking-widest">Active</span>
+                            <span className="text-sm font-bold text-white/20 uppercase tracking-widest">Active</span>
                         </div>
                     </div>
                 </div>

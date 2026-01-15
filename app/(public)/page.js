@@ -52,7 +52,7 @@ export default function LandingPage() {
                         <span className="font-black tracking-tighter text-2xl uppercase text-white">CLEARD</span>
                     </div>
 
-                    <div className="hidden md:flex items-center gap-10 text-xs font-black uppercase tracking-widest text-white/40">
+                    <div className="hidden md:flex items-center gap-10 text-sm font-black uppercase tracking-widest text-white/40">
                         <Link href="#protocol" className="hover:text-emerald-500 transition-colors">How it works</Link>
                         <Link href="#safety" className="hover:text-emerald-500 transition-colors">Security</Link>
                         <Link href="#faq" className="hover:text-emerald-500 transition-colors">FAQ</Link>
@@ -61,12 +61,12 @@ export default function LandingPage() {
 
                     <div className="flex items-center gap-3">
                         <Link href="/login">
-                            <Button variant="ghost" className="text-xs font-black uppercase tracking-widest px-5 text-white/40 hover:text-white hover:bg-white/5">
+                            <Button variant="ghost" className="text-sm font-black uppercase tracking-widest px-5 text-white/40 hover:text-white hover:bg-white/5">
                                 Sign In
                             </Button>
                         </Link>
                         <Link href="/signup">
-                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-black rounded-xl px-6 h-10 text-xs uppercase tracking-widest transition-all">
+                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-black rounded-xl px-6 h-10 text-sm uppercase tracking-widest transition-all">
                                 Sign Up
                             </Button>
                         </Link>
@@ -79,7 +79,7 @@ export default function LandingPage() {
                 <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-16 items-center relative z-10">
 
                     <div className="lg:col-span-7 text-left">
-                        <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-black uppercase tracking-widest mb-8 bg-emerald-500/10 border-emerald-500/20 text-emerald-400">
+                        <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-black uppercase tracking-widest mb-8 bg-emerald-500/10 border-emerald-500/20 text-emerald-400">
                             <Activity className="w-4 h-4" /> Eliminating Counterparty Risk
                         </div>
 
@@ -116,12 +116,12 @@ export default function LandingPage() {
                         <div className="relative space-y-4">
                             <div className="border p-8 rounded-[32px] transform -rotate-2 hover:rotate-0 transition-all duration-500 bg-[#0a0a0a] border-white/10 shadow-2xl">
                                 <div className="flex justify-between items-center mb-4">
-                                    <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">Milestone 01</span>
+                                    <span className="text-sm font-black text-emerald-500 uppercase tracking-widest">Milestone 01</span>
                                     <CheckCircle2 className="w-6 h-6 text-emerald-500" />
                                 </div>
                                 <h4 className="text-xl font-bold uppercase mb-2 text-white">Project Architecture</h4>
                                 <div className="flex justify-between items-end">
-                                    <p className="text-white/20 text-xs uppercase font-black tracking-widest">Status: Released</p>
+                                    <p className="text-white/20 text-sm uppercase font-black tracking-widest">Status: Released</p>
                                     <p className="text-xl font-black text-white">$4,500.00</p>
                                 </div>
                             </div>
@@ -131,7 +131,7 @@ export default function LandingPage() {
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
                                             <RefreshCcw className="w-4 h-4 animate-spin-slow" />
-                                            <span className="text-xs font-black opacity-60 uppercase tracking-widest">In Progress</span>
+                                            <span className="text-sm font-black opacity-60 uppercase tracking-widest">In Progress</span>
                                         </div>
                                         <h4 className="text-3xl font-black uppercase leading-none">Beta Deployment</h4>
                                     </div>
@@ -148,12 +148,12 @@ export default function LandingPage() {
 
                             <div className="border p-8 rounded-[32px] transform rotate-2 transition-all bg-[#0a0a0a] border-white/5 opacity-40 hover:opacity-100 shadow-2xl">
                                 <div className="flex justify-between items-center mb-4">
-                                    <span className="text-xs font-black text-white/20 uppercase tracking-widest">Milestone 03</span>
+                                    <span className="text-sm font-black text-white/20 uppercase tracking-widest">Milestone 03</span>
                                     <Box className="w-6 h-6 text-white/20" />
                                 </div>
                                 <h4 className="text-xl font-bold uppercase mb-2 text-white/20">Final Handover</h4>
                                 <div className="flex justify-between items-end">
-                                    <p className="text-white/10 text-xs uppercase font-black tracking-widest">Pending</p>
+                                    <p className="text-white/10 text-sm uppercase font-black tracking-widest">Pending</p>
                                     <p className="text-white/10 text-xl font-black">$8,500.00</p>
                                 </div>
                             </div>
@@ -167,7 +167,7 @@ export default function LandingPage() {
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-24">
                         <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white">How Cleard Protects You.</h2>
-                        <p className="text-white/40 font-bold uppercase tracking-widest text-xs">A three-step process to guaranteed payment.</p>
+                        <p className="text-white/40 font-bold uppercase tracking-widest text-sm">A three-step process to guaranteed payment.</p>
                     </div>
                     <div className="grid lg:grid-cols-3 gap-12">
                         {[
@@ -201,7 +201,7 @@ export default function LandingPage() {
                             </p>
                         </div>
                         <div className="text-right">
-                            <div className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-2">Protocol Capabilities</div>
+                            <div className="text-sm font-black text-emerald-500 uppercase tracking-widest mb-2">Protocol Capabilities</div>
                             <div className="h-1 w-32 bg-emerald-500 ml-auto"></div>
                         </div>
                     </div>
@@ -218,7 +218,7 @@ export default function LandingPage() {
                                     <f.icon className="w-8 h-8 text-emerald-500" />
                                 </div>
                                 <h4 className="text-xl font-black mb-4 uppercase tracking-tighter text-white">{f.title}</h4>
-                                <p className="text-xs leading-relaxed font-bold text-white/40 uppercase tracking-widest">{f.desc}</p>
+                                <p className="text-sm leading-relaxed font-bold text-white/40 uppercase tracking-widest">{f.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -231,12 +231,12 @@ export default function LandingPage() {
                     <div className="grid lg:grid-cols-2 gap-20 items-center relative z-10">
                         <div>
                             <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tight mb-8">Hardened <br />Security.</h2>
-                            <p className="text-white/40 text-xs font-bold uppercase tracking-[0.2em] leading-loose mb-12">Your project capital is protected by bank-grade infrastructure and isolated vaults.</p>
+                            <p className="text-white/40 text-sm font-bold uppercase tracking-[0.2em] leading-loose mb-12">Your project capital is protected by bank-grade infrastructure and isolated vaults.</p>
                             <div className="grid grid-cols-2 gap-6 text-white">
                                 {['AES-256 Encryption', 'Biometric MFA', 'SOC-2 Compliant', 'Insured Vaults'].map((text, i) => (
                                     <div key={i} className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center"><Check className="w-4 h-4 text-black" /></div>
-                                        <span className="text-xs font-black uppercase tracking-widest">{text}</span>
+                                        <span className="text-sm font-black uppercase tracking-widest">{text}</span>
                                     </div>
                                 ))}
                             </div>
@@ -250,7 +250,7 @@ export default function LandingPage() {
                                 <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-3xl flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer group">
                                     <div className="flex items-center gap-4">
                                         <item.icon className="w-8 h-8 text-emerald-500" />
-                                        <span className="text-xs font-black uppercase text-white tracking-[0.2em]">{item.title}</span>
+                                        <span className="text-sm font-black uppercase text-white tracking-[0.2em]">{item.title}</span>
                                     </div>
                                     <ArrowUpRight className="w-6 h-6 text-white/20 group-hover:text-emerald-500 transition-colors" />
                                 </div>
@@ -265,7 +265,7 @@ export default function LandingPage() {
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-20">
                         <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white">Common Questions.</h2>
-                        <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Everything you need to know about the protocol.</p>
+                        <p className="text-white/40 font-bold uppercase tracking-widest text-sm">Everything you need to know about the protocol.</p>
                     </div>
 
                     <div className="space-y-4">
@@ -289,7 +289,7 @@ export default function LandingPage() {
 
                                 <div className={`transition-all duration-300 ease-in-out overflow-hidden ${activeFaq === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                                     }`}>
-                                    <div className="p-8 pt-0 text-xs md:text-sm font-bold uppercase tracking-widest leading-loose text-white/40">
+                                    <div className="p-8 pt-0 text-sm md:text-sm font-bold uppercase tracking-widest leading-loose text-white/40">
                                         {faq.a}
                                     </div>
                                 </div>
@@ -309,18 +309,18 @@ export default function LandingPage() {
                             </div>
                             <span className="font-black tracking-tighter uppercase text-3xl text-white">CLEARD</span>
                         </div>
-                        <p className="text-white/20 text-xs font-black max-w-sm leading-relaxed uppercase tracking-[0.2em]">Infrastructure for the global workforce.</p>
+                        <p className="text-white/20 text-sm font-black max-w-sm leading-relaxed uppercase tracking-[0.2em]">Infrastructure for the global workforce.</p>
                     </div>
                     <div>
-                        <h4 className="text-xs font-black uppercase tracking-widest mb-10 text-white/40">Platform</h4>
-                        <ul className="space-y-4 text-xs text-white/20 font-black uppercase tracking-widest">
+                        <h4 className="text-sm font-black uppercase tracking-widest mb-10 text-white/40">Platform</h4>
+                        <ul className="space-y-4 text-sm text-white/20 font-black uppercase tracking-widest">
                             <li><Link href="#" className="hover:text-emerald-500 transition-colors">Vaults</Link></li>
                             <li><Link href="#" className="hover:text-emerald-400 transition-colors">Security</Link></li>
                         </ul>
                     </div>
                     <div>
-                        <h4 className="text-xs font-black uppercase tracking-widest mb-10 text-white/40">Contact</h4>
-                        <ul className="space-y-4 text-xs text-white/20 font-black uppercase tracking-widest">
+                        <h4 className="text-sm font-black uppercase tracking-widest mb-10 text-white/40">Contact</h4>
+                        <ul className="space-y-4 text-sm text-white/20 font-black uppercase tracking-widest">
                             <li><Link href="#" className="hover:text-emerald-500 transition-colors">Support</Link></li>
                             <li><Link href="#" className="hover:text-emerald-400 transition-colors">Sales</Link></li>
                         </ul>

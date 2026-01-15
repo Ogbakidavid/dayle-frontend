@@ -147,7 +147,7 @@ export default function FreelancerDashboard() {
 
                                 <div className="flex items-center gap-6">
                                     <div className="text-right">
-                                        <p className="text-xs text-gray-400 mb-1">Vault Value</p>
+                                        <p className="text-sm text-gray-400 mb-1">Vault Value</p>
                                         <p className="text-lg font-semibold text-white">
                                             ${(vault.totalAmount || vault.amount).toLocaleString()}
                                         </p>

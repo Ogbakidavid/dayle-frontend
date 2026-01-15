@@ -22,7 +22,7 @@ const Input = React.forwardRef(({ className, type, label, error, required, ...pr
                 {...props}
             />
             {error && (
-                <p className="text-xs font-medium text-red-600 animate-slide-in">
+                <p className="text-sm font-medium text-red-600 animate-slide-in">
                     {error}
                 </p>
             )}

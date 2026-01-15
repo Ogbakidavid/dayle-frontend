@@ -22,7 +22,7 @@ export function VaultCard({ vault, isClient }) {
                         <div className="flex items-center gap-2 text-3xl font-bold text-white amount-display">
                             ${vault.amount.toLocaleString()}
                         </div>
-                        <div className="flex items-center gap-1.5 mt-1 text-xs text-white/40 font-bold uppercase tracking-widest">
+                        <div className="flex items-center gap-1.5 mt-1 text-sm text-white/40 font-bold uppercase tracking-widest">
                             <Lock className="w-3.5 h-3.5" />
                             <span>Locked in vault</span>
                         </div>
@@ -36,7 +36,7 @@ export function VaultCard({ vault, isClient }) {
 
                 {/* Milestones Preview */}
                 {vault.milestones && vault.milestones.length > 0 && (
-                    <div className="flex items-center gap-2 text-xs text-white/40 font-bold uppercase tracking-widest pt-4 border-t border-white/5 transform transition-all">
+                    <div className="flex items-center gap-2 text-sm text-white/40 font-bold uppercase tracking-widest pt-4 border-t border-white/5 transform transition-all">
                         <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                         <span>{vault.milestones.length} milestone{vault.milestones.length > 1 ? 's' : ''}</span>
                     </div>

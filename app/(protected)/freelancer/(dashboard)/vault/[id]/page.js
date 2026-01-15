@@ -202,40 +202,40 @@ export default function FreelancerVaultPage() {
         <div className="max-w-7xl mx-auto p-6 space-y-10 font-sans selection:bg-emerald-500/30">
 
             {/* COMPACT DASHBOARD HEADER */}
-            <div className="flex justify-between items-end border-b border-white/5 pb-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-4">
+            <div className="flex justify-between items-end border-b border-white/5 pb-8">
+                <div className="space-y-3">
+                    <div className="flex items-center gap-5">
                         <button
                             onClick={() => router.push('/freelancer')}
-                            className="bg-white/5 hover:bg-white/10 p-2 rounded-lg transition-colors group"
+                            className="bg-white/5 hover:bg-white/10 p-2.5 rounded-lg transition-colors group"
                         >
-                            <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-white" />
+                            <ArrowLeft className="w-6 h-6 text-white group-hover:text-white" />
                         </button>
-                        <h1 className="text-3xl font-bold tracking-tighter text-white">
+                        <h1 className="text-4xl font-bold tracking-tighter text-white">
                             {VAULT.title}
                         </h1>
-                        <span className="px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+                        <span className="px-4 py-1.5 text-sm font-black uppercase tracking-[0.2em] rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
                             {VAULT.status}
                         </span>
                     </div>
-                    <p className="text-sm text-gray-500 font-medium ml-14">
-                        Contract with <span className="text-gray-200 font-semibold">{VAULT.client}</span> • <span className="font-mono text-[10px] opacity-60">ID: {VAULT.id}</span>
+                    <p className="text-base text-white font-medium ml-16 opacity-90">
+                        Contract with <span className="text-white font-bold">{VAULT.client}</span> • <span className="font-mono text-sm text-white opacity-70">ID: {VAULT.id}</span>
                     </p>
                 </div>
             </div>
 
-            <div className="grid lg:grid-cols-12 gap-8">
+            <div className="grid lg:grid-cols-12 gap-10">
 
                 {/* LEFT COLUMN: SETTLEMENT LEDGER */}
                 <div className="lg:col-span-8 space-y-8">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                            <Orbit className="w-5 h-5 text-emerald-500 animate-pulse" />
+                        <h2 className="text-xl font-bold text-white uppercase tracking-widest flex items-center gap-4">
+                            <Orbit className="w-6 h-6 text-emerald-500 animate-pulse" />
                             Settlement Ledger
                         </h2>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                         {milestones.map(m => (
                             <div
                                 key={m.id}
@@ -247,21 +247,21 @@ export default function FreelancerVaultPage() {
                             >
                                 <div
                                     onClick={() => setExpandedId(expandedId === m.id ? null : m.id)}
-                                    className="p-5 flex justify-between cursor-pointer items-center"
+                                    className="p-6 flex justify-between cursor-pointer items-center"
                                 >
-                                    <div className="flex items-center gap-5">
+                                    <div className="flex items-center gap-6">
                                         <div className={cn(
-                                            "w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs border transition-all duration-500",
-                                            m.status === 'RELEASED' ? "bg-emerald-500 border-emerald-400 text-black translate-x-1" : "bg-black/40 border-white/5 text-gray-400"
+                                            "w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm border transition-all duration-500",
+                                            m.status === 'RELEASED' ? "bg-emerald-500 border-emerald-400 text-black translate-x-1" : "bg-black/40 border-white/5 text-white"
                                         )}>
-                                            {m.status === 'RELEASED' ? <CheckCircle2 className="w-5 h-5" /> : `0${m.id}`}
+                                            {m.status === 'RELEASED' ? <CheckCircle2 className="w-6 h-6" /> : `0${m.id}`}
                                         </div>
                                         <div>
                                             <p className={cn(
-                                                "text-base font-bold tracking-tight transition-colors",
+                                                "text-lg font-bold tracking-tight transition-colors",
                                                 m.status === 'RELEASED' ? "text-emerald-500" : "text-white"
                                             )}>{m.title}</p>
-                                            <p className="text-xs text-gray-500 font-medium mt-0.5">${m.amount.toLocaleString()} Allocation</p>
+                                            <p className="text-sm text-white font-medium mt-1 opacity-80">${m.amount.toLocaleString()} Allocation</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-6">
@@ -270,17 +270,17 @@ export default function FreelancerVaultPage() {
                                 </div>
 
                                 {expandedId === m.id && (
-                                    <div className="p-6 border-t border-white/5 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                                    <div className="p-8 border-t border-white/5 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
 
                                         {/* TECHNICAL SPECS */}
-                                        <div className="space-y-3">
-                                            <p className="text-[10px] uppercase text-gray-600 font-black tracking-[0.2em] flex items-center gap-2">
-                                                <FileText className="w-3 h-3" /> Audit Requirements
+                                        <div className="space-y-4">
+                                            <p className="text-sm uppercase text-white font-black tracking-[0.2em] flex items-center gap-2">
+                                                <FileText className="w-4 h-4" /> Audit Requirements
                                             </p>
-                                            <ul className="space-y-2">
+                                            <ul className="space-y-3">
                                                 {m.specification.map((s, i) => (
-                                                    <li key={i} className="text-sm text-gray-300 flex items-start gap-3">
-                                                        <div className="w-1 h-1 rounded-full bg-emerald-500 mt-2 shrink-0" />
+                                                    <li key={i} className="text-base text-white flex items-start gap-4">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2.5 shrink-0" />
                                                         {s}
                                                     </li>
                                                 ))}
@@ -289,22 +289,22 @@ export default function FreelancerVaultPage() {
 
                                         {/* ACTION ZONE */}
                                         {m.status === 'OPEN' && (
-                                            <div className="bg-emerald-500/5 border border-emerald-500/10 p-5 rounded-xl relative overflow-hidden">
+                                            <div className="bg-emerald-500/5 border border-emerald-500/10 p-6 rounded-xl relative overflow-hidden">
                                                 <div className="absolute top-0 right-0 p-6 opacity-5">
-                                                    <Sparkles className="w-16 h-16 text-emerald-500" />
+                                                    <Sparkles className="w-20 h-20 text-emerald-500" />
                                                 </div>
-                                                <div className="relative z-10 space-y-4">
-                                                    <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest">Ready for verification?</p>
-                                                    <div className="flex gap-3">
+                                                <div className="relative z-10 space-y-5">
+                                                    <p className="text-sm font-bold text-emerald-500 uppercase tracking-widest">Ready for verification?</p>
+                                                    <div className="flex gap-4">
                                                         <Input
                                                             placeholder="Paste GitHub repository or live URL..."
                                                             value={submissionUrl}
                                                             onChange={e => setSubmissionUrl(e.target.value)}
-                                                            className="bg-black border-white/10 h-11 text-sm rounded-xl focus:ring-emerald-500/20"
+                                                            className="bg-black border-white/10 h-12 text-base rounded-xl focus:ring-emerald-500/20 text-white placeholder:text-white/40"
                                                         />
                                                         <Button
                                                             onClick={() => submitWork(m.id)}
-                                                            className="bg-white text-black hover:bg-emerald-500 hover:text-white font-bold rounded-xl h-11 px-8 active:scale-95 transition-all"
+                                                            className="bg-white text-black hover:bg-emerald-500 hover:text-white font-bold rounded-xl h-12 px-8 active:scale-95 transition-all text-sm"
                                                         >
                                                             Submit
                                                         </Button>
@@ -315,10 +315,10 @@ export default function FreelancerVaultPage() {
 
                                         {/* EVIDENCE & AI CHECKS */}
                                         {(m.evidence || m.aiChecks.length > 0) && (
-                                            <div className="grid md:grid-cols-2 gap-6 pt-2">
+                                            <div className="grid md:grid-cols-2 gap-8 pt-2">
                                                 {m.evidence && (
-                                                    <div className="space-y-2">
-                                                        <p className="text-[10px] uppercase text-gray-600 font-black tracking-[0.2em]">Verification Asset</p>
+                                                    <div className="space-y-3">
+                                                        <p className="text-sm uppercase text-white font-black tracking-[0.2em]">Verification Asset</p>
                                                         <a href={m.evidence} target="_blank" className="text-sm text-emerald-500 font-bold flex items-center gap-2 hover:underline">
                                                             <ExternalLink className="w-4 h-4" />
                                                             {m.evidence.replace('https://', '')}
@@ -326,26 +326,26 @@ export default function FreelancerVaultPage() {
                                                     </div>
                                                 )}
                                                 {m.aiChecks.length > 0 && (
-                                                    <div className="space-y-2">
-                                                        <p className="text-[10px] uppercase text-gray-600 font-black tracking-[0.2em]">AI Verification Trace</p>
+                                                    <div className="space-y-3">
+                                                        <p className="text-sm uppercase text-white font-black tracking-[0.2em]">AI Verification Trace</p>
                                                         <div className="space-y-3">
                                                             {m.aiChecks.map((c, i) => (
-                                                                <div key={i} className="flex items-center gap-2.5 text-xs">
+                                                                <div key={i} className="flex items-center gap-3 text-sm">
                                                                     {c.status === 'passed' ? (
-                                                                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                                                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                                                                     ) : c.status === 'failed' ? (
-                                                                        <XCircle className="w-4 h-4 text-red-500" />
+                                                                        <XCircle className="w-5 h-5 text-red-500" />
                                                                     ) : c.status === 'checking' ? (
-                                                                        <Loader2 className="w-4 h-4 text-emerald-500 animate-spin" />
+                                                                        <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
                                                                     ) : (
-                                                                        <div className="w-4 h-4 rounded-full border border-white/10" />
+                                                                        <div className="w-5 h-5 rounded-full border border-white/10" />
                                                                     )}
                                                                     <span className={cn(
                                                                         "font-medium transition-colors",
-                                                                        c.status === 'passed' ? "text-gray-200" :
+                                                                        c.status === 'passed' ? "text-white" :
                                                                             c.status === 'failed' ? "text-red-400" :
                                                                                 c.status === 'checking' ? "text-emerald-500 animate-pulse" :
-                                                                                    "text-gray-600"
+                                                                                    "text-white"
                                                                     )}>{c.label}</span>
                                                                 </div>
                                                             ))}
@@ -358,37 +358,37 @@ export default function FreelancerVaultPage() {
                                         {/* DISPUTE & STATUS MESSAGE */}
                                         {m.status === 'UNDER_REVIEW' && (
                                             <div className="flex justify-between items-center pt-2 border-t border-white/5">
-                                                <div className="flex items-center gap-2 text-[10px] text-amber-500 font-bold uppercase tracking-widest bg-amber-500/5 px-3 py-1.5 rounded-lg">
-                                                    <Cpu className="w-3.5 h-3.5 animate-pulse" />
+                                                <div className="flex items-center gap-3 text-sm text-amber-500 font-bold uppercase tracking-widest bg-amber-500/5 px-4 py-2 rounded-lg">
+                                                    <Cpu className="w-4 h-4 animate-pulse" />
                                                     Pending AI Verdict...
                                                 </div>
                                                 <Button
                                                     variant="outline"
-                                                    className="border-red-500/30 text-red-500 hover:bg-red-500/10 rounded-xl px-4 h-9 text-[10px] font-black uppercase tracking-widest"
+                                                    className="border-red-500/30 text-red-500 hover:bg-red-500/10 rounded-xl px-5 h-10 text-sm font-black uppercase tracking-widest"
                                                     onClick={() => raiseDispute(m.id)}
                                                 >
-                                                    <Flag className="w-3.5 h-3.5 mr-2" />
+                                                    <Flag className="w-4 h-4 mr-2" />
                                                     Dispute Verdict
                                                 </Button>
                                             </div>
                                         )}
 
                                         {m.status === 'DISPUTED' && (
-                                            <div className="bg-red-500/5 border border-red-500/10 p-4 rounded-xl flex gap-3 shadow-lg">
-                                                <Lock className="w-5 h-5 text-red-500 shrink-0" />
+                                            <div className="bg-red-500/5 border border-red-500/10 p-5 rounded-xl flex gap-4 shadow-lg">
+                                                <Lock className="w-6 h-6 text-red-500 shrink-0" />
                                                 <div className="space-y-1">
-                                                    <p className="text-[10px] text-red-500 leading-relaxed font-bold uppercase tracking-tight">
+                                                    <p className="text-sm text-red-500 leading-relaxed font-bold uppercase tracking-tight">
                                                         Settlement suspended: Dispute raised.
                                                     </p>
-                                                    <p className="text-[10px] text-gray-500 font-medium">Arbitration node will review the manual override request within 24h.</p>
+                                                    <p className="text-sm text-white font-medium">Arbitration node will review the manual override request within 24h.</p>
                                                 </div>
                                             </div>
                                         )}
 
                                         {m.status === 'RELEASED' && (
-                                            <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl flex gap-3">
-                                                <Shield className="w-5 h-5 text-emerald-500 shrink-0" />
-                                                <p className="text-[10px] text-emerald-500 leading-relaxed font-bold uppercase tracking-tight">
+                                            <div className="bg-emerald-500/5 border border-emerald-500/10 p-5 rounded-xl flex gap-4">
+                                                <Shield className="w-6 h-6 text-emerald-500 shrink-0" />
+                                                <p className="text-sm text-emerald-500 leading-relaxed font-bold uppercase tracking-tight">
                                                     Capital released on {m.timestamp}. Payout settled via Cleard Protocol.
                                                 </p>
                                             </div>
@@ -401,35 +401,35 @@ export default function FreelancerVaultPage() {
                 </div>
 
                 {/* RIGHT COLUMN: EARNINGS RADAR & CONTEXT */}
-                <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="lg:col-span-4 flex flex-col gap-8">
 
                     {/* EARNINGS RADAR */}
-                    <div className="bg-[#111111] border border-white/5 p-6 rounded-3xl space-y-8 shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-1000">
-                            <TrendingUp className="w-24 h-24 text-emerald-500" />
+                    <div className="bg-[#111111] border border-white/5 p-8 rounded-3xl space-y-8 shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-1000">
+                            <TrendingUp className="w-28 h-28 text-emerald-500" />
                         </div>
 
-                        <div className="space-y-2">
-                            <h3 className="text-[10px] uppercase text-gray-500 font-black tracking-[0.3em] flex items-center gap-2">
-                                <DollarSign className="w-4 h-4 text-emerald-500" /> Earnings Radar
+                        <div className="space-y-3">
+                            <h3 className="text-sm uppercase text-white font-black tracking-[0.3em] flex items-center gap-2">
+                                <DollarSign className="w-5 h-5 text-emerald-500" /> Earnings Radar
                             </h3>
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-3xl font-black text-white tracking-tighter">${released.toLocaleString()}</span>
-                                <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Released</span>
+                            <div className="flex items-baseline gap-3">
+                                <span className="text-4xl font-black text-white tracking-tighter">${released.toLocaleString()}</span>
+                                <span className="text-sm text-white font-bold uppercase tracking-widest">Released</span>
                             </div>
                         </div>
 
-                        <div className="space-y-6 pt-6 border-t border-white/5">
+                        <div className="space-y-8 pt-8 border-t border-white/5">
                             <div className="flex justify-between items-center group/item cursor-help">
-                                <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Awaiting Release</span>
-                                <span className="text-lg font-bold text-gray-200 group-hover/item:text-emerald-500 transition-colors">${pending.toLocaleString()}</span>
+                                <span className="text-sm text-white font-black uppercase tracking-widest">Awaiting Release</span>
+                                <span className="text-xl font-bold text-white group-hover/item:text-emerald-500 transition-colors">${pending.toLocaleString()}</span>
                             </div>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                                    <span className="text-gray-600">Total Pipeline</span>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center text-sm font-black uppercase tracking-widest">
+                                    <span className="text-white">Total Pipeline</span>
                                     <span className="text-white">${totalValue.toLocaleString()}</span>
                                 </div>
-                                <div className="h-1.5 bg-black rounded-full overflow-hidden shadow-inner border border-white/5">
+                                <div className="h-2 bg-black rounded-full overflow-hidden shadow-inner border border-white/5">
                                     <div
                                         className="h-full bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all duration-[2000ms] ease-out rounded-full"
                                         style={{ width: `${(released / totalValue) * 100}%` }}
@@ -438,42 +438,42 @@ export default function FreelancerVaultPage() {
                             </div>
                         </div>
 
-                        <div className="bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl flex gap-3 mt-6 shadow-lg">
-                            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-                            <p className="text-[10px] text-amber-500 leading-relaxed font-bold uppercase tracking-tight">
+                        <div className="bg-amber-500/5 border border-amber-500/10 p-5 rounded-xl flex gap-4 mt-6 shadow-lg">
+                            <AlertTriangle className="w-6 h-6 text-amber-500 shrink-0" />
+                            <p className="text-sm text-amber-500 leading-relaxed font-bold uppercase tracking-tight">
                                 Dispute Window active for {VAULT.id}. Standard 48h settlement buffer applied.
                             </p>
                         </div>
                     </div>
 
                     {/* GUARANTEED PAYOUT PIPELINE (EXPANDED TO FILL SPACE) */}
-                    <div className="flex-1 bg-emerald-500/5 border border-emerald-500/10 rounded-[2.5rem] p-8 relative overflow-hidden group shadow-2xl flex flex-col justify-between min-h-[400px]">
+                    <div className="flex-1 bg-emerald-500/5 border border-emerald-500/10 rounded-[2.5rem] p-10 relative overflow-hidden group shadow-2xl flex flex-col justify-between min-h-[450px]">
                         <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:scale-110 transition-transform duration-1000 grayscale group-hover:grayscale-0">
-                            <Shield className="w-48 h-48 text-emerald-500" />
+                            <Shield className="w-56 h-56 text-emerald-500" />
                         </div>
-                        <div className="relative z-10 space-y-6">
-                            <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20 shadow-inner">
-                                <Lock className="w-7 h-7 text-emerald-500" />
+                        <div className="relative z-10 space-y-8">
+                            <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20 shadow-inner">
+                                <Lock className="w-8 h-8 text-emerald-500" />
                             </div>
-                            <div className="space-y-4">
-                                <h4 className="text-xs font-black text-white uppercase tracking-[0.4em] leading-tight">Guaranteed<br />Payout Pipeline</h4>
-                                <div className="w-12 h-1 bg-emerald-500 rounded-full opacity-50" />
-                                <p className="text-sm text-gray-400 leading-relaxed font-medium">
+                            <div className="space-y-5">
+                                <h4 className="text-sm font-black text-white uppercase tracking-[0.4em] leading-tight">Guaranteed<br />Payout Pipeline</h4>
+                                <div className="w-14 h-1.5 bg-emerald-500 rounded-full opacity-50" />
+                                <p className="text-base text-white leading-relaxed font-medium">
                                     Cleard holds 100% of the contract value in escrow. Funds release automatically once the Objective AI verifies your work against the specifications. No manual client approval required for release.
                                 </p>
                             </div>
                         </div>
 
                         <div className="relative z-10 pt-8 border-t border-emerald-500/10">
-                            <ul className="space-y-4">
+                            <ul className="space-y-5">
                                 {[
                                     { label: 'Escrow Coverage', val: '100% Guaranteed' },
                                     { label: 'Release Type', val: 'Algorithmic' },
                                     { label: 'Protection', val: 'Vendor-First' }
                                 ].map((item, i) => (
                                     <li key={i} className="flex justify-between items-center group/li">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 group-hover/li:text-gray-400 transition-colors">{item.label}</span>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">{item.val}</span>
+                                        <span className="text-sm font-black uppercase tracking-widest text-white group-hover/li:text-white transition-colors">{item.label}</span>
+                                        <span className="text-sm font-black uppercase tracking-widest text-emerald-500">{item.val}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -491,11 +491,11 @@ export default function FreelancerVaultPage() {
 function StatusBadge({ status }) {
     return (
         <span className={cn(
-            'text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border shadow-sm transition-colors',
+            'text-sm font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border shadow-sm transition-colors',
             status === 'RELEASED' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
                 status === 'UNDER_REVIEW' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
                     status === 'DISPUTED' ? "bg-red-500/10 text-red-500 border-red-500/20" :
-                        "bg-white/5 text-gray-500 border-white/5"
+                        "bg-white/5 text-white border-white/5"
         )}>
             {status.replace('_', ' ')}
         </span>

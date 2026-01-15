@@ -141,7 +141,7 @@ export default function ClientDashboard() {
 
                                 <div className="flex items-center gap-6">
                                     <div className="text-right">
-                                        <p className="text-xs text-white mb-1">Value</p>
+                                        <p className="text-sm text-white mb-1">Value</p>
                                         <p className="text-lg font-semibold text-white">
                                             ${(vault.totalAmount || vault.amount).toLocaleString()}
                                         </p>

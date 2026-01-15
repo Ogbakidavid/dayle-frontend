@@ -116,7 +116,7 @@ export default function TransactionsPage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-semibold text-white">{tx.id}</p>
-                                                    <p className="text-xs text-slate-500 mt-0.5 font-medium">{tx.counterparty}</p>
+                                                    <p className="text-sm text-slate-500 mt-0.5 font-medium">{tx.counterparty}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -169,7 +169,7 @@ export default function TransactionsPage() {
                                         setCurrentPage(prev => Math.max(1, prev - 1));
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
                                     }}
-                                    className="h-9 px-4 text-xs border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                                    className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
                                 >
                                     Previous
                                 </Button>
@@ -181,7 +181,7 @@ export default function TransactionsPage() {
                                         setCurrentPage(prev => Math.min(totalPages, prev + 1));
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
                                     }}
-                                    className="h-9 px-4 text-xs border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                                    className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
                                 >
                                     Next
                                 </Button>

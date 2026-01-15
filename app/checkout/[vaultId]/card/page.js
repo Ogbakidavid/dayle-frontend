@@ -139,7 +139,7 @@ export default function CardPaymentPage() {
                                             </div>
                                             <div className="space-y-6">
                                                 <p className="text-2xl tracking-[0.2em]">{cardDetails.number || "•••• •••• •••• ••••"}</p>
-                                                <div className="flex justify-between text-xs font-black uppercase tracking-widest">
+                                                <div className="flex justify-between text-sm font-black uppercase tracking-widest">
                                                     <div><p className="text-white/50 mb-1">Holder</p><p className="text-sm tracking-normal">{cardDetails.name || "YOUR NAME"}</p></div>
                                                     <div className="text-right"><p className="text-white/50 mb-1">Expiry</p><p className="text-sm tracking-normal">{cardDetails.expiry || "MM/YY"}</p></div>
                                                 </div>
@@ -226,7 +226,7 @@ function ProcessingOverlay({ amount }) {
                 <Fingerprint className="w-10 h-10 text-emerald-500 absolute inset-0 m-auto" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">Processing ${amount}</h3>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-500/50">{messages[msgIdx]}</p>
+            <p className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500/50">{messages[msgIdx]}</p>
         </motion.div>
     );
 }

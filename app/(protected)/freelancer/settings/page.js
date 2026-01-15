@@ -41,10 +41,10 @@ export default function FreelancerSettingsPage() {
                 <div className="max-w-6xl mx-auto flex items-center justify-between">
                     <Link href="/freelancer" className="flex items-center gap-2 group transition-colors">
                         <ChevronLeft className="w-4 h-4 text-white/40 group-hover:text-emerald-500 transition-transform group-hover:-translate-x-1" />
-                        <span className="text-xs font-black uppercase tracking-widest text-white/40 group-hover:text-white">Freelancer Dashboard</span>
+                        <span className="text-sm font-black uppercase tracking-widest text-white/40 group-hover:text-white">Freelancer Dashboard</span>
                     </Link>
                     <div className="flex items-center gap-3">
-                        <span className="text-xs font-black text-white/20 uppercase tracking-[0.2em]">Account Center</span>
+                        <span className="text-sm font-black text-white/20 uppercase tracking-[0.2em]">Account Center</span>
                         <div className="h-4 w-[1px] bg-white/5" />
                         <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
@@ -62,7 +62,7 @@ export default function FreelancerSettingsPage() {
                     <aside className="md:w-64 flex-shrink-0">
                         <div className="mb-8">
                             <h1 className="text-2xl font-black text-white uppercase tracking-tighter">Settings</h1>
-                            <p className="text-xs font-bold text-white/20 uppercase tracking-widest mt-2">Manage freelancer preferences</p>
+                            <p className="text-sm font-bold text-white/20 uppercase tracking-widest mt-2">Manage freelancer preferences</p>
                         </div>
 
                         <nav className="space-y-1">
@@ -71,7 +71,7 @@ export default function FreelancerSettingsPage() {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={cn(
-                                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-xs font-black uppercase tracking-widest relative group",
+                                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-black uppercase tracking-widest relative group",
                                         activeTab === tab.id
                                             ? "text-emerald-400 bg-emerald-400/5"
                                             : "text-white/20 hover:text-white hover:bg-white/5"
@@ -89,7 +89,7 @@ export default function FreelancerSettingsPage() {
                         <div className="mt-12 pt-8 border-t border-white/5">
                             <button
                                 onClick={logout}
-                                className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-widest text-white/20 hover:text-red-400 transition-colors w-full"
+                                className="flex items-center gap-3 px-3 py-2 text-sm font-black uppercase tracking-widest text-white/20 hover:text-red-400 transition-colors w-full"
                             >
                                 <LogOut className="w-4 h-4" />
                                 Sign Out
@@ -114,21 +114,21 @@ export default function FreelancerSettingsPage() {
                                     </div>
                                     <div className="pb-1">
                                         <h3 className="text-lg font-black text-white uppercase tracking-tight">Freelancer Profile</h3>
-                                        <p className="text-xs font-bold text-white/20 uppercase tracking-widest mt-1">PNG, JPG or GIF up to 10MB</p>
+                                        <p className="text-sm font-bold text-white/20 uppercase tracking-widest mt-1">PNG, JPG or GIF up to 10MB</p>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black text-white/20 uppercase tracking-[0.2em] ml-1">Public Name</Label>
+                                        <Label className="text-sm font-black text-white/20 uppercase tracking-[0.2em] ml-1">Public Name</Label>
                                         <Input defaultValue={user?.name || "Jane Smith"} className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black text-white/20 uppercase tracking-[0.2em] ml-1">Email Address</Label>
+                                        <Label className="text-sm font-black text-white/20 uppercase tracking-[0.2em] ml-1">Email Address</Label>
                                         <Input defaultValue={user?.email || "jane@example.com"} className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
                                     </div>
                                     <div className="space-y-2 sm:col-span-2">
-                                        <Label className="text-xs font-black text-white/20 uppercase tracking-[0.2em] ml-1">Professional Bio</Label>
+                                        <Label className="text-sm font-black text-white/20 uppercase tracking-[0.2em] ml-1">Professional Bio</Label>
                                         <Input defaultValue="Senior Fullstack Engineer specializing in fintech and secure settlement systems." className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
                                     </div>
                                 </div>
@@ -145,7 +145,7 @@ export default function FreelancerSettingsPage() {
                         {activeTab === 'payment' && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 <div className="flex items-center justify-between mb-2">
-                                    <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Settlement Methods</h3>
+                                    <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Settlement Methods</h3>
                                     <Button variant="link" className="text-emerald-500 text-[10px] font-black uppercase tracking-widest p-0 h-auto">View Statements</Button>
                                 </div>
 
@@ -173,7 +173,7 @@ export default function FreelancerSettingsPage() {
                                     ))}
                                 </div>
 
-                                <Button className="w-full py-6 bg-transparent border border-dashed border-white/5 hover:border-emerald-500/50 hover:bg-emerald-500/5 text-white/20 hover:text-emerald-500 transition-all rounded-xl font-black uppercase text-xs tracking-widest">
+                                <Button className="w-full py-6 bg-transparent border border-dashed border-white/5 hover:border-emerald-500/50 hover:bg-emerald-500/5 text-white/20 hover:text-emerald-500 transition-all rounded-xl font-black uppercase text-sm tracking-widest">
                                     <Plus className="w-4 h-4 mr-2" /> Add Settlement Method
                                 </Button>
                             </div>
@@ -184,22 +184,22 @@ export default function FreelancerSettingsPage() {
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 <div className="space-y-6">
                                     <div>
-                                        <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] mb-1">Passcode Security</h3>
-                                        <p className="text-xs font-bold text-white/20 uppercase tracking-widest">Maintain bank-grade protection for your freelancer account</p>
+                                        <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-1">Passcode Security</h3>
+                                        <p className="text-sm font-bold text-white/20 uppercase tracking-widest">Maintain bank-grade protection for your freelancer account</p>
                                     </div>
 
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-black text-white/20 uppercase tracking-[0.2em] ml-1">Current Passcode</Label>
+                                            <Label className="text-sm font-black text-white/20 uppercase tracking-[0.2em] ml-1">Current Passcode</Label>
                                             <Input type="password" placeholder="••••••••" className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label className="text-xs font-black text-white/20 uppercase tracking-[0.2em] ml-1">New Password</Label>
+                                                <Label className="text-sm font-black text-white/20 uppercase tracking-[0.2em] ml-1">New Password</Label>
                                                 <Input type="password" placeholder="••••••••" className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-xs font-black text-white/20 uppercase tracking-[0.2em] ml-1">Confirm New</Label>
+                                                <Label className="text-sm font-black text-white/20 uppercase tracking-[0.2em] ml-1">Confirm New</Label>
                                                 <Input type="password" placeholder="••••••••" className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
                                             </div>
                                         </div>
@@ -217,13 +217,13 @@ export default function FreelancerSettingsPage() {
                                             </div>
                                             <div className="space-y-1">
                                                 <h4 className="text-sm font-black text-white uppercase tracking-tight">2FA Protection</h4>
-                                                <p className="text-xs font-bold text-white/40 leading-relaxed max-w-md uppercase tracking-widest">Secure your settlements with authenticator-based validation</p>
+                                                <p className="text-sm font-bold text-white/40 leading-relaxed max-w-md uppercase tracking-widest">Secure your settlements with authenticator-based validation</p>
                                                 <div className="pt-2">
                                                     <span className="text-[10px] px-2 py-1 bg-white/5 text-white/20 rounded-full font-black uppercase tracking-widest">Not Enabled</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <Button className="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold px-4 text-xs rounded-lg">
+                                        <Button className="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold px-4 text-sm rounded-lg">
                                             Enable
                                         </Button>
                                     </div>
@@ -235,8 +235,8 @@ export default function FreelancerSettingsPage() {
                                             <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                                             <div className="flex-1">
                                                 <h4 className="text-sm font-semibold text-red-400 mb-1">Deactivate Account</h4>
-                                                <p className="text-xs text-zinc-400 mb-4">Closing your freelancer account will clear any pending applications.</p>
-                                                <Button variant="outline" className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 text-xs">
+                                                <p className="text-sm text-zinc-400 mb-4">Closing your freelancer account will clear any pending applications.</p>
+                                                <Button variant="outline" className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 text-sm">
                                                     Delete Account
                                                 </Button>
                                             </div>
@@ -250,8 +250,8 @@ export default function FreelancerSettingsPage() {
                         {activeTab === 'notifications' && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 <div>
-                                    <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] mb-1">Alert Subscriptions</h3>
-                                    <p className="text-xs font-bold text-white/20 uppercase tracking-widest">Control how you stay updated on work progress</p>
+                                    <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-1">Alert Subscriptions</h3>
+                                    <p className="text-sm font-bold text-white/20 uppercase tracking-widest">Control how you stay updated on work progress</p>
                                 </div>
 
                                 <div className="space-y-3">
@@ -264,7 +264,7 @@ export default function FreelancerSettingsPage() {
                                         <div key={item.id} className="flex items-center justify-between p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
                                             <div className="flex-1">
                                                 <p className="text-sm font-bold text-white uppercase tracking-tight">{item.label}</p>
-                                                <p className="text-xs font-bold text-white/20 uppercase tracking-widest mt-1">{item.desc}</p>
+                                                <p className="text-sm font-bold text-white/20 uppercase tracking-widest mt-1">{item.desc}</p>
                                             </div>
                                             <Switch
                                                 checked={item.checked}
@@ -280,7 +280,7 @@ export default function FreelancerSettingsPage() {
                                             <Mail className="w-5 h-5 text-zinc-500 flex-shrink-0 mt-0.5" />
                                             <div className="flex-1">
                                                 <h4 className="text-sm font-black text-white uppercase tracking-tight mb-1">Verified Email</h4>
-                                                <p className="text-xs font-bold text-white/20 uppercase tracking-widest mb-3">System messages sent to: <span className="text-emerald-500/80">{user?.email || "jane@example.com"}</span></p>
+                                                <p className="text-sm font-bold text-white/20 uppercase tracking-widest mb-3">System messages sent to: <span className="text-emerald-500/80">{user?.email || "jane@example.com"}</span></p>
                                                 <Button variant="link" className="text-emerald-500 text-[10px] font-black uppercase tracking-widest p-0 h-auto">
                                                     Change Email
                                                 </Button>

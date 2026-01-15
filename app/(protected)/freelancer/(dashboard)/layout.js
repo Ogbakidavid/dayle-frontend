@@ -55,7 +55,7 @@ export default function FreelancerLayout({ children }) {
                                     </div>
                                     {item.badge && (
                                         <span className={cn(
-                                            "text-xs px-2 py-0.5 rounded-full font-medium",
+                                            "text-sm px-2 py-0.5 rounded-full font-medium",
                                             isActive
                                                 ? "bg-emerald-500/20 text-emerald-400"
                                                 : "bg-white/5 text-white/40"
@@ -71,10 +71,10 @@ export default function FreelancerLayout({ children }) {
 
                 {/* Status Indicator (Activated) */}
                 <div className="px-6 py-4 mx-4 mb-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
-                    <div className="flex items-center gap-2 text-emerald-500 text-xs font-black uppercase tracking-widest mb-1">
+                    <div className="flex items-center gap-2 text-emerald-500 text-sm font-black uppercase tracking-widest mb-1">
                         <CheckCircle className="w-3 h-3" /> Activated
                     </div>
-                    <p className="text-xs text-white/40 font-bold uppercase tracking-wide">Approved for Active Vault Access</p>
+                    <p className="text-sm text-white/40 font-bold uppercase tracking-wide">Approved for Active Vault Access</p>
                 </div>
 
                 {/* User Section */}
@@ -85,7 +85,7 @@ export default function FreelancerLayout({ children }) {
                         </div>
                         <div>
                             <p className="text-sm font-medium text-white">{user?.name || 'Jane Smith'}</p>
-                            <p className="text-xs text-white/40 font-bold uppercase tracking-wider italic">Freelancer</p>
+                            <p className="text-sm text-white/40 font-bold uppercase tracking-wider italic">Freelancer</p>
                         </div>
                     </div>
 
@@ -95,7 +95,7 @@ export default function FreelancerLayout({ children }) {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-full text-xs border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80 font-medium"
+                                className="h-9 w-full text-sm border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80 font-medium"
                             >
                                 <Settings className="w-3.5 h-3.5 mr-2" />
                                 Settings
@@ -105,7 +105,7 @@ export default function FreelancerLayout({ children }) {
                             variant="outline"
                             size="sm"
                             onClick={logout}
-                            className="h-9 text-xs border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 font-medium"
+                            className="h-9 text-sm border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 font-medium"
                         >
                             <LogOut className="w-3.5 h-3.5 mr-2" />
                             Sign out

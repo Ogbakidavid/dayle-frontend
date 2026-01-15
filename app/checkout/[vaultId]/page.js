@@ -25,16 +25,16 @@ export default function CheckoutSelectionPage() {
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-1">
-                                <p className="text-xs font-black uppercase text-white/20 tracking-[0.2em]">Payable Amount</p>
+                                <p className="text-sm font-black uppercase text-white/20 tracking-[0.2em]">Payable Amount</p>
                                 <h1 className="text-5xl font-bold text-white tracking-tighter">${amount.toLocaleString()}</h1>
                             </div>
                         </div>
                     </div>
                     <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                        <div className="flex items-center gap-2 text-emerald-500 text-xs font-black uppercase tracking-widest mb-2">
+                        <div className="flex items-center gap-2 text-emerald-500 text-sm font-black uppercase tracking-widest mb-2">
                             <ShieldCheck className="w-4 h-4" /> Vault Escrow Active
                         </div>
-                        <p className="text-xs text-white/40 leading-relaxed font-bold">Funds are held in a secure multi-sig vault until milestone approval.</p>
+                        <p className="text-sm text-white/40 leading-relaxed font-bold">Funds are held in a secure multi-sig vault until milestone approval.</p>
                     </div>
                 </section>
 
@@ -44,7 +44,7 @@ export default function CheckoutSelectionPage() {
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                             <div className="text-center space-y-2">
                                 <h2 className="text-3xl font-bold text-white tracking-tight">Payment Method</h2>
-                                <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Select how you want to fund this project</p>
+                                <p className="text-white/40 font-bold uppercase tracking-widest text-sm">Select how you want to fund this project</p>
                             </div>
                             <div className="grid gap-4">
                                 <MethodBtn

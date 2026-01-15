@@ -264,22 +264,22 @@ function Sidebar({ amount, transactionId, step }) {
                 </div>
                 <div className="space-y-6">
                     <div className="space-y-1">
-                        <p className="text-xs font-black uppercase text-white/20 tracking-[0.2em]">Payable Amount</p>
+                        <p className="text-sm font-black uppercase text-white/20 tracking-[0.2em]">Payable Amount</p>
                         <h1 className="text-5xl font-bold text-white tracking-tighter">${amount.toLocaleString()}</h1>
                     </div>
                     {step !== 'verification' && (
                         <div className="pt-4 border-t border-white/5">
-                            <p className="text-xs font-black uppercase text-white/20 tracking-[0.2em] mb-1">Transaction ID</p>
-                            <p className="text-xs text-white/60 font-medium">{transactionId}</p>
+                            <p className="text-sm font-black uppercase text-white/20 tracking-[0.2em] mb-1">Transaction ID</p>
+                            <p className="text-sm text-white/60 font-medium">{transactionId}</p>
                         </div>
                     )}
                 </div>
             </div>
             <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                <div className="flex items-center gap-2 text-emerald-500 text-xs font-black uppercase tracking-widest mb-2">
+                <div className="flex items-center gap-2 text-emerald-500 text-sm font-black uppercase tracking-widest mb-2">
                     <Shield className="w-4 h-4" /> Secure Onramp
                 </div>
-                <p className="text-xs text-white/40 leading-relaxed font-bold">Bank-verified crypto onramp. Funds are secured until transaction completes.</p>
+                <p className="text-sm text-white/40 leading-relaxed font-bold">Bank-verified crypto onramp. Funds are secured until transaction completes.</p>
             </div>
         </section>
     );
@@ -293,7 +293,7 @@ function VerificationScreen({ otp, otpError, onOtpChange, onOtpKeyDown, onOtpPas
                     <Shield className="w-8 h-8 text-emerald-500" />
                 </div>
                 <h2 className="text-3xl font-bold text-white tracking-tight">Verify Your Identity</h2>
-                <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Enter the 6-digit code sent to your phone</p>
+                <p className="text-white/40 font-bold uppercase tracking-widest text-sm">Enter the 6-digit code sent to your phone</p>
             </div>
 
             <div className="space-y-6">
@@ -330,7 +330,7 @@ function VerificationScreen({ otp, otpError, onOtpChange, onOtpKeyDown, onOtpPas
             </div>
 
             <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-                <p className="text-xs text-blue-400 text-center font-bold">💡 Demo: Use code <span className="font-bold">123456</span></p>
+                <p className="text-sm text-blue-400 text-center font-bold">💡 Demo: Use code <span className="font-bold">123456</span></p>
             </div>
         </motion.div>
     );
@@ -350,10 +350,10 @@ function PaymentInstructionsScreen({ amount, transactionId, timeRemaining, forma
                 </p>
 
                 <div className="pt-6 border-t border-white/5 space-y-4">
-                    <div className="flex items-center gap-3 text-xs font-black uppercase text-white/20 tracking-widest">
+                    <div className="flex items-center gap-3 text-sm font-black uppercase text-white/20 tracking-widest">
                         <Globe className="w-4 h-4" /> Global ACH/SWIFT
                     </div>
-                    <div className="flex items-center gap-3 text-xs font-black uppercase text-amber-500 tracking-widest">
+                    <div className="flex items-center gap-3 text-sm font-black uppercase text-amber-500 tracking-widest">
                         <Clock className="w-4 h-4" /> {formatTime(timeRemaining)} remaining
                     </div>
                 </div>
@@ -372,7 +372,7 @@ function PaymentInstructionsScreen({ amount, transactionId, timeRemaining, forma
                 <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
                     <div className="flex items-start gap-3">
                         <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                        <p className="text-xs text-amber-400 leading-relaxed font-bold">
+                        <p className="text-sm text-amber-400 leading-relaxed font-bold">
                             <span className="text-white">Important:</span> Include the reference code in your transfer to ensure automatic processing. Transfers without the code may be delayed.
                         </p>
                     </div>
@@ -470,13 +470,13 @@ function ProcessingStatusScreen({ status, transactionId, amount }) {
                 </div>
                 <div className="space-y-2">
                     <h2 className="text-3xl font-bold text-white tracking-tight">Processing Your Payment</h2>
-                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest max-w-md mx-auto">{getStatusMessage()}</p>
+                    <p className="text-white/40 text-sm font-bold uppercase tracking-widest max-w-md mx-auto">{getStatusMessage()}</p>
                 </div>
             </div>
 
             {/* PROGRESS BAR */}
             <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
-                <div className="flex items-center justify-between text-xs font-black uppercase tracking-widest">
+                <div className="flex items-center justify-between text-sm font-black uppercase tracking-widest">
                     <span className="text-white/20">Progress</span>
                     <span className="text-emerald-500 font-bold">{getProgressPercentage()}%</span>
                 </div>
@@ -499,7 +499,7 @@ function ProcessingStatusScreen({ status, transactionId, amount }) {
 
             {/* TIMELINE */}
             <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8">
-                <h3 className="text-xs font-black uppercase text-white/20 tracking-widest mb-6">Transaction Timeline</h3>
+                <h3 className="text-sm font-black uppercase text-white/20 tracking-widest mb-6">Transaction Timeline</h3>
                 <div className="space-y-6">
                     {steps.map((step, index) => (
                         <motion.div
@@ -541,7 +541,7 @@ function ProcessingStatusScreen({ status, transactionId, amount }) {
                                         {step.label}
                                     </h4>
                                     {step.timestamp && (
-                                        <span className="text-xs text-white/30 whitespace-nowrap font-bold uppercase tracking-widest">{step.timestamp}</span>
+                                        <span className="text-sm text-white/30 whitespace-nowrap font-bold uppercase tracking-widest">{step.timestamp}</span>
                                     )}
                                 </div>
                                 <p className={`text-sm font-medium transition-colors ${step.status === 'completed' || step.status === 'current' ? 'text-white/60' : 'text-white/10'
@@ -567,7 +567,7 @@ function ProcessingStatusScreen({ status, transactionId, amount }) {
                                                 className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
                                             />
                                         </div>
-                                        <span className="text-xs text-emerald-500 font-bold">Processing</span>
+                                        <span className="text-sm text-emerald-500 font-bold">Processing</span>
                                     </div>
                                 )}
                             </div>
@@ -577,7 +577,7 @@ function ProcessingStatusScreen({ status, transactionId, amount }) {
             </div>
 
             {/* FOOTER INFO */}
-            <div className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest">
+            <div className="flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest">
                 <Clock className="w-4 h-4 text-white/20" />
                 <p className="text-white/40">
                     Estimated completion: <span className="text-white">2-5 minutes</span>
@@ -586,7 +586,7 @@ function ProcessingStatusScreen({ status, transactionId, amount }) {
 
             {/* HELP TEXT */}
             <div className="text-center">
-                <p className="text-xs font-bold text-white/10 uppercase tracking-widest">
+                <p className="text-sm font-bold text-white/10 uppercase tracking-widest">
                     You can safely close this page. We'll notify you when the transaction completes.
                 </p>
             </div>
@@ -612,8 +612,8 @@ function SuccessScreen({ amount, transactionId, onContinue }) {
                 </div>
                 <div className="pt-4 border-t border-white/5">
                     <div className="flex justify-between items-center">
-                        <span className="text-xs text-white/20 font-black uppercase tracking-widest">Transaction ID</span>
-                        <span className="text-xs text-white/60 font-medium">{transactionId}</span>
+                        <span className="text-sm text-white/20 font-black uppercase tracking-widest">Transaction ID</span>
+                        <span className="text-sm text-white/60 font-medium">{transactionId}</span>
                     </div>
                 </div>
             </div>
@@ -641,7 +641,7 @@ function FailureScreen({ onRetry, onExit }) {
                     <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                     <div className="text-left space-y-2">
                         <p className="text-sm font-bold text-white">Possible reasons:</p>
-                        <ul className="text-xs text-white/40 font-bold uppercase tracking-widest space-y-1 list-disc list-inside">
+                        <ul className="text-sm text-white/40 font-bold uppercase tracking-widest space-y-1 list-disc list-inside">
                             <li>Payment timeout (24-hour window expired)</li>
                             <li>Incorrect reference code</li>
                             <li>Insufficient funds in source account</li>
@@ -672,7 +672,7 @@ function BankInfo({ label, value, copy, onCopy, copied, highlight }) {
     return (
         <div className="p-5 flex justify-between items-center">
             <div>
-                <p className="text-xs font-black uppercase text-white/20 tracking-widest mb-1">{label}</p>
+                <p className="text-sm font-black uppercase text-white/20 tracking-widest mb-1">{label}</p>
                 <p className={`text-sm ${highlight ? 'text-emerald-500 font-bold' : 'text-white'}`}>{value}</p>
             </div>
             {copy && (
@@ -696,7 +696,7 @@ function ProcessingOverlay() {
                 <Fingerprint className="w-10 h-10 text-emerald-500 absolute inset-0 m-auto" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">Verifying...</h3>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-500/50">Please wait</p>
+            <p className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500/50">Please wait</p>
         </motion.div>
     );
 }

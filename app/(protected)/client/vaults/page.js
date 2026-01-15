@@ -114,7 +114,7 @@ export default function VaultsPage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">{vault.title}</p>
-                                                    <p className="text-xs text-slate-500 mt-0.5 font-medium">{new Date(vault.createdAt || Date.now()).toLocaleDateString()}</p>
+                                                    <p className="text-sm text-slate-500 mt-0.5 font-medium">{new Date(vault.createdAt || Date.now()).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -177,7 +177,7 @@ export default function VaultsPage() {
                                 setCurrentPage(prev => Math.max(1, prev - 1));
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                             }}
-                            className="h-9 px-4 text-xs border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                            className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
                         >
                             Previous
                         </Button>
@@ -190,7 +190,7 @@ export default function VaultsPage() {
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
                                     }}
                                     className={cn(
-                                        "w-8 h-8 rounded-lg text-xs font-bold transition-all",
+                                        "w-8 h-8 rounded-lg text-sm font-bold transition-all",
                                         p === currentPage ? "bg-white text-black shadow-lg" : "bg-white/5 text-slate-500 hover:bg-white/10"
                                     )}
                                 >
@@ -206,7 +206,7 @@ export default function VaultsPage() {
                                 setCurrentPage(prev => Math.min(totalPages, prev + 1));
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                             }}
-                            className="h-9 px-4 text-xs border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                            className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
                         >
                             Next
                         </Button>

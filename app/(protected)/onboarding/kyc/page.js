@@ -316,7 +316,7 @@ export default function KYCPage() {
                                                         <Globe className="w-8 h-8 text-slate-500 group-hover:text-emerald-500 transition-colors" />
                                                     </div>
                                                     <div className="text-center">
-                                                        <p className="text-xs font-black text-white uppercase tracking-widest">Click to upload document</p>
+                                                        <p className="text-sm font-black text-white uppercase tracking-widest">Click to upload document</p>
                                                         <p className="text-[10px] font-medium text-slate-500 mt-1 uppercase tracking-tighter">PNG, JPG or PDF up to 10MB</p>
                                                     </div>
                                                 </>
@@ -519,7 +519,7 @@ export default function KYCPage() {
                                             <Button
                                                 type="button"
                                                 onClick={prevStep}
-                                                className="h-18 flex-1 bg-transparent border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white font-black uppercase tracking-widest text-xs rounded-2xl py-6 transition-all"
+                                                className="h-18 flex-1 bg-transparent border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white font-black uppercase tracking-widest text-sm rounded-2xl py-6 transition-all"
                                             >
                                                 Back
                                             </Button>

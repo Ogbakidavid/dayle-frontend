@@ -49,7 +49,7 @@ export default function WalletPageContent() {
             <header className="mb-10">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-xs font-black text-emerald-500 uppercase tracking-[0.3em] mb-2">
+                        <div className="flex items-center gap-2 text-sm font-black text-emerald-500 uppercase tracking-[0.3em] mb-2">
                             <ShieldCheck className="w-3.5 h-3.5" />
                             Secured Settlement Wallet
                         </div>
@@ -78,12 +78,12 @@ export default function WalletPageContent() {
                     <div className="lg:col-span-1">
                         <Card className="bg-[#111111] border-gray-900 overflow-hidden sticky top-32 rounded-sm shadow-2xl">
                             <div className="bg-emerald-600/10 border-b border-emerald-500/10 py-4 px-6">
-                                <h3 className="text-emerald-500 font-black uppercase tracking-[0.2em] text-xs">Instant Withdrawal</h3>
+                                <h3 className="text-emerald-500 font-black uppercase tracking-[0.2em] text-sm">Instant Withdrawal</h3>
                             </div>
                             <CardContent className="p-8 space-y-8">
                                 <form onSubmit={handleWithdraw} className="space-y-8">
                                     <div>
-                                        <label className="text-xs font-black text-white/40 uppercase tracking-widest mb-4 block">
+                                        <label className="text-sm font-black text-white/40 uppercase tracking-widest mb-4 block">
                                             Amount (USD)
                                         </label>
                                         <div className="relative group">
@@ -98,7 +98,7 @@ export default function WalletPageContent() {
                                                 step="0.01"
                                             />
                                         </div>
-                                        <div className="mt-4 flex items-center justify-between text-xs font-bold uppercase tracking-widest">
+                                        <div className="mt-4 flex items-center justify-between text-sm font-bold uppercase tracking-widest">
                                             <span className="text-white/40">Available Limit</span>
                                             <span className="text-emerald-400">
                                                 ${balance?.available?.toLocaleString() || '0.00'}
@@ -110,8 +110,8 @@ export default function WalletPageContent() {
                                         <div className="flex gap-4">
                                             <Zap className="w-5 h-5 text-emerald-500 shrink-0" />
                                             <div>
-                                                <p className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-1">Turbo Settlement</p>
-                                                <p className="text-xs font-bold text-white/40 leading-relaxed uppercase">
+                                                <p className="text-sm font-black text-emerald-500 uppercase tracking-widest mb-1">Turbo Settlement</p>
+                                                <p className="text-sm font-bold text-white/40 leading-relaxed uppercase">
                                                     Withdrawals are processed instantly via private settlement rails.
                                                 </p>
                                             </div>
@@ -120,7 +120,7 @@ export default function WalletPageContent() {
 
                                     <Button
                                         type="submit"
-                                        className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-black font-black uppercase text-xs tracking-[0.2em] rounded-sm transition-all shadow-lg shadow-emerald-600/10 active:scale-[0.98]"
+                                        className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-black font-black uppercase text-sm tracking-[0.2em] rounded-sm transition-all shadow-lg shadow-emerald-600/10 active:scale-[0.98]"
                                         disabled={!withdrawAmount || isWithdrawing || parseFloat(withdrawAmount) > (balance?.available || 0)}
                                     >
                                         {isWithdrawing ? 'Processing...' : 'Execute Settlement'}
@@ -143,7 +143,7 @@ export default function WalletPageContent() {
                                     <input
                                         type="text"
                                         placeholder="Search ledger..."
-                                        className="pl-10 pr-4 py-2 bg-[#111111] border border-white/5 rounded-sm text-xs font-medium outline-none focus:border-emerald-500/50 transition-all text-white w-64 placeholder:text-white/20"
+                                        className="pl-10 pr-4 py-2 bg-[#111111] border border-white/5 rounded-sm text-sm font-medium outline-none focus:border-emerald-500/50 transition-all text-white w-64 placeholder:text-white/20"
                                     />
                                 </div>
                             </div>
@@ -153,9 +153,9 @@ export default function WalletPageContent() {
                             <table className="w-full border-collapse">
                                 <thead className="bg-black/20 border-b border-white/5">
                                     <tr>
-                                        <th className="px-6 py-5 text-left text-xs font-black text-white/30 uppercase tracking-[0.2em]">Transaction</th>
-                                        <th className="px-6 py-5 text-left text-xs font-black text-white/30 uppercase tracking-[0.2em]">Status</th>
-                                        <th className="px-6 py-5 text-right text-xs font-black text-white/30 uppercase tracking-[0.2em]">Amount</th>
+                                        <th className="px-6 py-5 text-left text-sm font-black text-white/30 uppercase tracking-[0.2em]">Transaction</th>
+                                        <th className="px-6 py-5 text-left text-sm font-black text-white/30 uppercase tracking-[0.2em]">Status</th>
+                                        <th className="px-6 py-5 text-right text-sm font-black text-white/30 uppercase tracking-[0.2em]">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/[0.03]">
@@ -167,7 +167,7 @@ export default function WalletPageContent() {
                                         </tr>
                                     ) : transactions.length === 0 ? (
                                         <tr>
-                                            <td colSpan="3" className="py-20 text-center text-white/20 text-xs font-black uppercase tracking-[0.3em]">
+                                            <td colSpan="3" className="py-20 text-center text-white/20 text-sm font-black uppercase tracking-[0.3em]">
                                                 No transactions found in ledger
                                             </td>
                                         </tr>
@@ -184,7 +184,7 @@ export default function WalletPageContent() {
                                                         </div>
                                                         <div>
                                                             <div className="font-bold text-white text-sm uppercase tracking-wide group-hover:text-emerald-400 transition-colors">{tx.description}</div>
-                                                            <div className="text-xs text-white/30 font-black uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                                                            <div className="text-sm text-white/30 font-black uppercase tracking-widest mt-1.5 flex items-center gap-2">
                                                                 {new Date(tx.date).toLocaleDateString()}
                                                                 <span className="w-1 h-1 rounded-full bg-white/10" />
                                                                 ID: {tx.id}
@@ -194,7 +194,7 @@ export default function WalletPageContent() {
                                                 </td>
                                                 <td className="px-6 py-6">
                                                     <span className={cn(
-                                                        "px-2.5 py-1 text-xs font-black uppercase tracking-widest rounded-sm border",
+                                                        "px-2.5 py-1 text-sm font-black uppercase tracking-widest rounded-sm border",
                                                         tx.status === 'completed' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
                                                             tx.status === 'pending' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
                                                                 "bg-white/5 text-white/40 border-white/10"
@@ -219,7 +219,7 @@ export default function WalletPageContent() {
                             {/* Pagination Controls */}
                             {totalPages > 1 && (
                                 <div className="px-6 py-4 border-t border-white/5 flex items-center justify-between bg-black/10">
-                                    <div className="text-xs font-black text-white/20 uppercase tracking-widest">
+                                    <div className="text-sm font-black text-white/20 uppercase tracking-widest">
                                         Page {currentPage} of {totalPages}
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -228,7 +228,7 @@ export default function WalletPageContent() {
                                             size="sm"
                                             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                             disabled={currentPage === 1}
-                                            className="h-8 px-3 text-xs border-white/10 bg-transparent hover:bg-white/10 text-white/40 disabled:opacity-30"
+                                            className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/10 text-white/40 disabled:opacity-30"
                                         >
                                             Previous
                                         </Button>
@@ -237,7 +237,7 @@ export default function WalletPageContent() {
                                             size="sm"
                                             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                             disabled={currentPage === totalPages}
-                                            className="h-8 px-3 text-xs border-white/10 bg-transparent hover:bg-white/10 text-white/40 disabled:opacity-30"
+                                            className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/10 text-white/40 disabled:opacity-30"
                                         >
                                             Next
                                         </Button>

@@ -148,7 +148,7 @@ export default function CreateVaultPage() {
               )}>
                 {step > s.id ? <Check className="w-4 h-4" /> : <s.icon className="w-4 h-4" />}
               </div>
-              <span className={cn("text-xs uppercase tracking-widest font-medium", step === s.id ? "text-white" : "text-white/40")}>
+              <span className={cn("text-sm uppercase tracking-widest font-medium", step === s.id ? "text-white" : "text-white/40")}>
                 {s.name}
               </span>
             </div>
@@ -268,7 +268,7 @@ export default function CreateVaultPage() {
               {milestones.map((m, i) => (
                 <div key={i} className="bg-black border border-gray-800 p-6 rounded-lg space-y-4 relative group">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-emerald-500 font-bold uppercase tracking-tighter">Phase 0{i + 1}</span>
+                    <span className="text-sm text-emerald-500 font-bold uppercase tracking-tighter">Phase 0{i + 1}</span>
                     {milestones.length > 1 && (
                       <button onClick={() => removeMilestone(i)}>
                         <Trash2 className="w-4 h-4 text-white/40 hover:text-red-500 transition-colors" />
@@ -304,7 +304,7 @@ export default function CreateVaultPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-xs text-white/70 uppercase font-bold tracking-widest">Deliverable Type (AI Auditable)</Label>
+                      <Label className="text-sm text-white/70 uppercase font-bold tracking-widest">Deliverable Type (AI Auditable)</Label>
                       <select
                         value={m.deliverableType}
                         onChange={e => {
@@ -326,11 +326,11 @@ export default function CreateVaultPage() {
                       <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-md">
                         <div className="flex items-center gap-2 mb-2">
                           <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                          <p className="text-xs text-emerald-500 font-bold uppercase tracking-wider">Automated Verification Protocol</p>
+                          <p className="text-sm text-emerald-500 font-bold uppercase tracking-wider">Automated Verification Protocol</p>
                         </div>
                         <ul className="space-y-1">
                           {m.auditRules.map((r, idx) => (
-                            <li key={idx} className="text-xs text-white/70 flex items-center gap-2">
+                            <li key={idx} className="text-sm text-white/70 flex items-center gap-2">
                               <div className="w-1 h-1 bg-emerald-500 rounded-full" />
                               {r}
                             </li>
@@ -373,7 +373,7 @@ export default function CreateVaultPage() {
                     placeholder="freelancer@example.com"
                     className="bg-black border-gray-800 h-12 focus:border-emerald-500 text-white"
                   />
-                  <p className="text-xs text-white/50">If they don't have an account, they'll be invited to join Cleard.</p>
+                  <p className="text-sm text-white/50">If they don't have an account, they'll be invited to join Cleard.</p>
                 </div>
 
                 <div className="space-y-2">
@@ -391,7 +391,7 @@ export default function CreateVaultPage() {
                     <ShieldCheck className="w-5 h-5 text-emerald-500" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-medium text-white">Secure Invitation</h4>
+                    <h4 className="text-sm font-medium text-white">Secure Invitation</h4>
                     <p className="text-sm text-white/70 mt-1 leading-relaxed">
                       Upon deployment, the freelancer will receive a secure invitation link to view the vault conditions and accept the assignment. Capital remains locked until conditions are met.
                     </p>
@@ -443,7 +443,7 @@ export default function CreateVaultPage() {
                       <Users className="w-5 h-5 text-white/70" />
                     </div>
                     <div>
-                      <p className="text-xs text-white/50 uppercase font-bold tracking-widest">Assigned Freelancer</p>
+                      <p className="text-sm text-white/50 uppercase font-bold tracking-widest">Assigned Freelancer</p>
                       <p className="text-sm text-white font-medium">{freelancerName || "Unnamed Freelancer"}</p>
                       <p className="text-sm text-white/70">{freelancerEmail}</p>
                     </div>
@@ -481,7 +481,7 @@ export default function CreateVaultPage() {
                     <ShieldCheck className="w-5 h-5 text-amber-500" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-amber-500 uppercase tracking-wider">Escrow Protocol & AI Audit</h4>
+                    <h4 className="text-sm font-bold text-amber-500 uppercase tracking-wider">Escrow Protocol & AI Audit</h4>
                     <p className="text-sm text-gray-300 mt-1 leading-relaxed">
                       By deploying this vault, you agree that capital release is <span className="text-white font-medium">automated via AI audit</span>. Milestones unlock sequentially (01 → 02 → 03). You cannot manually release funds, but you maintain the right to view evidence and raise disputes if automated checks pass incorrectly.
                     </p>
