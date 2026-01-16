@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +43,7 @@ import { EvidencePanel } from "@/components/shared/EvidencePanel";
 
 export default function ClientVaultDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const vaultId = params.vaultId;
   const { vaults, loading: vaultsLoading } = useVault();
 
@@ -59,115 +60,112 @@ export default function ClientVaultDetailPage() {
   const displayMilestones = useMemo(() => {
     if (!vault) return [];
 
+    // 1. Determine base milestones
+    let baseMilestones = [];
     if (vault.milestones && vault.milestones.length > 0) {
-      // Just map standard ones if they exist, possibly merging local state
-      return vault.milestones.map((m) => ({
-        ...m,
-        status: milestoneStates[m.id] || m.status,
-      }));
-    }
-
-    // Generate mock milestones based on type
-    const baseMilestones = [];
-
-    if (vault.type === "development") {
-      baseMilestones.push(
-        {
-          title: "GitHub Repository Setup",
-          amount: vault.amount * 0.2,
-          deliverableId: "github_repo",
-          deliverable: "GitHub Repository",
-        },
-        {
-          title: "Core API Implementation",
-          amount: vault.amount * 0.4,
-          deliverableId: "api_endpoint",
-          deliverable: "Live API Endpoint",
-        },
-        {
-          title: "Production Deployment",
-          amount: vault.amount * 0.4,
-          deliverableId: "live_webapp",
-          deliverable: "Deployed Web App",
-        }
-      );
-    } else if (vault.type === "design") {
-      baseMilestones.push(
-        {
-          title: "Brand Guidelines",
-          amount: vault.amount * 0.3,
-          deliverableId: "figma_link",
-          deliverable: "Figma File",
-        },
-        {
-          title: "Logo Assets",
-          amount: vault.amount * 0.3,
-          deliverableId: "asset_pack",
-          deliverable: "Design Assets (ZIP)",
-        },
-        {
-          title: "Social Media Kit",
-          amount: vault.amount * 0.4,
-          deliverableId: "figma_link",
-          deliverable: "Figma Link",
-        }
-      );
-    } else if (vault.type === "content_ai") {
-      baseMilestones.push(
-        {
-          title: "Raw Data Collection",
-          amount: vault.amount * 0.3,
-          deliverableId: "ai_dataset",
-          deliverable: "JSON Dataset",
-        },
-        {
-          title: "Data Sanitization",
-          amount: vault.amount * 0.3,
-          deliverableId: "doc_submission",
-          deliverable: "Technical Document",
-        },
-        {
-          title: "Model Fine-tuning",
-          amount: vault.amount * 0.4,
-          deliverableId: "audio_video",
-          deliverable: "Model Weights (File)",
-        }
-      );
+      baseMilestones = vault.milestones;
     } else {
-      baseMilestones.push({
-        title: "Project Deliverable",
-        amount: vault.amount,
-        deliverableId: "doc_submission",
-        deliverable: "General Document",
-      });
+      // Generate mock milestones based on type
+      if (vault.type === "development") {
+        baseMilestones.push(
+          {
+            title: "GitHub Repository Setup",
+            amount: vault.amount * 0.2,
+            deliverableId: "github_repo",
+            deliverable: "GitHub Repository",
+          },
+          {
+            title: "Core API Implementation",
+            amount: vault.amount * 0.4,
+            deliverableId: "api_endpoint",
+            deliverable: "Live API Endpoint",
+          },
+          {
+            title: "Production Deployment",
+            amount: vault.amount * 0.4,
+            deliverableId: "live_webapp",
+            deliverable: "Deployed Web App",
+          }
+        );
+      } else if (vault.type === "design") {
+        baseMilestones.push(
+          {
+            title: "Brand Guidelines",
+            amount: vault.amount * 0.3,
+            deliverableId: "figma_link",
+            deliverable: "Figma File",
+          },
+          {
+            title: "Logo Assets",
+            amount: vault.amount * 0.3,
+            deliverableId: "asset_pack",
+            deliverable: "Design Assets (ZIP)",
+          },
+          {
+            title: "Social Media Kit",
+            amount: vault.amount * 0.4,
+            deliverableId: "figma_link",
+            deliverable: "Figma Link",
+          }
+        );
+      } else if (vault.type === "content_ai") {
+        baseMilestones.push(
+          {
+            title: "Raw Data Collection",
+            amount: vault.amount * 0.3,
+            deliverableId: "ai_dataset",
+            deliverable: "JSON Dataset",
+          },
+          {
+            title: "Data Sanitization",
+            amount: vault.amount * 0.3,
+            deliverableId: "doc_submission",
+            deliverable: "Technical Document",
+          },
+          {
+            title: "Model Fine-tuning",
+            amount: vault.amount * 0.4,
+            deliverableId: "audio_video",
+            deliverable: "Model Weights (File)",
+          }
+        );
+      } else {
+        baseMilestones.push({
+          title: "Project Deliverable",
+          amount: vault.amount,
+          deliverableId: "doc_submission",
+          deliverable: "General Document",
+        });
+      }
     }
 
+    // 2. Split into Compliance & Approval
     const splitMilestones = [];
     baseMilestones.forEach((m, idx) => {
       // 1. Compliance (AI)
       splitMilestones.push({
-        id: `m_${idx}_comp`,
-        title: `${m.title}`,
+        id: m.id ? `${m.id}_comp` : `m_${idx}_comp`,
+        title: m.title,
         subtitle: "Automated Compliance Check",
         amount: 0,
         displayAmount: m.amount,
-        status: "verified",
+        status: "verified", // Always verified in this view
         type: "COMPLIANCE_AI",
-        deliverable: m.deliverable,
+        deliverable: m.deliverable || "General Deliverable",
         checks: ["Format Validation", "Virus Scan", "Metadata Verify"],
       });
 
       // 2. Approval (Human)
-      const approvalId = `m_${idx}_appr`;
+      const approvalId = m.id ? `${m.id}_appr` : `m_${idx}_appr`;
       splitMilestones.push({
         id: approvalId,
-        title: `${m.title}`,
+        title: m.title,
         subtitle: "Client Approval Required",
         amount: m.amount,
         displayAmount: m.amount,
-        status: milestoneStates[approvalId] || "awaiting_approval", // Use local state if set
+        status: milestoneStates[approvalId] || m.status || "awaiting_approval", // Use local state, then prop, then default
         type: "APPROVAL_HUMAN",
-        deliverable: m.deliverable,
+        deliverable: m.deliverable || "General Deliverable",
         deliverableId: m.deliverableId,
       });
     });
@@ -259,13 +257,13 @@ export default function ClientVaultDetailPage() {
 
         {/* HEADER */}
         <header className="pt-8">
-          <Link
-            href="/client/vaults"
-            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-6 font-bold uppercase tracking-wide"
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Vaults
-          </Link>
+            Back
+          </button>
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -346,7 +344,7 @@ export default function ClientVaultDetailPage() {
                         </div>
 
                         <div>
-                          <h3 className="text-lg font-semibold text-white">
+                          <h3 className="text-lg font-bold text-white uppercase tracking-wide">
                             {milestone.title}
                           </h3>
                           <div className="flex gap-2 items-center mt-1 mb-2">
@@ -371,7 +369,7 @@ export default function ClientVaultDetailPage() {
                                 {milestone.checks.map((check) => (
                                   <span
                                     key={check}
-                                    className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono border border-emerald-500/30"
+                                    className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono border border-emerald-500/30 font-bold uppercase"
                                   >
                                     ✓ {check}
                                   </span>
@@ -380,7 +378,7 @@ export default function ClientVaultDetailPage() {
                             )}
 
                           {milestone.deliverable && (
-                            <div className="flex items-center gap-2 mt-2 mb-1">
+                            <div className="flex items-center gap-2 mt-3 mb-1">
                               <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
                                 Required:
                               </span>
@@ -406,91 +404,106 @@ export default function ClientVaultDetailPage() {
                         </div>
                       </div>
 
-                      {/* Action Button */}
-                      {milestone.status === "awaiting_approval" && (
-                        <Sheet>
-                          <SheetTrigger asChild>
-                            <Button
-                              size="sm"
-                              onClick={() => setActiveReview(milestone)}
-                              className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20"
-                            >
-                              Review
-                              <ChevronRight className="w-4 h-4 ml-1" />
-                            </Button>
-                          </SheetTrigger>
-                          <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:w-[540px] p-6 lg:p-8">
-                            <SheetHeader className="mb-6">
-                              <SheetTitle className="text-white text-2xl font-bold uppercase tracking-wide">
-                                Review Deliverable
-                              </SheetTitle>
-                              <SheetDescription className="text-slate-400">
-                                Review the evidence and data provided for this
-                                milestone before releasing funds.
-                              </SheetDescription>
-                            </SheetHeader>
+                      {/* Right Side: Action Button or Passed Badge */}
+                      <div className="flex flex-col items-end gap-2">
+                        {milestone.type === "COMPLIANCE_AI" && (
+                          <Badge
+                            variant="outline"
+                            className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px] h-6 px-3 flex items-center gap-1.5"
+                          >
+                            <CheckCircle className="w-3 h-3" />
+                            Passed
+                          </Badge>
+                        )}
 
-                            {activeReview && (
-                              <div className="space-y-6">
-                                <EvidencePanel
-                                  milestone={activeReview}
-                                  evidence={getMockEvidence(activeReview)}
-                                />
+                        {milestone.status === "awaiting_approval" &&
+                          milestone.type === "APPROVAL_HUMAN" && (
+                            <Sheet>
+                              <SheetTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  onClick={() => setActiveReview(milestone)}
+                                  className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20"
+                                >
+                                  Review
+                                  <ChevronRight className="w-4 h-4 ml-1" />
+                                </Button>
+                              </SheetTrigger>
+                              <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:w-[540px] p-6 lg:p-8">
+                                <SheetHeader className="mb-6">
+                                  <SheetTitle className="text-white text-2xl font-bold uppercase tracking-wide">
+                                    Review Deliverable
+                                  </SheetTitle>
+                                  <SheetDescription className="text-slate-400">
+                                    Review the evidence and data provided for
+                                    this milestone before releasing funds.
+                                  </SheetDescription>
+                                </SheetHeader>
 
-                                <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                                  <h4 className="text-sm font-bold text-amber-500 mb-2 uppercase tracking-wide">
-                                    Approval Action
-                                  </h4>
-                                  <p className="text-xs text-amber-200/70 mb-4">
-                                    By approving this milestone, you are
-                                    confirming that the work meets your
-                                    requirements.
-                                    <span className="text-white font-bold">
-                                      {" "}
-                                      $
-                                      {activeReview.displayAmount?.toLocaleString()}
-                                    </span>{" "}
-                                    will be released to the freelancer.
-                                  </p>
-                                  <div className="flex gap-3">
-                                    <SheetClose asChild>
-                                      <Button
-                                        onClick={handleApprove}
-                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
-                                      >
-                                        <Check className="w-4 h-4 mr-2" />
-                                        Approve & Pay
-                                      </Button>
-                                    </SheetClose>
-                                    <SheetClose asChild>
-                                      <Button
-                                        variant="outline"
-                                        className="border-white/10 hover:bg-white/5 text-slate-400 hover:text-white"
-                                      >
-                                        Cancel
-                                      </Button>
-                                    </SheetClose>
+                                {activeReview && (
+                                  <div className="space-y-6">
+                                    <EvidencePanel
+                                      milestone={activeReview}
+                                      evidence={getMockEvidence(activeReview)}
+                                    />
+
+                                    <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                                      <h4 className="text-sm font-bold text-amber-500 mb-2 uppercase tracking-wide">
+                                        Approval Action
+                                      </h4>
+                                      <p className="text-xs text-amber-200/70 mb-4">
+                                        By approving this milestone, you are
+                                        confirming that the work meets your
+                                        requirements.
+                                        <span className="text-white font-bold">
+                                          {" "}
+                                          $
+                                          {activeReview.displayAmount?.toLocaleString()}
+                                        </span>{" "}
+                                        will be released to the freelancer.
+                                      </p>
+                                      <div className="flex gap-3">
+                                        <SheetClose asChild>
+                                          <Button
+                                            onClick={handleApprove}
+                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                                          >
+                                            <Check className="w-4 h-4 mr-2" />
+                                            Approve & Pay
+                                          </Button>
+                                        </SheetClose>
+                                        <SheetClose asChild>
+                                          <Button
+                                            variant="outline"
+                                            className="border-white/10 hover:bg-white/5 text-slate-400 hover:text-white"
+                                          >
+                                            Cancel
+                                          </Button>
+                                        </SheetClose>
+                                      </div>
+                                    </div>
                                   </div>
-                                </div>
-                              </div>
-                            )}
-                          </SheetContent>
-                        </Sheet>
-                      )}
+                                )}
+                              </SheetContent>
+                            </Sheet>
+                          )}
 
-                      {milestone.status === "approved" && (
-                        <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
-                          <CheckCircle className="w-3 h-3 mr-1.5" />
-                          Approved
-                        </div>
-                      )}
+                        {milestone.status === "approved" &&
+                          milestone.type === "APPROVAL_HUMAN" && (
+                            <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
+                              <CheckCircle className="w-3 h-3 mr-1.5" />
+                              Approved
+                            </div>
+                          )}
 
-                      {milestone.status === "verified" && (
-                        <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
-                          <CheckCircle className="w-3 h-3 mr-1.5" />
-                          Passed
-                        </div>
-                      )}
+                        {milestone.status === "verified" &&
+                          milestone.type === "APPROVAL_HUMAN" && (
+                            <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
+                              <CheckCircle className="w-3 h-3 mr-1.5" />
+                              Passed
+                            </div>
+                          )}
+                      </div>
                     </div>
                   </div>
                 ))}
