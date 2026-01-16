@@ -50,8 +50,23 @@ export default function ClientReviewPage() {
       return;
     }
     setError("");
-    // Mock rejection logic
-    console.log("Rejected milestone", { reason: selectedReason, feedback });
+    // structured Milestone_Review record
+    const reviewRecord = {
+      vaultId,
+      milestoneId,
+      reviewerRole: "CLIENT",
+      action: "REVISION_REQUESTED", // or REJECTED depending on severity, usually revision first
+      reasonCode: selectedReason,
+      comments: feedback,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        attempt: 1, // mock
+      },
+    };
+
+    console.log("Submitting Milestone Review Record:", reviewRecord);
+
+    // In real app: await submitReview(reviewRecord);
     router.push(`/client/vault/${vaultId}`);
   };
 
@@ -145,81 +160,130 @@ export default function ClientReviewPage() {
             </Card>
           </div>
 
-          <div className="space-y-6">
-            <Card className="bg-[#0D0D0E] border-white/5">
+          {/* Action Sidebar */}
+          <div>
+            <Card className="bg-[#111111] border-white/10 sticky top-8">
               <CardHeader>
-                <CardTitle className="text-white">Action</CardTitle>
-                <CardDescription>
-                  Approve to release funds or request changes.
-                </CardDescription>
+                <CardTitle className="text-white text-sm font-bold uppercase tracking-wide">
+                  Actions
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-bold text-white uppercase tracking-wide">
-                      Decision Rationale
-                    </Label>
-                    <Select
-                      onValueChange={(val) => {
-                        setSelectedReason(val);
-                        setError("");
-                      }}
-                    >
-                      <SelectTrigger className="w-full bg-[#111111] border-white/10 text-white h-11">
-                        <SelectValue placeholder="Reason for changes (Required for Rejection)" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#111111] border-gray-800 text-white">
-                        {APPROVAL_REJECTION_CODES.map((reason) => (
-                          <SelectItem
-                            key={reason.code}
-                            value={reason.code}
-                            className="focus:bg-white/10 focus:text-white cursor-pointer"
-                          >
-                            <div className="flex flex-col py-1">
-                              <span className="font-bold">{reason.label}</span>
-                              <span className="text-xs text-white/50">
-                                {reason.description}
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {error && (
-                      <p className="text-red-500 text-xs font-bold uppercase tracking-wide">
-                        {error}
-                      </p>
-                    )}
-                  </div>
+              <CardContent className="space-y-4">
+                {/* Approve */}
+                <Button
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12"
+                  onClick={handleApprove}
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Approve & Release Payment
+                </Button>
 
-                  <div className="space-y-2">
-                    <Label className="text-sm font-bold text-white uppercase tracking-wide">
-                      Additional Context
-                    </Label>
-                    <Textarea
-                      placeholder="Add comments on what needs to be improved..."
-                      className="bg-black/30 border-white/10 text-white min-h-[120px]"
-                      value={feedback}
-                      onChange={(e) => setFeedback(e.target.value)}
-                    />
-                  </div>
+                <div className="relative flex items-center py-2">
+                  <div className="flex-grow border-t border-white/10"></div>
+                  <span className="flex-shrink-0 mx-4 text-white/30 text-xs font-bold uppercase tracking-wide">
+                    Or
+                  </span>
+                  <div className="flex-grow border-t border-white/10"></div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    variant="outline"
-                    className="border-red-500/20 text-red-500 bg-red-500/5 hover:bg-red-500/10 hover:text-red-400"
-                    onClick={handleReject}
+
+                {/* Request Changes */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-white/70 uppercase tracking-wide">
+                    Request Revisions
+                  </Label>
+                  <Select
+                    onValueChange={(val) => {
+                      if (val) {
+                        setSelectedReason(val);
+                      }
+                    }}
                   >
-                    <XCircle className="w-4 h-4 mr-2" />
-                    Request Changes
-                  </Button>
-                  <Button
-                    className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold"
-                    onClick={handleApprove}
+                    <SelectTrigger className="w-full bg-amber-500/10 border-amber-500/30 text-amber-500 hover:bg-amber-500/20 hover:border-amber-500/50">
+                      <SelectValue placeholder="Request Changes..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#141416] border-white/10 text-white">
+                      {APPROVAL_REJECTION_CODES.filter(
+                        (c) =>
+                          c.code === "REVISION_REQUIRED" ||
+                          c.code === "QUALITY_GAP"
+                      ).map((code) => (
+                        <SelectItem
+                          key={code.code}
+                          value={code.code}
+                          className="focus:bg-white/10 focus:text-white"
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-bold">{code.label}</span>
+                            <span className="text-xs text-white/50">
+                              {code.description}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {selectedReason && (
+                    <div className="space-y-2 pt-2">
+                      <Textarea
+                        placeholder="Add specific feedback notes..."
+                        className="bg-black/30 border-white/10 text-white text-sm"
+                        value={feedback}
+                        onChange={(e) => setFeedback(e.target.value)}
+                      />
+                      <Button
+                        variant="outline"
+                        className="w-full border-amber-500/50 text-amber-500"
+                        onClick={handleReject}
+                      >
+                        Confirm Request
+                      </Button>
+                    </div>
+                  )}
+
+                  <p className="text-[10px] text-white/40 pt-1">
+                    Sends milestone back to "Revision Requested".
+                  </p>
+                </div>
+
+                {/* Reject */}
+                <div className="space-y-2 pt-4 border-t border-white/5">
+                  <Label className="text-xs font-bold text-red-500/70 uppercase tracking-wide">
+                    Reject Submission
+                  </Label>
+                  <Select
+                    onValueChange={(val) => {
+                      if (val) {
+                        setSelectedReason(val);
+                        // If rejecting, we might want to force feedback, but for now just select
+                      }
+                    }}
                   >
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Approve & Pay
-                  </Button>
+                    <SelectTrigger className="w-full bg-red-500/5 border-red-500/20 text-red-500 hover:bg-red-500/10 hover:border-red-500/30">
+                      <SelectValue placeholder="Reject Work..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#141416] border-white/10 text-white">
+                      {APPROVAL_REJECTION_CODES.filter(
+                        (c) => c.code !== "REVISION_REQUIRED"
+                      ).map((code) => (
+                        <SelectItem
+                          key={code.code}
+                          value={code.code}
+                          className="focus:bg-white/10 focus:text-white"
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-bold">{code.label}</span>
+                            <span className="text-xs text-white/50">
+                              {code.description}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-white/40">
+                    Marks as "Rejected". Does NOT start a dispute.
+                  </p>
                 </div>
               </CardContent>
             </Card>

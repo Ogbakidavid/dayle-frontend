@@ -18,6 +18,7 @@ import {
   Users,
   X,
   Check,
+  Gavel,
 } from "lucide-react";
 import {
   Card,
@@ -26,6 +27,15 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Sheet,
   SheetContent,
@@ -40,6 +50,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 import { EvidencePanel } from "@/components/shared/EvidencePanel";
+import {
+  getDisputeEligibility,
+  DISPUTE_REASON_CODES,
+} from "@/lib/rules/disputes";
+import { APPROVAL_REJECTION_CODES } from "@/lib/rules/milestones";
 
 export default function ClientVaultDetailPage() {
   const params = useParams();
@@ -51,6 +66,11 @@ export default function ClientVaultDetailPage() {
   const [activeReview, setActiveReview] = useState(null); // The milestone being reviewed
   const [milestoneStates, setMilestoneStates] = useState({}); // Track approvals { [id]: 'approved' }
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // Review Modal State
+  const [reviewReason, setReviewReason] = useState("");
+  const [reviewFeedback, setReviewFeedback] = useState("");
+  const [reviewAction, setReviewAction] = useState(null); // 'REVISION_REQUESTED' | 'REJECTED'
 
   // Find vault from context or use a fallback for safety
   const vault = vaults.find((v) => v.id === vaultId);
@@ -214,6 +234,39 @@ export default function ClientVaultDetailPage() {
     }
   };
 
+  const handleReviewSubmit = () => {
+    if (!activeReview || !reviewAction || !reviewReason) return;
+
+    // Create structured record
+    const record = {
+      milestoneId: activeReview.id,
+      reviewerUserId: "current-client-id", // mock
+      outcome: reviewAction,
+      reasonCodes: [reviewReason],
+      notes: reviewFeedback,
+      createdAt: new Date().toISOString(),
+    };
+
+    console.log("Submitting Review Record:", record);
+
+    setMilestoneStates((prev) => ({
+      ...prev,
+      [activeReview.id]:
+        reviewAction === "REJECTED" ? "rejected" : "revision_requested",
+    }));
+
+    // Reset
+    setActiveReview(null);
+    setReviewAction(null);
+    setReviewReason("");
+    setReviewFeedback("");
+  };
+
+  // Check if any milestone is eligible for dispute
+  const anyEligibleForDispute = useMemo(() => {
+    return displayMilestones.some((m) => getDisputeEligibility(m).eligible);
+  }, [displayMilestones]);
+
   if (vaultsLoading) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white">
@@ -317,8 +370,8 @@ export default function ClientVaultDetailPage() {
                       milestone.type === "COMPLIANCE_AI"
                         ? "bg-emerald-950/10 border-emerald-500/10 hover:bg-emerald-950/20"
                         : milestone.type === "APPROVAL_HUMAN"
-                          ? "bg-amber-950/10 border-amber-500/10 hover:bg-amber-950/20"
-                          : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
+                        ? "bg-amber-950/10 border-amber-500/10 hover:bg-amber-950/20"
+                        : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
                     )}
                   >
                     <div className="flex items-start justify-between gap-4">
@@ -330,8 +383,8 @@ export default function ClientVaultDetailPage() {
                             milestone.type === "COMPLIANCE_AI"
                               ? "bg-emerald-500/10 text-emerald-500"
                               : milestone.type === "APPROVAL_HUMAN"
-                                ? "bg-amber-500/10 text-amber-500"
-                                : "bg-white/5 text-slate-500"
+                              ? "bg-amber-500/10 text-amber-500"
+                              : "bg-white/5 text-slate-500"
                           )}
                         >
                           {milestone.type === "COMPLIANCE_AI" ? (
@@ -400,6 +453,17 @@ export default function ClientVaultDetailPage() {
                             <span className={getStatusColor(milestone.status)}>
                               {milestone.status.replace("_", " ")}
                             </span>
+
+                            {/* Eligible Dispute Action */}
+                            {getDisputeEligibility(milestone).eligible && (
+                              <Link
+                                href={`/client/disputes/create?vaultId=${vaultId}&milestoneId=${milestone.id}`}
+                                className="ml-2 inline-flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded hover:bg-red-500/20 transition-colors"
+                              >
+                                <Gavel className="w-3 h-3" />
+                                Open Case
+                              </Link>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -447,39 +511,163 @@ export default function ClientVaultDetailPage() {
                                       evidence={getMockEvidence(activeReview)}
                                     />
 
-                                    <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                                      <h4 className="text-sm font-bold text-amber-500 mb-2 uppercase tracking-wide">
-                                        Approval Action
+                                    <div className="space-y-4 pt-4 border-t border-white/10">
+                                      <h4 className="text-sm font-bold text-white uppercase tracking-wide">
+                                        Actions
                                       </h4>
-                                      <p className="text-xs text-amber-200/70 mb-4">
-                                        By approving this milestone, you are
-                                        confirming that the work meets your
-                                        requirements.
-                                        <span className="text-white font-bold">
-                                          {" "}
-                                          $
-                                          {activeReview.displayAmount?.toLocaleString()}
-                                        </span>{" "}
-                                        will be released to the freelancer.
-                                      </p>
-                                      <div className="flex gap-3">
-                                        <SheetClose asChild>
-                                          <Button
-                                            onClick={handleApprove}
-                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
-                                          >
-                                            <Check className="w-4 h-4 mr-2" />
-                                            Approve & Pay
-                                          </Button>
-                                        </SheetClose>
-                                        <SheetClose asChild>
+
+                                      {/* Approve */}
+                                      <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                                        <div className="flex items-center justify-between gap-4">
+                                          <div>
+                                            <h5 className="text-sm font-bold text-emerald-500 uppercase tracking-wide">
+                                              Approve & Pay
+                                            </h5>
+                                            <p className="text-xs text-emerald-200/70 mt-1">
+                                              Release{" "}
+                                              <span className="text-white font-bold">
+                                                $
+                                                {activeReview.displayAmount?.toLocaleString()}
+                                              </span>{" "}
+                                              to freelancer.
+                                            </p>
+                                          </div>
+                                          <SheetClose asChild>
+                                            <Button
+                                              onClick={handleApprove}
+                                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                                            >
+                                              <Check className="w-4 h-4 mr-2" />
+                                              Approve
+                                            </Button>
+                                          </SheetClose>
+                                        </div>
+                                      </div>
+
+                                      <div className="relative flex items-center py-2">
+                                        <div className="flex-grow border-t border-white/10"></div>
+                                        <span className="flex-shrink-0 mx-4 text-white/30 text-xs font-bold uppercase tracking-wide">
+                                          Or Request Changes
+                                        </span>
+                                        <div className="flex-grow border-t border-white/10"></div>
+                                      </div>
+
+                                      {/* Revision / Reject */}
+                                      <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
                                           <Button
                                             variant="outline"
-                                            className="border-white/10 hover:bg-white/5 text-slate-400 hover:text-white"
+                                            className={cn(
+                                              "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400",
+                                              reviewAction ===
+                                                "REVISION_REQUESTED" &&
+                                                "bg-amber-500/10 ring-1 ring-amber-500"
+                                            )}
+                                            onClick={() => {
+                                              setReviewAction(
+                                                "REVISION_REQUESTED"
+                                              );
+                                              setReviewReason("");
+                                            }}
                                           >
-                                            Cancel
+                                            Request Changes
                                           </Button>
-                                        </SheetClose>
+                                          <Button
+                                            variant="outline"
+                                            className={cn(
+                                              "border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400",
+                                              reviewAction === "REJECTED" &&
+                                                "bg-red-500/10 ring-1 ring-red-500"
+                                            )}
+                                            onClick={() => {
+                                              setReviewAction("REJECTED");
+                                              setReviewReason("");
+                                            }}
+                                          >
+                                            Reject Work
+                                          </Button>
+                                        </div>
+
+                                        {reviewAction && (
+                                          <div className="space-y-4 p-4 rounded-lg bg-white/[0.02] border border-white/10 animate-in slide-in-from-top-2">
+                                            <div className="space-y-2">
+                                              <Label>
+                                                Reason codes (required)
+                                              </Label>
+                                              <Select
+                                                onValueChange={setReviewReason}
+                                              >
+                                                <SelectTrigger className="bg-black/40 border-white/10">
+                                                  <SelectValue placeholder="Select reason..." />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-[#141416] border-white/10 text-white">
+                                                  {APPROVAL_REJECTION_CODES.filter(
+                                                    (c) =>
+                                                      reviewAction ===
+                                                      "REJECTED"
+                                                        ? c.code !==
+                                                          "REVISION_REQUIRED"
+                                                        : true
+                                                  ).map((c) => (
+                                                    <SelectItem
+                                                      key={c.code}
+                                                      value={c.code}
+                                                      className="focus:bg-white/10 focus:text-white"
+                                                    >
+                                                      <div className="flex flex-col">
+                                                        <span className="font-bold">
+                                                          {c.label}
+                                                        </span>
+                                                        <span className="text-xs text-white/50">
+                                                          {c.description}
+                                                        </span>
+                                                      </div>
+                                                    </SelectItem>
+                                                  ))}
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                              <Label>Notes (Optional)</Label>
+                                              <Textarea
+                                                placeholder="Provide feedback..."
+                                                className="bg-black/40 border-white/10 min-h-[80px]"
+                                                value={reviewFeedback}
+                                                onChange={(e) =>
+                                                  setReviewFeedback(
+                                                    e.target.value
+                                                  )
+                                                }
+                                              />
+                                            </div>
+                                            <div className="flex justify-end gap-2">
+                                              <Button
+                                                variant="ghost"
+                                                onClick={() =>
+                                                  setReviewAction(null)
+                                                }
+                                              >
+                                                Cancel
+                                              </Button>
+                                              <SheetClose asChild>
+                                                <Button
+                                                  disabled={!reviewReason}
+                                                  onClick={handleReviewSubmit}
+                                                  className={
+                                                    reviewAction === "REJECTED"
+                                                      ? "bg-red-600 hover:bg-red-700"
+                                                      : "bg-amber-600 hover:bg-amber-700"
+                                                  }
+                                                >
+                                                  Confirm{" "}
+                                                  {reviewAction === "REJECTED"
+                                                    ? "Rejection"
+                                                    : "Request"}
+                                                </Button>
+                                              </SheetClose>
+                                            </div>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -535,7 +723,7 @@ export default function ClientVaultDetailPage() {
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-slate-400">
-                        AI Audit Confidence
+                        Verification Confidence
                       </span>
                       <span className="text-emerald-500 font-bold">99.8%</span>
                     </div>
@@ -561,33 +749,40 @@ export default function ClientVaultDetailPage() {
             </Card>
 
             {/* Dispute CTA */}
-            <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-6 opacity-60 hover:opacity-100 transition-opacity">
-              <div className="flex items-start gap-4">
-                <div className="p-2 rounded-lg bg-red-500/10 text-red-500">
-                  <AlertTriangle className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-red-500 uppercase tracking-widest mb-1">
-                    Start Dispute
-                  </h4>
-                  <p className="text-sm text-red-200/60 mb-4">
-                    Issues with deliverables? You can freeze funds here.
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-red-500 border-red-500/30 hover:bg-red-500/10 w-full"
-                    asChild
-                  >
-                    <Link
-                      href={`/client/disputes/create?vaultId=${vault.id}`}
-                    >
-                      Open Case
+            <Card
+              className={cn(
+                "border-white/5 bg-[#0D0D0E]",
+                !anyEligibleForDispute && "opacity-70"
+              )}
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Gavel className="w-5 h-5 text-amber-500" />
+                  Cases / Disputes
+                </CardTitle>
+                <CardDescription>
+                  {anyEligibleForDispute
+                    ? "Open a formal case if work does not meet requirements."
+                    : "No eligible cases for this vault right now. Disputes are only allowed for specific reason codes tied to a milestone."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  variant="outline"
+                  className="w-full border-white/10 hover:bg-white/5 text-white"
+                  disabled={!anyEligibleForDispute}
+                  asChild={anyEligibleForDispute}
+                >
+                  {anyEligibleForDispute ? (
+                    <Link href={`/client/disputes/create?vaultId=${vaultId}`}>
+                      Open a Case
                     </Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
+                  ) : (
+                    <Link href="/client/disputes">Go to disputes</Link>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
 
             <div className="bg-[#0D0D0E] border border-white/5 rounded-xl p-6 space-y-4">
               <h4 className="text-sm font-bold text-white uppercase tracking-widest">

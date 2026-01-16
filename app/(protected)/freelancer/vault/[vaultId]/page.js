@@ -18,6 +18,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Link2,
+  Gavel,
 } from "lucide-react";
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 import {
@@ -44,6 +45,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { EvidencePanel } from "@/components/shared/EvidencePanel";
 import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
+import { getDisputeEligibility } from "@/lib/rules/disputes";
 
 export default function FreelancerVaultDetailPage() {
   const params = useParams();
@@ -195,6 +197,11 @@ export default function FreelancerVaultDetailPage() {
 
     return splitMilestones;
   }, [vault, milestoneStates]);
+
+  // Check if any milestone is eligible for dispute
+  const anyEligibleForDispute = useMemo(() => {
+    return displayMilestones.some((m) => getDisputeEligibility(m).eligible);
+  }, [displayMilestones]);
 
   // Helper for status colors
   const getStatusColor = (status) => {
@@ -449,9 +456,10 @@ export default function FreelancerVaultDetailPage() {
                                                 <div className="relative">
                                                   <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
                                                   <Input
-                                                    placeholder={`Paste ${deliverableDef?.label ||
+                                                    placeholder={`Paste ${
+                                                      deliverableDef?.label ||
                                                       "Link"
-                                                      } URL...`}
+                                                    } URL...`}
                                                     className="bg-black/30 border-white/10 text-white pl-10"
                                                   />
                                                 </div>
@@ -568,7 +576,7 @@ export default function FreelancerVaultDetailPage() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Code Quality Score</span>
+                    <span className="text-slate-500">Checks Summary</span>
                     <span className="text-emerald-500 font-bold">A+</span>
                   </div>
                   <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
@@ -579,34 +587,42 @@ export default function FreelancerVaultDetailPage() {
             </Card>
 
             {/* Dispute CTA */}
-            <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 rounded-lg bg-red-500/10 text-red-500">
-                  <AlertTriangle className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-red-500 uppercase tracking-widest mb-1">
-                    Issues with Payment?
-                  </h4>
-                  <p className="text-sm text-red-200/60 mb-4">
-                    If the client is unresponsive or delaying approval
-                    unreasonably.
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-red-500 border-red-500/30 hover:bg-red-500/10 w-full"
-                    asChild
-                  >
+            <Card
+              className={cn(
+                "border-white/5 bg-[#0D0D0E]",
+                !anyEligibleForDispute && "opacity-70"
+              )}
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Gavel className="w-5 h-5 text-amber-500" />
+                  Cases / Disputes
+                </CardTitle>
+                <CardDescription>
+                  {anyEligibleForDispute
+                    ? "Open a formal case if work does not meet requirements."
+                    : "No eligible cases for this vault right now. Disputes are only allowed for specific reason codes tied to a milestone."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  variant="outline"
+                  className="w-full border-white/10 hover:bg-white/5 text-white"
+                  disabled={!anyEligibleForDispute}
+                  asChild={anyEligibleForDispute}
+                >
+                  {anyEligibleForDispute ? (
                     <Link
-                      href={`/freelancer/disputes/create?vaultId=${vault.id}`}
+                      href={`/freelancer/disputes/create?vaultId=${vaultId}`}
                     >
-                      Raise Dispute
+                      Open a Case
                     </Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
+                  ) : (
+                    <Link href="/freelancer/disputes">Go to disputes</Link>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

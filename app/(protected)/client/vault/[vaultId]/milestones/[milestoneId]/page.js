@@ -21,6 +21,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { EvidenceChannel } from "@/components/milestones/EvidenceChannel";
 
 export default function ClientMilestoneDetailPage() {
   const params = useParams();
@@ -140,6 +141,15 @@ export default function ClientMilestoneDetailPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Evidence Channel */}
+            <div className="h-[600px]">
+              <EvidenceChannel
+                vaultId={vaultId}
+                milestoneId={milestoneId}
+                role="client"
+              />
+            </div>
           </div>
         </div>
       </div>

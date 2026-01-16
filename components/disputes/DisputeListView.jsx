@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { disputes, getVaultById } from "@/lib/mock";
+// import { Button } from "@/components/ui/button";
+import { api } from "@/lib/mock-api";
 import { cn } from "@/lib/utils";
 import {
   Gavel,
@@ -95,7 +96,8 @@ function StatCard({ title, value, hint, icon: Icon, tone = "neutral" }) {
   const toneMap = {
     neutral: "border-white/10 bg-white/[0.03] hover:bg-white/[0.05]",
     amber: "border-amber-500/15 bg-amber-500/[0.06] hover:bg-amber-500/[0.09]",
-    emerald: "border-emerald-500/15 bg-emerald-500/[0.06] hover:bg-emerald-500/[0.09]",
+    emerald:
+      "border-emerald-500/15 bg-emerald-500/[0.06] hover:bg-emerald-500/[0.09]",
     sky: "border-sky-500/15 bg-sky-500/[0.06] hover:bg-sky-500/[0.09]",
   };
 
@@ -110,9 +112,7 @@ function StatCard({ title, value, hint, icon: Icon, tone = "neutral" }) {
             <p className="mt-2 text-3xl font-semibold tracking-tight text-white">
               {value}
             </p>
-            {hint ? (
-              <p className="mt-1 text-xs text-white/45">{hint}</p>
-            ) : null}
+            {hint ? <p className="mt-1 text-xs text-white/45">{hint}</p> : null}
           </div>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-black/30">
             <Icon className="h-5 w-5 text-white/70" />
@@ -128,19 +128,50 @@ export function DisputeListView({ role }) {
   const [statusFilter, setStatusFilter] = useState("all"); // all | open | investigating | resolved | closed
   const [sortKey, setSortKey] = useState("newest"); // newest | oldest
 
+  const [disputesData, setDisputesData] = useState([]);
+  const [vaultsData, setVaultsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch data
+  useState(() => {
+    async function load() {
+      try {
+        const [d, v] = await Promise.all([
+          api.disputes.list(),
+          api.vaults.list(),
+        ]);
+        setDisputesData(d);
+        setVaultsData(v);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [role]);
+
   const counts = useMemo(() => {
-    const open = disputes.filter((d) => d.status === "open").length;
-    const investigating = disputes.filter((d) => d.status === "investigating").length;
-    const resolved = disputes.filter((d) => d.status === "resolved").length;
-    const closed = disputes.filter((d) => d.status === "closed").length;
-    return { open, investigating, resolved, closed, total: disputes.length };
-  }, []);
+    const open = disputesData.filter((d) => d.status === "open").length;
+    const investigating = disputesData.filter(
+      (d) => d.status === "investigating"
+    ).length;
+    const resolved = disputesData.filter((d) => d.status === "resolved").length;
+    const closed = disputesData.filter((d) => d.status === "closed").length;
+    return {
+      open,
+      investigating,
+      resolved,
+      closed,
+      total: disputesData.length,
+    };
+  }, [disputesData]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
 
-    let list = disputes.map((d) => {
-      const vault = getVaultById(d.vaultId);
+    let list = disputesData.map((d) => {
+      const vault = vaultsData.find((v) => v.id === d.vaultId);
       return {
         ...d,
         vaultTitle: vault?.title || "Unknown Vault",
@@ -157,7 +188,9 @@ export function DisputeListView({ role }) {
           d.id,
           d.vaultTitle,
           d.milestoneId,
-          d.requirementId || "",
+          d.vaultTitle,
+          d.milestoneId,
+          d.requirementRef || "",
           d.summary || "",
           d.status,
         ]
@@ -174,12 +207,16 @@ export function DisputeListView({ role }) {
     });
 
     return list;
-  }, [query, statusFilter, sortKey]);
+  }, [query, statusFilter, sortKey, disputesData, vaultsData]);
 
   const statusTabs = [
     { key: "all", label: "All", count: counts.total },
     { key: "open", label: "Open", count: counts.open },
-    { key: "investigating", label: "Investigating", count: counts.investigating },
+    {
+      key: "investigating",
+      label: "Investigating",
+      count: counts.investigating,
+    },
     { key: "resolved", label: "Resolved", count: counts.resolved },
     { key: "closed", label: "Closed", count: counts.closed },
   ];
@@ -282,7 +319,9 @@ export function DisputeListView({ role }) {
                 type="button"
                 variant="outline"
                 className="h-11 w-full sm:w-auto border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.06] hover:text-white"
-                onClick={() => setSortKey((s) => (s === "newest" ? "oldest" : "newest"))}
+                onClick={() =>
+                  setSortKey((s) => (s === "newest" ? "oldest" : "newest"))
+                }
               >
                 <ArrowDownUp className="mr-2 h-4 w-4" />
                 {sortKey === "newest" ? "Newest first" : "Oldest first"}
@@ -306,12 +345,19 @@ export function DisputeListView({ role }) {
                       : "border-white/10 bg-white/[0.03] text-white/60 hover:bg-white/[0.06] hover:text-white"
                   )}
                 >
-                  <Filter className={cn("h-3.5 w-3.5", active ? "text-amber-200" : "text-white/40")} />
+                  <Filter
+                    className={cn(
+                      "h-3.5 w-3.5",
+                      active ? "text-amber-200" : "text-white/40"
+                    )}
+                  />
                   {t.label}
                   <span
                     className={cn(
                       "ml-1 rounded-full px-2 py-0.5 text-[11px]",
-                      active ? "bg-amber-500/15 text-amber-200" : "bg-white/5 text-white/50"
+                      active
+                        ? "bg-amber-500/15 text-amber-200"
+                        : "bg-white/5 text-white/50"
                     )}
                   >
                     {t.count}
@@ -330,8 +376,12 @@ export function DisputeListView({ role }) {
           <CardTitle className="flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-2">
               <Gavel className="h-5 w-5 text-amber-300" />
-              <span className="text-lg font-semibold tracking-tight">Cases</span>
-              <span className="text-sm font-normal text-white/40">({filtered.length})</span>
+              <span className="text-lg font-semibold tracking-tight">
+                Cases
+              </span>
+              <span className="text-sm font-normal text-white/40">
+                ({filtered.length})
+              </span>
             </div>
           </CardTitle>
         </CardHeader>
@@ -343,7 +393,9 @@ export function DisputeListView({ role }) {
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-black/30">
                   <Gavel className="h-6 w-6 text-white/60" />
                 </div>
-                <p className="text-base font-semibold text-white">No disputes found</p>
+                <p className="text-base font-semibold text-white">
+                  No disputes found
+                </p>
                 <p className="mt-1 text-sm text-white/50">
                   Try adjusting filters or open a new dispute.
                 </p>
@@ -388,19 +440,25 @@ export function DisputeListView({ role }) {
                           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-white/45">
                             <span>
                               Milestone:{" "}
-                              <span className="text-white/70">{dispute.milestoneId}</span>
+                              <span className="text-white/70">
+                                {dispute.milestoneId}
+                              </span>
                             </span>
 
-                            {dispute.requirementId ? (
+                            {dispute.requirementRef ? (
                               <span>
                                 Requirement:{" "}
-                                <span className="text-white/70">{dispute.requirementId}</span>
+                                <span className="text-white/70">
+                                  {dispute.requirementRef}
+                                </span>
                               </span>
                             ) : null}
 
                             <span>
                               Opened:{" "}
-                              <span className="text-white/70">{formatDate(dispute.openedAt)}</span>
+                              <span className="text-white/70">
+                                {formatDate(dispute.openedAt)}
+                              </span>
                             </span>
                           </div>
 
@@ -441,7 +499,6 @@ export function DisputeListView({ role }) {
           )}
         </CardContent>
       </Card>
-
     </div>
   );
 }
