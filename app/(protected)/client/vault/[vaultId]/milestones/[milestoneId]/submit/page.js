@@ -1,11 +1,12 @@
-import { MilestoneSubmitView } from '@/components/milestones/MilestoneSubmitView';
+import { MilestoneSubmitView } from "@/components/milestones/MilestoneSubmitView";
 
-export default function ClientMilestoneSubmitPage({ params }) {
-    return (
-        <MilestoneSubmitView
-            vaultId={params.vaultId}
-            milestoneId={params.milestoneId}
-            role="client"
-        />
-    );
+export default async function ClientMilestoneSubmitPage({ params }) {
+  const { vaultId, milestoneId } = await params;
+  return (
+    <MilestoneSubmitView
+      vaultId={vaultId}
+      milestoneId={milestoneId}
+      role="client"
+    />
+  );
 }

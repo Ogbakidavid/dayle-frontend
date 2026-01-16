@@ -1,5 +1,6 @@
-import { DisputeDetailView } from '@/components/disputes/DisputeDetailView';
+import { DisputeDetailView } from "@/components/disputes/DisputeDetailView";
 
-export default function ClientDisputeDetailPage({ params }) {
-    return <DisputeDetailView disputeId={params.disputeId} role="client" />;
+export default async function ClientDisputeDetailPage({ params }) {
+  const { disputeId } = await params;
+  return <DisputeDetailView disputeId={disputeId} role="client" />;
 }

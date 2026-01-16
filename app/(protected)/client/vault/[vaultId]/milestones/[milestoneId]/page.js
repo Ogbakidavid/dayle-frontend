@@ -48,7 +48,7 @@ export default function ClientMilestoneDetailPage() {
         <header className="pt-8">
           <Link
             href={`/client/vault/${vaultId}`}
-            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-6 font-bold uppercase tracking-wide"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Vault

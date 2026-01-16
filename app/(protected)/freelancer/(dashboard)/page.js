@@ -57,7 +57,7 @@ export default function FreelancerDashboard() {
         </div>
         <div className="flex gap-3">
           <Link href="/freelancer/wallet">
-            <Button className="bg-[#111111] border border-gray-800 hover:bg-gray-800 text-white font-medium">
+            <Button className="bg-[#111111] border border-gray-800 hover:bg-gray-800 text-white font-bold uppercase tracking-wide">
               Withdraw Funds
             </Button>
           </Link>
