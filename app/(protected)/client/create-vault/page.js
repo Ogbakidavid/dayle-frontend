@@ -128,29 +128,29 @@ export default function CreateVaultPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] py-12 px-4">
+    <div className="min-h-screen bg-[#0A0A0A] py-8 md:py-12 px-3 md:px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="mb-12 text-center">
-          <h1 className="text-3xl font-black text-white mb-3 tracking-tighter uppercase">
+        <div className="mb-8 md:mb-12 text-center">
+          <h1 className="text-2xl md:text-3xl font-black text-white mb-3 tracking-tighter uppercase">
             Create New Vault
           </h1>
-          <p className="text-white/70 text-base font-bold uppercase tracking-wide">
+          <p className="text-white/70 text-sm md:text-base font-bold uppercase tracking-wide">
             Define objective conditions for capital release
           </p>
         </div>
 
         {/* Progress Tracker */}
-        <div className="flex items-center justify-between mb-16 relative">
+        <div className="flex items-center justify-between mb-12 md:mb-16 relative px-2">
           <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 -translate-y-1/2" />
           {steps.map((s) => (
             <div
               key={s.id}
-              className="relative z-10 flex flex-col items-center gap-3"
+              className="relative z-10 flex flex-col items-center gap-2 md:gap-3"
             >
               <div
                 className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-300",
+                  "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border transition-all duration-300",
                   step === s.id
                     ? "bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                     : step > s.id
@@ -159,14 +159,14 @@ export default function CreateVaultPage() {
                 )}
               >
                 {step > s.id ? (
-                  <Check className="w-4 h-4" />
+                  <Check className="w-3 h-3 md:w-4 md:h-4" />
                 ) : (
-                  <s.icon className="w-4 h-4" />
+                  <s.icon className="w-3 h-3 md:w-4 md:h-4" />
                 )}
               </div>
               <span
                 className={cn(
-                  "text-sm uppercase tracking-wide font-medium",
+                  "text-xs md:text-sm uppercase tracking-wide font-medium",
                   step === s.id ? "text-white" : "text-white"
                 )}
               >
@@ -185,7 +185,7 @@ export default function CreateVaultPage() {
                 <Label className="text-sm font-bold uppercase tracking-wide text-white-200">
                   What work are you securing payment for? *
                 </Label>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
                   {Object.entries(VAULT_PURPOSE_MAPPING).map(([key, value]) => {
                     const Icon = value.icon;
                     return (
@@ -345,7 +345,7 @@ export default function CreateVaultPage() {
                     />
 
                     {/* Milestone Type Selection */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                       <button
                         onClick={() => updateMilestone(i, "type", "COMPLIANCE")}
                         className={cn(
@@ -695,12 +695,12 @@ export default function CreateVaultPage() {
           )}
 
           {/* NAVIGATION BUTTONS */}
-          <div className="flex justify-between mt-12 pt-6 border-t border-gray-900">
+          <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 mt-12 pt-6 border-t border-gray-900">
             <Button
               variant="ghost"
               onClick={() => setStep(step - 1)}
               disabled={step === 1}
-              className="text-white/70 hover:text-white font-bold uppercase tracking-wide"
+              className="text-white/70 hover:text-white font-bold uppercase tracking-wide w-full sm:w-auto"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
             </Button>
@@ -710,7 +710,7 @@ export default function CreateVaultPage() {
                 onClick={() => setStep(step + 1)}
                 disabled={!canContinue}
                 className={cn(
-                  "px-8 h-11 transition-all text-sm",
+                  "px-8 h-11 transition-all text-sm w-full sm:w-auto",
                   canContinue
                     ? "bg-white text-black hover:bg-emerald-500 hover:text-white font-bold uppercase tracking-wide"
                     : "bg-gray-800 text-white cursor-not-allowed"
@@ -719,8 +719,8 @@ export default function CreateVaultPage() {
                 Continue <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
-              <Link href="/checkout/new-vault-id">
-                <Button className="bg-emerald-500 text-black px-10 h-11 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20">
+              <Link href="/checkout/new-vault-id" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto bg-emerald-500 text-black px-10 h-11 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20">
                   Deploy Vault
                 </Button>
               </Link>

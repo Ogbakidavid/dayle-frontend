@@ -46,18 +46,18 @@ export default function FreelancerDashboard() {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
         <div className="space-y-1">
-          <h1 className="text-4xl font-black tracking-tighter text-white uppercase flex items-center gap-3">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase flex items-center gap-3">
             Overview
           </h1>
-          <p className="text-sm text-white font-bold uppercase tracking-wide">
+          <p className="text-xs md:text-sm text-white font-bold uppercase tracking-wide">
             Track your deliverables and secure earnings
           </p>
         </div>
         <div className="flex gap-3">
-          <Link href="/freelancer/wallet">
-            <Button className="bg-[#111111] border border-gray-800 hover:bg-gray-800 text-white font-bold uppercase tracking-wide">
+          <Link href="/freelancer/wallet" className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto bg-[#111111] border border-gray-800 hover:bg-gray-800 text-white font-bold uppercase tracking-wide">
               Withdraw Funds
             </Button>
           </Link>
@@ -65,7 +65,7 @@ export default function FreelancerDashboard() {
       </header>
 
       {/* Stats Cards */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="bg-[#111111] border border-gray-900 p-6 rounded-sm hover:border-gray-800 transition-colors">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">

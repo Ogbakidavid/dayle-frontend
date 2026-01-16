@@ -49,7 +49,7 @@ export default function ClientDashboard() {
         </div>
       </header>
       {/* Stats Cards - Cleaner */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
         <div className="bg-[#111111] border border-white/10 p-6 rounded-sm hover:border-white/20 transition-colors">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">

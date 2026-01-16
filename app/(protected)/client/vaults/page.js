@@ -72,12 +72,12 @@ export default function VaultsPage() {
     <div className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30">
       <div className="max-w-7xl mx-auto px-6 space-y-10">
         {/* 1. TOP NAVIGATION / HEADER */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
           <div className="space-y-1">
-            <h1 className="text-4xl font-black tracking-tighter text-white uppercase">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase">
               Financial Vaults
             </h1>
-            <p className="text-sm text-slate-500 font-bold uppercase tracking-wide">
+            <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide">
               Overview of your smart-escrow deployments
             </p>
           </div>
@@ -89,8 +89,8 @@ export default function VaultsPage() {
               <Filter className="w-4 h-4 mr-2 text-slate-400" />
               Filters
             </Button>
-            <Link href="/client/create-vault">
-              <Button className="bg-white text-black hover:bg-emerald-400 hover:text-black h-11 px-6 rounded-xl font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all lg:hidden">
+            <Link href="/client/create-vault" className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto bg-white text-black hover:bg-emerald-400 hover:text-black h-11 px-6 rounded-xl font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all">
                 <Plus className="w-4 h-4 mr-2" strokeWidth={3} />
                 New Vault
               </Button>
@@ -99,7 +99,7 @@ export default function VaultsPage() {
         </header>
 
         {/* 2. ANALYTICS GRID */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {stats.map((stat, i) => (
             <div
               key={i}
@@ -134,17 +134,17 @@ export default function VaultsPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
           <input
             type="search"
-            placeholder="Search assets, emails, or transaction IDs..."
+            placeholder="Search vaults..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner font-bold uppercase tracking-wide"
+            className="w-full pl-12 pr-4 py-3 md:py-4 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner font-bold uppercase tracking-wide text-sm md:text-base"
           />
         </div>
 
         {/* 4. DATA TABLE (LIST) */}
         <div className="bg-[#0D0D0E] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
                   <th className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-wide">
@@ -266,8 +266,8 @@ export default function VaultsPage() {
         </div>
 
         {/* 5. FOOTER SUMMARY */}
-        <footer className="flex items-center justify-between py-6 border-t border-white/5">
-          <p className="text-sm font-bold text-slate-600 uppercase tracking-wide">
+        <footer className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-white/5">
+          <p className="text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide text-center sm:text-left">
             Displaying {paginatedVaults.length} of {filteredVaults.length}{" "}
             smart-vaults
           </p>
@@ -284,7 +284,7 @@ export default function VaultsPage() {
             >
               Previous
             </Button>
-            <div className="flex items-center gap-1 px-2">
+            <div className="hidden sm:flex items-center gap-1 px-2">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
@@ -302,6 +302,9 @@ export default function VaultsPage() {
                   {p}
                 </button>
               ))}
+            </div>
+            <div className="sm:hidden text-sm font-bold text-white">
+              {currentPage} / {totalPages}
             </div>
             <Button
               variant="outline"

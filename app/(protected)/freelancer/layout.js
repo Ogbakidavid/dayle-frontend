@@ -17,6 +17,8 @@ import {
   FileText,
   CheckCircle,
   Gavel,
+  Menu,
+  X,
 } from "lucide-react";
 import { useUser } from "@/lib/store/user-context";
 import { cn } from "@/lib/utils";
@@ -38,11 +40,25 @@ const navigation = [
 export default function FreelancerLayout({ children }) {
   const pathname = usePathname();
   const { user, logout } = useUser();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white flex">
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Left Sidebar - Professional Dark Theme */}
-      <aside className="w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col sticky top-0 h-screen">
+      <aside className={cn(
+        "w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col h-screen transition-transform duration-300 ease-in-out",
+        "fixed lg:sticky top-0 z-50 lg:z-auto",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
         {/* Logo & Brand */}
         <div className="p-6 pb-4">
           <Link href="/freelancer" className="flex items-center gap-3 group">
@@ -120,9 +136,6 @@ export default function FreelancerLayout({ children }) {
               <p className="text-sm font-medium text-white">
                 {user?.name || "Jane Smith"}
               </p>
-              <p className="text-sm text-white font-bold uppercase tracking-wide italic">
-                Freelancer
-              </p>
             </div>
           </div>
 
@@ -153,9 +166,23 @@ export default function FreelancerLayout({ children }) {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile Header */}
+        <div className="lg:hidden sticky top-0 z-30 bg-[#111111] border-b border-gray-900 p-4 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(true)}
+            className="text-white hover:bg-white/10"
+          >
+            <Menu className="w-5 h-5" />
+          </Button>
+          <h1 className="text-lg font-bold uppercase">Cleard</h1>
+          <div className="w-9" /> {/* Spacer for centering */}
+        </div>
+
         {/* Content Area */}
         <main className="flex-1 overflow-y-auto bg-[#0A0A0A]">
-          <div className="p-8">
+          <div className="p-4 lg:p-8">
             <div className="max-w-7xl mx-auto">{children}</div>
           </div>
         </main>

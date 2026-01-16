@@ -86,7 +86,7 @@ export default function FreelancerVaultsPage() {
         </header>
 
         {/* 2. ANALYTICS GRID */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {stats.map((stat, i) => (
             <div
               key={i}
@@ -131,7 +131,7 @@ export default function FreelancerVaultsPage() {
         {/* 4. DATA TABLE (LIST) */}
         <div className="bg-[#0D0D0E] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
                   <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
