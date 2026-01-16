@@ -429,7 +429,7 @@ export default function ClientVaultDetailPage() {
                                   <ChevronRight className="w-4 h-4 ml-1" />
                                 </Button>
                               </SheetTrigger>
-                              <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:w-[540px] p-6 lg:p-8">
+                              <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:max-w-[50vw] p-6 lg:p-8">
                                 <SheetHeader className="mb-6">
                                   <SheetTitle className="text-white text-2xl font-bold uppercase tracking-wide">
                                     Review Deliverable
@@ -581,10 +581,10 @@ export default function ClientVaultDetailPage() {
                   >
                     <Link
                       href={`/client/disputes/${vault.id === "v_3"
-                          ? "d_003"
-                          : vault.id === "v_4"
-                            ? "d_004"
-                            : "d_001"
+                        ? "d_003"
+                        : vault.id === "v_4"
+                          ? "d_004"
+                          : "d_001"
                         }`}
                     >
                       Open Case
