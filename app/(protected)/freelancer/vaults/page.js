@@ -70,7 +70,7 @@ export default function FreelancerVaultsPage() {
             <h1 className="text-4xl font-black tracking-tighter text-white uppercase">
               Your Vaults
             </h1>
-            <p className="text-sm text-white/40 font-bold uppercase tracking-widest">
+            <p className="text-sm text-white font-bold uppercase tracking-wide">
               Manage your active contracts and milestones
             </p>
           </div>
@@ -102,11 +102,11 @@ export default function FreelancerVaultsPage() {
                 >
                   <stat.icon className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full uppercase tracking-wider">
+                <span className="text-sm font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full uppercase tracking-wide">
                   {stat.change}
                 </span>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2">
+              <p className="text-sm font-black uppercase tracking-wide text-white/30 mb-2">
                 {stat.label}
               </p>
               <h2 className="text-3xl font-black text-white tracking-tighter">
@@ -134,16 +134,16 @@ export default function FreelancerVaultsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Vault Detail
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Client
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide text-right">
                     Value
                   </th>
                   <th className="px-6 py-4"></th>
@@ -177,7 +177,7 @@ export default function FreelancerVaultsPage() {
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-emerald-500">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-sm font-bold text-emerald-500">
                           {(vault.clientEmail ||
                             vault.client?.email ||
                             "C")[0].toUpperCase()}
@@ -192,12 +192,12 @@ export default function FreelancerVaultsPage() {
                     <td className="px-6 py-5">
                       <div
                         className={cn(
-                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-bold uppercase tracking-wider",
+                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-sm font-bold uppercase tracking-wide",
                           vault.status === "active"
                             ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500"
                             : vault.status === "completed"
-                            ? "bg-blue-500/5 border-blue-500/20 text-blue-500"
-                            : "bg-amber-500/5 border-amber-500/20 text-amber-500"
+                              ? "bg-blue-500/5 border-blue-500/20 text-blue-500"
+                              : "bg-amber-500/5 border-amber-500/20 text-amber-500"
                         )}
                       >
                         <div
@@ -206,18 +206,18 @@ export default function FreelancerVaultsPage() {
                             vault.status === "active"
                               ? "bg-emerald-500"
                               : vault.status === "completed"
-                              ? "bg-blue-500"
-                              : "bg-amber-500"
+                                ? "bg-blue-500"
+                                : "bg-amber-500"
                           )}
                         />
                         {vault.status}
                       </div>
                     </td>
                     <td className="px-6 py-5 text-right">
-                      <p className="text-sm font-black text-white tracking-widest">
+                      <p className="text-sm font-black text-white tracking-wide">
                         ${(vault.totalAmount || vault.amount).toLocaleString()}
                       </p>
-                      <p className="text-[10px] text-slate-600 font-bold uppercase">
+                      <p className="text-sm text-slate-600 font-bold uppercase">
                         USD
                       </p>
                     </td>
@@ -254,7 +254,7 @@ export default function FreelancerVaultsPage() {
 
         {/* 5. FOOTER SUMMARY */}
         <footer className="flex items-center justify-between py-6 border-t border-white/5">
-          <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+          <p className="text-sm font-bold text-slate-600 uppercase tracking-wide">
             Displaying {paginatedVaults.length} of {filteredVaults.length}{" "}
             smart-vaults
           </p>
@@ -267,7 +267,7 @@ export default function FreelancerVaultsPage() {
                 setCurrentPage((prev) => Math.max(1, prev - 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+              className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-wide"
             >
               Previous
             </Button>
@@ -298,7 +298,7 @@ export default function FreelancerVaultsPage() {
                 setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+              className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-wide"
             >
               Next
             </Button>

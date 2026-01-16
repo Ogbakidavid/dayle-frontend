@@ -138,8 +138,8 @@ export default function CardPaymentPage() {
                                                 {!cardDetails.type && <span className="font-black italic text-xl opacity-80">CARD</span>}
                                             </div>
                                             <div className="space-y-6">
-                                                <p className="text-2xl tracking-[0.2em]">{cardDetails.number || "•••• •••• •••• ••••"}</p>
-                                                <div className="flex justify-between text-sm font-black uppercase tracking-widest">
+                                                <p className="text-2xl tracking-wide">{cardDetails.number || "•••• •••• •••• ••••"}</p>
+                                                <div className="flex justify-between text-sm font-black uppercase tracking-wide">
                                                     <div><p className="text-white/50 mb-1">Holder</p><p className="text-sm tracking-normal">{cardDetails.name || "YOUR NAME"}</p></div>
                                                     <div className="text-right"><p className="text-white/50 mb-1">Expiry</p><p className="text-sm tracking-normal">{cardDetails.expiry || "MM/YY"}</p></div>
                                                 </div>
@@ -185,13 +185,13 @@ function Sidebar({ amount }) {
                 </div>
                 <div className="space-y-6">
                     <div className="space-y-1">
-                        <p className="text-sm font-black uppercase text-white/40 tracking-[0.2em]">Payable Amount</p>
+                        <p className="text-sm font-black uppercase text-white tracking-wide">Payable Amount</p>
                         <h1 className="text-5xl font-bold text-white tracking-tighter">${amount.toLocaleString()}</h1>
                     </div>
                 </div>
             </div>
             <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                <div className="flex items-center gap-2 text-emerald-500 text-sm font-black uppercase tracking-widest mb-2">
+                <div className="flex items-center gap-2 text-emerald-500 text-sm font-black uppercase tracking-wide mb-2">
                     <Lock className="w-4 h-4" /> Vault Escrow Active
                 </div>
                 <p className="text-sm text-white/50 leading-relaxed font-bold">Funds are held in a secure multi-sig vault until milestone approval.</p>
@@ -203,7 +203,7 @@ function Sidebar({ amount }) {
 function InputField({ label, error, ...props }) {
     return (
         <div className="space-y-3">
-            <label className="text-sm font-black uppercase text-white/40 tracking-widest ml-1">{label}</label>
+            <label className="text-sm font-black uppercase text-white tracking-wide ml-1">{label}</label>
             <input {...props} className={`w-full bg-white/[0.03] border ${error ? 'border-red-500' : 'border-white/10'} h-14 rounded-2xl px-4 text-white focus:border-emerald-500/50 outline-none transition-all placeholder:text-slate-600`} />
             {error && <p className="text-sm text-red-500 font-bold ml-1">{error}</p>}
         </div>

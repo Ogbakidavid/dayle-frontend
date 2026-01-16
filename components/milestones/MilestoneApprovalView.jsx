@@ -38,9 +38,9 @@ export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
             </Link>
 
             <header className="space-y-3">
-                <div className="text-xs font-bold uppercase tracking-widest text-emerald-400">Approval Review</div>
+                <div className="text-xs font-bold uppercase tracking-wide text-emerald-400">Approval Review</div>
                 <h1 className="text-3xl font-bold text-white">{milestone.title}</h1>
-                <div className="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-widest text-white/40">
+                <div className="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wide text-white">
                     <span>Status: {MILESTONE_STATUS_LABELS[milestone.status] || milestone.status}</span>
                     <span>Vault: {vault.title}</span>
                 </div>
@@ -89,7 +89,7 @@ export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
                                     />
                                     <div>
                                         <p className="text-white font-semibold">{reason.label}</p>
-                                        <p className="text-xs text-white/40">{reason.description}</p>
+                                        <p className="text-xs text-white">{reason.description}</p>
                                     </div>
                                 </label>
                             ))}
@@ -111,7 +111,7 @@ export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
                                 )}
                                 <span>{approvalStatus}</span>
                             </div>
-                            <p className="text-xs text-white/40">
+                            <p className="text-xs text-white">
                                 Approved milestones release after client sign-off. Processing states will appear in the ledger.
                             </p>
                         </CardContent>

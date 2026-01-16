@@ -44,7 +44,7 @@ export function DisputeInitiationPanel({ milestone }) {
 
                 {milestone && policy.requiresRequirementId && (
                     <div className="space-y-2">
-                        <p className="text-xs font-bold uppercase tracking-widest text-white/40">Requirement scope</p>
+                        <p className="text-xs font-bold uppercase tracking-wide text-white">Requirement scope</p>
                         <select
                             value={selectedRequirement}
                             onChange={(event) => setSelectedRequirement(event.target.value)}
@@ -61,7 +61,7 @@ export function DisputeInitiationPanel({ milestone }) {
                 )}
 
                 <div className="space-y-3">
-                    <p className="text-xs font-bold uppercase tracking-widest text-white/40">Reason codes</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-white">Reason codes</p>
                     <div className="grid gap-2">
                         {DISPUTE_REASON_CODES.map((reason) => (
                             <label key={reason.code} className="flex items-start gap-3 border border-white/5 bg-black/40 rounded-lg p-3 text-sm text-white/70">
@@ -73,7 +73,7 @@ export function DisputeInitiationPanel({ milestone }) {
                                 />
                                 <div>
                                     <p className="text-white font-semibold">{reason.label}</p>
-                                    <p className="text-xs text-white/40">{reason.description}</p>
+                                    <p className="text-xs text-white">{reason.description}</p>
                                 </div>
                             </label>
                         ))}

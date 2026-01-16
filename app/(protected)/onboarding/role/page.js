@@ -5,15 +5,18 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Shield, Users, Briefcase, ArrowRight, Loader2 } from 'lucide-react';
 import { api, UserRole } from '@/lib/mock-api';
+import { useUser } from '@/lib/store/user-context';
 
 export default function RoleSelectionPage() {
     const router = useRouter();
+    const { refreshUser } = useUser();
     const [loading, setLoading] = useState(null);
 
     async function handleSelect(role) {
         setLoading(role);
         try {
             await api.auth.updateProfile(role);
+            await refreshUser();
             router.push(`/onboarding/kyc?role=${role}`);
         } catch (err) {
             console.error(err);
@@ -41,7 +44,7 @@ export default function RoleSelectionPage() {
                     <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">
                         Identify Your <span className="text-emerald-500">Node.</span>
                     </h1>
-                    <p className="text-white/40 text-xl font-bold max-w-xl mx-auto uppercase tracking-tight">
+                    <p className="text-white text-xl font-bold max-w-xl mx-auto uppercase tracking-tight">
                         Choose how you will interact with the Cleard protocol to begin setup.
                     </p>
                 </div>
@@ -60,12 +63,12 @@ export default function RoleSelectionPage() {
                                 <Users className="w-8 h-8 text-emerald-500" />
                             </div>
                             <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-4">I'm a Client</h3>
-                            <p className="text-white/40 text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
+                            <p className="text-white text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
                                 I want to hire talent, create secure payment vaults, and release funds only after work is verified.
                             </p>
                             <Button
                                 variant="ghost"
-                                className="p-0 text-emerald-500 font-black uppercase tracking-widest text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
+                                className="p-0 text-emerald-500 font-black uppercase tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
                             >
                                 {loading === UserRole.CLIENT ? <Loader2 className="w-5 h-5 animate-spin" /> : <span className="flex items-center gap-2">Setup Client Account <ArrowRight className="w-5 h-5" /></span>}
                             </Button>
@@ -83,12 +86,12 @@ export default function RoleSelectionPage() {
                                 <Briefcase className="w-8 h-8 text-emerald-500" />
                             </div>
                             <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-4">I'm a Talent</h3>
-                            <p className="text-white/40 text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
+                            <p className="text-white text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
                                 I want to work with verified clients and receive guaranteed, milestone-based payouts for my projects.
                             </p>
                             <Button
                                 variant="ghost"
-                                className="p-0 text-emerald-500 font-black uppercase tracking-widest text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
+                                className="p-0 text-emerald-500 font-black uppercase tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
                             >
                                 {loading === UserRole.FREELANCER ? <Loader2 className="w-5 h-5 animate-spin" /> : <span className="flex items-center gap-2">Setup Talent Account <ArrowRight className="w-5 h-5" /></span>}
                             </Button>
@@ -99,7 +102,7 @@ export default function RoleSelectionPage() {
 
                 {/* Footer Metadata */}
                 <div className="mt-20 flex flex-col items-center gap-4">
-                    <div className="flex gap-8 text-[11px] font-black text-white/10 uppercase tracking-[0.3em]">
+                    <div className="flex gap-8 text-[11px] font-black text-white uppercase tracking-[0.3em]">
                         <span>Secure Selection</span>
                         <span>•</span>
                         <span>Identity Verification Next</span>

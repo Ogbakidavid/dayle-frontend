@@ -137,7 +137,7 @@ export default function TransactionsPage() {
             <h1 className="text-3xl font-bold tracking-tight text-white uppercase">
               Transactions
             </h1>
-            <p className="text-sm text-slate-500 font-bold uppercase tracking-widest">
+            <p className="text-sm text-slate-500 font-bold uppercase tracking-wide">
               Financial activity and history
             </p>
           </div>
@@ -151,7 +151,7 @@ export default function TransactionsPage() {
             </Button>
             <Button
               variant="outline"
-              className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all font-bold uppercase tracking-widest"
+              className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all font-bold uppercase tracking-wide"
             >
               <Filter className="w-4 h-4 mr-2 text-slate-400" />
               Filters
@@ -170,7 +170,7 @@ export default function TransactionsPage() {
             <h2 className="text-3xl font-bold text-amber-500 mt-1">$11,500</h2>
           </div>
           <div className="bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl">
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-wide">
               Available
             </p>
             <h2 className="text-3xl font-bold text-emerald-500 mt-1 tracking-tight">
@@ -187,7 +187,7 @@ export default function TransactionsPage() {
             placeholder="Search by ID or counterparty..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-[#0D0D0E] border border-white/5 rounded-sm focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner font-bold uppercase tracking-wider"
+            className="w-full pl-12 pr-4 py-4 bg-[#0D0D0E] border border-white/5 rounded-sm focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner font-bold uppercase tracking-wide"
           />
         </div>
 
@@ -197,19 +197,19 @@ export default function TransactionsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Transaction
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Type
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Date
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">
+                  <th className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-wide text-right">
                     Amount
                   </th>
                 </tr>
@@ -235,32 +235,32 @@ export default function TransactionsPage() {
                           <p className="text-sm font-black text-white uppercase tracking-tight">
                             {tx.id}
                           </p>
-                          <p className="text-sm text-slate-500 mt-0.5 font-bold uppercase tracking-widest">
+                          <p className="text-sm text-slate-500 mt-0.5 font-bold uppercase tracking-wide">
                             {tx.counterparty}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="text-sm font-bold uppercase tracking-wider text-slate-400">
+                      <span className="text-sm font-bold uppercase tracking-wide text-slate-400">
                         {tx.type}
                       </span>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">
+                      <span className="text-sm text-slate-400 font-bold uppercase tracking-wide">
                         {tx.date}
                       </span>
                     </td>
                     <td className="px-6 py-5">
                       <div
                         className={cn(
-                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm border text-[10px] font-bold uppercase tracking-wider",
+                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm border text-sm font-bold uppercase tracking-wide",
                           tx.status === "completed"
                             ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500"
                             : tx.status === "processing" ||
                               tx.status === "pending"
-                            ? "bg-amber-500/5 border-amber-500/20 text-amber-500"
-                            : "bg-red-500/5 border-red-500/20 text-red-500"
+                              ? "bg-amber-500/5 border-amber-500/20 text-amber-500"
+                              : "bg-red-500/5 border-red-500/20 text-red-500"
                         )}
                       >
                         <div
@@ -270,8 +270,8 @@ export default function TransactionsPage() {
                               ? "bg-emerald-500"
                               : tx.status === "processing" ||
                                 tx.status === "pending"
-                              ? "bg-amber-500"
-                              : "bg-red-500"
+                                ? "bg-amber-500"
+                                : "bg-red-500"
                           )}
                         />
                         {tx.status}
@@ -289,7 +289,7 @@ export default function TransactionsPage() {
                         {tx.type === "deposit" ? "+" : "-"}$
                         {tx.amount.toLocaleString()}
                       </p>
-                      <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">
+                      <p className="text-sm text-slate-600 font-bold uppercase tracking-wide">
                         {tx.method}
                       </p>
                     </td>
@@ -302,7 +302,7 @@ export default function TransactionsPage() {
           {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="px-6 py-5 border-t border-white/5 flex items-center justify-between bg-white/[0.01]">
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              <p className="text-sm font-bold text-slate-500 uppercase tracking-wide">
                 Page {currentPage} of {totalPages}
               </p>
               <div className="flex gap-2">
@@ -314,7 +314,7 @@ export default function TransactionsPage() {
                     setCurrentPage((prev) => Math.max(1, prev - 1));
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                  className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-wide"
                 >
                   Previous
                 </Button>
@@ -326,7 +326,7 @@ export default function TransactionsPage() {
                     setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-widest"
+                  className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-wide"
                 >
                   Next
                 </Button>

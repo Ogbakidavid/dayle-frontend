@@ -29,7 +29,7 @@ export function DisputeDetailView({ disputeId, role }) {
             </Link>
 
             <header className="space-y-3">
-                <div className="text-xs font-bold uppercase tracking-widest text-emerald-400">Dispute Case</div>
+                <div className="text-xs font-bold uppercase tracking-wide text-emerald-400">Dispute Case</div>
                 <h1 className="text-3xl font-bold text-white">{dispute.id}</h1>
                 <p className="text-sm text-white/60">
                     Vault: {vault?.title || 'Vault'} · Milestone: {milestone?.title || dispute.milestoneId}
@@ -39,19 +39,19 @@ export function DisputeDetailView({ disputeId, role }) {
             <div className="grid md:grid-cols-3 gap-4">
                 <Card className="bg-[#111111] border-white/10">
                     <CardContent className="py-6">
-                        <p className="text-xs font-bold uppercase tracking-widest text-white/40">Status</p>
+                        <p className="text-xs font-bold uppercase tracking-wide text-white">Status</p>
                         <p className="text-lg font-bold text-white mt-2">{dispute.status}</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-[#111111] border-white/10">
                     <CardContent className="py-6">
-                        <p className="text-xs font-bold uppercase tracking-widest text-white/40">Opened by</p>
+                        <p className="text-xs font-bold uppercase tracking-wide text-white">Opened by</p>
                         <p className="text-lg font-bold text-white mt-2">{dispute.openedBy}</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-[#111111] border-white/10">
                     <CardContent className="py-6">
-                        <p className="text-xs font-bold uppercase tracking-widest text-white/40">Requirement</p>
+                        <p className="text-xs font-bold uppercase tracking-wide text-white">Requirement</p>
                         <p className="text-lg font-bold text-white mt-2">{dispute.requirementId || 'N/A'}</p>
                     </CardContent>
                 </Card>
@@ -70,12 +70,12 @@ export function DisputeDetailView({ disputeId, role }) {
                             <FileText className="w-4 h-4 text-emerald-400 mt-0.5" />
                             <span>{dispute.summary}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-white/40">
+                        <div className="flex items-center gap-2 text-xs text-white">
                             <Calendar className="w-4 h-4" />
                             Opened {new Date(dispute.openedAt).toLocaleDateString()}
                         </div>
                         {dispute.closedAt && (
-                            <div className="flex items-center gap-2 text-xs text-white/40">
+                            <div className="flex items-center gap-2 text-xs text-white">
                                 <Calendar className="w-4 h-4" />
                                 Closed {new Date(dispute.closedAt).toLocaleDateString()}
                             </div>
@@ -91,7 +91,7 @@ export function DisputeDetailView({ disputeId, role }) {
                         {dispute.reasonCodes.map((code) => (
                             <div key={code} className="flex items-center justify-between border border-white/5 bg-black/40 rounded-lg px-3 py-2">
                                 <span className="text-sm text-white/70">{getReasonLabel(code)}</span>
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">{code}</span>
+                                <span className="text-sm font-bold uppercase tracking-wide text-white/30">{code}</span>
                             </div>
                         ))}
                         <Button variant="outline" className="w-full border-white/10 text-white/70 hover:text-white">

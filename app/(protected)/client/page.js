@@ -43,7 +43,7 @@ export default function ClientDashboard() {
           <h1 className="text-4xl font-black tracking-tighter text-white uppercase">
             Overview
           </h1>
-          <p className="text-sm text-white/40 font-bold uppercase tracking-widest">
+          <p className="text-sm text-white font-bold uppercase tracking-wide">
             Welcome back to your client dashboard
           </p>
         </div>
@@ -55,7 +55,7 @@ export default function ClientDashboard() {
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
               <Wallet className="w-4 h-4 text-emerald-500" />
             </div>
-            <span className="text-sm font-bold uppercase tracking-wider text-white">
+            <span className="text-sm font-bold uppercase tracking-wide text-white">
               Available Balance
             </span>
           </div>
@@ -63,7 +63,7 @@ export default function ClientDashboard() {
             <h2 className="text-4xl font-black tracking-tighter text-white">
               ${balance?.available?.toLocaleString() || "0.00"}
             </h2>
-            <div className="flex items-center gap-2 text-emerald-500 text-sm font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-emerald-500 text-sm font-bold uppercase tracking-wide">
               <Zap className="w-4 h-4" />
               Fully Liquid
             </div>
@@ -75,7 +75,7 @@ export default function ClientDashboard() {
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
               <Shield className="w-4 h-4 text-emerald-500" />
             </div>
-            <span className="text-sm font-bold uppercase tracking-wider text-white">
+            <span className="text-sm font-bold uppercase tracking-wide text-white">
               Locked in Vaults
             </span>
           </div>
@@ -83,7 +83,7 @@ export default function ClientDashboard() {
             <h2 className="text-4xl font-black tracking-tighter text-white">
               ${totalLocked.toLocaleString()}
             </h2>
-            <p className="text-white text-sm font-bold uppercase tracking-wider">
+            <p className="text-white text-sm font-bold uppercase tracking-wide">
               {activeVaults.length} Active Contracts
             </p>
           </div>
@@ -100,7 +100,7 @@ export default function ClientDashboard() {
             <h3 className="text-xl font-black uppercase tracking-tight text-white mt-4">
               New Vault
             </h3>
-            <p className="text-emerald-100 text-sm mt-1 font-bold uppercase tracking-wider">
+            <p className="text-emerald-100 text-sm mt-1 font-bold uppercase tracking-wide">
               Create secure escrow
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function ClientDashboard() {
             <LayoutGrid className="w-5 h-5 text-emerald-500" />
             <h2 className="text-xl font-bold uppercase tracking-tight text-white">Active Vaults</h2>
           </div>
-          <div className="text-sm text-white font-bold uppercase tracking-wider">{activeVaults.length} active</div>
+          <div className="text-sm text-white font-bold uppercase tracking-wide">{activeVaults.length} active</div>
         </div>
 
         {loading ? (
@@ -128,8 +128,8 @@ export default function ClientDashboard() {
           </div>
         ) : activeVaults.length === 0 ? (
           <div className="py-16 text-center bg-[#111111] border border-white/10 rounded-sm">
-            <Activity className="w-12 h-12 text-white/20 mx-auto mb-4" />
-            <p className="text-white font-bold uppercase tracking-wider">No active vaults</p>
+            <Activity className="w-12 h-12 text-white mx-auto mb-4" />
+            <p className="text-white font-bold uppercase tracking-wide">No active vaults</p>
             <p className="text-sm text-white mt-2">
               Get started by creating your first vault
             </p>
@@ -150,12 +150,12 @@ export default function ClientDashboard() {
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <h4 className="font-bold uppercase tracking-wider text-white ">{vault.title}</h4>
-                    <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest rounded-sm border border-emerald-500/20">
+                    <h4 className="font-bold uppercase tracking-wide text-white ">{vault.title}</h4>
+                    <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-sm font-black uppercase tracking-wide rounded-sm border border-emerald-500/20">
                       {vault.status}
                     </span>
                   </div>
-                  <p className="text-sm font-bold uppercase tracking-wider text-white">
+                  <p className="text-sm font-bold uppercase tracking-wide text-gray-400">
                     {vault.freelancerEmail ||
                       vault.freelancer?.email ||
                       "Unassigned"}
@@ -164,8 +164,8 @@ export default function ClientDashboard() {
 
                 <div className="flex items-center gap-6">
                   <div className="text-right">
-                    <p className="text-sm font-bold uppercase tracking-wider text-white mb-1">Value</p>
-                    <p className="text-lg font-bold uppercase tracking-wider text-white">
+                    <p className="text-sm font-bold uppercase tracking-wide text-white mb-1">Value</p>
+                    <p className="text-lg font-bold uppercase tracking-wide text-white">
                       ${(vault.totalAmount || vault.amount).toLocaleString()}
                     </p>
                   </div>
@@ -179,7 +179,7 @@ export default function ClientDashboard() {
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="mt-6 flex items-center justify-between px-2">
-                <p className="text-[10px] font-black text-white uppercase tracking-widest">
+                <p className="text-sm font-black text-white uppercase tracking-wide">
                   Page {currentPage} of {totalPages}
                 </p>
                 <div className="flex gap-2">
@@ -190,7 +190,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(1, prev - 1))
                     }
-                    className="h-8 px-3 text-[10px] border-white/10 bg-transparent hover:bg-white/5 text-white font-bold uppercase tracking-wider"
+                    className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/5 text-white font-bold uppercase tracking-wide"
                   >
                     Previous
                   </Button>
@@ -201,7 +201,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                     }
-                    className="h-8 px-3 text-[10px] border-white/10 bg-transparent hover:bg-white/5 text-white font-bold uppercase tracking-wider"
+                    className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/5 text-white font-bold uppercase tracking-wide"
                   >
                     Next
                   </Button>

@@ -449,10 +449,9 @@ export default function FreelancerVaultDetailPage() {
                                                 <div className="relative">
                                                   <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
                                                   <Input
-                                                    placeholder={`Paste ${
-                                                      deliverableDef?.label ||
+                                                    placeholder={`Paste ${deliverableDef?.label ||
                                                       "Link"
-                                                    } URL...`}
+                                                      } URL...`}
                                                     className="bg-black/30 border-white/10 text-white pl-10"
                                                   />
                                                 </div>
@@ -600,13 +599,12 @@ export default function FreelancerVaultDetailPage() {
                     asChild
                   >
                     <Link
-                      href={`/freelancer/disputes/${
-                        vault.id === "v_3"
+                      href={`/freelancer/disputes/${vault.id === "v_3"
                           ? "d_003"
                           : vault.id === "v_4"
-                          ? "d_004"
-                          : "d_001"
-                      }`}
+                            ? "d_004"
+                            : "d_001"
+                        }`}
                     >
                       Raise Dispute
                     </Link>

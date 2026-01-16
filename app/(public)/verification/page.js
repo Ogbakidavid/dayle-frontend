@@ -54,8 +54,8 @@ function VerificationStatusContent() {
             <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
                 <AlertCircle className="w-16 h-16 text-red-500/50 mb-6" />
                 <h1 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Verification Link Invalid</h1>
-                <p className="text-white/40 max-w-sm font-bold uppercase tracking-widest text-sm mb-12">The specific vault node could not be located on the Cleard protocol.</p>
-                <Button onClick={() => router.push('/')} variant="ghost" className="text-emerald-500 font-black uppercase tracking-widest text-sm gap-2">
+                <p className="text-white max-w-sm font-bold uppercase tracking-wide text-sm mb-12">The specific vault node could not be located on the Cleard protocol.</p>
+                <Button onClick={() => router.push('/')} variant="ghost" className="text-emerald-500 font-black uppercase tracking-wide text-sm gap-2">
                     <ArrowLeft className="w-4 h-4" /> Return to Protocol
                 </Button>
             </div>
@@ -86,7 +86,7 @@ function VerificationStatusContent() {
                                 ) : isReview ? (
                                     <Clock className="w-10 h-10 text-blue-500 animate-pulse" />
                                 ) : (
-                                    <Clock className="w-10 h-10 text-white/20" />
+                                    <Clock className="w-10 h-10 text-white" />
                                 )}
                             </div>
                         </div>
@@ -94,9 +94,9 @@ function VerificationStatusContent() {
                     <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-4">
                         {isVerified ? 'Capital <span className="text-emerald-500 italic">Released.</span>' :
                             isReview ? 'Verification <span className="text-blue-500 italic">Active.</span>' :
-                                'Vault <span className="text-white/20 italic">Awaits.</span>'}
+                                'Vault <span className="text-white italic">Awaits.</span>'}
                     </h1>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-black uppercase tracking-widest text-white/40">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-black uppercase tracking-wide text-white">
                         <Lock className="w-3 h-3 text-emerald-500" /> Node ID: {vault.id}
                     </div>
                 </div>
@@ -107,23 +107,23 @@ function VerificationStatusContent() {
 
                     <div className="space-y-8 relative z-10">
                         <div className="space-y-2">
-                            <p className="text-sm font-black text-white/20 uppercase tracking-widest">Active Project</p>
+                            <p className="text-sm font-black text-white uppercase tracking-wide">Active Project</p>
                             <h3 className="text-2xl font-black text-white uppercase tracking-tight leading-tight">{vault.title}</h3>
                         </div>
 
                         <div className="py-8 border-y border-white/5 grid grid-cols-2 gap-8">
                             <div>
-                                <p className="text-sm font-black text-white/20 uppercase tracking-widest mb-1">Status</p>
-                                <p className={`text-sm font-black uppercase tracking-wider ${isVerified ? 'text-emerald-500' :
+                                <p className="text-sm font-black text-white uppercase tracking-wide mb-1">Status</p>
+                                <p className={`text-sm font-black uppercase tracking-wide ${isVerified ? 'text-emerald-500' :
                                     isReview ? 'text-blue-500' :
-                                        'text-white/40'
+                                        'text-white'
                                     }`}>
                                     {vault.status.replace(/_/g, ' ')}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm font-black text-white/20 uppercase tracking-widest mb-1">Identity</p>
-                                <p className="text-sm font-black text-white uppercase tracking-wider truncate">
+                                <p className="text-sm font-black text-white uppercase tracking-wide mb-1">Identity</p>
+                                <p className="text-sm font-black text-white uppercase tracking-wide truncate">
                                     {vault.clientName || 'Cleard Native Client'}
                                 </p>
                             </div>
@@ -131,24 +131,24 @@ function VerificationStatusContent() {
 
                         {isVerified ? (
                             <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center">
-                                <p className="text-sm font-black text-emerald-500 uppercase tracking-widest mb-2 font-['Poppins']">Financial Finality Reached</p>
-                                <p className="text-sm font-bold text-white/40 uppercase tracking-widest leading-relaxed">The objective requirements have been validated. Funds have been distributed to the recipient node.</p>
+                                <p className="text-sm font-black text-emerald-500 uppercase tracking-wide mb-2 font-['Poppins']">Financial Finality Reached</p>
+                                <p className="text-sm font-bold text-white uppercase tracking-wide leading-relaxed">The objective requirements have been validated. Funds have been distributed to the recipient node.</p>
                             </div>
                         ) : isReview ? (
                             <div className="p-6 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-center">
-                                <p className="text-sm font-black text-blue-500 uppercase tracking-widest mb-2">Computational Review</p>
-                                <p className="text-sm font-bold text-white/40 uppercase tracking-widest leading-relaxed">Our protocol is currently verifying the submitted evidence against the vault requirements.</p>
+                                <p className="text-sm font-black text-blue-500 uppercase tracking-wide mb-2">Computational Review</p>
+                                <p className="text-sm font-bold text-white uppercase tracking-wide leading-relaxed">Our protocol is currently verifying the submitted evidence against the vault requirements.</p>
                             </div>
                         ) : (
                             <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
-                                <p className="text-sm font-black text-white/40 uppercase tracking-widest mb-2">Waiting for Submission</p>
-                                <p className="text-sm font-bold text-white/40 uppercase tracking-widest leading-relaxed">Payment is locked and secured. Recipient has not yet submitted work for verification.</p>
+                                <p className="text-sm font-black text-white uppercase tracking-wide mb-2">Waiting for Submission</p>
+                                <p className="text-sm font-bold text-white uppercase tracking-wide leading-relaxed">Payment is locked and secured. Recipient has not yet submitted work for verification.</p>
                             </div>
                         )}
 
                         <Button
                             onClick={() => router.push('/')}
-                            className="w-full h-16 bg-white/[0.03] border border-white/10 hover:bg-white/[0.05] text-white font-black uppercase tracking-[0.2em] text-sm rounded-2xl transition-all"
+                            className="w-full h-16 bg-white/[0.03] border border-white/10 hover:bg-white/[0.05] text-white font-black uppercase tracking-wide text-sm rounded-2xl transition-all"
                         >
                             Close Transmission
                         </Button>
@@ -158,12 +158,12 @@ function VerificationStatusContent() {
                 {/* Footer Badges */}
                 <div className="mt-12 flex justify-center gap-8 opacity-40">
                     <div className="flex items-center gap-2">
-                        <Globe className="w-3 h-3 text-white/20" />
-                        <span className="text-sm font-black uppercase tracking-widest text-white/20">Global Settlement</span>
+                        <Globe className="w-3 h-3 text-white" />
+                        <span className="text-sm font-black uppercase tracking-wide text-white">Global Settlement</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Lock className="w-3 h-3 text-white/20" />
-                        <span className="text-sm font-black uppercase tracking-widest text-white/20">Audit-Proof Ledger</span>
+                        <Lock className="w-3 h-3 text-white" />
+                        <span className="text-sm font-black uppercase tracking-wide text-white">Audit-Proof Ledger</span>
                     </div>
                 </div>
             </div>

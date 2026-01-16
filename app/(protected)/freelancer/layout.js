@@ -67,8 +67,8 @@ export default function FreelancerLayout({ children }) {
                   className={cn(
                     "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                     isActive
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider"
-                      : "text-white/60 hover:bg-white/5 hover:text-white font-bold uppercase tracking-wider"
+                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wide"
+                      : "text-white/60 hover:bg-white/5 hover:text-white font-bold uppercase tracking-wide"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -77,7 +77,7 @@ export default function FreelancerLayout({ children }) {
                         "w-4 h-4 transition-colors font-bold uppercase",
                         isActive
                           ? "text-emerald-400"
-                          : "text-white/40 group-hover:text-white/80 font-bold uppercase"
+                          : "text-white group-hover:text-white/80 font-bold uppercase"
                       )}
                     />
                     <span>{item.name}</span>
@@ -88,7 +88,7 @@ export default function FreelancerLayout({ children }) {
                         "text-sm px-2 py-0.5 rounded-full font-medium",
                         isActive
                           ? "bg-emerald-500/20 text-emerald-400 font-bold uppercase"
-                          : "bg-white/5 text-white/40 font-bold uppercase"
+                          : "bg-white/5 text-white font-bold uppercase"
                       )}
                     >
                       {item.badge}
@@ -102,10 +102,10 @@ export default function FreelancerLayout({ children }) {
 
         {/* Status Indicator (Activated) */}
         <div className="px-6 py-4 mx-4 mb-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
-          <div className="flex items-center gap-2 text-emerald-500 text-sm font-black uppercase tracking-widest mb-1">
+          <div className="flex items-center gap-2 text-emerald-500 text-sm font-black uppercase tracking-wide mb-1">
             <CheckCircle className="w-3 h-3" /> Activated
           </div>
-          <p className="text-sm text-white/40 font-bold uppercase tracking-wide">
+          <p className="text-sm text-white font-bold uppercase tracking-wide">
             Approved for Active Vault Access
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function FreelancerLayout({ children }) {
               <p className="text-sm font-medium text-white">
                 {user?.name || "Jane Smith"}
               </p>
-              <p className="text-sm text-white/40 font-bold uppercase tracking-wider italic">
+              <p className="text-sm text-white font-bold uppercase tracking-wide italic">
                 Freelancer
               </p>
             </div>

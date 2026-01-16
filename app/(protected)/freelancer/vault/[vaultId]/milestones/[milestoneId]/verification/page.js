@@ -61,7 +61,7 @@ export default function FreelancerVerificationPage() {
           <CardContent className="pt-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-white uppercase tracking-widest">
+                <h3 className="text-sm font-bold text-white uppercase tracking-wide">
                   Checks Passed
                 </h3>
                 <div className="space-y-3">
@@ -83,7 +83,7 @@ export default function FreelancerVerificationPage() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-white uppercase tracking-widest">
+                <h3 className="text-sm font-bold text-white uppercase tracking-wide">
                   Artifacts
                 </h3>
                 <div className="space-y-2">

@@ -1,11 +1,20 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser } from '@/lib/store/user-context';
 import { api } from '@/lib/mock-api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import {
     Shield,
     CheckCircle2,
@@ -26,6 +35,8 @@ import {
 
 export default function KYCPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const roleParam = searchParams.get('role');
     const { user, refreshUser } = useUser();
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -53,7 +64,7 @@ export default function KYCPage() {
         ein: '',
     });
 
-    const isClient = user?.role === 'client';
+    const isClient = roleParam ? roleParam === 'client' : user?.role === 'client';
     const totalSteps = isClient ? 5 : 4;
 
     const stopCamera = () => {
@@ -187,7 +198,7 @@ export default function KYCPage() {
                 <div className="w-full max-w-2xl">
                     {/* Centered Heading */}
                     <div className="text-center mb-12 space-y-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-sm font-black uppercase tracking-wide text-emerald-400">
                             Verification Protocol
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
@@ -210,7 +221,7 @@ export default function KYCPage() {
                         <div className="p-8 md:p-16 relative z-10">
                             {/* Step Indicator Text */}
                             <div className="flex justify-between items-center mb-12">
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Phase {currentStep} of {totalSteps}</span>
+                                <span className="text-sm font-black text-slate-500 uppercase tracking-[0.3em]">Phase {currentStep} of {totalSteps}</span>
                                 <div className="flex gap-1.5">
                                     {[...Array(totalSteps)].map((_, i) => (
                                         <div key={i} className={`w-2 h-2 rounded-full transition-all duration-500 ${currentStep > i ? 'bg-emerald-500' : 'bg-white/10'}`}></div>
@@ -235,25 +246,42 @@ export default function KYCPage() {
                                                 placeholder="Enter your legal name as on ID"
                                                 value={formData.fullName}
                                                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                                className="!bg-[#050505] !border-white/10 !text-white focus:!border-emerald-500/50 !h-16"
+                                                className="!bg-[#050505] !border-white/10 !text-white focus:!border-emerald-500/50 !h-16 placeholder:text-gray-400"
                                                 required
                                             />
 
                                             <div className="grid md:grid-cols-2 gap-8">
-                                                <Input
-                                                    label="Date of Birth"
-                                                    type="date"
-                                                    value={formData.dateOfBirth}
-                                                    onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                                                    className="!bg-[#050505] !border-white/10 !text-white appearance-none !h-16"
-                                                    required
-                                                />
+                                                <div className="flex flex-col space-y-2">
+                                                    <label className="text-sm font-medium text-slate-500 uppercase tracking-wide">Date of Birth</label>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <Button
+                                                                variant={"outline"}
+                                                                className={cn(
+                                                                    "w-full justify-start text-left font-normal !bg-[#050505] !border-white/10 !text-white !h-16 rounded-xl hover:bg-white/5",
+                                                                    !formData.dateOfBirth && "text-muted-foreground"
+                                                                )}
+                                                            >
+                                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                                {formData.dateOfBirth ? format(new Date(formData.dateOfBirth), "PPP") : <span className="text-gray-400">Pick a date</span>}
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0" align="start">
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined}
+                                                                onSelect={(date) => setFormData({ ...formData, dateOfBirth: date ? date.toISOString().split('T')[0] : '' })}
+                                                                initialFocus
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </div>
                                                 <Input
                                                     label="SSN / National ID"
                                                     placeholder="XXX-XX-XXXX"
                                                     value={formData.ssn}
                                                     onChange={(e) => setFormData({ ...formData, ssn: e.target.value })}
-                                                    className="!bg-[#050505] !border-white/10 !text-white !h-16"
+                                                    className="!bg-[#050505] !border-white/10 !text-white !h-16 placeholder:text-gray-400"
                                                     required
                                                 />
                                             </div>
@@ -290,7 +318,7 @@ export default function KYCPage() {
                                                             <>
                                                                 <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
                                                                 <div className="space-y-2 text-center">
-                                                                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">OCR Extraction Active</p>
+                                                                    <p className="text-sm font-black text-emerald-500 uppercase tracking-wide">OCR Extraction Active</p>
                                                                     <div className="w-32 h-1 bg-emerald-500/20 rounded-full overflow-hidden">
                                                                         <div
                                                                             className="h-full bg-emerald-500 transition-all duration-300"
@@ -304,7 +332,7 @@ export default function KYCPage() {
                                                                 <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center">
                                                                     <CheckCircle2 className="w-6 h-6 text-black" />
                                                                 </div>
-                                                                <p className="text-[10px] font-black text-white uppercase tracking-widest">Document Verified</p>
+                                                                <p className="text-sm font-black text-white uppercase tracking-wide">Document Verified</p>
                                                                 <button className="text-[9px] text-slate-500 hover:text-white underline uppercase tracking-tighter">Replace Document</button>
                                                             </>
                                                         )}
@@ -316,8 +344,8 @@ export default function KYCPage() {
                                                         <Globe className="w-8 h-8 text-slate-500 group-hover:text-emerald-500 transition-colors" />
                                                     </div>
                                                     <div className="text-center">
-                                                        <p className="text-sm font-black text-white uppercase tracking-widest">Click to upload document</p>
-                                                        <p className="text-[10px] font-medium text-slate-500 mt-1 uppercase tracking-tighter">PNG, JPG or PDF up to 10MB</p>
+                                                        <p className="text-sm font-black text-white uppercase tracking-wide">Click to upload document</p>
+                                                        <p className="text-sm font-medium text-slate-500 mt-1 uppercase tracking-tighter">PNG, JPG or PDF up to 10MB</p>
                                                     </div>
                                                 </>
                                             )}
@@ -346,11 +374,11 @@ export default function KYCPage() {
                                                         </div>
                                                         {cameraError ? (
                                                             <div className="text-center px-8 space-y-4">
-                                                                <p className="text-[10px] font-medium text-red-500 uppercase tracking-widest">{cameraError}</p>
+                                                                <p className="text-sm font-medium text-red-500 uppercase tracking-wide">{cameraError}</p>
                                                                 <Button
                                                                     onClick={startScan}
                                                                     type="button"
-                                                                    className="bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[9px] px-6 py-3 rounded-full border border-white/10"
+                                                                    className="bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-wide text-[9px] px-6 py-3 rounded-full border border-white/10"
                                                                 >
                                                                     Retry Access
                                                                 </Button>
@@ -359,7 +387,7 @@ export default function KYCPage() {
                                                             <Button
                                                                 onClick={startScan}
                                                                 type="button"
-                                                                className="bg-emerald-500 text-black font-black uppercase tracking-widest text-[10px] px-8 py-4 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-105 transition-transform"
+                                                                className="bg-emerald-500 text-black font-black uppercase tracking-wide text-sm px-8 py-4 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-105 transition-transform"
                                                             >
                                                                 Enable Camera
                                                             </Button>
@@ -377,14 +405,14 @@ export default function KYCPage() {
                                                                 <Button
                                                                     onClick={retakePhoto}
                                                                     type="button"
-                                                                    className="bg-transparent border border-white/20 hover:bg-white/10 text-white text-[10px] uppercase tracking-widest px-4 h-10 rounded-full"
+                                                                    className="bg-transparent border border-white/20 hover:bg-white/10 text-white text-sm uppercase tracking-wide px-4 h-10 rounded-full"
                                                                 >
                                                                     Retake
                                                                 </Button>
                                                                 <Button
                                                                     onClick={confirmFace}
                                                                     type="button"
-                                                                    className="bg-emerald-500 hover:bg-emerald-400 text-black text-[10px] uppercase tracking-widest px-4 h-10 rounded-full"
+                                                                    className="bg-emerald-500 hover:bg-emerald-400 text-black text-sm uppercase tracking-wide px-4 h-10 rounded-full"
                                                                 >
                                                                     Confirm
                                                                 </Button>
@@ -405,12 +433,12 @@ export default function KYCPage() {
                                                         <div className="absolute inset-x-0 bottom-12 z-40 text-center space-y-3">
                                                             <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-emerald-500/30">
                                                                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Live Feed</span>
+                                                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-wide">Live Feed</span>
                                                             </div>
                                                             <Button
                                                                 onClick={capturePhoto}
                                                                 type="button"
-                                                                className="mx-auto flex bg-white text-black font-black uppercase tracking-widest text-[10px] px-6 py-2 rounded-full hover:scale-105 transition-transform"
+                                                                className="mx-auto flex bg-white text-black font-black uppercase tracking-wide text-sm px-6 py-2 rounded-full hover:scale-105 transition-transform"
                                                             >
                                                                 Capture Photo
                                                             </Button>
@@ -426,7 +454,7 @@ export default function KYCPage() {
                                             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-4 w-max">
                                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#050505] border border-white/10 shadow-xl">
                                                     <Fingerprint className="w-3 h-3 text-emerald-500" />
-                                                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Biometric Encrypted</span>
+                                                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-wide">Biometric Encrypted</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -448,7 +476,7 @@ export default function KYCPage() {
                                                 placeholder="123 Financial District"
                                                 value={formData.address}
                                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                                className="!bg-[#050505] !border-white/10 !text-white !h-16"
+                                                className="!bg-[#050505] !border-white/10 !text-white !h-16 placeholder:text-gray-400"
                                                 required
                                             />
 
@@ -458,7 +486,7 @@ export default function KYCPage() {
                                                     placeholder="San Francisco"
                                                     value={formData.city}
                                                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                                    className="!bg-[#050505] !border-white/10 !text-white !h-16"
+                                                    className="!bg-[#050505] !border-white/10 !text-white !h-16 placeholder:text-gray-400"
                                                     required
                                                 />
                                                 <Input
@@ -466,7 +494,7 @@ export default function KYCPage() {
                                                     placeholder="CA"
                                                     value={formData.state}
                                                     onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                                                    className="!bg-[#050505] !border-white/10 !text-white !h-16"
+                                                    className="!bg-[#050505] !border-white/10 !text-white !h-16 placeholder:text-gray-400"
                                                     required
                                                 />
                                                 <Input
@@ -474,7 +502,7 @@ export default function KYCPage() {
                                                     placeholder="94103"
                                                     value={formData.zip}
                                                     onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
-                                                    className="!bg-[#050505] !border-white/10 !text-white !h-16 md:col-span-1 col-span-2"
+                                                    className="!bg-[#050505] !border-white/10 !text-white !h-16 md:col-span-1 col-span-2 placeholder:text-gray-400"
                                                     required
                                                 />
                                             </div>
@@ -497,7 +525,7 @@ export default function KYCPage() {
                                                 placeholder="Acme Holdings Inc."
                                                 value={formData.businessName}
                                                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                                                className="!bg-[#050505] !border-white/10 !text-white !h-16"
+                                                className="!bg-[#050505] !border-white/10 !text-white !h-16 placeholder:text-gray-400"
                                                 required
                                             />
                                             <Input
@@ -505,7 +533,7 @@ export default function KYCPage() {
                                                 placeholder="XX-XXXXXXX"
                                                 value={formData.ein}
                                                 onChange={(e) => setFormData({ ...formData, ein: e.target.value })}
-                                                className="!bg-[#050505] !border-white/10 !text-white !h-16"
+                                                className="!bg-[#050505] !border-white/10 !text-white !h-16 placeholder:text-gray-400"
                                                 required
                                             />
                                         </div>
@@ -519,7 +547,7 @@ export default function KYCPage() {
                                             <Button
                                                 type="button"
                                                 onClick={prevStep}
-                                                className="h-18 flex-1 bg-transparent border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white font-black uppercase tracking-widest text-sm rounded-2xl py-6 transition-all"
+                                                className="h-18 flex-1 bg-transparent border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white font-black uppercase tracking-wide text-sm rounded-2xl py-6 transition-all"
                                             >
                                                 Back
                                             </Button>
@@ -528,7 +556,7 @@ export default function KYCPage() {
                                             type="submit"
                                             isLoading={loading}
                                             disabled={currentStep === 2 && !idImage}
-                                            className={`${currentStep > 1 ? 'flex-[2]' : 'w-full'} h-18 bg-emerald-500 hover:bg-emerald-600 text-black font-black uppercase tracking-[0.2em] text-sm rounded-2xl transition-all shadow-2xl shadow-emerald-500/20 group py-6 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed`}
+                                            className={`${currentStep > 1 ? 'flex-[2]' : 'w-full'} h-18 bg-emerald-500 hover:bg-emerald-600 text-black font-black uppercase tracking-wide text-sm rounded-2xl transition-all shadow-2xl shadow-emerald-500/20 group py-6 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed`}
                                         >
                                             {loading ? (
                                                 <span className="flex items-center gap-3">
@@ -547,7 +575,7 @@ export default function KYCPage() {
                                     {/* Security Notice */}
                                     <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex gap-4 items-center">
                                         <AlertCircle className="w-5 h-5 text-slate-600 shrink-0" />
-                                        <p className="text-[10px] font-medium text-slate-500 leading-tight uppercase tracking-widest">
+                                        <p className="text-sm font-medium text-slate-500 leading-tight uppercase tracking-wide">
                                             Information is secured by military-grade AES-256 encryption. Our verification partners are SOC2 Type II compliant.
                                         </p>
                                     </div>

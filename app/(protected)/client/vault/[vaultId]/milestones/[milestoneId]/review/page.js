@@ -70,7 +70,7 @@ export default function ClientReviewPage() {
             <h1 className="text-3xl font-bold text-white">Review Submission</h1>
             <Badge
               variant="outline"
-              className="bg-amber-500/10 text-amber-500 border-amber-500/20 uppercase tracking-widest text-[10px]"
+              className="bg-amber-500/10 text-amber-500 border-amber-500/20 uppercase tracking-wide text-sm"
             >
               Action Required
             </Badge>
@@ -132,7 +132,7 @@ export default function ClientReviewPage() {
                   </div>
                 </div>
                 <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-2">
                     Freelancer Notes
                   </p>
                   <p className="text-sm text-slate-300 italic">
@@ -156,7 +156,7 @@ export default function ClientReviewPage() {
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-sm font-bold text-white uppercase tracking-wider">
+                    <Label className="text-sm font-bold text-white uppercase tracking-wide">
                       Decision Rationale
                     </Label>
                     <Select
@@ -186,14 +186,14 @@ export default function ClientReviewPage() {
                       </SelectContent>
                     </Select>
                     {error && (
-                      <p className="text-red-500 text-xs font-bold uppercase tracking-widest">
+                      <p className="text-red-500 text-xs font-bold uppercase tracking-wide">
                         {error}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm font-bold text-white uppercase tracking-wider">
+                    <Label className="text-sm font-bold text-white uppercase tracking-wide">
                       Additional Context
                     </Label>
                     <Textarea

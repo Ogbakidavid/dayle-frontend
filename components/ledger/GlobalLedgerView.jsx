@@ -38,13 +38,13 @@ export function GlobalLedgerView({ role }) {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
+        <div className="text-xs font-black uppercase tracking-wide text-emerald-400">
           Global Ledger
         </div>
         <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
           Settlement Activity
         </h1>
-        <p className="text-sm font-bold text-white/40 uppercase tracking-widest">
+        <p className="text-sm font-bold text-white uppercase tracking-wide">
           USD-only ledger view with processing states for all vault movements.
         </p>
       </header>
@@ -60,7 +60,7 @@ export function GlobalLedgerView({ role }) {
         ].map((stat) => (
           <Card key={stat.label} className="bg-[#111111] border-white/10">
             <CardContent className="py-6">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-white/30">
+              <p className="text-xs font-black uppercase tracking-wide text-white/30">
                 {stat.label}
               </p>
               <p className="text-3xl font-black text-white mt-1 tracking-tighter">
@@ -96,7 +96,7 @@ export function GlobalLedgerView({ role }) {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="border-b border-white/5">
-                <tr className="text-xs font-black uppercase tracking-[0.2em] text-white/30">
+                <tr className="text-xs font-black uppercase tracking-wide text-white/30">
                   <th className="px-6 py-4">Entry</th>
                   <th className="px-6 py-4">Vault</th>
                   <th className="px-6 py-4">Status</th>
@@ -128,7 +128,7 @@ export function GlobalLedgerView({ role }) {
                             <p className="text-sm text-white font-black uppercase tracking-tight">
                               {entry.description}
                             </p>
-                            <p className="text-[10px] uppercase font-black tracking-widest text-white/30">
+                            <p className="text-sm uppercase font-black tracking-wide text-white/30">
                               {entry.id}
                             </p>
                           </div>
@@ -138,14 +138,14 @@ export function GlobalLedgerView({ role }) {
                         <p className="text-sm text-white/70">
                           {vault?.title || "Vault"}
                         </p>
-                        <p className="text-xs text-white/40">
+                        <p className="text-xs text-white">
                           {new Date(entry.date).toLocaleDateString()}
                         </p>
                       </td>
                       <td className="px-6 py-4">
                         <span
                           className={cn(
-                            "px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full border",
+                            "px-2 py-1 text-sm font-bold uppercase tracking-wide rounded-full border",
                             statusStyles[entry.status]
                           )}
                         >

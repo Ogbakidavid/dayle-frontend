@@ -10,20 +10,20 @@ import { Gavel, ArrowUpRight } from "lucide-react";
 const statusStyles = {
   open: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   resolved: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  closed: "bg-white/5 text-white/40 border-white/10",
+  closed: "bg-white/5 text-white border-white/10",
 };
 
 export function DisputeListView({ role }) {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
+        <div className="text-xs font-black uppercase tracking-wide text-emerald-400">
           Disputes
         </div>
         <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
           Case Queue
         </h1>
-        <p className="text-sm font-bold text-white/40 uppercase tracking-widest">
+        <p className="text-sm font-bold text-white uppercase tracking-wide">
           Disputes are tied to milestones and must reference structured reason
           codes.
         </p>
@@ -43,7 +43,7 @@ export function DisputeListView({ role }) {
         ].map((stat) => (
           <Card key={stat.label} className="bg-[#111111] border-white/10">
             <CardContent className="py-6">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-white/30">
+              <p className="text-xs font-black uppercase tracking-wide text-white/30">
                 {stat.label}
               </p>
               <p className="text-3xl font-black text-white mt-1 tracking-tighter">
@@ -73,18 +73,18 @@ export function DisputeListView({ role }) {
                   <p className="text-sm font-black text-white uppercase tracking-tight">
                     {dispute.id} · {vault?.title || "Vault"}
                   </p>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mt-1">
+                  <p className="text-sm font-black uppercase tracking-wide text-gray-400 mt-1">
                     Mileston {dispute.milestoneId} · Requirement{" "}
                     {dispute.requirementId || "N/A"}
                   </p>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mt-0.5">
+                  <p className="text-sm font-black uppercase tracking-wide text-gray-400 mt-0.5">
                     Opened {new Date(dispute.openedAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span
                     className={cn(
-                      "px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full border",
+                      "px-2 py-1 text-sm font-bold uppercase tracking-wide rounded-full border",
                       statusStyles[dispute.status]
                     )}
                   >

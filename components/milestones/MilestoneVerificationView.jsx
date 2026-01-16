@@ -36,9 +36,9 @@ export function MilestoneVerificationView({ vaultId, milestoneId, role }) {
             </Link>
 
             <header className="space-y-3">
-                <div className="text-xs font-bold uppercase tracking-widest text-emerald-400">Verification Result</div>
+                <div className="text-xs font-bold uppercase tracking-wide text-emerald-400">Verification Result</div>
                 <h1 className="text-3xl font-bold text-white">{milestone.title}</h1>
-                <div className="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-widest text-white/40">
+                <div className="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wide text-white">
                     <span>Status: {MILESTONE_STATUS_LABELS[milestone.status] || milestone.status}</span>
                     <span>Vault: {vault.title}</span>
                 </div>
@@ -56,7 +56,7 @@ export function MilestoneVerificationView({ vaultId, milestoneId, role }) {
                                 <span className={statusStyles[verificationStatus]}>{verificationStatus}</span>
                             </div>
                             {milestone.verification?.verifiedAt && (
-                                <p className="text-xs text-white/40 font-bold uppercase tracking-widest">
+                                <p className="text-xs text-white font-bold uppercase tracking-wide">
                                     Verified {new Date(milestone.verification.verifiedAt).toLocaleDateString()}
                                 </p>
                             )}
@@ -69,7 +69,7 @@ export function MilestoneVerificationView({ vaultId, milestoneId, role }) {
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-white/40">Verification review is still in progress.</p>
+                                    <p className="text-sm text-white">Verification review is still in progress.</p>
                                 )}
                             </div>
                         </CardContent>

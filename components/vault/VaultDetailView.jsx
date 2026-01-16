@@ -51,7 +51,7 @@ export function VaultDetailView({ vaultId, role }) {
     return (
         <div className="space-y-8">
             <header className="flex flex-col gap-4">
-                <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-emerald-400">
+                <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-wide text-emerald-400">
                     <ShieldCheck className="w-4 h-4" />
                     Vault Detail
                 </div>
@@ -59,7 +59,7 @@ export function VaultDetailView({ vaultId, role }) {
                     <div className="space-y-2">
                         <h1 className="text-3xl font-bold text-white">{vault.title}</h1>
                         <p className="text-sm text-white/60 max-w-2xl">{vault.description}</p>
-                        <div className="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-widest text-white/40">
+                        <div className="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-wide text-white">
                             <span>Client: {vault.clientName}</span>
                             <span>Freelancer: {vault.freelancer?.name || vault.freelancer?.email || vault.freelancerEmail || 'Unassigned'}</span>
                             <span>Created: {new Date(vault.createdAt).toLocaleDateString()}</span>
@@ -70,7 +70,7 @@ export function VaultDetailView({ vaultId, role }) {
                         <div className="text-3xl font-bold text-white">
                             ${totalAmount.toLocaleString()}
                         </div>
-                        <span className="text-xs font-bold uppercase tracking-widest text-white/40">Total locked</span>
+                        <span className="text-xs font-bold uppercase tracking-wide text-white">Total locked</span>
                     </div>
                 </div>
             </header>
@@ -82,7 +82,7 @@ export function VaultDetailView({ vaultId, role }) {
                             <ClipboardList className="w-5 h-5 text-emerald-500" />
                             Milestones
                         </h2>
-                        <span className="text-xs font-bold uppercase tracking-widest text-white/40">
+                        <span className="text-xs font-bold uppercase tracking-wide text-white">
                             {milestones.length} total
                         </span>
                     </div>
@@ -115,13 +115,13 @@ export function VaultDetailView({ vaultId, role }) {
                                                     {milestone.title}
                                                 </CardTitle>
                                                 <div className={cn(
-                                                    'px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full border',
+                                                    'px-2 py-1 text-sm font-bold uppercase tracking-wide rounded-full border',
                                                     typeStyles[milestone.type]
                                                 )}>
                                                     {milestone.type}
                                                 </div>
                                             </div>
-                                            <div className="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-widest text-white/40">
+                                            <div className="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-wide text-white">
                                                 <span className="flex items-center gap-2">
                                                     <Calendar className="w-3.5 h-3.5" />
                                                     Due {milestone.dueDate}
@@ -135,7 +135,7 @@ export function VaultDetailView({ vaultId, role }) {
                                         <CardContent className="space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <p className="text-xs font-bold uppercase tracking-widest text-white/40">Milestone value</p>
+                                                    <p className="text-xs font-bold uppercase tracking-wide text-white">Milestone value</p>
                                                     <p className="text-2xl font-bold text-white">${milestone.amount.toLocaleString()}</p>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
@@ -164,7 +164,7 @@ export function VaultDetailView({ vaultId, role }) {
                                             </div>
 
                                             <div className="rounded-lg border border-white/5 bg-black/40 p-4 space-y-2">
-                                                <p className="text-xs font-bold uppercase tracking-widest text-white/40">Requirements</p>
+                                                <p className="text-xs font-bold uppercase tracking-wide text-white">Requirements</p>
                                                 <div className="space-y-2">
                                                     {(milestone.requirements || []).map((req) => (
                                                         <div key={req.reqId} className="flex items-start gap-3 text-sm text-white/70">

@@ -25,9 +25,9 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
             </Link>
 
             <header className="space-y-3">
-                <div className="text-xs font-bold uppercase tracking-widest text-emerald-400">Milestone Submission</div>
+                <div className="text-xs font-bold uppercase tracking-wide text-emerald-400">Milestone Submission</div>
                 <h1 className="text-3xl font-bold text-white">{milestone.title}</h1>
-                <div className="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-widest text-white/40">
+                <div className="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wide text-white">
                     <span>Status: {MILESTONE_STATUS_LABELS[milestone.status] || milestone.status}</span>
                     <span>Due: {milestone.dueDate}</span>
                     <span>Vault: {vault.title}</span>
@@ -54,21 +54,21 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
                             </div>
 
                             <div className="space-y-3">
-                                <p className="text-xs font-bold uppercase tracking-widest text-white/40">Current files</p>
+                                <p className="text-xs font-bold uppercase tracking-wide text-white">Current files</p>
                                 {milestone.submission?.files?.length ? (
                                     milestone.submission.files.map((file) => (
                                         <div key={file.name} className="flex items-center justify-between border border-white/5 bg-black/40 rounded-lg px-4 py-3">
                                             <div>
                                                 <p className="text-sm text-white font-semibold">{file.name}</p>
-                                                <p className="text-xs text-white/40">{file.size} · {file.tag}</p>
+                                                <p className="text-xs text-white">{file.size} · {file.tag}</p>
                                             </div>
-                                            <Button size="sm" variant="ghost" className="text-white/40 hover:text-white">
+                                            <Button size="sm" variant="ghost" className="text-white hover:text-white">
                                                 View
                                             </Button>
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-white/40">No files uploaded yet.</p>
+                                    <p className="text-sm text-white">No files uploaded yet.</p>
                                 )}
                             </div>
                         </CardContent>
@@ -84,7 +84,7 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
                                     <FileText className="w-4 h-4 text-emerald-500 mt-0.5" />
                                     <div>
                                         <p className="text-sm text-white font-semibold">{req.reqId} · {req.label}</p>
-                                        <p className="text-xs text-white/40">{req.acceptance}</p>
+                                        <p className="text-xs text-white">{req.acceptance}</p>
                                     </div>
                                 </div>
                             ))}
@@ -96,7 +96,7 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
                             <CardTitle className="text-white">Submission Notes</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/40">
+                            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-white">
                                 <Calendar className="w-4 h-4" />
                                 Submitted {milestone.submission?.submittedAt ? new Date(milestone.submission.submittedAt).toLocaleDateString() : 'Not submitted'}
                             </div>
@@ -112,7 +112,7 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
                                     Submission Received
                                 </Button>
                             )}
-                            <p className="text-xs text-white/40">
+                            <p className="text-xs text-white">
                                 Submissions are reviewed against milestone requirements. No free-text disputes are accepted.
                             </p>
                         </CardContent>

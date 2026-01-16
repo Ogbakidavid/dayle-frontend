@@ -61,7 +61,7 @@ export default function ClientMilestoneDetailPage() {
                 </h1>
                 <Badge
                   variant="outline"
-                  className="bg-amber-500/10 text-amber-500 border-amber-500/20 uppercase tracking-widest text-[10px]"
+                  className="bg-amber-500/10 text-amber-500 border-amber-500/20 uppercase tracking-wide text-sm"
                 >
                   Awaiting Approval
                 </Badge>
@@ -71,7 +71,7 @@ export default function ClientMilestoneDetailPage() {
               </p>
             </div>
             <div className="text-right whitespace-nowrap">
-              <p className="text-sm text-slate-500 font-medium uppercase tracking-widest">
+              <p className="text-sm text-slate-500 font-medium uppercase tracking-wide">
                 Milestone Value
               </p>
               <p className="text-3xl font-bold text-white tracking-tight">
@@ -119,7 +119,7 @@ export default function ClientMilestoneDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wide mb-1">
                     Due Date
                   </p>
                   <div className="flex items-center gap-2 text-white">
@@ -130,7 +130,7 @@ export default function ClientMilestoneDetailPage() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wide mb-1">
                     Status
                   </p>
                   <div className="flex items-center gap-2 text-amber-500">

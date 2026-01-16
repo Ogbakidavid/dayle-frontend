@@ -13,19 +13,19 @@ export function WalletBalance({ balance, role = "client" }) {
                 </div>
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-transparent" />
                 <CardContent className="p-8 relative z-10">
-                    <div className="flex items-center gap-2 text-white/40 font-black uppercase tracking-[0.2em] text-sm mb-5">
+                    <div className="flex items-center gap-2 text-white font-black uppercase tracking-wide text-sm mb-5">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
                         Available Funds
                     </div>
                     <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-light text-white/10">$</span>
+                        <span className="text-2xl font-light text-white">$</span>
                         <span className="text-5xl font-bold text-white tracking-tighter">
                             {balance?.available?.toLocaleString() || '0.00'}
                         </span>
-                        <span className="text-sm font-black text-white/20 ml-1">USD</span>
+                        <span className="text-sm font-black text-white ml-1">USD</span>
                     </div>
                     <div className="mt-8 flex items-center gap-3">
-                        <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-sm font-black text-emerald-500 uppercase tracking-widest border border-emerald-500/20 flex items-center gap-2">
+                        <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-sm font-black text-emerald-500 uppercase tracking-wide border border-emerald-500/20 flex items-center gap-2">
                             <Zap size={10} /> Fully Liquid
                         </div>
                     </div>
@@ -38,18 +38,18 @@ export function WalletBalance({ balance, role = "client" }) {
                     <Clock size={120} className="text-white rotate-12" />
                 </div>
                 <CardContent className="p-8 relative z-10">
-                    <div className="flex items-center gap-2 text-white/40 font-black uppercase tracking-[0.2em] text-sm mb-5">
+                    <div className="flex items-center gap-2 text-white font-black uppercase tracking-wide text-sm mb-5">
                         <ShieldCheck size={14} className="text-emerald-500/50" />
                         Pending in Vaults
                     </div>
                     <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-light text-white/10">$</span>
+                        <span className="text-2xl font-light text-white">$</span>
                         <span className="text-5xl font-bold text-white tracking-tighter">
                             {balance?.pending?.toLocaleString() || '0.00'}
                         </span>
                     </div>
                     <div className="mt-8 flex items-center gap-2">
-                        <span className="text-sm font-black text-white/20 uppercase tracking-widest flex items-center gap-2">
+                        <span className="text-sm font-black text-white uppercase tracking-wide flex items-center gap-2">
                             <span className="w-1 h-1 rounded-full bg-white/10" />
                             {role === 'client' ? 'Reserved for project release' : 'Awaiting client release'}
                         </span>

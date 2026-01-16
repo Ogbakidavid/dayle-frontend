@@ -317,8 +317,8 @@ export default function ClientVaultDetailPage() {
                       milestone.type === "COMPLIANCE_AI"
                         ? "bg-emerald-950/10 border-emerald-500/10 hover:bg-emerald-950/20"
                         : milestone.type === "APPROVAL_HUMAN"
-                        ? "bg-amber-950/10 border-amber-500/10 hover:bg-amber-950/20"
-                        : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
+                          ? "bg-amber-950/10 border-amber-500/10 hover:bg-amber-950/20"
+                          : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
                     )}
                   >
                     <div className="flex items-start justify-between gap-4">
@@ -330,8 +330,8 @@ export default function ClientVaultDetailPage() {
                             milestone.type === "COMPLIANCE_AI"
                               ? "bg-emerald-500/10 text-emerald-500"
                               : milestone.type === "APPROVAL_HUMAN"
-                              ? "bg-amber-500/10 text-amber-500"
-                              : "bg-white/5 text-slate-500"
+                                ? "bg-amber-500/10 text-amber-500"
+                                : "bg-white/5 text-slate-500"
                           )}
                         >
                           {milestone.type === "COMPLIANCE_AI" ? (
@@ -580,13 +580,12 @@ export default function ClientVaultDetailPage() {
                     asChild
                   >
                     <Link
-                      href={`/client/disputes/${
-                        vault.id === "v_3"
+                      href={`/client/disputes/${vault.id === "v_3"
                           ? "d_003"
                           : vault.id === "v_4"
-                          ? "d_004"
-                          : "d_001"
-                      }`}
+                            ? "d_004"
+                            : "d_001"
+                        }`}
                     >
                       Open Case
                     </Link>
