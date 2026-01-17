@@ -46,20 +46,20 @@ export default function WalletPageContent() {
     return (
         <div className="min-h-screen bg-[#0A0A0A] pb-20 text-white">
             {/* Header */}
-            <header className="mb-10">
+            <header className="mb-6 md:mb-10 px-4 md:px-0">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm font-black text-emerald-500 uppercase tracking-[0.3em] mb-2">
-                            <ShieldCheck className="w-3.5 h-3.5" />
+                        <div className="flex items-center gap-2 text-[10px] md:text-sm font-black text-emerald-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2">
+                            <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                             Secured Settlement Wallet
                         </div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+                        <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight flex items-center gap-3">
                             Financial Center
                         </h1>
-                        <p className="text-sm text-white font-bold uppercase tracking-wide">Manage your vault earnings and global settlements</p>
+                        <p className="text-xs md:text-sm text-white/50 font-bold uppercase tracking-wide">Manage your vault earnings and global settlements</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button variant="outline" className="gap-2 font-bold h-11 px-6 border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80">
+                        <Button variant="outline" className="w-full md:w-auto gap-2 font-bold h-11 px-6 border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80 shrink-0">
                             <Download size={16} />
                             Export Ledger
                         </Button>
@@ -153,9 +153,9 @@ export default function WalletPageContent() {
                             <table className="w-full border-collapse">
                                 <thead className="bg-black/20 border-b border-white/5">
                                     <tr>
-                                        <th className="px-6 py-5 text-left text-sm font-black text-white/30 uppercase tracking-wide">Transaction</th>
-                                        <th className="px-6 py-5 text-left text-sm font-black text-white/30 uppercase tracking-wide">Status</th>
-                                        <th className="px-6 py-5 text-right text-sm font-black text-white/30 uppercase tracking-wide">Amount</th>
+                                        <th className="px-4 md:px-6 py-5 text-left text-[11px] font-black text-white/30 uppercase tracking-wide">Transaction</th>
+                                        <th className="hidden sm:table-cell px-6 py-5 text-left text-[11px] font-black text-white/30 uppercase tracking-wide">Status</th>
+                                        <th className="px-4 md:px-6 py-5 text-right text-[11px] font-black text-white/30 uppercase tracking-wide">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/[0.03]">
@@ -174,27 +174,30 @@ export default function WalletPageContent() {
                                     ) : (
                                         paginatedTransactions.map((tx) => (
                                             <tr key={tx.id} className="hover:bg-white/[0.02] transition-colors group">
-                                                <td className="px-6 py-6">
-                                                    <div className="flex items-center gap-5">
-                                                        <div className={`w-11 h-11 rounded-sm flex items-center justify-center shrink-0 border transition-colors ${tx.amount < 0
+                                                <td className="px-4 md:px-6 py-6">
+                                                    <div className="flex items-center gap-3 md:gap-5">
+                                                        <div className={`hidden xs:flex w-10 h-10 md:w-11 md:h-11 rounded-sm items-center justify-center shrink-0 border transition-colors ${tx.amount < 0
                                                             ? 'bg-amber-500/5 border-amber-500/20 text-amber-500'
                                                             : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-500'
                                                             }`}>
-                                                            {tx.amount < 0 ? <ArrowUpRight size={20} /> : <ArrowDownLeft size={20} />}
+                                                            {tx.amount < 0 ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownLeft className="w-5 h-5" />}
                                                         </div>
-                                                        <div>
-                                                            <div className="font-bold text-white text-sm uppercase tracking-wide group-hover:text-emerald-400 transition-colors">{tx.description}</div>
-                                                            <div className="text-sm text-white/30 font-black uppercase tracking-wide mt-1.5 flex items-center gap-2">
+                                                        <div className="min-w-0">
+                                                            <div className="font-bold text-white text-sm uppercase tracking-wide group-hover:text-emerald-400 transition-colors truncate">{tx.description}</div>
+                                                            <div className="text-[10px] md:text-sm text-white/30 font-black uppercase tracking-wide mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                                                                 {new Date(tx.date).toLocaleDateString()}
-                                                                <span className="w-1 h-1 rounded-full bg-white/10" />
-                                                                ID: {tx.id}
+                                                                <span className="hidden md:block w-1 h-1 rounded-full bg-white/10" />
+                                                                <span className="truncate">ID: {tx.id}</span>
+                                                                <span className="sm:hidden px-1.5 py-0.5 rounded-sm bg-white/5 border border-white/10 text-[9px]">
+                                                                    {tx.status}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-6">
+                                                <td className="hidden sm:table-cell px-6 py-6">
                                                     <span className={cn(
-                                                        "px-2.5 py-1 text-sm font-black uppercase tracking-wide rounded-sm border",
+                                                        "px-2.5 py-1 text-[11px] font-black uppercase tracking-wide rounded-sm border",
                                                         tx.status === 'completed' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
                                                             tx.status === 'pending' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
                                                                 "bg-white/5 text-white border-white/10"
@@ -202,9 +205,9 @@ export default function WalletPageContent() {
                                                         {tx.status}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-6 text-right">
+                                                <td className="px-4 md:px-6 py-6 text-right">
                                                     <div className={cn(
-                                                        "text-lg font-bold tracking-tight",
+                                                        "text-base md:text-lg font-bold tracking-tight",
                                                         tx.amount < 0 ? 'text-white' : 'text-emerald-500'
                                                     )}>
                                                         {tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toLocaleString()}

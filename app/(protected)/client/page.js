@@ -40,7 +40,7 @@ export default function ClientDashboard() {
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
-          <h1 className="text-4xl font-black tracking-tighter text-white uppercase">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase">
             Overview
           </h1>
           <p className="text-sm text-white font-bold uppercase tracking-wide">
@@ -146,30 +146,30 @@ export default function ClientDashboard() {
               <Link
                 key={vault.id}
                 href={`/client/vault/${vault.id}`}
-                className="group flex items-center justify-between p-5 bg-[#111111] border border-white/10 rounded-sm hover:border-white/20 transition-colors"
+                className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-[#111111] border border-white/10 rounded-sm hover:border-white/20 transition-colors gap-4"
               >
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <h4 className="font-bold uppercase tracking-wide text-white ">{vault.title}</h4>
-                    <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-sm font-black uppercase tracking-wide rounded-sm border border-emerald-500/20">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <h4 className="font-bold uppercase tracking-wide text-white truncate">{vault.title}</h4>
+                    <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-xs font-black uppercase tracking-wide rounded-sm border border-emerald-500/20 whitespace-nowrap">
                       {vault.status}
                     </span>
                   </div>
-                  <p className="text-sm font-bold uppercase tracking-wide text-gray-400">
+                  <p className="text-sm font-bold uppercase tracking-wide text-gray-400 truncate">
                     {vault.freelancerEmail ||
                       vault.freelancer?.email ||
                       "Unassigned"}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-sm font-bold uppercase tracking-wide text-white mb-1">Value</p>
+                <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-t-0 border-white/5 pt-4 sm:pt-0">
+                  <div className="sm:text-right">
+                    <p className="text-[10px] sm:text-sm font-bold uppercase tracking-wide text-white/40 sm:text-white mb-0.5 sm:mb-1">Value</p>
                     <p className="text-lg font-bold uppercase tracking-wide text-white">
                       ${(vault.totalAmount || vault.amount).toLocaleString()}
                     </p>
                   </div>
-                  <div className="w-10 h-10 rounded-sm bg-white/5 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                  <div className="w-10 h-10 rounded-sm bg-white/5 flex items-center justify-center group-hover:bg-emerald-500 transition-colors shrink-0">
                     <ArrowUpRight className="w-4 h-4 text-white group-hover:text-white transition-colors" />
                   </div>
                 </div>

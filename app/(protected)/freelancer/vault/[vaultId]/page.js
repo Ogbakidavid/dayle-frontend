@@ -212,6 +212,8 @@ export default function FreelancerVaultDetailPage() {
       case "awaiting_approval":
       case "pending_review":
         return "text-amber-500";
+      case "rejected":
+      case "failed":
       case "disputed":
         return "text-red-500";
       default:
@@ -250,38 +252,38 @@ export default function FreelancerVaultDetailPage() {
     <div className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30 pb-20">
       <div className="max-w-6xl mx-auto px-6 space-y-8">
         {/* HEADER */}
-        <header className="pt-8">
+        <header className="pt-4 md:pt-8 bg-transparent">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
+            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-4 md:mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </button>
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-white">{vault.title}</h1>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-3 mb-2">
+                <h1 className="text-2xl md:text-3xl font-bold text-white truncate">{vault.title}</h1>
                 <Badge
                   variant="outline"
-                  className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px]"
+                  className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px] shrink-0"
                 >
                   {vault.status}
                 </Badge>
               </div>
-              <p className="text-slate-500 font-medium">
+              <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide truncate">
                 Vault ID:{" "}
                 <span className="text-slate-400 font-mono">{vaultId}</span>
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-slate-500 font-medium uppercase tracking-widest">
+            <div className="text-left md:text-right border-t md:border-t-0 border-white/5 pt-4 md:pt-0">
+              <p className="text-[10px] md:text-sm text-slate-500 font-medium uppercase tracking-widest">
                 Potential Earnings
               </p>
-              <p className="text-3xl font-bold text-white tracking-tight">
+              <p className="text-2xl md:text-3xl font-bold text-white tracking-tight">
                 ${vault.amount?.toLocaleString() || "0"}
               </p>
-              <p className="text-xs text-emerald-500 font-medium mt-1">
+              <p className="text-[10px] md:text-xs text-emerald-500 font-medium mt-1">
                 ${(vault.paidAmount || 0).toLocaleString()} Received
               </p>
             </div>
@@ -304,9 +306,9 @@ export default function FreelancerVaultDetailPage() {
                     key={milestone.id}
                     className="group relative bg-white/[0.02] border border-white/5 rounded-xl p-5 hover:bg-white/[0.04] transition-all"
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
                       {/* Left: Icon & Info */}
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-4 min-w-0">
                         <div
                           className={cn(
                             "mt-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
@@ -322,14 +324,14 @@ export default function FreelancerVaultDetailPage() {
                           )}
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-lg font-bold text-white uppercase tracking-wide group-hover:text-emerald-400 transition-colors">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-base sm:text-lg font-bold text-white uppercase tracking-wide break-words">
                               {milestone.title}
                             </h3>
                             <Badge
                               variant="outline"
                               className={cn(
-                                "uppercase tracking-widest text-[10px] h-5",
+                                "uppercase tracking-widest text-[10px] h-5 whitespace-nowrap",
                                 milestone.type === "COMPLIANCE_AI"
                                   ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
                                   : "bg-amber-500/10 text-amber-500 border-amber-500/20"
@@ -343,7 +345,7 @@ export default function FreelancerVaultDetailPage() {
 
                           {milestone.type === "COMPLIANCE_AI" &&
                             milestone.checks && (
-                              <div className="flex gap-2 mt-2">
+                              <div className="flex flex-wrap gap-2 mt-2">
                                 {milestone.checks.map((check) => (
                                   <span
                                     key={check}
@@ -356,34 +358,45 @@ export default function FreelancerVaultDetailPage() {
                             )}
 
                           {milestone.deliverable && (
-                            <div className="flex items-center gap-2 mt-3 mb-1">
-                              <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 mb-1">
+                              <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold whitespace-nowrap">
                                 Required:
                               </span>
-                              <span className="text-[12px] text-white font-bold uppercase tracking-wide">
+                              <span className="text-[12px] text-white font-bold uppercase tracking-wide break-words">
                                 {milestone.deliverable}
                               </span>
                             </div>
                           )}
 
-                          <div className="flex items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-slate-500">
+                          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-slate-500">
                             {milestone.type === "APPROVAL_HUMAN" && (
                               <>
-                                <span>
+                                <span className="text-white">
                                   ${milestone.displayAmount?.toLocaleString()}
                                 </span>
-                                <span className="w-1 h-1 rounded-full bg-slate-700" />
+                                <span className="hidden xs:block w-1 h-1 rounded-full bg-slate-700" />
                               </>
                             )}
-                            <span className={getStatusColor(milestone.status)}>
+                            <span className={cn(getStatusColor(milestone.status), "whitespace-nowrap")}>
                               {milestone.status.replace("_", " ")}
                             </span>
+
+                            {/* Eligible Dispute Action */}
+                            {getDisputeEligibility(milestone).eligible && (
+                              <Link
+                                href={`/freelancer/disputes/create?vaultId=${vaultId}&milestoneId=${milestone.id}`}
+                                className="inline-flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded hover:bg-red-500/20 transition-colors"
+                              >
+                                <Gavel className="w-3 h-3" />
+                                Open Case
+                              </Link>
+                            )}
                           </div>
                         </div>
                       </div>
 
                       {/* Right: Actions */}
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 shrink-0">
                         {milestone.type === "COMPLIANCE_AI" && (
                           <Badge
                             variant="outline"
@@ -456,10 +469,9 @@ export default function FreelancerVaultDetailPage() {
                                                 <div className="relative">
                                                   <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
                                                   <Input
-                                                    placeholder={`Paste ${
-                                                      deliverableDef?.label ||
+                                                    placeholder={`Paste ${deliverableDef?.label ||
                                                       "Link"
-                                                    } URL...`}
+                                                      } URL...`}
                                                     className="bg-black/30 border-white/10 text-white pl-10"
                                                   />
                                                 </div>

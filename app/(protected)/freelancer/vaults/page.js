@@ -134,19 +134,19 @@ export default function FreelancerVaultsPage() {
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Vault Detail
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="hidden lg:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Client
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide text-right">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide text-right">
                     Value
                   </th>
-                  <th className="px-6 py-4"></th>
+                  <th className="px-4 md:px-6 py-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -158,41 +158,49 @@ export default function FreelancerVaultsPage() {
                       (window.location.href = `/freelancer/vault/${vault.id}`)
                     }
                   >
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 group-hover:border-emerald-500/20 transition-all">
+                    <td className="px-4 md:px-6 py-5">
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="hidden xs:flex w-10 h-10 rounded-xl bg-white/5 border border-white/5 items-center justify-center text-slate-400 group-hover:text-emerald-500 group-hover:border-emerald-500/20 transition-all shrink-0">
                           <FileText className="w-5 h-5" />
                         </div>
-                        <div>
-                          <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors truncate">
                             {vault.title}
                           </p>
-                          <p className="text-sm text-slate-500 mt-0.5 font-medium">
-                            {new Date(
-                              vault.createdAt || Date.now()
-                            ).toLocaleDateString()}
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                            <p className="text-[10px] md:text-sm text-slate-500 font-medium whitespace-nowrap">
+                              {new Date(
+                                vault.createdAt || Date.now()
+                              ).toLocaleDateString()}
+                            </p>
+                            <span className="sm:hidden text-[10px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded-sm border border-emerald-500/20 font-black uppercase tracking-wide whitespace-nowrap">
+                              {vault.status}
+                            </span>
+                          </div>
+                          <p className="lg:hidden text-[10px] text-white/40 font-bold uppercase tracking-wide mt-1 truncate">
+                            Client: {vault.clientEmail || vault.client?.email || "Unknown Client"}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="hidden lg:table-cell px-6 py-5">
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-sm font-bold text-emerald-500">
                           {(vault.clientEmail ||
                             vault.client?.email ||
                             "C")[0].toUpperCase()}
                         </div>
-                        <span className="text-sm text-slate-400 font-medium">
+                        <span className="text-sm text-slate-400 font-medium truncate max-w-[150px]">
                           {vault.clientEmail ||
                             vault.client?.email ||
                             "Unknown Client"}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="hidden sm:table-cell px-6 py-5">
                       <div
                         className={cn(
-                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-sm font-bold uppercase tracking-wide",
+                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[11px] md:text-sm font-bold uppercase tracking-wide",
                           vault.status === "active"
                             ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500"
                             : vault.status === "completed"
@@ -213,15 +221,15 @@ export default function FreelancerVaultsPage() {
                         {vault.status}
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-right">
-                      <p className="text-sm font-black text-white tracking-wide">
+                    <td className="px-4 md:px-6 py-5 text-right">
+                      <p className="text-sm md:text-base font-black text-white tracking-wide">
                         ${(vault.totalAmount || vault.amount).toLocaleString()}
                       </p>
-                      <p className="text-sm text-slate-600 font-bold uppercase">
+                      <p className="text-[10px] md:text-sm text-slate-600 font-bold uppercase">
                         USD
                       </p>
                     </td>
-                    <td className="px-6 py-5 text-right">
+                    <td className="px-4 md:px-6 py-5 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Link
                           href={`/freelancer/vault/${vault.id}`}
@@ -235,14 +243,6 @@ export default function FreelancerVaultsPage() {
                             <ArrowUpRight className="w-4 h-4" />
                           </Button>
                         </Link>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 text-slate-500 hover:text-white hover:bg-white/10 rounded-lg"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
                       </div>
                     </td>
                   </tr>

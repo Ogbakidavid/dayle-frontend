@@ -197,19 +197,19 @@ export default function TransactionsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Transaction
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="hidden md:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Type
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     Date
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide text-center sm:text-left">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-wide text-right">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-wide text-right">
                     Amount
                   </th>
                 </tr>
@@ -220,10 +220,10 @@ export default function TransactionsPage() {
                     key={tx.id}
                     className="group hover:bg-white/[0.02] transition-colors"
                   >
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-sm bg-white/5 border border-white/5 flex items-center justify-center text-slate-400">
-                          {tx.type === "deposit" ? (
+                    <td className="px-4 md:px-6 py-5">
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="hidden xs:flex w-10 h-10 rounded-sm bg-white/5 border border-white/5 items-center justify-center text-slate-400 shrink-0">
+                          {tx.type === "deposit" || tx.type === "payment" ? (
                             <ArrowDownLeft className="w-5 h-5 text-emerald-500" />
                           ) : tx.type === "withdrawal" ? (
                             <ArrowUpRight className="w-5 h-5 text-amber-500" />
@@ -231,56 +231,61 @@ export default function TransactionsPage() {
                             <RefreshCw className="w-5 h-5 text-blue-500" />
                           )}
                         </div>
-                        <div>
-                          <p className="text-sm font-black text-white uppercase tracking-tight">
+                        <div className="min-w-0">
+                          <p className="text-sm font-black text-white uppercase tracking-tight truncate">
                             {tx.id}
                           </p>
-                          <p className="text-sm text-slate-500 mt-0.5 font-bold uppercase tracking-wide">
+                          <p className="text-xs md:text-sm text-slate-500 mt-0.5 font-bold uppercase tracking-wide truncate">
                             {tx.counterparty}
+                          </p>
+                          <p className="md:hidden text-[10px] text-slate-600 font-bold uppercase tracking-wide mt-1">
+                            {tx.date} • {tx.type}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="hidden md:table-cell px-6 py-5">
                       <span className="text-sm font-bold uppercase tracking-wide text-slate-400">
                         {tx.type}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="hidden sm:table-cell px-6 py-5">
                       <span className="text-sm text-slate-400 font-bold uppercase tracking-wide">
                         {tx.date}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
-                      <div
-                        className={cn(
-                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm border text-sm font-bold uppercase tracking-wide",
-                          tx.status === "completed"
-                            ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500"
-                            : tx.status === "processing" ||
-                              tx.status === "pending"
-                              ? "bg-amber-500/5 border-amber-500/20 text-amber-500"
-                              : "bg-red-500/5 border-red-500/20 text-red-500"
-                        )}
-                      >
+                    <td className="px-4 md:px-6 py-5">
+                      <div className="flex justify-center sm:justify-start">
                         <div
                           className={cn(
-                            "w-1 h-1 rounded-full",
+                            "inline-flex items-center gap-1.5 px-2 py-0.5 md:px-2.5 md:py-1 rounded-sm border text-[10px] md:text-sm font-bold uppercase tracking-wide",
                             tx.status === "completed"
-                              ? "bg-emerald-500"
+                              ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500"
                               : tx.status === "processing" ||
                                 tx.status === "pending"
-                                ? "bg-amber-500"
-                                : "bg-red-500"
+                                ? "bg-amber-500/5 border-amber-500/20 text-amber-500"
+                                : "bg-red-500/5 border-red-500/20 text-red-500"
                           )}
-                        />
-                        {tx.status}
+                        >
+                          <div
+                            className={cn(
+                              "w-1 h-1 rounded-full",
+                              tx.status === "completed"
+                                ? "bg-emerald-500"
+                                : tx.status === "processing" ||
+                                  tx.status === "pending"
+                                  ? "bg-amber-500"
+                                  : "bg-red-500"
+                            )}
+                          />
+                          {tx.status}
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-right">
+                    <td className="px-4 md:px-6 py-5 text-right">
                       <p
                         className={cn(
-                          "text-sm font-bold tracking-tight",
+                          "text-sm md:text-base font-bold tracking-tight",
                           tx.type === "deposit"
                             ? "text-emerald-500"
                             : "text-white"
@@ -289,7 +294,7 @@ export default function TransactionsPage() {
                         {tx.type === "deposit" ? "+" : "-"}$
                         {tx.amount.toLocaleString()}
                       </p>
-                      <p className="text-sm text-slate-600 font-bold uppercase tracking-wide">
+                      <p className="text-[10px] md:text-sm text-slate-600 font-bold uppercase tracking-wide">
                         {tx.method}
                       </p>
                     </td>

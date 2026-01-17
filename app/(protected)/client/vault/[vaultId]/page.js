@@ -370,12 +370,12 @@ export default function ClientVaultDetailPage() {
                       milestone.type === "COMPLIANCE_AI"
                         ? "bg-emerald-950/10 border-emerald-500/10 hover:bg-emerald-950/20"
                         : milestone.type === "APPROVAL_HUMAN"
-                        ? "bg-amber-950/10 border-amber-500/10 hover:bg-amber-950/20"
-                        : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
+                          ? "bg-amber-950/10 border-amber-500/10 hover:bg-amber-950/20"
+                          : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
                     )}
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <div className="flex items-start gap-4 min-w-0">
                         {/* Icon/Number */}
                         <div
                           className={cn(
@@ -383,8 +383,8 @@ export default function ClientVaultDetailPage() {
                             milestone.type === "COMPLIANCE_AI"
                               ? "bg-emerald-500/10 text-emerald-500"
                               : milestone.type === "APPROVAL_HUMAN"
-                              ? "bg-amber-500/10 text-amber-500"
-                              : "bg-white/5 text-slate-500"
+                                ? "bg-amber-500/10 text-amber-500"
+                                : "bg-white/5 text-slate-500"
                           )}
                         >
                           {milestone.type === "COMPLIANCE_AI" ? (
@@ -397,10 +397,10 @@ export default function ClientVaultDetailPage() {
                         </div>
 
                         <div>
-                          <h3 className="text-lg font-bold text-white uppercase tracking-wide">
+                          <h3 className="text-base sm:text-lg font-bold text-white uppercase tracking-wide break-words">
                             {milestone.title}
                           </h3>
-                          <div className="flex gap-2 items-center mt-1 mb-2">
+                          <div className="flex flex-wrap gap-2 items-center mt-1 mb-2">
                             <Badge
                               variant="outline"
                               className={cn(
@@ -418,7 +418,7 @@ export default function ClientVaultDetailPage() {
 
                           {milestone.type === "COMPLIANCE_AI" &&
                             milestone.checks && (
-                              <div className="flex gap-2 mt-2">
+                              <div className="flex flex-wrap gap-2 mt-2">
                                 {milestone.checks.map((check) => (
                                   <span
                                     key={check}
@@ -431,23 +431,23 @@ export default function ClientVaultDetailPage() {
                             )}
 
                           {milestone.deliverable && (
-                            <div className="flex items-center gap-2 mt-3 mb-1">
-                              <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 mb-1">
+                              <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold whitespace-nowrap">
                                 Required:
                               </span>
-                              <span className="text-[12px] text-white font-bold uppercase tracking-wide">
+                              <span className="text-[12px] text-white font-bold uppercase tracking-wide break-words">
                                 {milestone.deliverable}
                               </span>
                             </div>
                           )}
 
-                          <div className="flex items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-slate-500">
+                          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-slate-500">
                             {milestone.type === "APPROVAL_HUMAN" && (
                               <>
-                                <span>
+                                <span className="text-white">
                                   ${milestone.displayAmount?.toLocaleString()}
                                 </span>
-                                <span className="w-1 h-1 rounded-full bg-slate-700" />
+                                <span className="hidden xs:block w-1 h-1 rounded-full bg-slate-700" />
                               </>
                             )}
                             <span className={getStatusColor(milestone.status)}>
@@ -469,7 +469,7 @@ export default function ClientVaultDetailPage() {
                       </div>
 
                       {/* Right Side: Action Button or Passed Badge */}
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 shrink-0">
                         {milestone.type === "COMPLIANCE_AI" && (
                           <Badge
                             variant="outline"
@@ -560,8 +560,8 @@ export default function ClientVaultDetailPage() {
                                             className={cn(
                                               "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400",
                                               reviewAction ===
-                                                "REVISION_REQUESTED" &&
-                                                "bg-amber-500/10 ring-1 ring-amber-500"
+                                              "REVISION_REQUESTED" &&
+                                              "bg-amber-500/10 ring-1 ring-amber-500"
                                             )}
                                             onClick={() => {
                                               setReviewAction(
@@ -577,7 +577,7 @@ export default function ClientVaultDetailPage() {
                                             className={cn(
                                               "border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400",
                                               reviewAction === "REJECTED" &&
-                                                "bg-red-500/10 ring-1 ring-red-500"
+                                              "bg-red-500/10 ring-1 ring-red-500"
                                             )}
                                             onClick={() => {
                                               setReviewAction("REJECTED");
@@ -604,9 +604,9 @@ export default function ClientVaultDetailPage() {
                                                   {APPROVAL_REJECTION_CODES.filter(
                                                     (c) =>
                                                       reviewAction ===
-                                                      "REJECTED"
+                                                        "REJECTED"
                                                         ? c.code !==
-                                                          "REVISION_REQUIRED"
+                                                        "REVISION_REQUIRED"
                                                         : true
                                                   ).map((c) => (
                                                     <SelectItem

@@ -225,16 +225,16 @@ export function DisputeListView({ role }) {
     <div className="space-y-7">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
+        <div className="space-y-1">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03]">
+            <div className="hidden xs:flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] shrink-0">
               <Gavel className="h-5 w-5 text-amber-300" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
+              <h1 className="text-2xl md:text-3xl font-bold text-white uppercase tracking-tighter">
                 Disputes
               </h1>
-              <p className="text-sm text-white/60">
+              <p className="text-xs md:text-sm text-white/50 font-bold uppercase tracking-wide">
                 {role === "client"
                   ? "Review and manage disputes tied to your milestones."
                   : "Open and track disputes for fair milestone resolution."}
@@ -430,7 +430,7 @@ export function DisputeListView({ role }) {
 
                           {/* Meta line: ID + status */}
                           <div className="mt-2 flex flex-wrap items-center gap-2">
-                            <span className="text-[13px] font-semibold text-white/85">
+                            <span className="text-[12px] md:text-[13px] font-semibold text-white/85">
                               {dispute.id}
                             </span>
                             <StatusPill status={dispute.status} />

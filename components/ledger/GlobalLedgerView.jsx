@@ -41,7 +41,7 @@ export function GlobalLedgerView({ role }) {
         <div className="text-xs font-black uppercase tracking-wide text-emerald-400">
           Global Ledger
         </div>
-        <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
+        <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase">
           Settlement Activity
         </h1>
         <p className="text-sm font-bold text-white uppercase tracking-wide">
@@ -71,7 +71,7 @@ export function GlobalLedgerView({ role }) {
         ))}
       </div>
 
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <input
@@ -81,10 +81,10 @@ export function GlobalLedgerView({ role }) {
             className="w-full pl-10 pr-4 py-2 bg-[#111111] border border-white/10 rounded-lg text-sm text-white focus:border-emerald-500/40"
           />
         </div>
-        <Link href={`/${role}`}>
+        <Link href={`/${role}`} className="w-full sm:w-auto">
           <Button
             variant="outline"
-            className="border-white/10 text-white/70 hover:text-white"
+            className="w-full sm:w-auto border-white/10 text-white/70 hover:text-white"
           >
             Back to dashboard
           </Button>
@@ -96,11 +96,11 @@ export function GlobalLedgerView({ role }) {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="border-b border-white/5">
-                <tr className="text-xs font-black uppercase tracking-wide text-white/30">
-                  <th className="px-6 py-4">Entry</th>
-                  <th className="px-6 py-4">Vault</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Amount (USD)</th>
+                <tr className="text-[10px] md:text-xs font-black uppercase tracking-wide text-white/30">
+                  <th className="px-4 md:px-6 py-4">Entry</th>
+                  <th className="hidden md:table-cell px-6 py-4">Vault</th>
+                  <th className="px-4 md:px-6 py-4 text-center sm:text-left">Status</th>
+                  <th className="px-4 md:px-6 py-4 text-right">Amount (USD)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -108,11 +108,11 @@ export function GlobalLedgerView({ role }) {
                   const vault = getVaultById(entry.vaultId);
                   return (
                     <tr key={entry.id} className="hover:bg-white/[0.02]">
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div
                             className={cn(
-                              "w-9 h-9 rounded-lg flex items-center justify-center border",
+                              "hidden xs:flex w-9 h-9 rounded-lg items-center justify-center border shrink-0",
                               entry.type === "release"
                                 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                                 : "bg-blue-500/10 border-blue-500/20 text-blue-400"
@@ -124,17 +124,20 @@ export function GlobalLedgerView({ role }) {
                               <ArrowDownLeft className="w-4 h-4" />
                             )}
                           </div>
-                          <div>
-                            <p className="text-sm text-white font-black uppercase tracking-tight">
+                          <div className="min-w-0">
+                            <p className="text-sm text-white font-black uppercase tracking-tight truncate">
                               {entry.description}
                             </p>
-                            <p className="text-sm uppercase font-black tracking-wide text-white/30">
+                            <p className="text-[10px] md:text-sm uppercase font-black tracking-wide text-white/30 truncate">
                               {entry.id}
                             </p>
+                            <div className="md:hidden mt-1 text-[10px] text-white/50 font-bold uppercase tracking-wide">
+                              {vault?.title || "Vault"} • {new Date(entry.date).toLocaleDateString()}
+                            </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="hidden md:table-cell px-6 py-4">
                         <p className="text-sm text-white/70">
                           {vault?.title || "Vault"}
                         </p>
@@ -142,17 +145,19 @@ export function GlobalLedgerView({ role }) {
                           {new Date(entry.date).toLocaleDateString()}
                         </p>
                       </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={cn(
-                            "px-2 py-1 text-sm font-bold uppercase tracking-wide rounded-full border",
-                            statusStyles[entry.status]
-                          )}
-                        >
-                          {entry.status}
-                        </span>
+                      <td className="px-4 md:px-6 py-4">
+                        <div className="flex justify-center sm:justify-start">
+                          <span
+                            className={cn(
+                              "px-2 py-0.5 md:py-1 text-[10px] md:text-sm font-bold uppercase tracking-wide rounded-full border",
+                              statusStyles[entry.status]
+                            )}
+                          >
+                            {entry.status}
+                          </span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-right text-sm font-bold text-white">
+                      <td className="px-4 md:px-6 py-4 text-right text-sm font-bold text-white">
                         ${entry.amount.toLocaleString()}
                       </td>
                     </tr>
