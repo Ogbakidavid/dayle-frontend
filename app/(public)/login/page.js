@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
-import { Shield, ArrowRight, Loader2, CheckCircle2, Lock, User } from 'lucide-react';
+import { Shield, ArrowRight, Loader2, CheckCircle2, User } from 'lucide-react';
 import { api, UserRole } from '@/lib/mock-api';
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -112,15 +114,13 @@ export default function LoginPage() {
                 <Link href="/forgot-password" className="text-sm text-emerald-500 hover:text-emerald-400 font-black uppercase tracking-wide transition-colors">Forgot password?</Link>
               </div>
               <div className="relative group">
-                <Input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
                   placeholder="••••••••"
                   required
                   className="!bg-[#0a0a0a] border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
                 />
-                <Lock className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
               </div>
             </div>
 
