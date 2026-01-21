@@ -113,7 +113,7 @@ export default function LoginPage() {
                   type="email"
                   placeholder="name@company.com"
                   required
-                  className="!bg-[#0a0a0a] border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
+                  className="!bg-[#0a0a0a] border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.05] focus:ring-0 transition-all !text-white text-lg placeholder:text-white/50 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
                 />
                 <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
               </div>
@@ -130,7 +130,7 @@ export default function LoginPage() {
                   name="password"
                   placeholder="••••••••"
                   required
-                  className="!bg-[#0a0a0a] border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
+                  className="!bg-[#0a0a0a] border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
                 />
               </div>
             </div>

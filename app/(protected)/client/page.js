@@ -162,7 +162,7 @@ export default function ClientDashboard() {
               Get started by creating your first vault
             </p>
             <Link href="/client/create-vault">
-              <Button className="mt-6 bg-emerald-600 hover:bg-emerald-700">
+              <Button className="mt-6 bg-emerald-600 hover:bg-emerald-700 font-bold uppercase tracking-wide">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Vault
               </Button>
@@ -185,7 +185,7 @@ export default function ClientDashboard() {
                 >
                   <motion.div
                     variants={itemVariants}
-                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-[#111111] border border-white/10 rounded-sm hover:border-white/20 transition-colors gap-4"
+                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-[#111111] border border-white/10 rounded-sm hover:border-white/20 transition-colors gap-8"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-2">

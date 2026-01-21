@@ -272,7 +272,7 @@ export default function LandingPage() {
                         transition={{ duration: 0.6 }}
                         className="text-center mb-24"
                     >
-                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white">How Dayle Protects You.</h2>
+                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4 text-white">How <span className="text-emerald-500"> Dayle </span> Protects You.</h2>
                         <p className="text-white font-bold uppercase tracking-wide text-sm">A three-step process to guaranteed payment.</p>
                     </motion.div>
                     <motion.div
@@ -349,7 +349,7 @@ export default function LandingPage() {
                                 <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center mb-6 md:mb-10 transition-all bg-white/[0.03] border-white/10 group-hover:bg-emerald-500/10">
                                     <f.icon className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" />
                                 </div>
-                                <h4 className="text-lg md:text-xl font-black mb-3 md:mb-4 uppercase tracking-tighter text-white">{f.title}</h4>
+                                <h4 className="text-lg md:text-xl font-black mb-3 md:mb-4 uppercase tracking-wide text-white">{f.title}</h4>
                                 <p className="text-xs md:text-sm leading-relaxed font-bold text-white uppercase tracking-wide">{f.desc}</p>
                             </motion.div>
                         ))}
@@ -374,7 +374,7 @@ export default function LandingPage() {
                                 {['AES-256 Encryption', 'Biometric MFA', 'SOC-2 Compliant', 'Insured Vaults'].map((text, i) => (
                                     <div key={i} className="flex items-center gap-2 md:gap-3">
                                         <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0"><Check className="w-3 h-3 md:w-4 md:h-4 text-black" /></div>
-                                        <span className="text-xs md:text-sm font-black uppercase tracking-wide">{text}</span>
+                                        <span className="text-xs md:text-sm font-bold uppercase tracking-wide">{text}</span>
                                     </div>
                                 ))}
                             </div>
@@ -395,7 +395,7 @@ export default function LandingPage() {
                                 >
                                     <div className="flex items-center gap-3 md:gap-4">
                                         <item.icon className="w-6 h-6 md:w-8 md:h-8 text-emerald-500 flex-shrink-0" />
-                                        <span className="text-xs md:text-sm font-black uppercase text-white tracking-wide">{item.title}</span>
+                                        <span className="text-xs md:text-sm font-bold uppercase text-white tracking-wide">{item.title}</span>
                                     </div>
                                     <ArrowUpRight className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:text-emerald-500 transition-colors flex-shrink-0" />
                                 </motion.div>
@@ -415,7 +415,7 @@ export default function LandingPage() {
                         transition={{ duration: 0.6 }}
                         className="text-center mb-20"
                     >
-                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white">Common Questions.</h2>
+                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4 text-white">Common Questions.</h2>
                         <p className="text-white font-bold uppercase tracking-wide text-sm">Everything you need to know about the protocol.</p>
                     </motion.div>
 
@@ -464,24 +464,24 @@ export default function LandingPage() {
                             </div>
                             <span className="font-black tracking-tighter uppercase text-2xl md:text-3xl text-white">Dayle</span>
                         </div>
-                        <p className="text-white text-xs md:text-sm font-black max-w-sm leading-relaxed uppercase tracking-wide">Infrastructure for the global workforce.</p>
+                        <p className="text-white text-xs md:text-sm font-bold max-w-sm leading-relaxed uppercase tracking-wide">Infrastructure for the global workforce.</p>
                     </div>
                     <div>
                         <h4 className="text-xs md:text-sm font-black uppercase tracking-wide mb-6 md:mb-10 text-white">Platform</h4>
-                        <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-white font-black uppercase tracking-wide">
+                        <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-white font-bold uppercase tracking-wide">
                             <li><Link href="#" className="hover:text-emerald-500 transition-colors">Vaults</Link></li>
                             <li><Link href="#" className="hover:text-emerald-400 transition-colors">Security</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h4 className="text-xs md:text-sm font-black uppercase tracking-wide mb-6 md:mb-10 text-white">Contact</h4>
-                        <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-white font-black uppercase tracking-wide">
+                        <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-white font-bold uppercase tracking-wide">
                             <li><Link href="#" className="hover:text-emerald-500 transition-colors">Support</Link></li>
                             <li><Link href="#" className="hover:text-emerald-400 transition-colors">Sales</Link></li>
                         </ul>
                     </div>
                 </div>
-                <div className="max-w-7xl mx-auto mt-16 md:mt-24 lg:mt-32 pt-8 md:pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs md:text-sm font-black text-white uppercase tracking-[0.2em] md:tracking-[0.3em]">
+                <div className="max-w-7xl mx-auto mt-16 md:mt-24 lg:mt-32 pt-8 md:pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs md:text-sm font-bold text-white uppercase tracking-[0.2em] md:tracking-[0.3em]">
                     <span>© 2026 Dayle Protocol.</span>
                     <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> All Systems Operational</span>
                 </div>
