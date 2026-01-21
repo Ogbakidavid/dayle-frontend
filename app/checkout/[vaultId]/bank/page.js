@@ -260,7 +260,7 @@ function Sidebar({ amount, transactionId, step }) {
                     <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
                         <Lock className="w-4 h-4 text-black" />
                     </div>
-                    <span className="text-white font-bold tracking-tighter text-lg uppercase">Cleard</span>
+                    <span className="text-white font-bold tracking-tighter text-lg uppercase">Dayle</span>
                 </div>
                 <div className="space-y-6">
                     <div className="space-y-1">
@@ -362,7 +362,7 @@ function PaymentInstructionsScreen({ amount, transactionId, timeRemaining, forma
             {/* BANK DETAILS */}
             <div className="space-y-6">
                 <div className="bg-white/[0.02] border border-white/5 rounded-3xl divide-y divide-white/5 overflow-hidden">
-                    <BankInfo label="Bank Name" value="Cleard Trust Bank" />
+                    <BankInfo label="Bank Name" value="Dayle Trust Bank" />
                     <BankInfo label="Account Number" value="9920 1120 4452" copy onCopy={() => onCopy("9920 1120 4452", "account")} copied={copied === "account"} />
                     <BankInfo label="Routing Number" value="121000358" copy onCopy={() => onCopy("121000358", "routing")} copied={copied === "routing"} />
                     <BankInfo label="Amount" value={`$${amount.toLocaleString()}`} highlight />

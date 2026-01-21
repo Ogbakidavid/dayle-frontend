@@ -45,7 +45,7 @@ export default function RoleSelectionPage() {
                         Identify Your <span className="text-emerald-500">Node.</span>
                     </h1>
                     <p className="text-white text-xl font-bold max-w-xl mx-auto uppercase tracking-tight">
-                        Choose how you will interact with the Cleard protocol to begin setup.
+                        Choose how you will interact with the Dayle protocol to begin setup.
                     </p>
                 </div>
 

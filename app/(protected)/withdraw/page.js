@@ -205,7 +205,7 @@ export default function FreelancerWithdrawPage() {
                             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform" onClick={() => router.push('/freelancer/wallet')}>
                                 <Lock className="w-4 h-4 text-black" />
                             </div>
-                            <span className="text-white font-bold tracking-tighter text-lg uppercase">Cleard</span>
+                            <span className="text-white font-bold tracking-tighter text-lg uppercase">Dayle</span>
                         </div>
 
                         <div className="space-y-8">
@@ -557,7 +557,7 @@ export default function FreelancerWithdrawPage() {
                                             </>
                                         )}
                                         <ReviewItem label="Gross Settlement" value={`$${amount.toLocaleString()}`} />
-                                        <ReviewItem label="Network Fee" value="$0.00" subValue="Cleard Turbo Promotion applied" highlight="text-emerald-500" />
+                                        <ReviewItem label="Network Fee" value="$0.00" subValue="Dayle Turbo Promotion applied" highlight="text-emerald-500" />
                                         <div className="p-6 bg-white/[0.02] flex justify-between items-center">
                                             <span className="text-sm font-black uppercase text-white tracking-wide">Net Credit</span>
                                             <span className="text-2xl font-bold text-white">${amount.toLocaleString()} <span className="text-sm text-white/30">{selectedCurrency}</span></span>
@@ -567,7 +567,7 @@ export default function FreelancerWithdrawPage() {
                                     <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex gap-4 items-start">
                                         <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                                         <p className="text-sm text-amber-300 leading-relaxed font-bold">
-                                            By proceeding, you authorize Cleard to execute this transfer. Funds should arrive in your account within 5-10 minutes.
+                                            By proceeding, you authorize Dayle to execute this transfer. Funds should arrive in your account within 5-10 minutes.
                                         </p>
                                     </div>
 

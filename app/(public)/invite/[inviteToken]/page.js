@@ -193,7 +193,7 @@ export default function InvitePage() {
                         <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-black">
                             <Shield className="w-5 h-5 stroke-[3px]" />
                         </div>
-                        <span className="font-black tracking-tighter text-white text-xl uppercase">CLEARD</span>
+                        <span className="font-black tracking-tighter text-white text-xl uppercase">Dayle</span>
                     </Link>
                     {isLoggedIn && (
                         <div className="flex items-center gap-4">
@@ -400,7 +400,7 @@ export default function InvitePage() {
 
                 <p className="mt-12 text-white/20 text-xs uppercase tracking-widest font-bold flex items-center gap-2">
                     <Shield className="w-3 h-3" />
-                    Secured by Cleard Protocol
+                    Secured by Dayle Protocol
                 </p>
             </main>
 

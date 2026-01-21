@@ -215,7 +215,7 @@ export default function FreelancerDashboard() {
                       </span>
                     </div>
                     <p className="text-sm text-white/50 uppercase font-bold tracking-wide truncate">
-                      Client: {vault.clientName || "Cleard Client"}
+                      Client: {vault.clientName || "Dayle Client"}
                     </p>
                   </div>
 

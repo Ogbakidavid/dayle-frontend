@@ -10,7 +10,7 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Cleard - Work with Certainty",
+  title: "Dayle - Work with Certainty",
   description: "Bank-grade infrastructure for milestone-based payments.",
 };
 

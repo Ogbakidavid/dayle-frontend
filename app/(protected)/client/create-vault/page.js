@@ -605,7 +605,7 @@ export default function CreateVaultPage() {
                       />
                       <p className="text-sm text-white/50">
                         If they don't have an account, they'll be invited to join
-                        Cleard.
+                        Dayle.
                       </p>
                     </div>
 
@@ -847,7 +847,7 @@ export default function CreateVaultPage() {
         <div className="mt-8 flex items-center justify-center gap-2 text-white/30">
           <Lock className="w-3 h-3" />
           <span className="text-sm uppercase tracking-tighter font-medium">
-            Secured by Cleard Escrow Protocol
+            Secured by Dayle Escrow Protocol
           </span>
         </div>
       </div>

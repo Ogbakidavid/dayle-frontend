@@ -21,7 +21,7 @@ export default function CheckoutSelectionPage() {
                             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
                                 <Lock className="w-4 h-4 text-black" />
                             </div>
-                            <span className="text-white font-bold tracking-tighter text-lg uppercase">Cleard</span>
+                            <span className="text-white font-bold tracking-tighter text-lg uppercase">Dayle</span>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-1">

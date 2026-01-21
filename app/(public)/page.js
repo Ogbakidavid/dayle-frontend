@@ -41,7 +41,7 @@ export default function LandingPage() {
         },
         {
             q: "What happens if a client refuses to approve a milestone?",
-            a: "Cleard includes a built-in Dispute Hub. If a milestone is contested, an independent arbitrator reviews the submitted work against the project scope to ensure a fair resolution."
+            a: "Dayle includes a built-in Dispute Hub. If a milestone is contested, an independent arbitrator reviews the submitted work against the project scope to ensure a fair resolution."
         },
         {
             q: "Are there any hidden fees for international transfers?",
@@ -49,7 +49,7 @@ export default function LandingPage() {
         },
         {
             q: "Is my data and capital insured?",
-            a: "Yes. All project capital held in Cleard vaults is covered by our secondary insurance layer, and our infrastructure is SOC-2 Type II compliant with AES-256 encryption."
+            a: "Yes. All project capital held in Dayle vaults is covered by our secondary insurance layer, and our infrastructure is SOC-2 Type II compliant with AES-256 encryption."
         }
     ];
 
@@ -72,7 +72,7 @@ export default function LandingPage() {
                         <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-500 rounded-lg md:rounded-xl flex items-center justify-center">
                             <Shield className="w-5 h-5 md:w-6 md:h-6 text-black stroke-[3px]" />
                         </div>
-                        <span className="font-black tracking-tighter text-xl md:text-2xl uppercase text-white">CLEARD</span>
+                        <span className="font-black tracking-tighter text-xl md:text-2xl uppercase text-white">Dayle</span>
                     </div>
 
                     {/* Desktop Navigation */}
@@ -161,7 +161,7 @@ export default function LandingPage() {
                         </motion.h1>
 
                         <motion.p variants={fadeInUp} className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-xl mb-8 md:mb-12 font-bold leading-relaxed tracking-tight text-white uppercase">
-                            Cleard replaces manual escrow with programmable vaults.
+                            Dayle replaces manual escrow with programmable vaults.
                             Funds are locked, milestones are verified, and payouts happen
                             at the speed of code.
                         </motion.p>
@@ -272,7 +272,7 @@ export default function LandingPage() {
                         transition={{ duration: 0.6 }}
                         className="text-center mb-24"
                     >
-                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white">How Cleard Protects You.</h2>
+                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white">How Dayle Protects You.</h2>
                         <p className="text-white font-bold uppercase tracking-wide text-sm">A three-step process to guaranteed payment.</p>
                     </motion.div>
                     <motion.div
@@ -319,7 +319,7 @@ export default function LandingPage() {
                                 Programmable <br /> Trust Infrastructure.
                             </h2>
                             <p className="font-bold text-xl leading-relaxed text-white uppercase tracking-tight">
-                                Cleard abstracts away the complexity of financial legalities into a set of automated protocols.
+                                Dayle abstracts away the complexity of financial legalities into a set of automated protocols.
                             </p>
                         </div>
                         <div className="text-right">
@@ -462,7 +462,7 @@ export default function LandingPage() {
                             <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
                                 <Shield className="w-6 h-6 md:w-7 md:h-7 text-black stroke-[3px]" />
                             </div>
-                            <span className="font-black tracking-tighter uppercase text-2xl md:text-3xl text-white">CLEARD</span>
+                            <span className="font-black tracking-tighter uppercase text-2xl md:text-3xl text-white">Dayle</span>
                         </div>
                         <p className="text-white text-xs md:text-sm font-black max-w-sm leading-relaxed uppercase tracking-wide">Infrastructure for the global workforce.</p>
                     </div>
@@ -482,7 +482,7 @@ export default function LandingPage() {
                     </div>
                 </div>
                 <div className="max-w-7xl mx-auto mt-16 md:mt-24 lg:mt-32 pt-8 md:pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs md:text-sm font-black text-white uppercase tracking-[0.2em] md:tracking-[0.3em]">
-                    <span>© 2026 Cleard Protocol.</span>
+                    <span>© 2026 Dayle Protocol.</span>
                     <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> All Systems Operational</span>
                 </div>
             </footer>

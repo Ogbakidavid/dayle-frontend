@@ -72,7 +72,7 @@ export default function ClientLayout({ children }) {
                             <Shield className="w-5 h-5 text-black" strokeWidth={2.5} />
                         </div>
                         <div>
-                            <h1 className="text-2xl text-white tracking-tight font-bold uppercase">Cleard</h1>
+                            <h1 className="text-2xl text-white tracking-tight font-bold uppercase">Dayle</h1>
                         </div>
                     </Link>
                 </div>
@@ -162,7 +162,7 @@ export default function ClientLayout({ children }) {
                     >
                         <Menu className="w-5 h-5" />
                     </Button>
-                    <h1 className="text-lg font-bold uppercase">Cleard</h1>
+                    <h1 className="text-lg font-bold uppercase">Dayle</h1>
                     <div className="w-9" /> {/* Spacer for centering */}
                 </div >
 

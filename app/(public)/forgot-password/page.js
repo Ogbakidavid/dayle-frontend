@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
                         <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-emerald-500/20 text-black">
                             <Shield className="w-7 h-7 stroke-[3px]" />
                         </div>
-                        <span className="font-black tracking-tighter text-white text-3xl uppercase">CLEARD</span>
+                        <span className="font-black tracking-tighter text-white text-3xl uppercase">Dayle</span>
                     </Link>
 
                     <h1 className="text-6xl lg:text-7xl font-black text-white leading-[0.95] uppercase tracking-tighter mb-12">

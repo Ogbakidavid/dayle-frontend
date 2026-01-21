@@ -237,7 +237,7 @@ export default function ClientVaultDetailPage() {
             .replace(/ /g, "_")}_v1.zip`,
           requirementId: "REQ-AUTO-01",
           comment: "Automated scan complete. No PII detected.",
-          author: "Cleard AI",
+          author: "Dayle AI",
           createdAt: new Date().toISOString(),
         },
       ],

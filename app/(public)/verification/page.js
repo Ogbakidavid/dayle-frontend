@@ -54,7 +54,7 @@ function VerificationStatusContent() {
             <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
                 <AlertCircle className="w-16 h-16 text-red-500/50 mb-6" />
                 <h1 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Verification Link Invalid</h1>
-                <p className="text-white max-w-sm font-bold uppercase tracking-wide text-sm mb-12">The specific vault node could not be located on the Cleard protocol.</p>
+                <p className="text-white max-w-sm font-bold uppercase tracking-wide text-sm mb-12">The specific vault node could not be located on the Dayle protocol.</p>
                 <Button onClick={() => router.push('/')} variant="ghost" className="text-emerald-500 font-black uppercase tracking-wide text-sm gap-2">
                     <ArrowLeft className="w-4 h-4" /> Return to Protocol
                 </Button>
@@ -124,7 +124,7 @@ function VerificationStatusContent() {
                             <div>
                                 <p className="text-sm font-black text-white uppercase tracking-wide mb-1">Identity</p>
                                 <p className="text-sm font-black text-white uppercase tracking-wide truncate">
-                                    {vault.clientName || 'Cleard Native Client'}
+                                    {vault.clientName || 'Dayle Native Client'}
                                 </p>
                             </div>
                         </div>

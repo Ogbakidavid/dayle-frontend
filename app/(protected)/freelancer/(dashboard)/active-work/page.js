@@ -113,7 +113,7 @@ export default function ActiveWorkPage() {
                       <p className="flex items-center gap-1.5 uppercase font-bold tracking-wide">
                         Client:{" "}
                         <span className="text-gray-400 truncate max-w-[120px] md:max-w-none">
-                          {vault.clientName || "Cleard Client"}
+                          {vault.clientName || "Dayle Client"}
                         </span>
                       </p>
                       <span className="hidden xs:block w-1 h-1 rounded-full bg-gray-800" />
