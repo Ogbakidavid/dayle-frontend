@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -10,9 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Shield, ArrowRight, Loader2, CheckCircle2, User } from 'lucide-react';
 import { api, UserRole } from '@/lib/mock-api';
 
+import { useUser } from '@/lib/store/user-context';
+
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login: contextLogin } = useUser();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -26,7 +31,13 @@ export default function LoginPage() {
     const password = formData.get('password');
 
     try {
-      const user = await api.auth.login(email, password);
+      const user = await contextLogin(email, password);
+
+      if (returnTo) {
+        router.push(returnTo);
+        return;
+      }
+
       if (user.role === UserRole.CLIENT) router.push('/client');
       else if (user.role === UserRole.FREELANCER) router.push('/freelancer');
       else router.push('/onboarding/role');
@@ -186,7 +197,10 @@ export default function LoginPage() {
 
           <p className="mt-12 text-center text-white text-sm font-bold uppercase tracking-wide">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-white hover:text-emerald-500 font-black transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-emerald-500/50">
+            <Link
+              href={returnTo ? `/signup?returnTo=${encodeURIComponent(returnTo)}` : "/signup"}
+              className="text-white hover:text-emerald-500 font-black transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-emerald-500/50"
+            >
               Create account
             </Link>
           </p>

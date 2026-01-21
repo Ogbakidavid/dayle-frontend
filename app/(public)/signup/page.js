@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -10,9 +10,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { api } from '@/lib/mock-api';
 import { ArrowRight, CheckCircle2, Loader2, Shield, User } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { useUser } from '@/lib/store/user-context';
 
 export default function SignupPage() {
     const router = useRouter();
+    const { signup: contextSignup } = useUser();
+    const searchParams = useSearchParams();
+    const returnTo = searchParams.get('returnTo');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -37,7 +41,13 @@ export default function SignupPage() {
 
         setLoading(true);
         try {
-            const user = await api.auth.signup(email, password);
+            await contextSignup(email, password);
+
+            if (returnTo) {
+                router.push(returnTo);
+                return;
+            }
+
             router.push('/verify-email');
         } catch (err) {
             setError('Something went wrong. Please try again.');
@@ -208,7 +218,10 @@ export default function SignupPage() {
 
                     <p className="mt-12 text-center text-white text-sm font-bold uppercase tracking-wide">
                         Already have an account?{' '}
-                        <Link href="/login" className="text-white hover:text-emerald-500 font-black transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-emerald-500/50">
+                        <Link
+                            href={returnTo ? `/login?returnTo=${encodeURIComponent(returnTo)}` : "/login"}
+                            className="text-white hover:text-emerald-500 font-black transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-emerald-500/50"
+                        >
                             Sign In
                         </Link>
                     </p>

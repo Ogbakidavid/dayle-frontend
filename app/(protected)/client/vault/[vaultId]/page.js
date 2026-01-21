@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Link2, Mail, UserPlus } from "lucide-react";
+import { toast } from "sonner";
+import { api } from "@/lib/mock-api";
 import {
   ArrowLeft,
   Shield,
@@ -74,6 +77,25 @@ export default function ClientVaultDetailPage() {
 
   // Find vault from context or use a fallback for safety
   const vault = vaults.find((v) => v.id === vaultId);
+
+  // Invitation State
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [sendingInvite, setSendingInvite] = useState(false);
+  const [latestInvite, setLatestInvite] = useState(null);
+
+  // Fetch latest invitation status for this vault
+  useEffect(() => {
+    async function fetchInviteStatus() {
+      if (!vault || (vault.status !== "FUNDED_UNASSIGNED" && vault.status !== "INVITED")) return;
+      try {
+        const data = await api.invites.getByVaultId(vault.id);
+        setLatestInvite(data);
+      } catch (err) {
+        console.error("Failed to fetch invite status:", err);
+      }
+    }
+    fetchInviteStatus();
+  }, [vault]);
 
   // Memoize generated milestones to prevent re-generation on re-renders,
   // but allow updates via local state overrides
@@ -785,17 +807,137 @@ export default function ClientVaultDetailPage() {
             </Card>
 
             <div className="bg-[#0D0D0E] border border-white/5 rounded-xl p-6 space-y-4">
-              <h4 className="text-sm font-bold text-white uppercase tracking-widest">
-                Contract Documents
-              </h4>
-              <div className="space-y-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-slate-400 hover:text-white h-auto py-3"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  <span className="truncate">Service_Agreement_v2.pdf</span>
-                </Button>
+              {/* Freelancer Assignment Section */}
+              {(vault.status === "FUNDED_UNASSIGNED" || vault.status === "INVITED") && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4">
+                    Freelancer Assignment
+                  </h4>
+                  <Card className={cn(
+                    "bg-white/[0.02] border-white/10 transition-colors",
+                    latestInvite?.status === "DECLINED" && "border-red-500/30 bg-red-500/5"
+                  )}>
+                    <CardContent className="p-4 space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className={cn(
+                          "p-2 rounded-lg",
+                          latestInvite?.status === "DECLINED" ? "bg-red-500/10" : "bg-amber-500/10"
+                        )}>
+                          <UserPlus className={cn(
+                            "w-5 h-5",
+                            latestInvite?.status === "DECLINED" ? "text-red-500" : "text-amber-500"
+                          )} />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="text-sm font-bold text-white">
+                              {latestInvite?.status === "DECLINED"
+                                ? "Freelancer Declined Invitation"
+                                : vault.status === "FUNDED_UNASSIGNED"
+                                  ? "Awaiting Freelancer Assignment"
+                                  : "Invitation Pending"}
+                            </p>
+                            {latestInvite?.status === "DECLINED" && (
+                              <Badge variant="destructive" className="text-[10px] uppercase h-4 px-1">Declined</Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-400">
+                            {latestInvite?.status === "DECLINED"
+                              ? <>
+                                The previous freelancer <span className="text-white">({latestInvite.email})</span> declined this invitation.
+                                {latestInvite.declineReason && (
+                                  <span className="block mt-1 text-red-400/70 italic text-[11px]">
+                                    Reason: {latestInvite.declineReason.replace(/_/g, " ")}
+                                  </span>
+                                )}
+                              </>
+                              : "Enter a freelancer's email address to send them an invitation to this vault."}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 pt-2">
+                        <div>
+                          <Label htmlFor="invite-email" className="text-white text-[10px] font-bold uppercase tracking-widest mb-2 block opacity-50">
+                            REASSIGN FREELANCER
+                          </Label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                            <input
+                              id="invite-email"
+                              type="email"
+                              value={inviteEmail}
+                              onChange={(e) => setInviteEmail(e.target.value)}
+                              placeholder="freelancer@example.com"
+                              className="w-full bg-black/60 border border-white/10 rounded-lg px-10 py-2.5 text-white text-sm placeholder:text-slate-500 focus:border-emerald-500/50 focus:outline-none transition-all"
+                            />
+                          </div>
+                        </div>
+
+                        <Button
+                          onClick={() => {
+                            if (!inviteEmail) {
+                              toast.error("Please enter a valid email address");
+                              return;
+                            }
+                            setSendingInvite(true);
+                            // Simulate sending invitation
+                            setTimeout(() => {
+                              toast.success(`Invitation sent to ${inviteEmail}`);
+                              setInviteEmail("");
+                              setSendingInvite(false);
+                              setLatestInvite({
+                                vaultId: vault.id,
+                                email: inviteEmail,
+                                status: "PENDING",
+                                invitedAt: new Date().toISOString()
+                              });
+                            }, 1000);
+                          }}
+                          disabled={sendingInvite || !inviteEmail}
+                          className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-xs h-10"
+                        >
+                          {sendingInvite ? "Sending..." : "Send New Invitation"}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              <div>
+                <h4 className="text-sm font-bold text-white uppercase tracking-widest">
+                  Contract Documents
+                </h4>
+                <div className="space-y-2">
+                  {/* DEV ONLY: Invitation Link Generator */}
+                  {(vault.id === "v_invite_test" || vault.status === "INVITED" || vault.status === "FUNDED_UNASSIGNED") && (
+                    <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                      <p className="text-xs text-emerald-500 font-bold uppercase mb-2">Dev Helper: Invites</p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                        onClick={() => {
+                          // Hardcoded token for the test, normally this would come from API
+                          const token = "invite_valid_123";
+                          navigator.clipboard.writeText(`${window.location.origin}/invite/${token}`);
+                          toast.success("Invitation link copied to clipboard");
+                        }}
+                      >
+                        <Link2 className="w-3 h-3 mr-2" />
+                        Copy Test Invite Link
+                      </Button>
+                    </div>
+                  )}
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-slate-400 hover:text-white h-auto py-3"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    <span className="truncate">Service_Agreement_v2.pdf</span>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

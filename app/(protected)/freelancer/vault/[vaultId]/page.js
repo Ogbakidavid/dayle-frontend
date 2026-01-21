@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { api } from "@/lib/mock-api";
 import {
   Upload,
   FileText,
@@ -43,7 +44,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { EvidencePanel } from "@/components/shared/EvidencePanel";
-import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 import { getDisputeEligibility } from "@/lib/rules/disputes";
 
@@ -51,10 +51,28 @@ export default function FreelancerVaultDetailPage() {
   const params = useParams();
   const router = useRouter();
   const vaultId = params.vaultId;
-  const { vaults, loading: vaultsLoading } = useVault();
 
-  // Find vault from context
-  const vault = vaults.find((v) => v.id === vaultId);
+  // Fetch vault directly by ID instead of relying on context
+  const [vault, setVault] = useState(null);
+  const [vaultsLoading, setVaultsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadVault() {
+      try {
+        setVaultsLoading(true);
+        const data = await api.vaults.getById(vaultId);
+        setVault(data);
+      } catch (err) {
+        console.error("Failed to load vault:", err);
+        setVault(null);
+      } finally {
+        setVaultsLoading(false);
+      }
+    }
+    if (vaultId) {
+      loadVault();
+    }
+  }, [vaultId]);
 
   // Local State for interactive mock submission
   const [activeSubmit, setActiveSubmit] = useState(null);
@@ -87,7 +105,12 @@ export default function FreelancerVaultDetailPage() {
     if (vault.milestones && vault.milestones.length > 0) {
       baseMilestones = vault.milestones;
     } else {
-      // Generate mock milestones based on type
+      // If no milestones (e.g. freshly accepted invite), we might return empty or a placeholder
+      if (vault.status === "FUNDED_ASSIGNED" || vault.status === "AWAITING_FUNDING") {
+        return [];
+      }
+
+      // Generate mock milestones based on type for other active states
       if (vault.type === "development") {
         baseMilestones.push(
           {
@@ -243,8 +266,17 @@ export default function FreelancerVaultDetailPage() {
   }
 
   if (!vault) {
+    // Debug info to help understand why access might be denied
     return (
-      <div className="p-10 text-red-500">Vault not found or access denied.</div>
+      <div className="p-10 text-red-500">
+        <h2 className="text-xl font-bold mb-2">Vault not found or access denied.</h2>
+        <p className="text-sm opacity-70">
+          Please check if you are logged in as the correct freelancer.
+        </p>
+        <Link href="/freelancer">
+          <Button variant="outline" className="mt-4">Return to Dashboard</Button>
+        </Link>
+      </div>
     );
   }
 
@@ -260,6 +292,7 @@ export default function FreelancerVaultDetailPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </button>
+
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3 mb-2">
