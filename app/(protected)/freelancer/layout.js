@@ -23,6 +23,27 @@ import {
 import { useUser } from "@/lib/store/user-context";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { motion } from "framer-motion";
+
+const sidebarVariants = {
+  hidden: { x: -280, opacity: 0 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    transition: {
+      type: "tween",
+      ease: "circOut",
+      duration: 0.4,
+      staggerChildren: 0.05,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0 },
+};
 
 const navigation = [
   { name: "Overview", href: "/freelancer", icon: LayoutDashboard, badge: null },
@@ -54,11 +75,15 @@ export default function FreelancerLayout({ children }) {
       )}
 
       {/* Left Sidebar - Professional Dark Theme */}
-      <aside className={cn(
-        "w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col h-screen transition-transform duration-300 ease-in-out",
-        "fixed lg:sticky top-0 z-50 lg:z-auto",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-      )}>
+      <motion.aside
+        initial="hidden"
+        animate="visible"
+        variants={sidebarVariants}
+        className={cn(
+          "w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col h-screen transition-transform duration-300 ease-in-out",
+          "fixed lg:sticky top-0 z-50 lg:z-auto",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        )}>
         {/* Logo & Brand */}
         <div className="p-6 pb-4">
           <Link href="/freelancer" className="flex items-center gap-3 group">
@@ -79,7 +104,8 @@ export default function FreelancerLayout({ children }) {
             const isActive = pathname === item.href;
             return (
               <Link key={item.name} href={item.href}>
-                <div
+                <motion.div
+                  variants={itemVariants}
                   className={cn(
                     "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                     isActive
@@ -110,7 +136,7 @@ export default function FreelancerLayout({ children }) {
                       {item.badge}
                     </span>
                   )}
-                </div>
+                </motion.div>
               </Link>
             );
           })}
@@ -162,7 +188,7 @@ export default function FreelancerLayout({ children }) {
             </Button>
           </div>
         </div>
-      </aside>
+      </motion.aside>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">

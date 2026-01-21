@@ -7,6 +7,23 @@ import { Button } from "@/components/ui/button";
 import { getLedgerEntries, getVaultById } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 import { Search, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 const statusStyles = {
   completed: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -36,17 +53,22 @@ export function GlobalLedgerView({ role }) {
     .reduce((sum, entry) => sum + entry.amount, 0);
 
   return (
-    <div className="space-y-8">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-8"
+    >
       <header className="space-y-2">
-        <div className="text-xs font-black uppercase tracking-wide text-emerald-400">
+        <motion.div variants={itemVariants} className="text-xs font-black uppercase tracking-wide text-emerald-400">
           Global Ledger
-        </div>
-        <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase">
+        </motion.div>
+        <motion.h1 variants={itemVariants} className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase">
           Settlement Activity
-        </h1>
-        <p className="text-sm font-bold text-white uppercase tracking-wide">
+        </motion.h1>
+        <motion.p variants={itemVariants} className="text-sm font-bold text-white uppercase tracking-wide">
           USD-only ledger view with processing states for all vault movements.
-        </p>
+        </motion.p>
       </header>
 
       <div className="grid md:grid-cols-3 gap-4">
@@ -58,20 +80,25 @@ export function GlobalLedgerView({ role }) {
           { label: "Completed", value: `$${completedTotal.toLocaleString()}` },
           { label: "Entries", value: `${entries.length}` },
         ].map((stat) => (
-          <Card key={stat.label} className="bg-[#111111] border-white/10">
-            <CardContent className="py-6">
-              <p className="text-xs font-black uppercase tracking-wide text-white/30">
-                {stat.label}
-              </p>
-              <p className="text-3xl font-black text-white mt-1 tracking-tighter">
-                {stat.value}
-              </p>
-            </CardContent>
-          </Card>
+          <motion.div
+            variants={itemVariants}
+            key={stat.label}
+          >
+            <Card className="bg-[#111111] border-white/10">
+              <CardContent className="py-6">
+                <p className="text-xs font-black uppercase tracking-wide text-white/30">
+                  {stat.label}
+                </p>
+                <p className="text-3xl font-black text-white mt-1 tracking-tighter">
+                  {stat.value}
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
 
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <input
@@ -89,85 +116,87 @@ export function GlobalLedgerView({ role }) {
             Back to dashboard
           </Button>
         </Link>
-      </div>
+      </motion.div>
 
-      <Card className="bg-[#111111] border-white/10">
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="border-b border-white/5">
-                <tr className="text-[10px] md:text-xs font-black uppercase tracking-wide text-white/30">
-                  <th className="px-4 md:px-6 py-4">Entry</th>
-                  <th className="hidden md:table-cell px-6 py-4">Vault</th>
-                  <th className="px-4 md:px-6 py-4 text-center sm:text-left">Status</th>
-                  <th className="px-4 md:px-6 py-4 text-right">Amount (USD)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {filtered.map((entry) => {
-                  const vault = getVaultById(entry.vaultId);
-                  return (
-                    <tr key={entry.id} className="hover:bg-white/[0.02]">
-                      <td className="px-4 md:px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={cn(
-                              "hidden xs:flex w-9 h-9 rounded-lg items-center justify-center border shrink-0",
-                              entry.type === "release"
-                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                : "bg-blue-500/10 border-blue-500/20 text-blue-400"
-                            )}
-                          >
-                            {entry.type === "release" ? (
-                              <ArrowUpRight className="w-4 h-4" />
-                            ) : (
-                              <ArrowDownLeft className="w-4 h-4" />
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm text-white font-black uppercase tracking-tight truncate">
-                              {entry.description}
-                            </p>
-                            <p className="text-[10px] md:text-sm uppercase font-black tracking-wide text-white/30 truncate">
-                              {entry.id}
-                            </p>
-                            <div className="md:hidden mt-1 text-[10px] text-white/50 font-bold uppercase tracking-wide">
-                              {vault?.title || "Vault"} • {new Date(entry.date).toLocaleDateString()}
+      <motion.div variants={itemVariants}>
+        <Card className="bg-[#111111] border-white/10">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="border-b border-white/5">
+                  <tr className="text-[10px] md:text-xs font-black uppercase tracking-wide text-white/30">
+                    <th className="px-4 md:px-6 py-4">Entry</th>
+                    <th className="hidden md:table-cell px-6 py-4">Vault</th>
+                    <th className="px-4 md:px-6 py-4 text-center sm:text-left">Status</th>
+                    <th className="px-4 md:px-6 py-4 text-right">Amount (USD)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {filtered.map((entry) => {
+                    const vault = getVaultById(entry.vaultId);
+                    return (
+                      <tr key={entry.id} className="hover:bg-white/[0.02]">
+                        <td className="px-4 md:px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={cn(
+                                "hidden xs:flex w-9 h-9 rounded-lg items-center justify-center border shrink-0",
+                                entry.type === "release"
+                                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                  : "bg-blue-500/10 border-blue-500/20 text-blue-400"
+                              )}
+                            >
+                              {entry.type === "release" ? (
+                                <ArrowUpRight className="w-4 h-4" />
+                              ) : (
+                                <ArrowDownLeft className="w-4 h-4" />
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm text-white font-black uppercase tracking-tight truncate">
+                                {entry.description}
+                              </p>
+                              <p className="text-[10px] md:text-sm uppercase font-black tracking-wide text-white/30 truncate">
+                                {entry.id}
+                              </p>
+                              <div className="md:hidden mt-1 text-[10px] text-white/50 font-bold uppercase tracking-wide">
+                                {vault?.title || "Vault"} • {new Date(entry.date).toLocaleDateString()}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="hidden md:table-cell px-6 py-4">
-                        <p className="text-sm text-white/70">
-                          {vault?.title || "Vault"}
-                        </p>
-                        <p className="text-xs text-white">
-                          {new Date(entry.date).toLocaleDateString()}
-                        </p>
-                      </td>
-                      <td className="px-4 md:px-6 py-4">
-                        <div className="flex justify-center sm:justify-start">
-                          <span
-                            className={cn(
-                              "px-2 py-0.5 md:py-1 text-[10px] md:text-sm font-bold uppercase tracking-wide rounded-full border",
-                              statusStyles[entry.status]
-                            )}
-                          >
-                            {entry.status}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 md:px-6 py-4 text-right text-sm font-bold text-white">
-                        ${entry.amount.toLocaleString()}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                        </td>
+                        <td className="hidden md:table-cell px-6 py-4">
+                          <p className="text-sm text-white/70">
+                            {vault?.title || "Vault"}
+                          </p>
+                          <p className="text-xs text-white">
+                            {new Date(entry.date).toLocaleDateString()}
+                          </p>
+                        </td>
+                        <td className="px-4 md:px-6 py-4">
+                          <div className="flex justify-center sm:justify-start">
+                            <span
+                              className={cn(
+                                "px-2 py-0.5 md:py-1 text-[10px] md:text-sm font-bold uppercase tracking-wide rounded-full border",
+                                statusStyles[entry.status]
+                              )}
+                            >
+                              {entry.status}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 md:px-6 py-4 text-right text-sm font-bold text-white">
+                          ${entry.amount.toLocaleString()}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 }

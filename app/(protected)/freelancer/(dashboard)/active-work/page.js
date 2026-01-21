@@ -5,6 +5,23 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Briefcase, ArrowUpRight, LayoutGrid, Activity } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 export default function ActiveWorkPage() {
   const { vaults, loading } = useVault();
@@ -22,7 +39,12 @@ export default function ActiveWorkPage() {
   );
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-8 max-w-6xl mx-auto"
+    >
       {/* Breadcrumbs / Header */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm font-black text-slate-500 uppercase tracking-wide">
@@ -37,14 +59,14 @@ export default function ActiveWorkPage() {
         </div>
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-1">
+          <motion.div variants={itemVariants} className="space-y-1">
             <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase flex items-center gap-3">
               Active Assignments
             </h1>
             <p className="text-xs md:text-sm text-white/50 font-bold uppercase tracking-wide">
               Manage your ongoing contracts and deliverables
             </p>
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -157,6 +179,6 @@ export default function ActiveWorkPage() {
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

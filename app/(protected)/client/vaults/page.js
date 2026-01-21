@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Lock,
@@ -22,6 +23,22 @@ import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 
 // Local mock data removed in favor of central vault-context
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 export default function VaultsPage() {
   const { vaults, loading } = useVault();
@@ -69,19 +86,24 @@ export default function VaultsPage() {
   ];
 
   return (
-    <div className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30"
+    >
       <div className="max-w-7xl mx-auto px-6 space-y-10">
         {/* 1. TOP NAVIGATION / HEADER */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
-          <div className="space-y-1">
+          <motion.div variants={itemVariants} className="space-y-1">
             <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase">
               Financial Vaults
             </h1>
             <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide">
               Overview of your smart-escrow deployments
             </p>
-          </div>
-          <div className="flex items-center gap-3">
+          </motion.div>
+          <motion.div variants={itemVariants} className="flex items-center gap-3">
             <Button
               variant="outline"
               className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all"
@@ -95,13 +117,14 @@ export default function VaultsPage() {
                 New Vault
               </Button>
             </Link>
-          </div>
+          </motion.div>
         </header>
 
         {/* 2. ANALYTICS GRID */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {stats.map((stat, i) => (
-            <div
+            <motion.div
+              variants={itemVariants}
               key={i}
               className="relative group bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl overflow-hidden hover:border-white/10 transition-all"
             >
@@ -125,12 +148,12 @@ export default function VaultsPage() {
               <h2 className="text-3xl font-black text-white tracking-tighter">
                 {stat.value}
               </h2>
-            </div>
+            </motion.div>
           ))}
         </section>
 
         {/* 3. SEARCH & TOOLS */}
-        <div className="relative group">
+        <motion.div variants={itemVariants} className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
           <input
             type="search"
@@ -139,10 +162,10 @@ export default function VaultsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-3 md:py-4 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner font-bold uppercase tracking-wide text-sm md:text-base"
           />
-        </div>
+        </motion.div>
 
         {/* 4. DATA TABLE (LIST) */}
-        <div className="bg-[#0D0D0E] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+        <motion.div variants={itemVariants} className="bg-[#0D0D0E] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
@@ -263,7 +286,7 @@ export default function VaultsPage() {
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
 
         {/* 5. FOOTER SUMMARY */}
         <footer className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-white/5">
@@ -321,6 +344,6 @@ export default function VaultsPage() {
           </div>
         </footer>
       </div>
-    </div>
+    </motion.div>
   );
 }

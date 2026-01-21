@@ -7,6 +7,28 @@ import { Shield, LayoutDashboard, Plus, Wallet, LogOut, Settings, Bell, Search, 
 import { useUser } from '@/lib/store/user-context';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
+
+const sidebarVariants = {
+    hidden: { x: -280, opacity: 0 },
+    visible: {
+        x: 0,
+        opacity: 1,
+        transition: {
+            // Using a standard tween for smoother, less "bouncy" feel
+            type: "tween",
+            ease: "circOut",
+            duration: 0.4,
+            staggerChildren: 0.05,
+            delayChildren: 0.05 // Drastically reduced from 0.2 to prevent "hanging"
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 }
+};
 
 const navigation = [
     { name: 'Overview', href: '/client', icon: LayoutDashboard, badge: null },
@@ -34,11 +56,15 @@ export default function ClientLayout({ children }) {
             )}
 
             {/* Left Sidebar - Professional Dark Theme */}
-            <aside className={cn(
-                "w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col h-screen transition-transform duration-300 ease-in-out",
-                "fixed lg:sticky top-0 z-50 lg:z-auto",
-                sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-            )}>
+            <motion.aside
+                initial="hidden"
+                animate="visible"
+                variants={sidebarVariants}
+                className={cn(
+                    "w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col h-screen transition-transform duration-300 ease-in-out",
+                    "fixed lg:sticky top-0 z-50 lg:z-auto",
+                    sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+                )}>
                 {/* Logo & Brand */}
                 <div className="p-6 pb-4">
                     <Link href="/client" className="flex items-center gap-3 group">
@@ -57,12 +83,14 @@ export default function ClientLayout({ children }) {
                         const isActive = pathname === item.href;
                         return (
                             <Link key={item.name} href={item.href}>
-                                <div className={cn(
-                                    "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
-                                    isActive
-                                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wide"
-                                        : "text-white/60 hover:bg-white/5 hover:text-white font-bold uppercase tracking-wide"
-                                )}>
+                                <motion.div
+                                    variants={itemVariants}
+                                    className={cn(
+                                        "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
+                                        isActive
+                                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wide"
+                                            : "text-white/60 hover:bg-white/5 hover:text-white font-bold uppercase tracking-wide"
+                                    )}>
                                     <div className="flex items-center gap-3">
                                         <item.icon className={cn(
                                             "w-4 h-4 transition-colors font-bold uppercase",
@@ -80,7 +108,7 @@ export default function ClientLayout({ children }) {
                                             {item.badge}
                                         </span>
                                     )}
-                                </div>
+                                </motion.div>
                             </Link>
                         );
                     })}
@@ -120,12 +148,12 @@ export default function ClientLayout({ children }) {
                         </Button>
                     </div>
                 </div>
-            </aside>
+            </motion.aside>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col min-w-0">
+            < div className="flex-1 flex flex-col min-w-0" >
                 {/* Mobile Header */}
-                <div className="lg:hidden sticky top-0 z-30 bg-[#111111] border-b border-gray-900 p-4 flex items-center justify-between">
+                < div className="lg:hidden sticky top-0 z-30 bg-[#111111] border-b border-gray-900 p-4 flex items-center justify-between" >
                     <Button
                         variant="ghost"
                         size="sm"
@@ -136,17 +164,17 @@ export default function ClientLayout({ children }) {
                     </Button>
                     <h1 className="text-lg font-bold uppercase">Cleard</h1>
                     <div className="w-9" /> {/* Spacer for centering */}
-                </div>
+                </div >
 
                 {/* Content Area */}
-                <main className="flex-1 overflow-y-auto bg-[#0A0A0A]">
+                < main className="flex-1 overflow-y-auto bg-[#0A0A0A]" >
                     <div className="p-4 lg:p-8">
                         <div className="max-w-7xl mx-auto">
                             {children}
                         </div>
                     </div>
-                </main>
-            </div>
-        </div>
+                </main >
+            </div >
+        </div >
     );
 }

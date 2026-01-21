@@ -4,9 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
-import { Shield, ArrowRight, Loader2, CheckCircle2, Lock, ArrowLeft } from 'lucide-react';
+import { Shield, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 
 export default function ResetPasswordPage() {
     const router = useRouter();
@@ -104,30 +104,26 @@ export default function ResetPasswordPage() {
                                 <div className="space-y-3">
                                     <Label htmlFor="password" className="text-sm font-black uppercase tracking-wide text-white ml-1">New Password</Label>
                                     <div className="relative group">
-                                        <Input
+                                        <PasswordInput
                                             id="password"
                                             name="password"
-                                            type="password"
                                             placeholder="••••••••"
                                             required
                                             className="!bg-[#0a0a0a] border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
                                         />
-                                        <Lock className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
                                     <Label htmlFor="confirmPassword" className="text-sm font-black uppercase tracking-wide text-white ml-1">Confirm New Password</Label>
                                     <div className="relative group">
-                                        <Input
+                                        <PasswordInput
                                             id="confirmPassword"
                                             name="confirmPassword"
-                                            type="password"
                                             placeholder="••••••••"
                                             required
                                             className="!bg-[#0a0a0a] border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] autofill:text-fill-white"
                                         />
-                                        <Lock className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                                     </div>
                                 </div>
 

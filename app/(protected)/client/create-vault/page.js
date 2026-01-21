@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,11 +31,43 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+
+const variants = {
+  enter: (direction) => ({
+    x: direction > 0 ? 1000 : -1000,
+    opacity: 0,
+    scale: 0.95,
+  }),
+  center: {
+    zIndex: 1,
+    x: 0,
+    opacity: 1,
+    scale: 1,
+  },
+  exit: (direction) => ({
+    zIndex: 0,
+    x: direction < 0 ? 1000 : -1000,
+    opacity: 0,
+    scale: 0.95,
+  }),
+};
 
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 
 export default function CreateVaultPage() {
-  const [step, setStep] = useState(1);
+  const router = useRouter();
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [[page, direction], setPage] = useState([1, 0]);
+  const step = page;
+
+  const paginate = (newDirection) => {
+    setPage([page + newDirection, newDirection]);
+  };
+
+  const setStep = (newStep) => {
+    setPage([newStep, newStep > step ? 1 : -1]);
+  };
 
   // Step 1 State
   const [vaultPurpose, setVaultPurpose] = useState("");
@@ -127,28 +160,52 @@ export default function CreateVaultPage() {
     setTotalAmount(total);
   };
 
+  const handleDeploy = () => {
+    setIsDeploying(true);
+    setTimeout(() => {
+      router.push("/checkout/new-vault-id");
+    }, 2000);
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] py-8 md:py-12 px-3 md:px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8 md:mb-12 text-center">
-          <h1 className="text-2xl md:text-3xl font-black text-white mb-3 tracking-tighter uppercase">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-2xl md:text-3xl font-black text-white mb-3 tracking-tighter uppercase"
+          >
             Create New Vault
-          </h1>
-          <p className="text-white/70 text-sm md:text-base font-bold uppercase tracking-wide">
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-white/70 text-sm md:text-base font-bold uppercase tracking-wide"
+          >
             Define objective conditions for capital release
-          </p>
+          </motion.p>
         </div>
 
         {/* Progress Tracker */}
         <div className="flex items-center justify-between mb-12 md:mb-16 relative px-2">
-          <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 -translate-y-1/2" />
-          {steps.map((s) => (
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.8, ease: "circOut" }}
+            className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 -translate-y-1/2 origin-left"
+          />
+          {steps.map((s, i) => (
             <div
               key={s.id}
               className="relative z-10 flex flex-col items-center gap-2 md:gap-3"
             >
-              <div
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: i * 0.1 }}
                 className={cn(
                   "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border transition-all duration-300",
                   step === s.id
@@ -163,569 +220,627 @@ export default function CreateVaultPage() {
                 ) : (
                   <s.icon className="w-3 h-3 md:w-4 md:h-4" />
                 )}
-              </div>
-              <span
+              </motion.div>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 + (i * 0.1) }}
                 className={cn(
                   "text-xs md:text-sm uppercase tracking-wide font-medium",
                   step === s.id ? "text-white" : "text-white"
                 )}
               >
                 {s.name}
-              </span>
+              </motion.span>
             </div>
           ))}
         </div>
 
         {/* Form Container */}
-        <div className="bg-[#0D0D0D] border border-gray-900 rounded-lg p-8 shadow-xl">
-          {/* STEP 1: BASICS / PURPOSE */}
-          {step === 1 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
-              <div className="space-y-4">
-                <Label className="text-sm font-bold uppercase tracking-wide text-white-200">
-                  What work are you securing payment for? *
-                </Label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
-                  {Object.entries(VAULT_PURPOSE_MAPPING).map(([key, value]) => {
-                    const Icon = value.icon;
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => setVaultPurpose(key)}
-                        className={cn(
-                          "flex flex-col items-center gap-3 p-4 border rounded-md transition-all",
-                          vaultPurpose === key
-                            ? "border-emerald-500 bg-emerald-500/5 text-emerald-400"
-                            : "border-gray-800 bg-black text-white/50 hover:border-gray-700"
-                        )}
-                      >
-                        <Icon className="w-6 h-6" />
-                        <span className="text-sm font-bold uppercase tracking-wide">
-                          {value.label}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
-                    Vault Title *
-                  </Label>
-                  <Input
-                    value={vaultTitle}
-                    onChange={(e) => setVaultTitle(e.target.value)}
-                    placeholder="e.g., Q1 Mobile App Sprint"
-                    className="bg-black border-gray-800 h-12 focus:border-emerald-500 text-white placeholder:text-gray-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
-                    Contract Budget (Target) *
-                  </Label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-                    <Input
-                      type="number"
-                      value={budgetAmount}
-                      onChange={(e) => setBudgetAmount(e.target.value)}
-                      placeholder="0.00"
-                      className="bg-black border-gray-800 h-12 pl-10 focus:border-emerald-500 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
-                    Brief Description *
-                  </Label>
-                  <Textarea
-                    value={vaultDescription}
-                    onChange={(e) => setVaultDescription(e.target.value)}
-                    placeholder="Describe the overall scope and deliverables..."
-                    className="bg-black border-gray-800 min-h-[120px] focus:border-emerald-500 text-white placeholder:text-gray-400"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 2: PURPOSE-DRIVEN MILESTONES */}
-          {step === 2 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold uppercase tracking-tight text-white underline decoration-emerald-500/50 underline-offset-8">
-                  {VAULT_PURPOSE_MAPPING[vaultPurpose]?.label} Milestones
-                </h2>
-              </div>
-
-              {/* BUDGET TRACKER */}
-              <div className="bg-[#0A0A0A] border border-gray-800 p-5 rounded-xl space-y-3">
-                <div className="flex justify-between items-end">
-                  <div className="space-y-1">
-                    <p className="text-sm uppercase text-white-500 font-black tracking-wide">
-                      Allocation Tracker
-                    </p>
-                    <p
-                      className={cn(
-                        "text-lg font-bold tracking-tight",
-                        totalAmount > budgetAmount
-                          ? "text-red-500"
-                          : "text-white"
-                      )}
-                    >
-                      ${totalAmount.toLocaleString()}{" "}
-                      <span className="text-white-600 font-medium text-sm">
-                        / ${Number(budgetAmount).toLocaleString()}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    {totalAmount > budgetAmount ? (
-                      <div className="flex items-center gap-1.5 text-red-500 animate-pulse">
-                        <AlertCircle className="w-3 h-3" />
-                        <span className="text-sm font-black uppercase tracking-wide">
-                          Over Budget
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 text-emerald-500">
-                        <TrendingDown className="w-3 h-3" />
-                        <span className="text-sm font-black uppercase tracking-wide">
-                          ${(budgetAmount - totalAmount).toLocaleString()}{" "}
-                          Remaining
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="h-1.5 bg-gray-900 rounded-full overflow-hidden shadow-inner">
-                  <div
-                    className={cn(
-                      "h-full transition-all duration-500 ease-out rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]",
-                      totalAmount > budgetAmount
-                        ? "bg-red-500"
-                        : "bg-emerald-500"
-                    )}
-                    style={{
-                      width: `${Math.min(
-                        (totalAmount / budgetAmount) * 100,
-                        100
-                      )}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {milestones.map((m, i) => (
-                <div
-                  key={i}
-                  className="bg-black border border-gray-800 p-6 rounded-lg space-y-4 relative group"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-emerald-500 font-bold uppercase tracking-tighter">
-                      Phase 0{i + 1}
-                    </span>
-                    {milestones.length > 1 && (
-                      <button onClick={() => removeMilestone(i)}>
-                        <Trash2 className="w-4 h-4 text-white hover:text-red-500 transition-colors" />
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4">
-                    <Input
-                      placeholder="What is being delivered?"
-                      value={m.title}
-                      onChange={(e) =>
-                        updateMilestone(i, "title", e.target.value)
-                      }
-                      className="bg-[#0A0A0A] border-gray-800 text-white h-11 placeholder:text-gray-400"
-                    />
-
-                    {/* Milestone Type Selection */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                      <button
-                        onClick={() => updateMilestone(i, "type", "COMPLIANCE")}
-                        className={cn(
-                          "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
-                          m.type === "COMPLIANCE"
-                            ? "bg-emerald-500/10 border-emerald-500 text-emerald-500"
-                            : "bg-[#0A0A0A] border-gray-800 text-white/50 hover:border-gray-700"
-                        )}
-                      >
-                        <ShieldCheck className="w-5 h-5" />
-                        <div className="text-center">
-                          <p className="text-xs font-bold uppercase tracking-wide">
-                            Compliance
-                          </p>
-                          <p className="text-sm opacity-70 font-bold uppercase tracking-wide">
-                            Auto-release on pass
-                          </p>
-                        </div>
-                      </button>
-
-                      <button
-                        onClick={() => updateMilestone(i, "type", "APPROVAL")}
-                        className={cn(
-                          "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
-                          m.type === "APPROVAL"
-                            ? "bg-amber-500/10 border-amber-500 text-amber-500"
-                            : "bg-[#0A0A0A] border-gray-800 text-white/50 hover:border-gray-700"
-                        )}
-                      >
-                        <ShieldCheck className="w-5 h-5" />
-                        <div className="text-center">
-                          <p className="text-xs font-bold uppercase tracking-wide">
-                            Approval
-                          </p>
-                          <p className="text-sm opacity-70 font-bold uppercase tracking-wide">
-                            Client sign-off required
-                          </p>
-                        </div>
-                      </button>
+        <div className="relative overflow-hidden min-h-[600px]">
+          <AnimatePresence initial={false} custom={direction} mode="wait">
+            <motion.div
+              key={page}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 },
+              }}
+              className="bg-[#0D0D0D] border border-gray-900 rounded-lg p-8 shadow-xl w-full"
+            >
+              {/* STEP 1: BASICS / PURPOSE */}
+              {step === 1 && (
+                <div className="space-y-8">
+                  <div className="space-y-4">
+                    <Label className="text-sm font-bold uppercase tracking-wide text-white-200">
+                      What work are you securing payment for? *
+                    </Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+                      {Object.entries(VAULT_PURPOSE_MAPPING).map(([key, value], idx) => {
+                        const Icon = value.icon;
+                        return (
+                          <motion.button
+                            key={key}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.05 }}
+                            whileHover={{ scale: 1.05, backgroundColor: "rgba(16, 185, 129, 0.1)" }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setVaultPurpose(key)}
+                            className={cn(
+                              "flex flex-col items-center gap-3 p-4 border rounded-md transition-all",
+                              vaultPurpose === key
+                                ? "border-emerald-500 bg-emerald-500/5 text-emerald-400"
+                                : "border-gray-800 bg-black text-white/50 hover:border-gray-700"
+                            )}
+                          >
+                            <Icon className="w-6 h-6" />
+                            <span className="text-sm font-bold uppercase tracking-wide">
+                              {value.label}
+                            </span>
+                          </motion.button>
+                        );
+                      })}
                     </div>
+                  </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
+                        Vault Title *
+                      </Label>
+                      <Input
+                        value={vaultTitle}
+                        onChange={(e) => setVaultTitle(e.target.value)}
+                        placeholder="e.g., Q1 Mobile App Sprint"
+                        className="bg-black border-gray-800 h-12 focus:border-emerald-500 text-white placeholder:text-gray-400"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
+                        Contract Budget (Target) *
+                      </Label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50 text-sm">
-                          $
-                        </span>
+                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
                         <Input
                           type="number"
-                          placeholder="Amount"
-                          value={m.amount}
-                          onChange={(e) =>
-                            updateMilestone(i, "amount", e.target.value)
-                          }
-                          className="bg-[#0A0A0A] border-gray-800 text-white pl-7 h-11 placeholder:text-gray-400"
+                          value={budgetAmount}
+                          onChange={(e) => setBudgetAmount(e.target.value)}
+                          placeholder="0.00"
+                          className="bg-black border-gray-800 h-12 pl-10 focus:border-emerald-500 text-white placeholder:text-gray-400"
                         />
                       </div>
-                      <Input
-                        type="date"
-                        value={m.dueDate}
-                        onChange={(e) =>
-                          updateMilestone(i, "dueDate", e.target.value)
-                        }
-                        className="bg-[#0A0A0A] border-gray-800 text-white h-11 [color-scheme:dark]"
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
+                        Brief Description *
+                      </Label>
+                      <Textarea
+                        value={vaultDescription}
+                        onChange={(e) => setVaultDescription(e.target.value)}
+                        placeholder="Describe the overall scope and deliverables..."
+                        className="bg-black border-gray-800 min-h-[120px] focus:border-emerald-500 text-white placeholder:text-gray-400"
                       />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 2: PURPOSE-DRIVEN MILESTONES */}
+              {step === 2 && (
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold uppercase tracking-tight text-white underline decoration-emerald-500/50 underline-offset-8">
+                      {VAULT_PURPOSE_MAPPING[vaultPurpose]?.label} Milestones
+                    </h2>
+                  </div>
+
+                  {/* BUDGET TRACKER */}
+                  <div className="bg-[#0A0A0A] border border-gray-800 p-5 rounded-xl space-y-3">
+                    <div className="flex justify-between items-end">
+                      <div className="space-y-1">
+                        <p className="text-sm uppercase text-white-500 font-black tracking-wide">
+                          Allocation Tracker
+                        </p>
+                        <p
+                          className={cn(
+                            "text-lg font-bold tracking-tight",
+                            totalAmount > budgetAmount
+                              ? "text-red-500"
+                              : "text-white"
+                          )}
+                        >
+                          ${totalAmount.toLocaleString()}{" "}
+                          <span className="text-white-600 font-medium text-sm">
+                            / ${Number(budgetAmount).toLocaleString()}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        {totalAmount > budgetAmount ? (
+                          <div className="flex items-center gap-1.5 text-red-500 animate-pulse">
+                            <AlertCircle className="w-3 h-3" />
+                            <span className="text-sm font-black uppercase tracking-wide">
+                              Over Budget
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5 text-emerald-500">
+                            <TrendingDown className="w-3 h-3" />
+                            <span className="text-sm font-black uppercase tracking-wide">
+                              ${(budgetAmount - totalAmount).toLocaleString()}{" "}
+                              Remaining
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="h-1.5 bg-gray-900 rounded-full overflow-hidden shadow-inner">
+                      <motion.div
+                        className={cn(
+                          "h-full rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]",
+                          totalAmount > budgetAmount
+                            ? "bg-red-500"
+                            : "bg-emerald-500"
+                        )}
+                        initial={{ width: 0 }}
+                        animate={{
+                          width: `${Math.min((totalAmount / budgetAmount) * 100, 100)}%`
+                        }}
+                        transition={{ duration: 0.5, ease: "circOut" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <AnimatePresence>
+                      {milestones.map((m, i) => (
+                        <motion.div
+                          key={i} // Use a stable ID if possible ideally, but index works for append-only logic mostly
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                          className="bg-black border border-gray-800 p-6 rounded-lg space-y-4 relative group overflow-hidden"
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-emerald-500 font-bold uppercase tracking-tighter">
+                              Phase 0{i + 1}
+                            </span>
+                            {milestones.length > 1 && (
+                              <button onClick={() => removeMilestone(i)}>
+                                <Trash2 className="w-4 h-4 text-white hover:text-red-500 transition-colors" />
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4">
+                            <Input
+                              placeholder="What is being delivered?"
+                              value={m.title}
+                              onChange={(e) =>
+                                updateMilestone(i, "title", e.target.value)
+                              }
+                              className="bg-[#0A0A0A] border-gray-800 text-white h-11 placeholder:text-gray-400"
+                            />
+
+                            {/* Milestone Type Selection */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                              <button
+                                onClick={() => updateMilestone(i, "type", "COMPLIANCE")}
+                                className={cn(
+                                  "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
+                                  m.type === "COMPLIANCE"
+                                    ? "bg-emerald-500/10 border-emerald-500 text-emerald-500"
+                                    : "bg-[#0A0A0A] border-gray-800 text-white/50 hover:border-gray-700"
+                                )}
+                              >
+                                <ShieldCheck className="w-5 h-5" />
+                                <div className="text-center">
+                                  <p className="text-xs font-bold uppercase tracking-wide">
+                                    Compliance
+                                  </p>
+                                  <p className="text-sm opacity-70 font-bold uppercase tracking-wide">
+                                    Auto-release on pass
+                                  </p>
+                                </div>
+                              </button>
+
+                              <button
+                                onClick={() => updateMilestone(i, "type", "APPROVAL")}
+                                className={cn(
+                                  "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
+                                  m.type === "APPROVAL"
+                                    ? "bg-amber-500/10 border-amber-500 text-amber-500"
+                                    : "bg-[#0A0A0A] border-gray-800 text-white/50 hover:border-gray-700"
+                                )}
+                              >
+                                <ShieldCheck className="w-5 h-5" />
+                                <div className="text-center">
+                                  <p className="text-xs font-bold uppercase tracking-wide">
+                                    Approval
+                                  </p>
+                                  <p className="text-sm opacity-70 font-bold uppercase tracking-wide">
+                                    Client sign-off required
+                                  </p>
+                                </div>
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50 text-sm">
+                                  $
+                                </span>
+                                <Input
+                                  type="number"
+                                  placeholder="Amount"
+                                  value={m.amount}
+                                  onChange={(e) =>
+                                    updateMilestone(i, "amount", e.target.value)
+                                  }
+                                  className="bg-[#0A0A0A] border-gray-800 text-white pl-7 h-11 placeholder:text-gray-400"
+                                />
+                              </div>
+                              <Input
+                                type="date"
+                                value={m.dueDate}
+                                onChange={(e) =>
+                                  updateMilestone(i, "dueDate", e.target.value)
+                                }
+                                className="bg-[#0A0A0A] border-gray-800 text-white h-11 [color-scheme:dark]"
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label className="text-sm text-white/70 uppercase font-bold tracking-wide">
+                                Deliverable Type (AI Auditable)
+                              </Label>
+                              <select
+                                value={m.deliverableType}
+                                onChange={(e) => {
+                                  const deliverables =
+                                    VAULT_PURPOSE_MAPPING[vaultPurpose].deliverables;
+                                  const selected = deliverables.find(
+                                    (d) => d.id === e.target.value
+                                  );
+                                  updateMilestone(
+                                    i,
+                                    "deliverableType",
+                                    selected?.id || ""
+                                  );
+                                  updateMilestone(
+                                    i,
+                                    "auditRules",
+                                    selected?.rules || []
+                                  );
+                                }}
+                                className="w-full bg-[#0A0A0A] border border-gray-800 text-white p-3 text-sm rounded-md focus:border-emerald-500 outline-none font-bold uppercase tracking-wide"
+                              >
+                                <option value="">
+                                  Choose deliverable for{" "}
+                                  {VAULT_PURPOSE_MAPPING[vaultPurpose]?.label}
+                                </option>
+                                {VAULT_PURPOSE_MAPPING[vaultPurpose]?.deliverables.map(
+                                  (d) => (
+                                    <option key={d.id} value={d.id}>
+                                      {d.label}
+                                    </option>
+                                  )
+                                )}
+                              </select>
+                            </div>
+
+                            {m.auditRules.length > 0 && (
+                              <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-md">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                                  <p className="text-sm text-emerald-500 font-bold uppercase tracking-wide">
+                                    Automated Verification Protocol
+                                  </p>
+                                </div>
+                                <ul className="space-y-1">
+                                  {m.auditRules.map((r, idx) => (
+                                    <li
+                                      key={idx}
+                                      className="text-sm text-white/70 flex items-center gap-2"
+                                    >
+                                      <div className="w-1 h-1 bg-emerald-500 rounded-full" />
+                                      {r}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    onClick={addMilestone}
+                    className="w-full border-dashed border-gray-800 text-white/70 hover:text-white hover:bg-white/5 h-12 text-sm font-bold uppercase tracking-wide"
+                  >
+                    <Plus className="w-4 h-4 mr-2" /> Add Next Milestone
+                  </Button>
+                </div>
+              )}
+
+              {/* STEP 3: ASSIGN FREELANCER */}
+              {step === 3 && (
+                <div className="space-y-8">
+                  <div className="text-center mb-8">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      type="spring"
+                      className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
+                    >
+                      <Users className="w-8 h-8 text-emerald-500" />
+                    </motion.div>
+                    <h2 className="text-xl font-black uppercase tracking-tight text-white">
+                      Who is this vault for?
+                    </h2>
+                    <p className="text-white/70 text-sm mt-1 font-bold uppercase tracking-wide">
+                      Assign a freelancer to this vault to begin the collaboration.
+                    </p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
+                        Freelancer Email Address *
+                      </Label>
+                      <Input
+                        type="email"
+                        value={freelancerEmail}
+                        onChange={(e) => setFreelancerEmail(e.target.value)}
+                        placeholder="freelancer@example.com"
+                        className="bg-black border-gray-800 h-12 focus:border-emerald-500 text-white placeholder:text-gray-400"
+                      />
+                      <p className="text-sm text-white/50">
+                        If they don't have an account, they'll be invited to join
+                        Cleard.
+                      </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-sm text-white/70 uppercase font-bold tracking-wide">
-                        Deliverable Type (AI Auditable)
+                      <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
+                        Freelancer Name (Optional)
                       </Label>
-                      <select
-                        value={m.deliverableType}
-                        onChange={(e) => {
-                          const deliverables =
-                            VAULT_PURPOSE_MAPPING[vaultPurpose].deliverables;
-                          const selected = deliverables.find(
-                            (d) => d.id === e.target.value
-                          );
-                          updateMilestone(
-                            i,
-                            "deliverableType",
-                            selected?.id || ""
-                          );
-                          updateMilestone(
-                            i,
-                            "auditRules",
-                            selected?.rules || []
-                          );
-                        }}
-                        className="w-full bg-[#0A0A0A] border border-gray-800 text-white p-3 text-sm rounded-md focus:border-emerald-500 outline-none font-bold uppercase tracking-wide"
-                      >
-                        <option value="">
-                          Choose deliverable for{" "}
-                          {VAULT_PURPOSE_MAPPING[vaultPurpose]?.label}
-                        </option>
-                        {VAULT_PURPOSE_MAPPING[vaultPurpose]?.deliverables.map(
-                          (d) => (
-                            <option key={d.id} value={d.id}>
-                              {d.label}
-                            </option>
-                          )
-                        )}
-                      </select>
+                      <Input
+                        value={freelancerName}
+                        onChange={(e) => setFreelancerName(e.target.value)}
+                        placeholder="e.g., Jane Doe"
+                        className="bg-black border-gray-800 h-12 focus:border-emerald-500 text-white placeholder:text-gray-400"
+                      />
                     </div>
 
-                    {m.auditRules.length > 0 && (
-                      <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-md">
-                        <div className="flex items-center gap-2 mb-2">
-                          <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                          <p className="text-sm text-emerald-500 font-bold uppercase tracking-wide">
-                            Automated Verification Protocol
-                          </p>
-                        </div>
-                        <ul className="space-y-1">
-                          {m.auditRules.map((r, idx) => (
-                            <li
-                              key={idx}
-                              className="text-sm text-white/70 flex items-center gap-2"
-                            >
-                              <div className="w-1 h-1 bg-emerald-500 rounded-full" />
-                              {r}
-                            </li>
-                          ))}
-                        </ul>
+                    <div className="bg-white/5 border border-white/10 p-4 rounded-lg flex gap-4">
+                      <div className="p-2 bg-emerald-500/20 rounded-md h-fit">
+                        <ShieldCheck className="w-5 h-5 text-emerald-500" />
                       </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              <Button
-                variant="outline"
-                onClick={addMilestone}
-                className="w-full border-dashed border-gray-800 text-white/70 hover:text-white hover:bg-white/5 h-12 text-sm font-bold uppercase tracking-wide"
-              >
-                <Plus className="w-4 h-4 mr-2" /> Add Next Milestone
-              </Button>
-            </div>
-          )}
-
-          {/* STEP 3: ASSIGN FREELANCER */}
-          {step === 3 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-emerald-500" />
-                </div>
-                <h2 className="text-xl font-black uppercase tracking-tight text-white">
-                  Who is this vault for?
-                </h2>
-                <p className="text-white/70 text-sm mt-1 font-bold uppercase tracking-wide">
-                  Assign a freelancer to this vault to begin the collaboration.
-                </p>
-              </div>
-
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
-                    Freelancer Email Address *
-                  </Label>
-                  <Input
-                    type="email"
-                    value={freelancerEmail}
-                    onChange={(e) => setFreelancerEmail(e.target.value)}
-                    placeholder="freelancer@example.com"
-                    className="bg-black border-gray-800 h-12 focus:border-emerald-500 text-white placeholder:text-gray-400"
-                  />
-                  <p className="text-sm text-white/50">
-                    If they don't have an account, they'll be invited to join
-                    Cleard.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
-                    Freelancer Name (Optional)
-                  </Label>
-                  <Input
-                    value={freelancerName}
-                    onChange={(e) => setFreelancerName(e.target.value)}
-                    placeholder="e.g., Jane Doe"
-                    className="bg-black border-gray-800 h-12 focus:border-emerald-500 text-white placeholder:text-gray-400"
-                  />
-                </div>
-
-                <div className="bg-white/5 border border-white/10 p-4 rounded-lg flex gap-4">
-                  <div className="p-2 bg-emerald-500/20 rounded-md h-fit">
-                    <ShieldCheck className="w-5 h-5 text-emerald-500" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-white">
-                      Secure Invitation
-                    </h4>
-                    <p className="text-sm text-white/70 mt-1 leading-relaxed">
-                      Upon deployment, the freelancer will receive a secure
-                      invitation link to view the vault conditions and accept
-                      the assignment. Capital remains locked until conditions
-                      are met.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 4: REVIEW & DEPLOY */}
-          {step === 4 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-black uppercase tracking-tight text-white">
-                  Review Vault Setup
-                </h2>
-                <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                  <span className="text-emerald-500 text-sm font-bold uppercase tracking-wide">
-                    Ready to Deploy
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {/* Basic Info Summary */}
-                <div className="bg-black border border-gray-800 p-6 rounded-lg space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-sm font-medium text-white/50 uppercase tracking-wide">
-                        Vault Title
-                      </h3>
-                      <p className="text-lg text-white font-bold uppercase tracking-wide mt-1">
-                        {vaultTitle}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <h3 className="text-sm font-medium text-white/50 uppercase tracking-wide">
-                        Total Value
-                      </h3>
-                      <p className="text-2xl text-emerald-500 font-bold mt-1">
-                        ${totalAmount.toLocaleString()}
-                      </p>
+                      <div>
+                        <h4 className="text-sm font-medium text-white">
+                          Secure Invitation
+                        </h4>
+                        <p className="text-sm text-white/70 mt-1 leading-relaxed">
+                          Upon deployment, the freelancer will receive a secure
+                          invitation link to view the vault conditions and accept
+                          the assignment. Capital remains locked until conditions
+                          are met.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-white/50 uppercase tracking-wide">
-                      Purpose
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      {(() => {
-                        const Icon =
-                          VAULT_PURPOSE_MAPPING[vaultPurpose]?.icon || Hash;
-                        return <Icon className="w-4 h-4 text-emerald-500" />;
-                      })()}
-                      <span className="text-sm text-white">
-                        {VAULT_PURPOSE_MAPPING[vaultPurpose]?.label}
+                </div>
+              )}
+
+              {/* STEP 4: REVIEW & DEPLOY */}
+              {step === 4 && (
+                <div className="space-y-8">
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-xl font-black uppercase tracking-tight text-white">
+                      Review Vault Setup
+                    </h2>
+                    <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                      <span className="text-emerald-500 text-sm font-bold uppercase tracking-wide">
+                        Ready to Deploy
                       </span>
                     </div>
                   </div>
-                </div>
 
-                {/* Freelancer Summary */}
-                <div className="bg-black border border-gray-800 p-4 rounded-lg flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center">
-                      <Users className="w-5 h-5 text-white/70" />
+                  <div className="space-y-4">
+                    {/* Basic Info Summary */}
+                    <div className="bg-black border border-gray-800 p-6 rounded-lg space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-sm font-medium text-white/50 uppercase tracking-wide">
+                            Vault Title
+                          </h3>
+                          <p className="text-lg text-white font-bold uppercase tracking-wide mt-1">
+                            {vaultTitle}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <h3 className="text-sm font-medium text-white/50 uppercase tracking-wide">
+                            Total Value
+                          </h3>
+                          <p className="text-2xl text-emerald-500 font-bold mt-1">
+                            ${totalAmount.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-white/50 uppercase tracking-wide">
+                          Purpose
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          {(() => {
+                            const Icon =
+                              VAULT_PURPOSE_MAPPING[vaultPurpose]?.icon || Hash;
+                            return <Icon className="w-4 h-4 text-emerald-500" />;
+                          })()}
+                          <span className="text-sm text-white">
+                            {VAULT_PURPOSE_MAPPING[vaultPurpose]?.label}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-white/50 uppercase font-bold tracking-wide">
-                        Assigned Freelancer
-                      </p>
-                      <p className="text-sm text-white font-bold uppercase tracking-normal">
-                        {freelancerName || "Unnamed Freelancer"}
-                      </p>
-                      <p className="text-sm text-white/70">{freelancerEmail}</p>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Milestones Summary */}
-                <div className="space-y-3">
-                  <h3 className="text-sm text-white/50 uppercase font-bold tracking-wide ml-1">
-                    Milestones ({milestones.length})
-                  </h3>
-                  {milestones.map((m, i) => (
-                    <div
-                      key={i}
-                      className="bg-black border border-gray-800 p-4 rounded-lg flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 rounded-full border border-gray-800 flex items-center justify-center text-sm text-white/70 font-mono">
-                          0{i + 1}
+                    {/* Freelancer Summary */}
+                    <div className="bg-black border border-gray-800 p-4 rounded-lg flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center">
+                          <Users className="w-5 h-5 text-white/70" />
                         </div>
                         <div>
-                          <p className="text-sm text-white font-bold uppercase tracking-normal">
-                            {m.title}
+                          <p className="text-sm text-white/50 uppercase font-bold tracking-wide">
+                            Assigned Freelancer
                           </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                            <span className="text-sm text-white/70 capitalize">
-                              {m.deliverableType.replace("_", " ")} Verification
-                            </span>
-                            <span
-                              className={cn(
-                                "text-sm font-bold uppercase tracking-wide px-2 py-0.5 rounded-sm border",
-                                m.type === "COMPLIANCE"
-                                  ? "border-emerald-500/30 text-emerald-500"
-                                  : "border-amber-500/30 text-amber-500"
-                              )}
-                            >
-                              {m.type === "COMPLIANCE" ? "Auto" : "Manual"}
-                            </span>
-                          </div>
+                          <p className="text-sm text-white font-bold uppercase tracking-normal">
+                            {freelancerName || "Unnamed Freelancer"}
+                          </p>
+                          <p className="text-sm text-white/70">{freelancerEmail}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm text-white font-mono font-bold">
-                          ${Number(m.amount).toLocaleString()}
-                        </p>
-                        <p className="text-sm text-white/70 mt-1">
-                          {m.dueDate || "No due date"}
+                    </div>
+
+                    {/* Milestones Summary */}
+                    <div className="space-y-3">
+                      <h3 className="text-sm text-white/50 uppercase font-bold tracking-wide ml-1">
+                        Milestones ({milestones.length})
+                      </h3>
+                      {milestones.map((m, i) => (
+                        <div
+                          key={i}
+                          className="bg-black border border-gray-800 p-4 rounded-lg flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-8 h-8 rounded-full border border-gray-800 flex items-center justify-center text-sm text-white/70 font-mono">
+                              0{i + 1}
+                            </div>
+                            <div>
+                              <p className="text-sm text-white font-bold uppercase tracking-normal">
+                                {m.title}
+                              </p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                                <span className="text-sm text-white/70 capitalize">
+                                  {m.deliverableType.replace("_", " ")} Verification
+                                </span>
+                                <span
+                                  className={cn(
+                                    "text-sm font-bold uppercase tracking-wide px-2 py-0.5 rounded-sm border",
+                                    m.type === "COMPLIANCE"
+                                      ? "border-emerald-500/30 text-emerald-500"
+                                      : "border-amber-500/30 text-amber-500"
+                                  )}
+                                >
+                                  {m.type === "COMPLIANCE" ? "Auto" : "Manual"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-white font-mono font-bold">
+                              ${Number(m.amount).toLocaleString()}
+                            </p>
+                            <p className="text-sm text-white/70 mt-1">
+                              {m.dueDate || "No due date"}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Audit & Release Disclaimer */}
+                    <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-lg flex gap-4">
+                      <div className="p-2 bg-amber-500/20 rounded-md h-fit">
+                        <ShieldCheck className="w-5 h-5 text-amber-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-amber-500 uppercase tracking-wide">
+                          Escrow Protocol & AI Audit
+                        </h4>
+                        <p className="text-sm text-white-300 mt-1 leading-relaxed">
+                          By deploying this vault, you agree that capital release is{" "}
+                          <span className="text-white font-medium">
+                            automated via AI audit
+                          </span>
+                          . Milestones unlock sequentially (01 → 02 → 03). You
+                          cannot manually release funds, but you maintain the right
+                          to view evidence and raise disputes if automated checks
+                          pass incorrectly.
                         </p>
                       </div>
                     </div>
-                  ))}
-                </div>
-
-                {/* Audit & Release Disclaimer */}
-                <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-lg flex gap-4">
-                  <div className="p-2 bg-amber-500/20 rounded-md h-fit">
-                    <ShieldCheck className="w-5 h-5 text-amber-500" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-amber-500 uppercase tracking-wide">
-                      Escrow Protocol & AI Audit
-                    </h4>
-                    <p className="text-sm text-white-300 mt-1 leading-relaxed">
-                      By deploying this vault, you agree that capital release is{" "}
-                      <span className="text-white font-medium">
-                        automated via AI audit
-                      </span>
-                      . Milestones unlock sequentially (01 → 02 → 03). You
-                      cannot manually release funds, but you maintain the right
-                      to view evidence and raise disputes if automated checks
-                      pass incorrectly.
-                    </p>
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* NAVIGATION BUTTONS */}
-          <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 mt-12 pt-6 border-t border-gray-900">
-            <Button
-              variant="ghost"
-              onClick={() => setStep(step - 1)}
-              disabled={step === 1}
-              className="text-white/70 hover:text-white font-bold uppercase tracking-wide w-full sm:w-auto"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" /> Back
-            </Button>
-
-            {step < 4 ? (
-              <Button
-                onClick={() => setStep(step + 1)}
-                disabled={!canContinue}
-                className={cn(
-                  "px-8 h-11 transition-all text-sm w-full sm:w-auto",
-                  canContinue
-                    ? "bg-white text-black hover:bg-emerald-500 hover:text-white font-bold uppercase tracking-wide"
-                    : "bg-gray-800 text-white cursor-not-allowed"
-                )}
-              >
-                Continue <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            ) : (
-              <Link href="/checkout/new-vault-id" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto bg-emerald-500 text-black px-10 h-11 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20">
-                  Deploy Vault
+              {/* NAVIGATION BUTTONS */}
+              <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 mt-12 pt-6 border-t border-gray-900">
+                <Button
+                  variant="ghost"
+                  onClick={() => paginate(-1)}
+                  disabled={step === 1}
+                  className="text-white/70 hover:text-white font-bold uppercase tracking-wide w-full sm:w-auto"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" /> Back
                 </Button>
-              </Link>
-            )}
-          </div>
+
+                {step < 4 ? (
+                  <Button
+                    onClick={() => paginate(1)}
+                    disabled={!canContinue}
+                    className={cn(
+                      "px-8 h-11 transition-all text-sm w-full sm:w-auto",
+                      canContinue
+                        ? "bg-white text-black hover:bg-emerald-500 hover:text-white font-bold uppercase tracking-wide"
+                        : "bg-gray-800 text-white cursor-not-allowed"
+                    )}
+                  >
+                    Continue <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleDeploy}
+                    disabled={isDeploying}
+                    className="w-full sm:w-auto bg-emerald-500 text-black px-10 h-11 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 disabled:opacity-90 disabled:cursor-not-allowed transition-all"
+                  >
+                    {isDeploying ? (
+                      <div className="flex items-center gap-1 font-bold">
+                        <span>Deploying</span>
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.4, repeat: Infinity, repeatType: "reverse", delay: 0 }}
+                        >.</motion.span>
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.4, repeat: Infinity, repeatType: "reverse", delay: 0.2 }}
+                        >.</motion.span>
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.4, repeat: Infinity, repeatType: "reverse", delay: 0.4 }}
+                        >.</motion.span>
+                      </div>
+                    ) : (
+                      "Deploy Vault"
+                    )}
+                  </Button>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Footer info */}

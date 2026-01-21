@@ -16,6 +16,23 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 // Mock Data
 const mockTransactions = [
@@ -129,19 +146,24 @@ export default function TransactionsPage() {
   );
 
   return (
-    <div className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30"
+    >
       <div className="max-w-7xl mx-auto px-6 space-y-10">
         {/* 1. TOP NAVIGATION / HEADER */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-1">
+          <motion.div variants={itemVariants} className="space-y-1">
             <h1 className="text-3xl font-bold tracking-tight text-white uppercase">
               Transactions
             </h1>
             <p className="text-sm text-slate-500 font-bold uppercase tracking-wide">
               Financial activity and history
             </p>
-          </div>
-          <div className="flex items-center gap-3">
+          </motion.div>
+          <motion.div variants={itemVariants} className="flex items-center gap-3">
             <Button
               variant="outline"
               className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all"
@@ -156,11 +178,11 @@ export default function TransactionsPage() {
               <Filter className="w-4 h-4 mr-2 text-slate-400" />
               Filters
             </Button>
-          </div>
+          </motion.div>
         </header>
 
         {/* 2. STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl">
             <p className="text-sm font-medium text-slate-500">Total Volume</p>
             <h2 className="text-3xl font-bold text-white mt-1">$42,500</h2>
@@ -177,10 +199,10 @@ export default function TransactionsPage() {
               $31,000
             </h2>
           </div>
-        </div>
+        </motion.div>
 
         {/* 3. SEARCH */}
-        <div className="relative group">
+        <motion.div variants={itemVariants} className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
           <input
             type="search"
@@ -189,10 +211,10 @@ export default function TransactionsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-4 bg-[#0D0D0E] border border-white/5 rounded-sm focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner font-bold uppercase tracking-wide"
           />
-        </div>
+        </motion.div>
 
         {/* 4. TABLE */}
-        <div className="bg-[#0D0D0E] border border-white/5 rounded-sm overflow-hidden shadow-2xl">
+        <motion.div variants={itemVariants} className="bg-[#0D0D0E] border border-white/5 rounded-sm overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -338,8 +360,8 @@ export default function TransactionsPage() {
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

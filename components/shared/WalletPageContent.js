@@ -20,6 +20,23 @@ import {
     Zap,
     ArrowRight
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.2,
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 export default function WalletPageContent() {
     const { balance, transactions, loading, withdraw } = useWallet();
@@ -44,11 +61,16 @@ export default function WalletPageContent() {
     );
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A] pb-20 text-white">
+        <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="min-h-screen bg-[#0A0A0A] pb-20 text-white"
+        >
             {/* Header */}
             <header className="mb-6 md:mb-10 px-4 md:px-0">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div className="space-y-1">
+                    <motion.div variants={itemVariants} className="space-y-1">
                         <div className="flex items-center gap-2 text-[10px] md:text-sm font-black text-emerald-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2">
                             <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                             Secured Settlement Wallet
@@ -57,81 +79,83 @@ export default function WalletPageContent() {
                             Financial Center
                         </h1>
                         <p className="text-xs md:text-sm text-white/50 font-bold uppercase tracking-wide">Manage your vault earnings and global settlements</p>
-                    </div>
-                    <div className="flex items-center gap-3">
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="flex items-center gap-3">
                         <Button variant="outline" className="w-full md:w-auto gap-2 font-bold h-11 px-6 border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80 shrink-0">
                             <Download size={16} />
                             Export Ledger
                         </Button>
-                    </div>
+                    </motion.div>
                 </div>
             </header>
 
             <div className="space-y-10">
                 {/* Balance Visualization */}
-                <div className="bg-[#111111] border border-gray-900 rounded-sm p-1">
+                <motion.div variants={itemVariants} className="bg-[#111111] border border-gray-900 rounded-sm p-1">
                     <WalletBalance balance={balance} role="freelancer" />
-                </div>
+                </motion.div>
 
                 <div className="grid lg:grid-cols-3 gap-10">
                     {/* Withdrawal Interface */}
                     <div className="lg:col-span-1">
-                        <Card className="bg-[#111111] border-gray-900 overflow-hidden sticky top-32 rounded-sm shadow-2xl">
-                            <div className="bg-emerald-600/10 border-b border-emerald-500/10 py-4 px-6">
-                                <h3 className="text-emerald-500 font-black uppercase tracking-wide text-sm">Instant Withdrawal</h3>
-                            </div>
-                            <CardContent className="p-8 space-y-8">
-                                <form onSubmit={handleWithdraw} className="space-y-8">
-                                    <div>
-                                        <label className="text-sm font-black text-white uppercase tracking-wide mb-4 block">
-                                            Amount (USD)
-                                        </label>
-                                        <div className="relative group">
-                                            <span className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-bold text-white group-focus-within:text-emerald-500 transition-colors">$</span>
-                                            <input
-                                                type="number"
-                                                value={withdrawAmount}
-                                                onChange={(e) => setWithdrawAmount(e.target.value)}
-                                                placeholder="0.00"
-                                                className="w-full text-4xl font-bold tabular-nums bg-transparent border-b border-white/10 focus:border-emerald-500 outline-none py-4 pl-8 transition-all text-white placeholder:text-white"
-                                                min="1"
-                                                step="0.01"
-                                            />
-                                        </div>
-                                        <div className="mt-4 flex items-center justify-between text-sm font-bold uppercase tracking-wide">
-                                            <span className="text-white">Available Limit</span>
-                                            <span className="text-emerald-400">
-                                                ${balance?.available?.toLocaleString() || '0.00'}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-emerald-500/5 rounded-sm p-4 border border-emerald-500/10">
-                                        <div className="flex gap-4">
-                                            <Zap className="w-5 h-5 text-emerald-500 shrink-0" />
-                                            <div>
-                                                <p className="text-sm font-black text-emerald-500 uppercase tracking-wide mb-1">Turbo Settlement</p>
-                                                <p className="text-sm font-bold text-white leading-relaxed uppercase">
-                                                    Withdrawals are processed instantly via private settlement rails.
-                                                </p>
+                        <motion.div variants={itemVariants}>
+                            <Card className="bg-[#111111] border-gray-900 overflow-hidden sticky top-32 rounded-sm shadow-2xl">
+                                <div className="bg-emerald-600/10 border-b border-emerald-500/10 py-4 px-6">
+                                    <h3 className="text-emerald-500 font-black uppercase tracking-wide text-sm">Instant Withdrawal</h3>
+                                </div>
+                                <CardContent className="p-8 space-y-8">
+                                    <form onSubmit={handleWithdraw} className="space-y-8">
+                                        <div>
+                                            <label className="text-sm font-black text-white uppercase tracking-wide mb-4 block">
+                                                Amount (USD)
+                                            </label>
+                                            <div className="relative group">
+                                                <span className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-bold text-white group-focus-within:text-emerald-500 transition-colors">$</span>
+                                                <input
+                                                    type="number"
+                                                    value={withdrawAmount}
+                                                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                                                    placeholder="0.00"
+                                                    className="w-full text-4xl font-bold tabular-nums bg-transparent border-b border-white/10 focus:border-emerald-500 outline-none py-4 pl-8 transition-all text-white placeholder:text-white"
+                                                    min="1"
+                                                    step="0.01"
+                                                />
+                                            </div>
+                                            <div className="mt-4 flex items-center justify-between text-sm font-bold uppercase tracking-wide">
+                                                <span className="text-white">Available Limit</span>
+                                                <span className="text-emerald-400">
+                                                    ${balance?.available?.toLocaleString() || '0.00'}
+                                                </span>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <Button
-                                        type="submit"
-                                        className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-black font-black uppercase text-sm tracking-wide rounded-sm transition-all shadow-lg shadow-emerald-600/10 active:scale-[0.98]"
-                                        disabled={!withdrawAmount || isWithdrawing || parseFloat(withdrawAmount) > (balance?.available || 0)}
-                                    >
-                                        {isWithdrawing ? 'Processing...' : 'Execute Settlement'}
-                                    </Button>
-                                </form>
-                            </CardContent>
-                        </Card>
+                                        <div className="bg-emerald-500/5 rounded-sm p-4 border border-emerald-500/10">
+                                            <div className="flex gap-4">
+                                                <Zap className="w-5 h-5 text-emerald-500 shrink-0" />
+                                                <div>
+                                                    <p className="text-sm font-black text-emerald-500 uppercase tracking-wide mb-1">Turbo Settlement</p>
+                                                    <p className="text-sm font-bold text-white leading-relaxed uppercase">
+                                                        Withdrawals are processed instantly via private settlement rails.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            type="submit"
+                                            className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-black font-black uppercase text-sm tracking-wide rounded-sm transition-all shadow-lg shadow-emerald-600/10 active:scale-[0.98]"
+                                            disabled={!withdrawAmount || isWithdrawing || parseFloat(withdrawAmount) > (balance?.available || 0)}
+                                        >
+                                            {isWithdrawing ? 'Processing...' : 'Execute Settlement'}
+                                        </Button>
+                                    </form>
+                                </CardContent>
+                            </Card>
+                        </motion.div>
                     </div>
 
                     {/* Transaction History Ledger */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <motion.div variants={itemVariants} className="lg:col-span-2 space-y-6">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-bold text-white flex items-center gap-3 tracking-tight">
                                 <History className="w-5 h-5 text-emerald-500" />
@@ -248,9 +272,9 @@ export default function WalletPageContent() {
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
