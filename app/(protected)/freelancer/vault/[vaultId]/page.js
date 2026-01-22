@@ -184,41 +184,17 @@ export default function FreelancerVaultDetailPage() {
       }
     }
 
-    // 2. Split into Compliance & Approval
-    const splitMilestones = [];
-    baseMilestones.forEach((m, idx) => {
-      // 1. Compliance (AI)
-      splitMilestones.push({
-        id: m.id ? `${m.id}_comp` : `m_${idx}_comp`,
-        title: m.title,
-        subtitle: "Automated Compliance Check",
-        amount: 0,
+    // 2. Map to Unified Milestone Object (Matches Client View)
+    return baseMilestones.map((m, idx) => {
+      const id = m.id || `m_${idx}`;
+      return {
+        ...m,
+        id: id,
+        complianceStatus: "PASSED", // In MVP, these are automated checks that pass instantly
+        status: milestoneStates[id] || m.status || "PENDING",
         displayAmount: m.amount,
-        status: "VERIFIED", // Freelancer sees this as verified instantly in this mock
-        type: "COMPLIANCE_AI",
-        deliverable: m.deliverable || "General Deliverable",
-        checks: ["Format Validation", "Virus Scan", "Metadata Verify"],
-      });
-
-      // 2. Approval (Human)
-      const approvalId = m.id ? `${m.id}_appr` : `m_${idx}_appr`;
-      splitMilestones.push({
-        id: approvalId,
-        title: m.title,
-        subtitle: "Release Funds",
-        amount: m.amount,
-        displayAmount: m.amount,
-        status:
-          milestoneStates[approvalId] ||
-          m.status ||
-          (idx === 0 ? "PENDING" : "PENDING"), // Default all to pending if no status
-        type: "APPROVAL_HUMAN",
-        deliverable: m.deliverable || "General Deliverable",
-        deliverableId: m.deliverableId,
-      });
+      };
     });
-
-    return splitMilestones;
   }, [vault, milestoneStates]);
 
   // Check if any milestone is eligible for dispute
@@ -339,118 +315,74 @@ export default function FreelancerVaultDetailPage() {
                 {displayMilestones.map((milestone, index) => (
                   <div
                     key={milestone.id}
-                    className="group relative bg-white/[0.02] border border-white/5 rounded-xl p-5 hover:bg-white/[0.04] transition-all"
+                    className="group relative bg-white/2 border border-white/5 rounded-xl p-5 hover:bg-white/4 transition-all"
                   >
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      {/* Left: Icon & Info */}
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      {/* Left: Info */}
                       <div className="flex items-start gap-4 min-w-0">
-                        <div
-                          className={cn(
-                            "mt-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
-                            milestone.type === "COMPLIANCE_AI"
-                              ? "bg-emerald-500/10 text-emerald-500"
-                              : "bg-amber-500/10 text-amber-500"
-                          )}
-                        >
-                          {milestone.type === "COMPLIANCE_AI" ? (
-                            <Zap className="w-4 h-4" />
-                          ) : (
-                            <Users className="w-4 h-4" />
-                          )}
+                        <div className="mt-1 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-sm font-bold text-gray-400">
+                          {index + 1}
                         </div>
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-base sm:text-lg font-bold text-white uppercase tracking-wide break-words">
-                              {milestone.title}
-                            </h3>
-                            <Badge
-                              variant="outline"
-                              className={cn(
-                                "uppercase tracking-widest text-[10px] h-5 whitespace-nowrap",
-                                milestone.type === "COMPLIANCE_AI"
-                                  ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                  : "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                              )}
-                            >
-                              {milestone.type === "COMPLIANCE_AI"
-                                ? "AI Compliance"
-                                : "Client Approval"}
-                            </Badge>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg font-bold text-white uppercase tracking-wide truncate">
+                            {milestone.title}
+                          </h3>
+
+                          {/* Escrow Verification Protocol */}
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+                              <Zap className="w-3 h-3" />
+                              <span className="uppercase tracking-widest text-[9px] font-bold">
+                                AI: {milestone.complianceStatus}
+                              </span>
+                            </div>
+                            <div className={cn(
+                              "flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-bold uppercase tracking-widest",
+                              getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
+                              getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20"),
+                              getStatusColor(milestone.status)
+                            )}>
+                              <Users className="w-3 h-3" />
+                              <span>
+                                Approval: {milestone.status.replace("_", " ")}
+                              </span>
+                            </div>
                           </div>
 
-                          {milestone.type === "COMPLIANCE_AI" &&
-                            milestone.checks && (
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {milestone.checks.map((check) => (
-                                  <span
-                                    key={check}
-                                    className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono border border-emerald-500/30 font-bold uppercase"
-                                  >
-                                    ✓ {check}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
                           {milestone.deliverable && (
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 mb-1">
-                              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold whitespace-nowrap">
-                                Required:
-                              </span>
-                              <span className="text-[12px] text-white font-bold uppercase tracking-wide break-words">
+                            <div className="mt-3 flex items-center gap-3">
+                              <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gray-400 font-black">
+                                <FileText className="w-3 h-3" />
+                                Deliverable:
+                              </div>
+                              <span className="text-[12px] text-white font-bold uppercase bg-white/5 px-2 py-0.5 rounded border border-white/5">
                                 {milestone.deliverable}
                               </span>
                             </div>
                           )}
-
-                          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-gray-400">
-                            {milestone.type === "APPROVAL_HUMAN" && (
-                              <>
-                                <span className="text-white">
-                                  ${milestone.displayAmount?.toLocaleString()}
-                                </span>
-                                <span className="hidden xs:block w-1 h-1 rounded-full bg-slate-700" />
-                              </>
-                            )}
-                            <span className={cn(getStatusColor(milestone.status), "whitespace-nowrap")}>
-                              {milestone.status.replace("_", " ")}
-                            </span>
-
-                            {/* Eligible Dispute Action */}
-                            {getDisputeEligibility(milestone).eligible && (
-                              <Link
-                                href={`/freelancer/disputes/create?vaultId=${vaultId}&milestoneId=${milestone.id}`}
-                                className="inline-flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded hover:bg-red-500/20 transition-colors font-bold uppercase tracking-normal"
-                              >
-                                <Gavel className="w-3 h-3" />
-                                Open Case
-                              </Link>
-                            )}
-                          </div>
                         </div>
                       </div>
 
-                      {/* Right: Actions */}
-                      <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 shrink-0">
-                        {milestone.type === "COMPLIANCE_AI" && (
-                          <Badge
-                            variant="outline"
-                            className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-wide text-[10px] h-6 px-3 flex items-center gap-1.5"
-                          >
-                            <CheckCircle className="w-3 h-3" />
-                            Passed
-                          </Badge>
-                        )}
+                      {/* Right: Actions & Amount */}
+                      <div className="flex flex-col items-end gap-3 shrink-0">
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-white">
+                            ${milestone.displayAmount?.toLocaleString()}
+                          </p>
+                          {milestone.dueDate && (
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
+                              Due: {milestone.dueDate}
+                            </p>
+                          )}
+                        </div>
 
-                        {milestone.type === "APPROVAL_HUMAN" &&
-                          (milestone.status === "PENDING" ||
-                            !milestone.status) && (
+                        {(milestone.status === "PENDING" || !milestone.status) ? (
                             <Sheet>
                               <SheetTrigger asChild>
                                 <Button
                                   size="sm"
                                   onClick={() => setActiveSubmit(milestone)}
-                                  className="bg-emerald-500 text-black hover:bg-emerald-400 font-black uppercase tracking-normal"
+                                  className="bg-emerald-500 text-black hover:bg-emerald-400 font-black uppercase tracking-normal h-8"
                                 >
                                   Submit
                                   <Upload className="w-4 h-4 ml-2" />
@@ -482,55 +414,42 @@ export default function FreelancerVaultDetailPage() {
 
                                     <div className="space-y-4">
                                       <div className="space-y-2">
-                                        <div className="space-y-2">
-                                          <Label className="text-white font-bold uppercase tracking-normal">
-                                            Submission
-                                          </Label>
-                                          {(() => {
-                                            // Determine Input Type from Constants
-                                            const purpose =
-                                              VAULT_PURPOSE_MAPPING[vault.type];
-                                            const deliverableDef =
-                                              purpose?.deliverables?.find(
-                                                (d) =>
-                                                  d.id ===
-                                                  activeSubmit.deliverableId
-                                              );
-                                            const isLink =
-                                              deliverableDef?.type === "link";
+                                        <Label className="text-white font-bold uppercase tracking-normal">
+                                          Submission
+                                        </Label>
+                                        {(() => {
+                                          const purpose = VAULT_PURPOSE_MAPPING[vault.type];
+                                          const deliverableDef = purpose?.deliverables?.find(d => d.id === activeSubmit.deliverableId);
+                                          const isLink = deliverableDef?.type === "link";
 
-                                            if (isLink) {
-                                              return (
-                                                <div className="relative">
-                                                  <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-                                                  <Input
-                                                    placeholder={`Paste ${deliverableDef?.label ||
-                                                      "Link"
-                                                      } URL...`}
-                                                    className="bg-black/30 border-white/10 text-white pl-10"
-                                                  />
-                                                </div>
-                                              );
-                                            }
-
+                                          if (isLink) {
                                             return (
-                                              <div className="relative border-2 border-dashed border-white/10 rounded-xl p-8 hover:bg-white/[0.02] transition-colors text-center cursor-pointer group">
-                                                <input
-                                                  type="file"
-                                                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                              <div className="relative">
+                                                <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                                                <Input
+                                                  placeholder={`Paste ${deliverableDef?.label || "Link"} URL...`}
+                                                  className="bg-black/30 border-white/10 text-white pl-10"
                                                 />
-                                                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-3 group-hover:text-emerald-500 transition-colors" />
-                                                <p className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">
-                                                  Drop files here or click to
-                                                  upload
-                                                </p>
-                                                <p className="text-xs text-gray-400 mt-1">
-                                                  Max 50MB
-                                                </p>
                                               </div>
                                             );
-                                          })()}
-                                        </div>
+                                          }
+
+                                          return (
+                                            <div className="relative border-2 border-dashed border-white/10 rounded-xl p-8 hover:bg-white/2 transition-colors text-center cursor-pointer group">
+                                              <input
+                                                type="file"
+                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                              />
+                                              <Upload className="w-8 h-8 text-gray-400 mx-auto mb-3 group-hover:text-emerald-500 transition-colors" />
+                                              <p className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">
+                                                Drop files here or click to upload
+                                              </p>
+                                              <p className="text-xs text-gray-400 mt-1">
+                                                Max 50MB
+                                              </p>
+                                            </div>
+                                          );
+                                        })()}
                                       </div>
 
                                       <div className="space-y-2">
@@ -566,27 +485,23 @@ export default function FreelancerVaultDetailPage() {
                                 )}
                               </SheetContent>
                             </Sheet>
-                          )}
-
-                        {milestone.type === "APPROVAL_HUMAN" &&
-                          milestone.status === "AWAITING_APPROVAL" && (
-                            <Button
-                              size="sm"
+                          ) : (
+                            <Badge
                               variant="outline"
-                              disabled
-                              className="border-amber-500/20 text-amber-500 bg-amber-500/5 font-bold uppercase tracking-normal"
+                              className={cn(
+                                "uppercase tracking-widest text-[10px] h-7 px-3 flex items-center gap-1.5",
+                                getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
+                                getStatusColor(milestone.status),
+                                getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20")
+                              )}
                             >
-                              <Clock className="w-4 h-4 mr-2" />
-                              In Review
-                            </Button>
-                          )}
-
-                        {milestone.status === "VERIFIED" &&
-                          milestone.type === "APPROVAL_HUMAN" && (
-                            <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
-                              <CheckCircle className="w-3 h-3 mr-1.5" />
-                              Approved
-                            </div>
+                              {milestone.status === "VERIFIED" || milestone.status === "APPROVED" ? (
+                                <CheckCircle className="w-3.5 h-3.5" />
+                              ) : (
+                                <Clock className="w-3.5 h-3.5" />
+                              )}
+                              {milestone.status.replace("_", " ")}
+                            </Badge>
                           )}
                       </div>
                     </div>

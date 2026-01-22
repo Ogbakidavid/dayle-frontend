@@ -11,9 +11,8 @@ import { api } from "@/lib/mock-api";
 import {
   ArrowLeft,
   Shield,
-  Clock,
   CheckCircle,
-  AlertTriangle,
+  Clock,
   FileText,
   ChevronRight,
   Download,
@@ -22,6 +21,7 @@ import {
   X,
   Check,
   Gavel,
+  ExternalLink,
 } from "lucide-react";
 import {
   Card,
@@ -58,6 +58,7 @@ import {
   DISPUTE_REASON_CODES,
 } from "@/lib/rules/disputes";
 import { APPROVAL_REJECTION_CODES } from "@/lib/rules/milestones";
+import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 
 export default function ClientVaultDetailPage() {
   const params = useParams();
@@ -181,38 +182,21 @@ export default function ClientVaultDetailPage() {
       }
     }
 
-    // 2. Split into Compliance & Approval
-    const splitMilestones = [];
-    baseMilestones.forEach((m, idx) => {
-      // 1. Compliance (AI)
-      splitMilestones.push({
-        id: m.id ? `${m.id}_comp` : `m_${idx}_comp`,
-        title: m.title,
-        subtitle: "Automated Compliance Check",
-        amount: 0,
-        displayAmount: m.amount,
-        status: "VERIFIED", // Always verified in this view
-        type: "COMPLIANCE_AI",
-        deliverable: m.deliverable || "General Deliverable",
+    // 2. Map to Unified Milestone Object (MVP Architecture)
+    return baseMilestones.map((m, idx) => {
+      const id = m.id || `m_${idx}`;
+      return {
+        ...m,
+        id: id,
+        type: "APPROVAL", // Primary type for dispute rules
+        // AI Phase: In MVP, these are automated checks that usually pass instantly upon submission
+        complianceStatus: "PASSED",
         checks: ["Format Validation", "Virus Scan", "Metadata Verify"],
-      });
-
-      // 2. Approval (Human)
-      const approvalId = m.id ? `${m.id}_appr` : `m_${idx}_appr`;
-      splitMilestones.push({
-        id: approvalId,
-        title: m.title,
-        subtitle: "Client Approval Required",
-        amount: m.amount,
+        // Human Phase: The actual client approval/rejection cycle
+        status: milestoneStates[id] || m.status || "AWAITING_APPROVAL",
         displayAmount: m.amount,
-        status: milestoneStates[approvalId] || m.status || "AWAITING_APPROVAL", // Use local state, then prop, then default
-        type: "APPROVAL_HUMAN",
-        deliverable: m.deliverable || "General Deliverable",
-        deliverableId: m.deliverableId,
-      });
+      };
     });
-
-    return splitMilestones;
   }, [vault, milestoneStates]);
 
   // Mock Evidence Generator for the Review Panel
@@ -287,6 +271,30 @@ export default function ClientVaultDetailPage() {
   // Check if any milestone is eligible for dispute
   const anyEligibleForDispute = useMemo(() => {
     return displayMilestones.some((m) => getDisputeEligibility(m).eligible);
+  }, [displayMilestones]);
+
+  // Aggregate all submitted deliverables for the "Contract Documents" section
+  const submittedDeliverables = useMemo(() => {
+    const list = [];
+    displayMilestones.forEach((m) => {
+      // Logic: If status is VERIFIED, APPROVED, or AWAITING_APPROVAL, the freelancer has submitted work.
+      // In MVP mock, if there is a 'deliverableId' and 'deliverable' name, we treat it as a potential link/file.
+      const hasWork = ["VERIFIED", "APPROVED", "AWAITING_APPROVAL", "SUBMITTED"].includes(m.status);
+      if (hasWork && m.deliverable) {
+        // Attempt to find metadata from constants to see if it's a file or link
+        const purpose = vault.type;
+        const deliverableMeta = VAULT_PURPOSE_MAPPING[purpose]?.deliverables?.find(d => d.label === m.deliverable || d.id === m.deliverableId);
+        
+        list.push({
+          id: `${m.id}_deliverable`,
+          name: m.deliverable,
+          milestoneName: m.title,
+          type: deliverableMeta?.type || (m.deliverable.toLowerCase().includes("link") || m.deliverable.toLowerCase().includes("url") ? "link" : "file"),
+          url: "#", // Mocked URL
+        });
+      }
+    });
+    return list;
   }, [displayMilestones]);
 
   if (vaultsLoading) {
@@ -390,332 +398,278 @@ export default function ClientVaultDetailPage() {
                 {displayMilestones.map((milestone, index) => (
                   <div
                     key={milestone.id}
-                    className={cn(
-                      "group relative border rounded-xl p-5 transition-all",
-                      milestone.type === "COMPLIANCE_AI"
-                        ? "bg-emerald-950/10 border-emerald-500/10 hover:bg-emerald-950/20"
-                        : milestone.type === "APPROVAL_HUMAN"
-                          ? "bg-amber-950/10 border-amber-500/10 hover:bg-amber-950/20"
-                          : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
-                    )}
+                    className="group relative border border-white/5 rounded-xl p-5 bg-white/2 hover:bg-white/4 transition-all"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                       <div className="flex items-start gap-4 min-w-0">
-                        {/* Icon/Number */}
-                        <div
-                          className={cn(
-                            "mt-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
-                            milestone.type === "COMPLIANCE_AI"
-                              ? "bg-emerald-500/10 text-emerald-500"
-                              : milestone.type === "APPROVAL_HUMAN"
-                                ? "bg-amber-500/10 text-amber-500"
-                                : "bg-white/5 text-gray-400"
-                          )}
-                        >
-                          {milestone.type === "COMPLIANCE_AI" ? (
-                            <Zap className="w-4 h-4" />
-                          ) : milestone.type === "APPROVAL_HUMAN" ? (
-                            <Users className="w-4 h-4" />
-                          ) : (
-                            index + 1
-                          )}
+                        {/* Milestone Index */}
+                        <div className="mt-1 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-sm font-bold text-gray-400">
+                          {index + 1}
                         </div>
 
-                        <div>
-                          <h3 className="text-base sm:text-lg font-bold text-white uppercase tracking-wide break-words">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg font-bold text-white uppercase tracking-wide truncate">
                             {milestone.title}
                           </h3>
-                          <div className="flex flex-wrap gap-2 items-center mt-1 mb-2">
-                            <Badge
-                              variant="outline"
-                              className={cn(
-                                "uppercase tracking-widest text-[10px] h-5",
-                                milestone.type === "COMPLIANCE_AI"
-                                  ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                  : "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                              )}
-                            >
-                              {milestone.type === "COMPLIANCE_AI"
-                                ? "AI Compliance"
-                                : "Client Approval"}
-                            </Badge>
+
+                          {/* Escrow Verification Protocol */}
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+                              <Zap className="w-3 h-3" />
+                              <span className="uppercase tracking-widest text-[9px] font-bold">
+                                AI: {milestone.complianceStatus}
+                              </span>
+                            </div>
+                            <div className={cn(
+                              "flex items-center gap-1.5 px-2 py-0.5 rounded border",
+                              getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
+                              getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20"),
+                              getStatusColor(milestone.status)
+                            )}>
+                              <Users className="w-3 h-3" />
+                              <span className="uppercase tracking-widest text-[9px] font-bold">
+                                Approval: {milestone.status.replace("_", " ")}
+                              </span>
+                            </div>
                           </div>
 
-                          {milestone.type === "COMPLIANCE_AI" &&
-                            milestone.checks && (
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {milestone.checks.map((check) => (
-                                  <span
-                                    key={check}
-                                    className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono border border-emerald-500/30 font-bold uppercase"
-                                  >
-                                    ✓ {check}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
                           {milestone.deliverable && (
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 mb-1">
-                              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold whitespace-nowrap">
-                                Required:
-                              </span>
-                              <span className="text-[12px] text-white font-bold uppercase tracking-wide break-words">
+                            <div className="mt-3 flex items-center gap-3">
+                              <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gray-500 font-black">
+                                <FileText className="w-3 h-3" />
+                                Deliverable:
+                              </div>
+                              <span className="text-[11px] text-gray-300 font-bold uppercase bg-white/5 px-2 py-0.5 rounded border border-white/5">
                                 {milestone.deliverable}
                               </span>
                             </div>
                           )}
-
-                          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-gray-400">
-                            {milestone.type === "APPROVAL_HUMAN" && (
-                              <>
-                                <span className="text-white">
-                                  ${milestone.displayAmount?.toLocaleString()}
-                                </span>
-                                <span className="hidden xs:block w-1 h-1 rounded-full bg-slate-700" />
-                              </>
-                            )}
-                            <span className={getStatusColor(milestone.status)}>
-                              {milestone.status.replace("_", " ")}
-                            </span>
-
-                            {/* Eligible Dispute Action */}
-                            {getDisputeEligibility(milestone).eligible && (
-                              <Link
-                                href={`/client/disputes/create?vaultId=${vaultId}&milestoneId=${milestone.id}`}
-                                className="ml-2 inline-flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded hover:bg-red-500/20 transition-colors font-bold uppercase tracking-wide"
-                              >
-                                <Gavel className="w-3 h-3" />
-                                Open Case
-                              </Link>
-                            )}
-                          </div>
                         </div>
                       </div>
 
-                      {/* Right Side: Action Button or Passed Badge */}
-                      <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 shrink-0">
-                        {milestone.type === "COMPLIANCE_AI" && (
-                          <Badge
-                            variant="outline"
-                            className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px] h-6 px-3 flex items-center gap-1.5"
-                          >
-                            <CheckCircle className="w-3 h-3" />
-                            Passed
-                          </Badge>
-                        )}
+                        <div className="flex flex-col items-end gap-2 shrink-0">
+                          <div className="text-right">
+                            <p className="text-lg font-bold text-white">
+                              ${milestone.displayAmount?.toLocaleString()}
+                            </p>
+                            {milestone.dueDate && (
+                              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
+                                Due: {milestone.dueDate}
+                              </p>
+                            )}
+                          </div>
 
-                        {milestone.status === "AWAITING_APPROVAL" &&
-                          milestone.type === "APPROVAL_HUMAN" && (
-                            <Sheet>
-                              <SheetTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  onClick={() => setActiveReview(milestone)}
-                                  className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20 font-bold uppercase tracking-wide"
-                                >
-                                  Review
-                                  <ChevronRight className="w-4 h-4 ml-1" />
-                                </Button>
-                              </SheetTrigger>
-                              <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:max-w-[50vw] p-6 lg:p-8 overflow-y-auto">
-                                <SheetHeader className="mb-6">
-                                  <SheetTitle className="text-white text-2xl font-bold uppercase tracking-wide">
-                                    Review Deliverable
-                                  </SheetTitle>
-                                  <SheetDescription className="text-gray-400 font-bold uppercase tracking-normal">
-                                    Review the evidence and data provided for
-                                    this milestone before releasing funds.
-                                  </SheetDescription>
-                                </SheetHeader>
+                        {milestone.status === "AWAITING_APPROVAL" ? (
+                          <Sheet>
+                            <SheetTrigger asChild>
+                              <Button
+                                size="sm"
+                                onClick={() => setActiveReview(milestone)}
+                                className="bg-amber-500 text-black hover:bg-amber-400 font-bold uppercase tracking-wide text-[11px] h-8"
+                              >
+                                Review Work
+                                <ChevronRight className="w-4 h-4 ml-1" />
+                              </Button>
+                            </SheetTrigger>
+                            <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:max-w-[50vw] p-6 lg:p-8 overflow-y-auto">
+                              <SheetHeader className="mb-6">
+                                <SheetTitle className="text-white text-2xl font-bold uppercase tracking-wide">
+                                  Review Deliverable
+                                </SheetTitle>
+                                <SheetDescription className="text-gray-400 font-bold uppercase tracking-normal">
+                                  Review the evidence and data provided for this
+                                  milestone before releasing funds.
+                                </SheetDescription>
+                              </SheetHeader>
 
-                                {activeReview && (
-                                  <div className="space-y-6">
-                                    <EvidencePanel
-                                      milestone={activeReview}
-                                      evidence={getMockEvidence(activeReview)}
-                                    />
+                              {activeReview && (
+                                <div className="space-y-6">
+                                  <EvidencePanel
+                                    milestone={activeReview}
+                                    evidence={getMockEvidence(activeReview)}
+                                  />
 
-                                    <div className="space-y-4 pt-4 border-t border-white/10">
-                                      <h4 className="text-sm font-bold text-white uppercase tracking-wide">
-                                        Actions
-                                      </h4>
+                                  <div className="space-y-4 pt-4 border-t border-white/10">
+                                    <h4 className="text-sm font-bold text-white uppercase tracking-wide">
+                                      Actions
+                                    </h4>
 
-                                      {/* Approve */}
-                                      <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                                        <div className="flex items-center justify-between gap-4">
-                                          <div>
-                                            <h5 className="text-sm font-bold text-emerald-500 uppercase tracking-wide">
-                                              Approve & Pay
-                                            </h5>
-                                            <p className="text-xs text-emerald-200/70 mt-1 font-semibold uppercase tracking-normal">
-                                              Release{" "}
-                                              <span className="text-white font-bold">
-                                                $
-                                                {activeReview.displayAmount?.toLocaleString()}
-                                              </span>{" "}
-                                              to freelancer.
-                                            </p>
-                                          </div>
-                                          <SheetClose asChild>
-                                            <Button
-                                              onClick={handleApprove}
-                                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wide"
-                                            >
-                                              <Check className="w-4 h-4 mr-2" />
-                                              Approve
-                                            </Button>
-                                          </SheetClose>
+                                    {/* Approve */}
+                                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                                      <div className="flex items-center justify-between gap-4">
+                                        <div>
+                                          <h5 className="text-sm font-bold text-emerald-500 uppercase tracking-wide">
+                                            Approve & Pay
+                                          </h5>
+                                          <p className="text-xs text-emerald-200/70 mt-1 font-semibold uppercase tracking-normal">
+                                            Release{" "}
+                                            <span className="text-white font-bold">
+                                              $
+                                              {activeReview.displayAmount?.toLocaleString()}
+                                            </span>{" "}
+                                            to freelancer.
+                                          </p>
                                         </div>
-                                      </div>
-
-                                      <div className="relative flex items-center py-2">
-                                        <div className="flex-grow border-t border-white/10"></div>
-                                        <span className="flex-shrink-0 mx-4 text-white/30 text-xs font-bold uppercase tracking-wide">
-                                          Or Request Changes
-                                        </span>
-                                        <div className="flex-grow border-t border-white/10"></div>
-                                      </div>
-
-                                      {/* Revision / Reject */}
-                                      <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <SheetClose asChild>
                                           <Button
-                                            variant="outline"
-                                            className={cn(
-                                              "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400 font-bold uppercase tracking-wide",
-                                              reviewAction ===
-                                              "REVISION_REQUESTED" &&
-                                              "bg-amber-500/10 ring-1 ring-amber-500"
-                                            )}
-                                            onClick={() => {
-                                              setReviewAction(
-                                                "REVISION_REQUESTED"
-                                              );
-                                              setReviewReason("");
-                                            }}
+                                            onClick={handleApprove}
+                                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wide"
                                           >
-                                            Request Changes
+                                            <Check className="w-4 h-4 mr-2" />
+                                            Approve
                                           </Button>
-                                          <Button
-                                            variant="outline"
-                                            className={cn(
-                                              "border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 font-bold uppercase tracking-wide",
-                                              reviewAction === "REJECTED" &&
-                                              "bg-red-500/10 ring-1 ring-red-500"
-                                            )}
-                                            onClick={() => {
-                                              setReviewAction("REJECTED");
-                                              setReviewReason("");
-                                            }}
-                                          >
-                                            Reject Work
-                                          </Button>
-                                        </div>
-
-                                        {reviewAction && (
-                                          <div className="space-y-4 p-4 rounded-lg bg-white/[0.02] border border-white/10 animate-in slide-in-from-top-2">
-                                            <div className="space-y-2">
-                                              <Label>
-                                                Reason codes (required)
-                                              </Label>
-                                              <Select
-                                                onValueChange={setReviewReason}
-                                              >
-                                                <SelectTrigger className="bg-black/40 border-white/10">
-                                                  <SelectValue placeholder="Select reason..." />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-[#141416] border-white/10 text-white">
-                                                  {APPROVAL_REJECTION_CODES.filter(
-                                                    (c) =>
-                                                      reviewAction ===
-                                                        "REJECTED"
-                                                        ? c.code !==
-                                                        "REVISION_REQUIRED"
-                                                        : true
-                                                  ).map((c) => (
-                                                    <SelectItem
-                                                      key={c.code}
-                                                      value={c.code}
-                                                      className="focus:bg-white/10 focus:text-white"
-                                                    >
-                                                      <div className="flex flex-col">
-                                                        <span className="font-bold">
-                                                          {c.label}
-                                                        </span>
-                                                        <span className="text-xs text-white/50">
-                                                          {c.description}
-                                                        </span>
-                                                      </div>
-                                                    </SelectItem>
-                                                  ))}
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                            <div className="space-y-2">
-                                              <Label>Notes (Optional)</Label>
-                                              <Textarea
-                                                placeholder="Provide feedback..."
-                                                className="bg-black/40 border-white/10 min-h-[80px]"
-                                                value={reviewFeedback}
-                                                onChange={(e) =>
-                                                  setReviewFeedback(
-                                                    e.target.value
-                                                  )
-                                                }
-                                              />
-                                            </div>
-                                            <div className="flex justify-end gap-2">
-                                              <Button
-                                                variant="ghost"
-                                                onClick={() =>
-                                                  setReviewAction(null)
-                                                }
-                                              >
-                                                Cancel
-                                              </Button>
-                                              <SheetClose asChild>
-                                                <Button
-                                                  disabled={!reviewReason}
-                                                  onClick={handleReviewSubmit}
-                                                  className={
-                                                    reviewAction === "REJECTED"
-                                                      ? "bg-red-600 hover:bg-red-700"
-                                                      : "bg-amber-600 hover:bg-amber-700"
-                                                  }
-                                                >
-                                                  Confirm{" "}
-                                                  {reviewAction === "REJECTED"
-                                                    ? "Rejection"
-                                                    : "Request"}
-                                                </Button>
-                                              </SheetClose>
-                                            </div>
-                                          </div>
-                                        )}
+                                        </SheetClose>
                                       </div>
                                     </div>
+
+                                    <div className="relative flex items-center py-2">
+                                      <div className="flex-grow border-t border-white/10"></div>
+                                      <span className="flex-shrink-0 mx-4 text-white/30 text-xs font-bold uppercase tracking-wide">
+                                        Or Request Changes
+                                      </span>
+                                      <div className="flex-grow border-t border-white/10"></div>
+                                    </div>
+
+                                    {/* Revision / Reject */}
+                                    <div className="space-y-4">
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <Button
+                                          variant="outline"
+                                          className={cn(
+                                            "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400 font-bold uppercase tracking-wide",
+                                            reviewAction ===
+                                              "REVISION_REQUESTED" &&
+                                              "bg-amber-500/10 ring-1 ring-amber-500"
+                                          )}
+                                          onClick={() => {
+                                            setReviewAction(
+                                              "REVISION_REQUESTED"
+                                            );
+                                            setReviewReason("");
+                                          }}
+                                        >
+                                          Request Changes
+                                        </Button>
+                                        <Button
+                                          variant="outline"
+                                          className={cn(
+                                            "border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 font-bold uppercase tracking-wide",
+                                            reviewAction === "REJECTED" &&
+                                              "bg-red-500/10 ring-1 ring-red-500"
+                                          )}
+                                          onClick={() => {
+                                            setReviewAction("REJECTED");
+                                            setReviewReason("");
+                                          }}
+                                        >
+                                          Reject Work
+                                        </Button>
+                                      </div>
+
+                                      {reviewAction && (
+                                        <div className="space-y-4 p-4 rounded-lg bg-white/[0.02] border border-white/10 animate-in slide-in-from-top-2">
+                                          <div className="space-y-2">
+                                            <Label>
+                                              Reason codes (required)
+                                            </Label>
+                                            <Select
+                                              onValueChange={setReviewReason}
+                                            >
+                                              <SelectTrigger className="bg-black/40 border-white/10">
+                                                <SelectValue placeholder="Select reason..." />
+                                              </SelectTrigger>
+                                              <SelectContent className="bg-[#141416] border-white/10 text-white">
+                                                {APPROVAL_REJECTION_CODES.filter(
+                                                  (c) =>
+                                                    reviewAction === "REJECTED"
+                                                      ? c.code !==
+                                                        "REVISION_REQUIRED"
+                                                      : true
+                                                ).map((c) => (
+                                                  <SelectItem
+                                                    key={c.code}
+                                                    value={c.code}
+                                                    className="focus:bg-white/10 focus:text-white"
+                                                  >
+                                                    <div className="flex flex-col">
+                                                      <span className="font-bold">
+                                                        {c.label}
+                                                      </span>
+                                                      <span className="text-xs text-white/50">
+                                                        {c.description}
+                                                      </span>
+                                                    </div>
+                                                  </SelectItem>
+                                                ))}
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-2">
+                                            <Label>Notes (Optional)</Label>
+                                            <Textarea
+                                              placeholder="Provide feedback..."
+                                              className="bg-black/40 border-white/10 min-h-[80px]"
+                                              value={reviewFeedback}
+                                              onChange={(e) =>
+                                                setReviewFeedback(
+                                                  e.target.value
+                                                )
+                                              }
+                                            />
+                                          </div>
+                                          <div className="flex justify-end gap-2">
+                                            <Button
+                                              variant="ghost"
+                                              onClick={() =>
+                                                setReviewAction(null)
+                                              }
+                                            >
+                                              Cancel
+                                            </Button>
+                                            <SheetClose asChild>
+                                              <Button
+                                                disabled={!reviewReason}
+                                                onClick={handleReviewSubmit}
+                                                className={
+                                                  reviewAction === "REJECTED"
+                                                    ? "bg-red-600 hover:bg-red-700"
+                                                    : "bg-amber-600 hover:bg-amber-700"
+                                                }
+                                              >
+                                                Confirm{" "}
+                                                {reviewAction === "REJECTED"
+                                                  ? "Rejection"
+                                                  : "Request"}
+                                              </Button>
+                                            </SheetClose>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
-                                )}
-                              </SheetContent>
-                            </Sheet>
-                          )}
-
-                        {milestone.status === "VERIFIED" &&
-                          milestone.type === "APPROVAL_HUMAN" && (
-                            <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
-                              <CheckCircle className="w-3 h-3 mr-1.5" />
-                              Approved
-                            </div>
-                          )}
-
-                        {(milestone.status === "VERIFIED" || milestone.status === "APPROVED") &&
-                          milestone.type === "APPROVAL_HUMAN" && (
-                            <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
-                              <CheckCircle className="w-3 h-3 mr-1.5" />
-                              Passed
-                            </div>
-                          )}
+                                </div>
+                              )}
+                            </SheetContent>
+                          </Sheet>
+                        ) : (
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "uppercase tracking-widest text-[10px] h-7 px-3 flex items-center gap-1.5",
+                              getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
+                              getStatusColor(milestone.status),
+                              getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20")
+                            )}
+                          >
+                            {milestone.status === "VERIFIED" ||
+                            milestone.status === "APPROVED" ? (
+                              <CheckCircle className="w-3.5 h-3.5" />
+                            ) : (
+                              <Clock className="w-3.5 h-3.5" />
+                            )}
+                            {milestone.status.replace("_", " ")}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -726,49 +680,41 @@ export default function ClientVaultDetailPage() {
 
           {/* RIGHT COLUMN: SUMMARY & ACTIONS */}
           <div className="space-y-6">
-            {/* Verification Summary */}
-            <Card className="bg-[#0D0D0E] border-white/5">
+            {/* Verification Summary (MVP DEMO) */}
+            <Card className="bg-[#0D0D0E] border-white/5 relative overflow-hidden">
+              <div className="absolute top-2 right-2">
+                <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30 text-[8px] uppercase font-black">
+                  Demo Module
+                </Badge>
+              </div>
               <CardHeader>
-                <CardTitle className="text-white text-lg font-extrabold uppercase tracking-wide">
+                <CardTitle className="text-white text-lg font-bold uppercase tracking-normal">
                   Production Simulation
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4">
-                  <p className="text-xs text-gray-400 font-semibold uppercase tracking-normal leading-relaxed">
-                    This view simulates how milestones are processed in
-                    production: first passing automated AI Compliance checks,
-                    then forwarded for Client Approval.
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tight leading-relaxed">
+                    This view simulates automated AI compliance checks before
+                    forwarding work for human approval.
                   </p>
 
-                  <div className="p-4 bg-white/5 rounded-lg border border-white/5 space-y-3">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-400 font-bold uppercase tracking-normal">Escrow Status</span>
-                      <span className="text-emerald-500 font-bold uppercase tracking-normal">Secure</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-400 font-bold uppercase tracking-normal">
-                        Verification Confidence
+                  <div className="p-4 bg-white/3 rounded-lg border border-white/5 space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-500 font-bold uppercase">
+                        AI Confidence
                       </span>
-                      <span className="text-emerald-500 font-bold uppercase tracking-normal">99.8%</span>
+                      <span className="text-emerald-500 font-bold">99.8%</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-400 font-bold uppercase tracking-normal">Next Action</span>
-                      <span className="text-amber-500 font-bold uppercase tracking-normal">
-                        Client Review
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-500 font-bold uppercase">
+                        Next Step
+                      </span>
+                      <span className="text-amber-500 font-bold">
+                        Human Review
                       </span>
                     </div>
                   </div>
-                </div>
-
-                <div className="pt-4 border-t border-white/5">
-                  <Button
-                    variant="outline"
-                    className="w-full border-white/10 bg-transparent hover:bg-white/5 text-white"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    View Full Audit Log
-                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -908,38 +854,40 @@ export default function ClientVaultDetailPage() {
                 </div>
               )}
 
-              <div>
-                <h4 className="text-sm font-bold text-white uppercase tracking-widest">
-                  Contract Documents
+              <div className="relative">
+                <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4">
+                  Contract Deliverables
                 </h4>
                 <div className="space-y-2">
-                  {/* DEV ONLY: Invitation Link Generator */}
-                  {(vault.id === "v_invite_test" || vault.status === "INVITED" || vault.status === "FUNDED_UNASSIGNED") && (
-                    <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                      <p className="text-xs text-emerald-500 font-bold uppercase mb-2">Dev Helper: Invites</p>
+                  {submittedDeliverables.length > 0 ? (
+                    submittedDeliverables.map((doc) => (
                       <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                        key={doc.id}
+                        variant="ghost"
                         onClick={() => {
-                          // Hardcoded token for the test, normally this would come from API
-                          const token = "invite_valid_123";
-                          navigator.clipboard.writeText(`${window.location.origin}/invite/${token}`);
-                          toast.success("Invitation link copied to clipboard");
+                          toast.info(`Opening ${doc.name} submitted for ${doc.milestoneName}`);
                         }}
+                        className="w-full justify-between items-center text-gray-500 hover:text-white h-auto py-3 px-4 border border-white/5 bg-white/2 hover:bg-white/5 transition-all group"
                       >
-                        <Link2 className="w-3 h-3 mr-2" />
-                        Copy Test Invite Link
+                        <div className="flex items-center min-w-0 mr-3">
+                          {doc.type === "link" ? (
+                            <ExternalLink className="w-4 h-4 mr-3 shrink-0 text-emerald-500/70" />
+                          ) : (
+                            <Download className="w-4 h-4 mr-3 shrink-0" />
+                          )}
+                          <div className="text-left min-w-0">
+                            <span className="block text-[11px] font-bold text-white uppercase truncate">{doc.name}</span>
+                            <span className="block text-[9px] text-gray-600 font-bold uppercase tracking-tighter mt-0.5">{doc.milestoneName}</span>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                       </Button>
+                    ))
+                  ) : (
+                    <div className="p-4 border border-dashed border-white/5 rounded-lg text-center">
+                      <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">No deliverables submitted yet</p>
                     </div>
                   )}
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start text-gray-400 hover:text-white h-auto py-3"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    <span className="truncate">Service_Agreement_v2.pdf</span>
-                  </Button>
                 </div>
               </div>
             </div>
