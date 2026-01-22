@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,20 +17,13 @@ import {
   ArrowLeft,
   Check,
   Hash,
-  Sparkles,
-  Code,
-  Palette,
-  FileJson,
-  Smartphone,
-  Link2,
-  Music,
-  Clapperboard,
   DollarSign,
   TrendingDown,
   AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 
 const variants = {
   enter: (direction) => ({
@@ -53,8 +45,6 @@ const variants = {
   }),
 };
 
-import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
-
 export default function CreateVaultPage() {
   const router = useRouter();
   const [isDeploying, setIsDeploying] = useState(false);
@@ -65,29 +55,24 @@ export default function CreateVaultPage() {
     setPage([page + newDirection, newDirection]);
   };
 
-  const setStep = (newStep) => {
-    setPage([newStep, newStep > step ? 1 : -1]);
-  };
-
   // Step 1 State
   const [vaultPurpose, setVaultPurpose] = useState("");
   const [vaultTitle, setVaultTitle] = useState("");
   const [vaultDescription, setVaultDescription] = useState("");
-  const [budgetAmount, setBudgetAmount] = useState("");
+  const [budgetAmount, setBudgetAmount] = useState(""); // string input
   const [totalAmount, setTotalAmount] = useState(0);
 
   // Step 3 State
   const [freelancerEmail, setFreelancerEmail] = useState("");
   const [freelancerName, setFreelancerName] = useState("");
 
-  // Step 2 State
   const [milestones, setMilestones] = useState([
     {
       title: "",
       amount: "",
       dueDate: "",
       deliverableType: "",
-      type: "COMPLIANCE",
+      aiVerificationEnabled: true,
       auditRules: [],
     },
   ]);
@@ -99,22 +84,29 @@ export default function CreateVaultPage() {
     { id: 4, name: "Review", icon: ShieldCheck },
   ];
 
+  // ✅ FIX: numeric budget for comparisons & calculations
+  const budget = Number(budgetAmount) || 0;
+
+  // ✅ Helper: deliverable labels
+  const getDeliverableLabel = (deliverableId) => {
+    const list = VAULT_PURPOSE_MAPPING[vaultPurpose]?.deliverables || [];
+    return list.find((d) => d.id === deliverableId)?.label || deliverableId;
+  };
+
   /* -----------------------------
      VALIDATION LOGIC
   --------------------------------*/
+
+  // ✅ Recommendation: description NOT required (you asked this)
   const isStep1Complete =
-    vaultTitle.trim() !== "" &&
-    vaultPurpose !== "" &&
-    vaultDescription.trim() !== "" &&
-    budgetAmount > 0;
+    vaultTitle.trim() !== "" && vaultPurpose !== "" && budget > 0;
 
   const isStep2Complete =
     milestones.length > 0 &&
     milestones.every(
-      (m) =>
-        m.title.trim() !== "" && m.amount !== "" && m.deliverableType !== ""
+      (m) => m.title.trim() !== "" && m.amount !== "" && m.deliverableType !== ""
     ) &&
-    totalAmount <= budgetAmount;
+    totalAmount <= budget;
 
   const isStep3Complete =
     freelancerEmail.trim() !== "" &&
@@ -137,7 +129,7 @@ export default function CreateVaultPage() {
         amount: "",
         dueDate: "",
         deliverableType: "",
-        type: "COMPLIANCE", // Default to Compliance
+        aiVerificationEnabled: true,
         auditRules: [],
       },
     ]);
@@ -162,9 +154,11 @@ export default function CreateVaultPage() {
 
   const handleDeploy = () => {
     setIsDeploying(true);
+
+    // ⚠️ This is still a demo action. Replace with API call later.
     setTimeout(() => {
       router.push("/checkout/new-vault-id");
-    }, 2000);
+    }, 1200);
   };
 
   return (
@@ -185,7 +179,7 @@ export default function CreateVaultPage() {
             transition={{ delay: 0.2 }}
             className="text-white/70 text-sm md:text-base font-bold uppercase tracking-wide"
           >
-            Define objective conditions for capital release
+            Set deliverables and review checkpoints for escrow release
           </motion.p>
         </div>
 
@@ -221,10 +215,11 @@ export default function CreateVaultPage() {
                   <s.icon className="w-3 h-3 md:w-4 md:h-4" />
                 )}
               </motion.div>
+
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 + (i * 0.1) }}
+                transition={{ delay: 0.4 + i * 0.1 }}
                 className={cn(
                   "text-xs md:text-sm uppercase tracking-wide font-medium",
                   step === s.id ? "text-white" : "text-white"
@@ -252,7 +247,7 @@ export default function CreateVaultPage() {
               }}
               className="bg-[#0D0D0D] border border-gray-900 rounded-lg p-8 shadow-xl w-full"
             >
-              {/* STEP 1: BASICS / PURPOSE */}
+              {/* STEP 1 */}
               {step === 1 && (
                 <div className="space-y-8">
                   <div className="space-y-4">
@@ -268,7 +263,10 @@ export default function CreateVaultPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.05 }}
-                            whileHover={{ scale: 1.05, backgroundColor: "rgba(16, 185, 129, 0.1)" }}
+                            whileHover={{
+                              scale: 1.05,
+                              backgroundColor: "rgba(16, 185, 129, 0.1)",
+                            }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setVaultPurpose(key)}
                             className={cn(
@@ -300,9 +298,10 @@ export default function CreateVaultPage() {
                         className="bg-black border-gray-800 h-12 focus:border-emerald-500 text-white placeholder:text-gray-400"
                       />
                     </div>
+
                     <div className="space-y-2">
                       <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
-                        Contract Budget (Target) *
+                        Contract Budget *
                       </Label>
                       <div className="relative">
                         <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
@@ -315,22 +314,26 @@ export default function CreateVaultPage() {
                         />
                       </div>
                     </div>
+
                     <div className="space-y-2">
                       <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
-                        Brief Description *
+                        Brief Description (Optional)
                       </Label>
                       <Textarea
                         value={vaultDescription}
                         onChange={(e) => setVaultDescription(e.target.value)}
-                        placeholder="Describe the overall scope and deliverables..."
+                        placeholder="Optional context for the freelancer + future disputes..."
                         className="bg-black border-gray-800 min-h-[120px] focus:border-emerald-500 text-white placeholder:text-gray-400"
                       />
+                      <p className="text-xs text-white/40 font-medium">
+                        This can appear in the vault detail screen later and helps with clarity during reviews.
+                      </p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* STEP 2: PURPOSE-DRIVEN MILESTONES */}
+              {/* STEP 2 */}
               {step === 2 && (
                 <div className="space-y-6">
                   <div className="flex justify-between items-center mb-4">
@@ -339,7 +342,7 @@ export default function CreateVaultPage() {
                     </h2>
                   </div>
 
-                  {/* BUDGET TRACKER */}
+                  {/* Budget Tracker */}
                   <div className="bg-[#0A0A0A] border border-gray-800 p-5 rounded-xl space-y-3">
                     <div className="flex justify-between items-end">
                       <div className="space-y-1">
@@ -349,19 +352,18 @@ export default function CreateVaultPage() {
                         <p
                           className={cn(
                             "text-lg font-bold tracking-tight",
-                            totalAmount > budgetAmount
-                              ? "text-red-500"
-                              : "text-white"
+                            totalAmount > budget ? "text-red-500" : "text-white"
                           )}
                         >
                           ${totalAmount.toLocaleString()}{" "}
                           <span className="text-white-600 font-medium text-sm">
-                            / ${Number(budgetAmount).toLocaleString()}
+                            / ${budget.toLocaleString()}
                           </span>
                         </p>
                       </div>
+
                       <div className="text-right">
-                        {totalAmount > budgetAmount ? (
+                        {totalAmount > budget ? (
                           <div className="flex items-center gap-1.5 text-red-500 animate-pulse">
                             <AlertCircle className="w-3 h-3" />
                             <span className="text-sm font-black uppercase tracking-wide">
@@ -372,24 +374,26 @@ export default function CreateVaultPage() {
                           <div className="flex items-center gap-1.5 text-emerald-500">
                             <TrendingDown className="w-3 h-3" />
                             <span className="text-sm font-black uppercase tracking-wide">
-                              ${(budgetAmount - totalAmount).toLocaleString()}{" "}
-                              Remaining
+                              ${(budget - totalAmount).toLocaleString()} Remaining
                             </span>
                           </div>
                         )}
                       </div>
                     </div>
+
                     <div className="h-1.5 bg-gray-900 rounded-full overflow-hidden shadow-inner">
                       <motion.div
                         className={cn(
                           "h-full rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]",
-                          totalAmount > budgetAmount
-                            ? "bg-red-500"
-                            : "bg-emerald-500"
+                          totalAmount > budget ? "bg-red-500" : "bg-emerald-500"
                         )}
                         initial={{ width: 0 }}
                         animate={{
-                          width: `${Math.min((totalAmount / budgetAmount) * 100, 100)}%`
+                          width: `${
+                            budget > 0
+                              ? Math.min((totalAmount / budget) * 100, 100)
+                              : 0
+                          }%`,
                         }}
                         transition={{ duration: 0.5, ease: "circOut" }}
                       />
@@ -400,7 +404,7 @@ export default function CreateVaultPage() {
                     <AnimatePresence>
                       {milestones.map((m, i) => (
                         <motion.div
-                          key={i} // Use a stable ID if possible ideally, but index works for append-only logic mostly
+                          key={i}
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0, marginBottom: 0 }}
@@ -410,6 +414,7 @@ export default function CreateVaultPage() {
                             <span className="text-sm text-emerald-500 font-bold uppercase tracking-tighter">
                               Phase 0{i + 1}
                             </span>
+
                             {milestones.length > 1 && (
                               <button onClick={() => removeMilestone(i)}>
                                 <Trash2 className="w-4 h-4 text-white hover:text-red-500 transition-colors" />
@@ -427,47 +432,43 @@ export default function CreateVaultPage() {
                               className="bg-[#0A0A0A] border-gray-800 text-white h-11 placeholder:text-gray-400"
                             />
 
-                            {/* Milestone Type Selection */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                              <button
-                                onClick={() => updateMilestone(i, "type", "COMPLIANCE")}
-                                className={cn(
-                                  "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
-                                  m.type === "COMPLIANCE"
-                                    ? "bg-emerald-500/10 border-emerald-500 text-emerald-500"
-                                    : "bg-[#0A0A0A] border-gray-800 text-white/50 hover:border-gray-700"
-                                )}
-                              >
-                                <ShieldCheck className="w-5 h-5" />
-                                <div className="text-center">
-                                  <p className="text-xs font-bold uppercase tracking-wide">
-                                    Compliance
-                                  </p>
-                                  <p className="text-sm opacity-70 font-bold uppercase tracking-wide">
-                                    Auto-release on pass
+                            {/* Escrow-safe rules (Mandatory Requirements) */}
+                            <div className="space-y-4 pt-2">
+                              {/* Mandatory Client Approval */}
+                              <div className="flex items-center justify-between p-3 bg-[#0A0A0A] border border-gray-800 rounded-lg">
+                                <div className="space-y-0.5">
+                                  <Label className="text-xs font-bold uppercase tracking-wider text-white">
+                                    Client Approval Required
+                                  </Label>
+                                  <p className="text-[10px] text-gray-500 uppercase font-bold">
+                                    Mandatory for all payout releases
                                   </p>
                                 </div>
-                              </button>
+                                <div className="flex items-center gap-2 text-emerald-500">
+                                  <ShieldCheck className="w-4 h-4" />
+                                  <span className="text-[10px] font-black uppercase tracking-widest">
+                                    ALWAYS ON
+                                  </span>
+                                </div>
+                              </div>
 
-                              <button
-                                onClick={() => updateMilestone(i, "type", "APPROVAL")}
-                                className={cn(
-                                  "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
-                                  m.type === "APPROVAL"
-                                    ? "bg-amber-500/10 border-amber-500 text-amber-500"
-                                    : "bg-[#0A0A0A] border-gray-800 text-white/50 hover:border-gray-700"
-                                )}
-                              >
-                                <ShieldCheck className="w-5 h-5" />
-                                <div className="text-center">
-                                  <p className="text-xs font-bold uppercase tracking-wide">
-                                    Approval
-                                  </p>
-                                  <p className="text-sm opacity-70 font-bold uppercase tracking-wide">
-                                    Client sign-off required
+                              {/* Mandatory AI Verification Audit */}
+                              <div className="flex items-center justify-between p-3 bg-[#0A0A0A] border border-gray-800 rounded-lg">
+                                <div className="space-y-0.5">
+                                  <Label className="text-xs font-bold uppercase tracking-wider text-white">
+                                    AI Verification Audit
+                                  </Label>
+                                  <p className="text-[10px] text-gray-500 uppercase font-bold">
+                                    Automated checks for deliverable quality
                                   </p>
                                 </div>
-                              </button>
+                                <div className="flex items-center gap-2 text-emerald-500">
+                                  <ShieldCheck className="w-4 h-4" />
+                                  <span className="text-[10px] font-black uppercase tracking-widest">
+                                    ALWAYS ON
+                                  </span>
+                                </div>
+                              </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
@@ -485,6 +486,7 @@ export default function CreateVaultPage() {
                                   className="bg-[#0A0A0A] border-gray-800 text-white pl-7 h-11 placeholder:text-gray-400"
                                 />
                               </div>
+
                               <Input
                                 type="date"
                                 value={m.dueDate}
@@ -497,26 +499,22 @@ export default function CreateVaultPage() {
 
                             <div className="space-y-2">
                               <Label className="text-sm text-white/70 uppercase font-bold tracking-wide">
-                                Deliverable Type (AI Auditable)
+                                Deliverable Type
                               </Label>
+
                               <select
                                 value={m.deliverableType}
                                 onChange={(e) => {
                                   const deliverables =
-                                    VAULT_PURPOSE_MAPPING[vaultPurpose].deliverables;
+                                    VAULT_PURPOSE_MAPPING[vaultPurpose]?.deliverables ||
+                                    [];
+
                                   const selected = deliverables.find(
                                     (d) => d.id === e.target.value
                                   );
-                                  updateMilestone(
-                                    i,
-                                    "deliverableType",
-                                    selected?.id || ""
-                                  );
-                                  updateMilestone(
-                                    i,
-                                    "auditRules",
-                                    selected?.rules || []
-                                  );
+
+                                  updateMilestone(i, "deliverableType", selected?.id || "");
+                                  updateMilestone(i, "auditRules", selected?.rules || []);
                                 }}
                                 className="w-full bg-[#0A0A0A] border border-gray-800 text-white p-3 text-sm rounded-md focus:border-emerald-500 outline-none font-bold uppercase tracking-wide"
                               >
@@ -534,7 +532,8 @@ export default function CreateVaultPage() {
                               </select>
                             </div>
 
-                            {m.auditRules.length > 0 && (
+                            {/* ✅ Show audit protocol only if AI is ON */}
+                            {m.aiVerificationEnabled && m.auditRules.length > 0 && (
                               <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-md">
                                 <div className="flex items-center gap-2 mb-2">
                                   <ShieldCheck className="w-3 h-3 text-emerald-500" />
@@ -571,7 +570,7 @@ export default function CreateVaultPage() {
                 </div>
               )}
 
-              {/* STEP 3: ASSIGN FREELANCER */}
+              {/* STEP 3 */}
               {step === 3 && (
                 <div className="space-y-8">
                   <div className="text-center mb-8">
@@ -583,11 +582,13 @@ export default function CreateVaultPage() {
                     >
                       <Users className="w-8 h-8 text-emerald-500" />
                     </motion.div>
+
                     <h2 className="text-xl font-black uppercase tracking-tight text-white">
                       Who is this vault for?
                     </h2>
+
                     <p className="text-white/70 text-sm mt-1 font-bold uppercase tracking-wide">
-                      Assign a freelancer to this vault to begin the collaboration.
+                      Assign a freelancer to begin the collaboration.
                     </p>
                   </div>
 
@@ -604,8 +605,7 @@ export default function CreateVaultPage() {
                         className="bg-black border-gray-800 h-12 focus:border-emerald-500 text-white placeholder:text-gray-400"
                       />
                       <p className="text-sm text-white/50">
-                        If they don't have an account, they'll be invited to join
-                        Dayle.
+                        If they don&apos;t have an account, they&apos;ll be invited to join.
                       </p>
                     </div>
 
@@ -630,10 +630,8 @@ export default function CreateVaultPage() {
                           Secure Invitation
                         </h4>
                         <p className="text-sm text-white/70 mt-1 leading-relaxed">
-                          Upon deployment, the freelancer will receive a secure
-                          invitation link to view the vault conditions and accept
-                          the assignment. Capital remains locked until conditions
-                          are met.
+                          The freelancer receives an invite to accept the vault terms.
+                          Funds stay locked until the client approves each milestone.
                         </p>
                       </div>
                     </div>
@@ -641,7 +639,7 @@ export default function CreateVaultPage() {
                 </div>
               )}
 
-              {/* STEP 4: REVIEW & DEPLOY */}
+              {/* STEP 4 */}
               {step === 4 && (
                 <div className="space-y-8">
                   <div className="flex items-center justify-between mb-2">
@@ -656,7 +654,7 @@ export default function CreateVaultPage() {
                   </div>
 
                   <div className="space-y-4">
-                    {/* Basic Info Summary */}
+                    {/* Basic Summary */}
                     <div className="bg-black border border-gray-800 p-6 rounded-lg space-y-4">
                       <div className="flex justify-between items-start">
                         <div>
@@ -667,6 +665,7 @@ export default function CreateVaultPage() {
                             {vaultTitle}
                           </p>
                         </div>
+
                         <div className="text-right">
                           <h3 className="text-sm font-medium text-white/50 uppercase tracking-wide">
                             Total Value
@@ -676,14 +675,14 @@ export default function CreateVaultPage() {
                           </p>
                         </div>
                       </div>
+
                       <div>
                         <h3 className="text-sm font-medium text-white/50 uppercase tracking-wide">
                           Purpose
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
                           {(() => {
-                            const Icon =
-                              VAULT_PURPOSE_MAPPING[vaultPurpose]?.icon || Hash;
+                            const Icon = VAULT_PURPOSE_MAPPING[vaultPurpose]?.icon || Hash;
                             return <Icon className="w-4 h-4 text-emerald-500" />;
                           })()}
                           <span className="text-sm text-white">
@@ -691,6 +690,18 @@ export default function CreateVaultPage() {
                           </span>
                         </div>
                       </div>
+
+                      {/* ✅ If description exists, show it HERE so it’s not wasted */}
+                      {vaultDescription.trim() !== "" && (
+                        <div>
+                          <h3 className="text-sm font-medium text-white/50 uppercase tracking-wide">
+                            Description
+                          </h3>
+                          <p className="text-sm text-white/80 leading-relaxed mt-1">
+                            {vaultDescription}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Freelancer Summary */}
@@ -716,6 +727,7 @@ export default function CreateVaultPage() {
                       <h3 className="text-sm text-white/50 uppercase font-bold tracking-wide ml-1">
                         Milestones ({milestones.length})
                       </h3>
+
                       {milestones.map((m, i) => (
                         <div
                           key={i}
@@ -725,28 +737,28 @@ export default function CreateVaultPage() {
                             <div className="w-8 h-8 rounded-full border border-gray-800 flex items-center justify-center text-sm text-white/70 font-mono">
                               0{i + 1}
                             </div>
+
                             <div>
                               <p className="text-sm text-white font-bold uppercase tracking-normal">
                                 {m.title}
                               </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                                <span className="text-sm text-white/70 capitalize">
-                                  {m.deliverableType.replace("_", " ")} Verification
+
+                              <div className="flex flex-wrap items-center gap-2 mt-1">
+                                <span className="text-sm text-white/70 font-semibold">
+                                  {getDeliverableLabel(m.deliverableType)}
                                 </span>
-                                <span
-                                  className={cn(
-                                    "text-sm font-bold uppercase tracking-wide px-2 py-0.5 rounded-sm border",
-                                    m.type === "COMPLIANCE"
-                                      ? "border-emerald-500/30 text-emerald-500"
-                                      : "border-amber-500/30 text-amber-500"
-                                  )}
-                                >
-                                  {m.type === "COMPLIANCE" ? "Auto" : "Manual"}
+
+                                <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-sm border border-emerald-500/30 text-emerald-500">
+                                  AI Verification: ALWAYS ON
+                                </span>
+
+                                <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-sm border border-emerald-500/30 text-emerald-500">
+                                  Client Approval Required
                                 </span>
                               </div>
                             </div>
                           </div>
+
                           <div className="text-right">
                             <p className="text-sm text-white font-mono font-bold">
                               ${Number(m.amount).toLocaleString()}
@@ -759,24 +771,25 @@ export default function CreateVaultPage() {
                       ))}
                     </div>
 
-                    {/* Audit & Release Disclaimer */}
-                    <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-lg flex gap-4">
-                      <div className="p-2 bg-amber-500/20 rounded-md h-fit">
-                        <ShieldCheck className="w-5 h-5 text-amber-500" />
+                    {/* Disclaimer */}
+                    <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-lg flex gap-4">
+                      <div className="p-2 bg-emerald-500/20 rounded-md h-fit">
+                        <ShieldCheck className="w-5 h-5 text-emerald-500" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-amber-500 uppercase tracking-wide">
-                          Escrow Protocol & AI Audit
+                        <h4 className="text-sm font-bold text-emerald-500 uppercase tracking-wide">
+                          Escrow Verification Protocol
                         </h4>
                         <p className="text-sm text-white-300 mt-1 leading-relaxed">
-                          By deploying this vault, you agree that capital release is{" "}
+                          Release is secured by a joint protocol:{" "}
                           <span className="text-white font-medium">
-                            automated via AI audit
-                          </span>
-                          . Milestones unlock sequentially (01 → 02 → 03). You
-                          cannot manually release funds, but you maintain the right
-                          to view evidence and raise disputes if automated checks
-                          pass incorrectly.
+                            Mandatory AI Audit
+                          </span>{" "}
+                          validates deliverable integrity, but{" "}
+                          <span className="text-white font-medium">
+                            Client Approval
+                          </span>{" "}
+                          is strictly required for all fund releases.
                         </p>
                       </div>
                     </div>
@@ -784,7 +797,7 @@ export default function CreateVaultPage() {
                 </div>
               )}
 
-              {/* NAVIGATION BUTTONS */}
+              {/* NAVIGATION */}
               <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 mt-12 pt-6 border-t border-gray-900">
                 <Button
                   variant="ghost"
@@ -812,7 +825,7 @@ export default function CreateVaultPage() {
                   <Button
                     onClick={handleDeploy}
                     disabled={isDeploying}
-                    className="w-full sm:w-auto bg-emerald-500 text-black px-10 h-11 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 disabled:opacity-90 disabled:cursor-not-allowed transition-all"
+                    className="w-full sm:w-auto bg-emerald-500 text-black px-10 h-11 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 disabled:opacity-90 disabled:cursor-not-allowed transition-all font-bold uppercase tracking-wide"
                   >
                     {isDeploying ? (
                       <div className="flex items-center gap-1 font-bold">
@@ -820,18 +833,39 @@ export default function CreateVaultPage() {
                         <motion.span
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          transition={{ duration: 0.4, repeat: Infinity, repeatType: "reverse", delay: 0 }}
-                        >.</motion.span>
+                          transition={{
+                            duration: 0.4,
+                            repeat: Infinity,
+                            repeatType: "reverse",
+                            delay: 0,
+                          }}
+                        >
+                          .
+                        </motion.span>
                         <motion.span
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          transition={{ duration: 0.4, repeat: Infinity, repeatType: "reverse", delay: 0.2 }}
-                        >.</motion.span>
+                          transition={{
+                            duration: 0.4,
+                            repeat: Infinity,
+                            repeatType: "reverse",
+                            delay: 0.2,
+                          }}
+                        >
+                          .
+                        </motion.span>
                         <motion.span
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          transition={{ duration: 0.4, repeat: Infinity, repeatType: "reverse", delay: 0.4 }}
-                        >.</motion.span>
+                          transition={{
+                            duration: 0.4,
+                            repeat: Infinity,
+                            repeatType: "reverse",
+                            delay: 0.4,
+                          }}
+                        >
+                          .
+                        </motion.span>
                       </div>
                     ) : (
                       "Deploy Vault"
@@ -843,10 +877,10 @@ export default function CreateVaultPage() {
           </AnimatePresence>
         </div>
 
-        {/* Footer info */}
+        {/* Footer */}
         <div className="mt-8 flex items-center justify-center gap-2 text-white/30">
           <Lock className="w-3 h-3" />
-          <span className="text-sm uppercase tracking-tighter font-medium">
+          <span className="text-sm uppercase tracking-wide font-bold">
             Secured by Dayle Escrow Protocol
           </span>
         </div>
