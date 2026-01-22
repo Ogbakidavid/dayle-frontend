@@ -612,22 +612,38 @@ export default function FreelancerVaultDetailPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400 font-bold uppercase tracking-normal">Requirements Met</span>
-                    <span className="text-emerald-500 font-bold uppercase tracking-normal">12/12</span>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400 font-bold uppercase tracking-normal">
+                      Requirements Met:
+                    </span>
+                    <span className="text-emerald-500 font-bold uppercase tracking-normal">
+                      12/12
+                    </span>
                   </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 w-full" />
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400 font-bold uppercase tracking-normal">
+                      Checks Passed:
+                    </span>
+                    <span className="text-emerald-500 font-bold uppercase tracking-normal">
+                      12/12
+                    </span>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400 font-bold uppercase tracking-normal">Checks Summary</span>
-                    <span className="text-emerald-500 font-bold uppercase tracking-normal">A+</span>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400 font-bold uppercase tracking-normal">
+                      Last Verified:
+                    </span>
+                    <span className="text-white font-bold uppercase tracking-normal">
+                      2 mins ago
+                    </span>
                   </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 w-full" />
+                  <div className="flex justify-between items-center text-sm pt-2 border-t border-white/5">
+                    <span className="text-gray-400 font-bold uppercase tracking-normal">
+                      Status:
+                    </span>
+                    <span className="text-emerald-500 font-bold uppercase tracking-normal">
+                      Verified
+                    </span>
                   </div>
                 </div>
               </CardContent>
