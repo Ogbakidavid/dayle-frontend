@@ -34,49 +34,87 @@ export default function ClientReviewPage() {
   const params = useParams();
   const router = useRouter();
   const { vaultId, milestoneId } = params;
-  const [feedback, setFeedback] = useState("");
   const [selectedReason, setSelectedReason] = useState("");
+  const [reviewAction, setReviewAction] = useState(null); // 'APPROVE' | 'REQUEST_CHANGES' | 'REJECT'
+  const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
 
   const handleApprove = () => {
-    // Mock approval logic
-    console.log("Approved milestone");
+    // Create structured MilestoneReview record
+    const reviewRecord = {
+      id: `review_${Date.now()}`,
+      milestoneId,
+      reviewerUserId: "current-client-id", // mock
+      outcome: "APPROVE",
+      reasonCodes: [],
+      notes: "",
+      createdAt: new Date().toISOString(),
+    };
+
+    console.log("Submitting Milestone Review Record (APPROVE):", reviewRecord);
+
+    // In real app: await api.milestones.review(reviewRecord);
+    // This would set milestone.status = VERIFIED
     router.push(`/client/vault/${vaultId}`);
   };
 
-  const handleReject = () => {
+  const handleRequestChanges = () => {
     if (!selectedReason) {
       setError("Please select a reason for requesting changes.");
       return;
     }
     setError("");
-    // structured Milestone_Review record
+
+    // Create structured MilestoneReview record
     const reviewRecord = {
-      vaultId,
+      id: `review_${Date.now()}`,
       milestoneId,
-      reviewerRole: "CLIENT",
-      action: "REVISION_REQUESTED", // or REJECTED depending on severity, usually revision first
-      reasonCode: selectedReason,
-      comments: feedback,
-      timestamp: new Date().toISOString(),
-      metadata: {
-        attempt: 1, // mock
-      },
+      reviewerUserId: "current-client-id", // mock
+      outcome: "REQUEST_CHANGES",
+      reasonCodes: [selectedReason],
+      notes: feedback,
+      createdAt: new Date().toISOString(),
     };
 
-    console.log("Submitting Milestone Review Record:", reviewRecord);
+    console.log("Submitting Milestone Review Record (REQUEST_CHANGES):", reviewRecord);
 
-    // In real app: await submitReview(reviewRecord);
+    // In real app: await api.milestones.review(reviewRecord);
+    // This would set milestone.status = REVISION_REQUESTED
+    router.push(`/client/vault/${vaultId}`);
+  };
+
+  const handleReject = () => {
+    if (!selectedReason) {
+      setError("Please select a reason for rejection.");
+      return;
+    }
+    setError("");
+
+    // Create structured MilestoneReview record
+    const reviewRecord = {
+      id: `review_${Date.now()}`,
+      milestoneId,
+      reviewerUserId: "current-client-id", // mock
+      outcome: "REJECT",
+      reasonCodes: [selectedReason],
+      notes: feedback,
+      createdAt: new Date().toISOString(),
+    };
+
+    console.log("Submitting Milestone Review Record (REJECT):", reviewRecord);
+
+    // In real app: await api.milestones.review(reviewRecord);
+    // This would set milestone.status = REJECTED
     router.push(`/client/vault/${vaultId}`);
   };
 
   return (
-    <div className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30 pb-20">
+    <div className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30 pb-20">
       <div className="max-w-4xl mx-auto px-6 space-y-8">
         <header className="pt-8">
           <Link
             href={`/client/vault/${vaultId}`}
-            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Vault
@@ -90,7 +128,7 @@ export default function ClientReviewPage() {
               Action Required
             </Badge>
           </div>
-          <p className="text-slate-500 mt-2">
+          <p className="text-gray-400 mt-2">
             Freelancer has submitted work for approval.
           </p>
         </header>
@@ -112,7 +150,7 @@ export default function ClientReviewPage() {
                         <p className="text-sm text-white font-medium">
                           backend_v1.zip
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-gray-400">
                           12.5 MB · Uploaded 2 hours ago
                         </p>
                       </div>
@@ -120,7 +158,7 @@ export default function ClientReviewPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="text-slate-400 hover:text-white"
+                      className="text-gray-400 hover:text-white"
                     >
                       <Download className="w-4 h-4" />
                     </Button>
@@ -132,7 +170,7 @@ export default function ClientReviewPage() {
                         <p className="text-sm text-white font-medium">
                           api_docs.pdf
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-gray-400">
                           2.1 MB · Uploaded 2 hours ago
                         </p>
                       </div>
@@ -140,17 +178,17 @@ export default function ClientReviewPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="text-slate-400 hover:text-white"
+                      className="text-gray-400 hover:text-white"
                     >
                       <Download className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
                 <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-2">
+                  <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-2">
                     Freelancer Notes
                   </p>
-                  <p className="text-sm text-slate-300 italic">
+                  <p className="text-sm text-gray-400 italic">
                     "Here is the first draft of the API. I've included the
                     swagger docs as requested. Let me know if you need any
                     changes."

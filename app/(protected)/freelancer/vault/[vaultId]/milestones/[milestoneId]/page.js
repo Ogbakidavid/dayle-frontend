@@ -43,13 +43,13 @@ export default function FreelancerMilestoneDetailPage() {
   };
 
   return (
-    <div className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30 pb-20">
+    <div className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30 pb-20">
       <div className="max-w-4xl mx-auto px-6 space-y-8">
         {/* HEADER */}
         <header className="pt-8">
           <Link
             href={`/freelancer/vault/${vaultId}`}
-            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Vault
@@ -62,17 +62,17 @@ export default function FreelancerMilestoneDetailPage() {
                 </h1>
                 <Badge
                   variant="outline"
-                  className="bg-slate-500/10 text-slate-400 border-slate-500/20 uppercase tracking-wide text-sm"
+                  className="bg-slate-500/10 text-gray-400 border-slate-500/20 uppercase tracking-wide text-sm"
                 >
                   In Progress
                 </Badge>
               </div>
-              <p className="text-slate-500 text-lg">
+              <p className="text-gray-400 text-lg">
                 {mockMilestone.description}
               </p>
             </div>
             <div className="text-right whitespace-nowrap">
-              <p className="text-sm text-slate-500 font-medium uppercase tracking-wide">
+              <p className="text-sm text-gray-400 font-medium uppercase tracking-wide">
                 Milestone Value
               </p>
               <p className="text-3xl font-bold text-white tracking-tight">
@@ -97,7 +97,7 @@ export default function FreelancerMilestoneDetailPage() {
                     className="flex items-center gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/5"
                   >
                     <FileText className="w-4 h-4 text-emerald-500" />
-                    <span className="text-slate-300 text-sm">{item}</span>
+                    <span className="text-gray-400 text-sm">{item}</span>
                   </div>
                 ))}
               </CardContent>
@@ -109,7 +109,7 @@ export default function FreelancerMilestoneDetailPage() {
                   <h3 className="text-white font-semibold mb-1">
                     Ready to submit?
                   </h3>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-gray-400">
                     Ensure all deliverables are ready. Once submitted, the
                     client will review your work.
                   </p>
@@ -117,7 +117,7 @@ export default function FreelancerMilestoneDetailPage() {
                 <Link
                   href={`/freelancer/vault/${vaultId}/milestones/${milestoneId}/submit`}
                 >
-                  <Button className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold">
+                  <Button className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide">
                     Submit Work
                     <Upload className="w-4 h-4 ml-2" />
                   </Button>
@@ -133,7 +133,7 @@ export default function FreelancerMilestoneDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wide mb-1">
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wide mb-1">
                     Due Date
                   </p>
                   <div className="flex items-center gap-2 text-white">
@@ -144,10 +144,10 @@ export default function FreelancerMilestoneDetailPage() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wide mb-1">
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wide mb-1">
                     Status
                   </p>
-                  <div className="flex items-center gap-2 text-slate-400">
+                  <div className="flex items-center gap-2 text-gray-400">
                     <Clock className="w-4 h-4" />
                     <span>Work in Progress</span>
                   </div>

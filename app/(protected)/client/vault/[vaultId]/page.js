@@ -191,7 +191,7 @@ export default function ClientVaultDetailPage() {
         subtitle: "Automated Compliance Check",
         amount: 0,
         displayAmount: m.amount,
-        status: "verified", // Always verified in this view
+        status: "VERIFIED", // Always verified in this view
         type: "COMPLIANCE_AI",
         deliverable: m.deliverable || "General Deliverable",
         checks: ["Format Validation", "Virus Scan", "Metadata Verify"],
@@ -205,7 +205,7 @@ export default function ClientVaultDetailPage() {
         subtitle: "Client Approval Required",
         amount: m.amount,
         displayAmount: m.amount,
-        status: milestoneStates[approvalId] || m.status || "awaiting_approval", // Use local state, then prop, then default
+        status: milestoneStates[approvalId] || m.status || "AWAITING_APPROVAL", // Use local state, then prop, then default
         type: "APPROVAL_HUMAN",
         deliverable: m.deliverable || "General Deliverable",
         deliverableId: m.deliverableId,
@@ -248,7 +248,7 @@ export default function ClientVaultDetailPage() {
     if (activeReview) {
       setMilestoneStates((prev) => ({
         ...prev,
-        [activeReview.id]: "approved",
+        [activeReview.id]: "VERIFIED",
       }));
       setActiveReview(null);
       setShowSuccess(true);
@@ -274,7 +274,7 @@ export default function ClientVaultDetailPage() {
     setMilestoneStates((prev) => ({
       ...prev,
       [activeReview.id]:
-        reviewAction === "REJECTED" ? "rejected" : "revision_requested",
+        reviewAction === "REJECTED" ? "REJECTED" : "REVISION_REQUESTED",
     }));
 
     // Reset
@@ -307,15 +307,18 @@ export default function ClientVaultDetailPage() {
 
   // Helper for status colors
   const getStatusColor = (status) => {
-    if (status === "verified" || status === "approved" || status === "passed")
+    const normalized = status?.toUpperCase();
+    if (normalized === "VERIFIED" || normalized === "APPROVED")
       return "text-emerald-500";
-    if (status === "awaiting_approval" || status === "pending")
+    if (normalized === "AWAITING_APPROVAL" || normalized === "PENDING" || normalized === "SUBMITTED")
       return "text-amber-500";
-    return "text-slate-500";
+    if (normalized === "REJECTED" || normalized === "REVISION_REQUESTED")
+      return "text-red-500";
+    return "text-gray-400";
   };
 
   return (
-    <div className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30 pb-20">
+    <div className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30 pb-20">
       <div className="max-w-6xl mx-auto px-6 space-y-8">
         {/* SUCCESS ALERT */}
         {showSuccess && (
@@ -334,7 +337,7 @@ export default function ClientVaultDetailPage() {
         <header className="pt-8">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
+            className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -350,19 +353,19 @@ export default function ClientVaultDetailPage() {
                   {vault.status}
                 </Badge>
               </div>
-              <p className="text-slate-500 font-bold uppercase tracking-wide">
+              <p className="text-gray-400 font-bold uppercase tracking-wide">
                 Vault ID:{" "}
-                <span className="text-slate-400 font-mono">{vault.id}</span>
+                <span className="text-gray-400 font-mono">{vault.id}</span>
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-slate-500 font-medium uppercase tracking-widest">
+              <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">
                 Total Value
               </p>
-              <p className="text-3xl font-bold text-white tracking-tight">
+              <p className="text-3xl font-bold uppercase text-white tracking-tight">
                 ${(vault.totalAmount || vault.amount).toLocaleString()}
               </p>
-              <p className="text-xs text-emerald-500 font-medium mt-1">
+              <p className="text-xs text-emerald-500 font-bold uppercase tracking-tight mt-1">
                 ${(vault.paidAmount || 0).toLocaleString()} Released
               </p>
             </div>
@@ -406,7 +409,7 @@ export default function ClientVaultDetailPage() {
                               ? "bg-emerald-500/10 text-emerald-500"
                               : milestone.type === "APPROVAL_HUMAN"
                                 ? "bg-amber-500/10 text-amber-500"
-                                : "bg-white/5 text-slate-500"
+                                : "bg-white/5 text-gray-400"
                           )}
                         >
                           {milestone.type === "COMPLIANCE_AI" ? (
@@ -454,7 +457,7 @@ export default function ClientVaultDetailPage() {
 
                           {milestone.deliverable && (
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 mb-1">
-                              <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold whitespace-nowrap">
+                              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold whitespace-nowrap">
                                 Required:
                               </span>
                               <span className="text-[12px] text-white font-bold uppercase tracking-wide break-words">
@@ -463,7 +466,7 @@ export default function ClientVaultDetailPage() {
                             </div>
                           )}
 
-                          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-slate-500">
+                          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-gray-400">
                             {milestone.type === "APPROVAL_HUMAN" && (
                               <>
                                 <span className="text-white">
@@ -480,7 +483,7 @@ export default function ClientVaultDetailPage() {
                             {getDisputeEligibility(milestone).eligible && (
                               <Link
                                 href={`/client/disputes/create?vaultId=${vaultId}&milestoneId=${milestone.id}`}
-                                className="ml-2 inline-flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded hover:bg-red-500/20 transition-colors"
+                                className="ml-2 inline-flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded hover:bg-red-500/20 transition-colors font-bold uppercase tracking-wide"
                               >
                                 <Gavel className="w-3 h-3" />
                                 Open Case
@@ -502,14 +505,14 @@ export default function ClientVaultDetailPage() {
                           </Badge>
                         )}
 
-                        {milestone.status === "awaiting_approval" &&
+                        {milestone.status === "AWAITING_APPROVAL" &&
                           milestone.type === "APPROVAL_HUMAN" && (
                             <Sheet>
                               <SheetTrigger asChild>
                                 <Button
                                   size="sm"
                                   onClick={() => setActiveReview(milestone)}
-                                  className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20"
+                                  className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20 font-bold uppercase tracking-wide"
                                 >
                                   Review
                                   <ChevronRight className="w-4 h-4 ml-1" />
@@ -520,7 +523,7 @@ export default function ClientVaultDetailPage() {
                                   <SheetTitle className="text-white text-2xl font-bold uppercase tracking-wide">
                                     Review Deliverable
                                   </SheetTitle>
-                                  <SheetDescription className="text-slate-400">
+                                  <SheetDescription className="text-gray-400 font-bold uppercase tracking-normal">
                                     Review the evidence and data provided for
                                     this milestone before releasing funds.
                                   </SheetDescription>
@@ -545,7 +548,7 @@ export default function ClientVaultDetailPage() {
                                             <h5 className="text-sm font-bold text-emerald-500 uppercase tracking-wide">
                                               Approve & Pay
                                             </h5>
-                                            <p className="text-xs text-emerald-200/70 mt-1">
+                                            <p className="text-xs text-emerald-200/70 mt-1 font-semibold uppercase tracking-normal">
                                               Release{" "}
                                               <span className="text-white font-bold">
                                                 $
@@ -557,7 +560,7 @@ export default function ClientVaultDetailPage() {
                                           <SheetClose asChild>
                                             <Button
                                               onClick={handleApprove}
-                                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wide"
                                             >
                                               <Check className="w-4 h-4 mr-2" />
                                               Approve
@@ -580,7 +583,7 @@ export default function ClientVaultDetailPage() {
                                           <Button
                                             variant="outline"
                                             className={cn(
-                                              "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400",
+                                              "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400 font-bold uppercase tracking-wide",
                                               reviewAction ===
                                               "REVISION_REQUESTED" &&
                                               "bg-amber-500/10 ring-1 ring-amber-500"
@@ -597,7 +600,7 @@ export default function ClientVaultDetailPage() {
                                           <Button
                                             variant="outline"
                                             className={cn(
-                                              "border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400",
+                                              "border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 font-bold uppercase tracking-wide",
                                               reviewAction === "REJECTED" &&
                                               "bg-red-500/10 ring-1 ring-red-500"
                                             )}
@@ -698,7 +701,7 @@ export default function ClientVaultDetailPage() {
                             </Sheet>
                           )}
 
-                        {milestone.status === "approved" &&
+                        {milestone.status === "VERIFIED" &&
                           milestone.type === "APPROVAL_HUMAN" && (
                             <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
                               <CheckCircle className="w-3 h-3 mr-1.5" />
@@ -706,7 +709,7 @@ export default function ClientVaultDetailPage() {
                             </div>
                           )}
 
-                        {milestone.status === "verified" &&
+                        {(milestone.status === "VERIFIED" || milestone.status === "APPROVED") &&
                           milestone.type === "APPROVAL_HUMAN" && (
                             <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
                               <CheckCircle className="w-3 h-3 mr-1.5" />
@@ -726,13 +729,13 @@ export default function ClientVaultDetailPage() {
             {/* Verification Summary */}
             <Card className="bg-[#0D0D0E] border-white/5">
               <CardHeader>
-                <CardTitle className="text-white text-lg">
+                <CardTitle className="text-white text-lg font-extrabold uppercase tracking-wide">
                   Production Simulation
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4">
-                  <p className="text-xs text-slate-500 uppercase tracking-widest leading-relaxed">
+                  <p className="text-xs text-gray-400 font-semibold uppercase tracking-normal leading-relaxed">
                     This view simulates how milestones are processed in
                     production: first passing automated AI Compliance checks,
                     then forwarded for Client Approval.
@@ -740,18 +743,18 @@ export default function ClientVaultDetailPage() {
 
                   <div className="p-4 bg-white/5 rounded-lg border border-white/5 space-y-3">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-slate-400">Escrow Status</span>
-                      <span className="text-emerald-500 font-bold">Secure</span>
+                      <span className="text-gray-400 font-bold uppercase tracking-normal">Escrow Status</span>
+                      <span className="text-emerald-500 font-bold uppercase tracking-normal">Secure</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-slate-400">
+                      <span className="text-gray-400 font-bold uppercase tracking-normal">
                         Verification Confidence
                       </span>
-                      <span className="text-emerald-500 font-bold">99.8%</span>
+                      <span className="text-emerald-500 font-bold uppercase tracking-normal">99.8%</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-slate-400">Next Action</span>
-                      <span className="text-amber-500 font-bold">
+                      <span className="text-gray-400 font-bold uppercase tracking-normal">Next Action</span>
+                      <span className="text-amber-500 font-bold uppercase tracking-normal">
                         Client Review
                       </span>
                     </div>
@@ -778,14 +781,14 @@ export default function ClientVaultDetailPage() {
               )}
             >
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
+                <CardTitle className="flex items-center gap-2 text-white font-bold uppercase tracking-normal">
                   <Gavel className="w-5 h-5 text-amber-500" />
-                  Cases / Disputes
+                  Case Files
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="font-semibold text-gray-400 uppercase tracking-normal mb-2">
                   {anyEligibleForDispute
-                    ? "Open a formal case if work does not meet requirements."
-                    : "No eligible cases for this vault right now. Disputes are only allowed for specific reason codes tied to a milestone."}
+                    ? "Open a formal case file if work does not meet requirements."
+                    : "No eligible case files for this vault right now. Case files are only allowed for specific reason codes tied to a milestone."}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -841,7 +844,7 @@ export default function ClientVaultDetailPage() {
                               <Badge variant="destructive" className="text-[10px] uppercase h-4 px-1">Declined</Badge>
                             )}
                           </div>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-gray-400">
                             {latestInvite?.status === "DECLINED"
                               ? <>
                                 The previous freelancer <span className="text-white">({latestInvite.email})</span> declined this invitation.
@@ -862,14 +865,14 @@ export default function ClientVaultDetailPage() {
                             REASSIGN FREELANCER
                           </Label>
                           <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                               id="invite-email"
                               type="email"
                               value={inviteEmail}
                               onChange={(e) => setInviteEmail(e.target.value)}
                               placeholder="freelancer@example.com"
-                              className="w-full bg-black/60 border border-white/10 rounded-lg px-10 py-2.5 text-white text-sm placeholder:text-slate-500 focus:border-emerald-500/50 focus:outline-none transition-all"
+                              className="w-full bg-black/60 border border-white/10 rounded-lg px-10 py-2.5 text-white text-sm placeholder:text-gray-400 focus:border-emerald-500/50 focus:outline-none transition-all"
                             />
                           </div>
                         </div>
@@ -932,7 +935,7 @@ export default function ClientVaultDetailPage() {
                   )}
                   <Button
                     variant="ghost"
-                    className="w-full justify-start text-slate-400 hover:text-white h-auto py-3"
+                    className="w-full justify-start text-gray-400 hover:text-white h-auto py-3"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     <span className="truncate">Service_Agreement_v2.pdf</span>

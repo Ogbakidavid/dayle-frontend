@@ -42,18 +42,18 @@ export default function SubmissionPage() {
   };
 
   return (
-    <div className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30 pb-20">
+    <div className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30 pb-20">
       <div className="max-w-3xl mx-auto px-6 space-y-8">
         <header className="pt-8">
           <Link
             href={`/freelancer/vault/${vaultId}/milestones/${milestoneId}`}
-            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Milestone
           </Link>
           <h1 className="text-3xl font-bold text-white">Submit Work</h1>
-          <p className="text-slate-500 mt-2">
+          <p className="text-gray-400 mt-2">
             Upload deliverables and provide comments for the client.
           </p>
         </header>
@@ -70,11 +70,11 @@ export default function SubmissionPage() {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     onChange={handleFileChange}
                   />
-                  <Upload className="w-8 h-8 text-slate-500 mx-auto mb-3" />
+                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-3" />
                   <p className="text-sm font-medium text-white">
                     Drop files here or click to upload
                   </p>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     Supported: PDF, ZIP, PNG, JPG (Max 50MB)
                   </p>
                 </div>
@@ -91,14 +91,14 @@ export default function SubmissionPage() {
                           <span className="text-sm text-white">
                             {file.name}
                           </span>
-                          <span className="text-xs text-slate-500">
+                          <span className="text-xs text-gray-400">
                             {(file.size / 1024 / 1024).toFixed(2)} MB
                           </span>
                         </div>
                         <button
                           type="button"
                           onClick={() => removeFile(i)}
-                          className="text-slate-500 hover:text-white"
+                          className="text-gray-400 hover:text-white"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -126,7 +126,7 @@ export default function SubmissionPage() {
                   <Button
                     variant="ghost"
                     type="button"
-                    className="text-slate-400 hover:text-white"
+                    className="text-gray-400 hover:text-white"
                   >
                     Cancel
                   </Button>

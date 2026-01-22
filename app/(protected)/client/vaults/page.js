@@ -90,7 +90,7 @@ export default function VaultsPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30"
+      className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30"
     >
       <div className="max-w-7xl mx-auto px-6 space-y-10">
         {/* 1. TOP NAVIGATION / HEADER */}
@@ -99,7 +99,7 @@ export default function VaultsPage() {
             <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase">
               Financial Vaults
             </h1>
-            <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide">
+            <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-wide">
               Overview of your smart-escrow deployments
             </p>
           </motion.div>
@@ -108,7 +108,7 @@ export default function VaultsPage() {
               variant="outline"
               className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all"
             >
-              <Filter className="w-4 h-4 mr-2 text-slate-400" />
+              <Filter className="w-4 h-4 mr-2 text-gray-400" />
               Filters
             </Button>
             <Link href="/client/create-vault" className="w-full sm:w-auto">
@@ -142,7 +142,7 @@ export default function VaultsPage() {
                   {stat.change}
                 </span>
               </div>
-              <p className="text-sm font-black uppercase tracking-wide text-slate-500 mb-2">
+              <p className="text-sm font-black uppercase tracking-wide text-gray-400 mb-2">
                 {stat.label}
               </p>
               <h2 className="text-3xl font-black text-white tracking-tighter">
@@ -154,7 +154,7 @@ export default function VaultsPage() {
 
         {/* 3. SEARCH & TOOLS */}
         <motion.div variants={itemVariants} className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
           <input
             type="search"
             placeholder="Search vaults..."
@@ -170,16 +170,16 @@ export default function VaultsPage() {
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
-                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-wide">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide">
                     Vault Detail
                   </th>
-                  <th className="hidden lg:table-cell px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-wide">
+                  <th className="hidden lg:table-cell px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide">
                     Counterparty
                   </th>
-                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-wide">
+                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide">
                     Status
                   </th>
-                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-wide text-right">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide text-right">
                     Value
                   </th>
                   <th className="px-4 md:px-6 py-4"></th>
@@ -196,7 +196,7 @@ export default function VaultsPage() {
                   >
                     <td className="px-4 md:px-6 py-5">
                       <div className="flex items-center gap-3 md:gap-4">
-                        <div className="hidden xs:flex w-10 h-10 rounded-xl bg-white/5 border border-white/5 items-center justify-center text-slate-400 group-hover:text-emerald-500 group-hover:border-emerald-500/20 transition-all shrink-0">
+                        <div className="hidden xs:flex w-10 h-10 rounded-xl bg-white/5 border border-white/5 items-center justify-center text-gray-400 group-hover:text-emerald-500 group-hover:border-emerald-500/20 transition-all shrink-0">
                           <FileText className="w-5 h-5" />
                         </div>
                         <div className="min-w-0">
@@ -204,7 +204,7 @@ export default function VaultsPage() {
                             {vault.title}
                           </p>
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
-                            <p className="text-[10px] md:text-sm text-slate-500 font-bold uppercase tracking-wide">
+                            <p className="text-[10px] md:text-sm text-gray-400 font-bold uppercase tracking-wide">
                               {new Date(
                                 vault.createdAt || Date.now()
                               ).toLocaleDateString()}
@@ -213,7 +213,7 @@ export default function VaultsPage() {
                               {vault.status}
                             </span>
                           </div>
-                          <p className="lg:hidden text-[10px] text-slate-600 font-bold uppercase tracking-wide mt-1 truncate">
+                          <p className="lg:hidden text-[10px] text-gray-400 font-bold uppercase tracking-wide mt-1 truncate">
                             {vault.freelancerEmail || vault.freelancer?.email || "Unassigned"}
                           </p>
                         </div>
@@ -226,7 +226,7 @@ export default function VaultsPage() {
                             vault.freelancer?.email ||
                             "U")[0].toUpperCase()}
                         </div>
-                        <span className="text-sm text-slate-400 font-bold uppercase tracking-wide truncate max-w-[150px]">
+                        <span className="text-sm text-gray-400 font-bold uppercase tracking-wide truncate max-w-[150px]">
                           {vault.freelancerEmail ||
                             vault.freelancer?.email ||
                             "Unassigned"}
@@ -261,7 +261,7 @@ export default function VaultsPage() {
                       <p className="text-sm md:text-base font-bold text-white tracking-wide">
                         ${(vault.totalAmount || vault.amount).toLocaleString()}
                       </p>
-                      <p className="text-[10px] md:text-sm text-slate-600 font-bold uppercase tracking-wide">
+                      <p className="text-[10px] md:text-sm text-gray-400 font-bold uppercase tracking-wide">
                         USD
                       </p>
                     </td>
@@ -274,7 +274,7 @@ export default function VaultsPage() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8 text-slate-500 hover:text-white hover:bg-white/10 rounded-lg"
+                            className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg"
                           >
                             <ArrowUpRight className="w-4 h-4" />
                           </Button>
@@ -290,7 +290,7 @@ export default function VaultsPage() {
 
         {/* 5. FOOTER SUMMARY */}
         <footer className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-white/5">
-          <p className="text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide text-center sm:text-left">
+          <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wide text-center sm:text-left">
             Displaying {paginatedVaults.length} of {filteredVaults.length}{" "}
             smart-vaults
           </p>
@@ -303,7 +303,7 @@ export default function VaultsPage() {
                 setCurrentPage((prev) => Math.max(1, prev - 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-wide"
+              className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white transition-all font-bold uppercase tracking-wide"
             >
               Previous
             </Button>
@@ -319,7 +319,7 @@ export default function VaultsPage() {
                     "w-8 h-8 rounded-lg text-sm font-bold transition-all",
                     p === currentPage
                       ? "bg-white text-black shadow-lg"
-                      : "bg-white/5 text-slate-500 hover:bg-white/10"
+                      : "bg-white/5 text-gray-400 hover:bg-white/10"
                   )}
                 >
                   {p}
@@ -337,7 +337,7 @@ export default function VaultsPage() {
                 setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-wide"
+              className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white transition-all font-bold uppercase tracking-wide"
             >
               Next
             </Button>

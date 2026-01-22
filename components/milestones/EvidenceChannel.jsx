@@ -86,7 +86,7 @@ export function EvidenceChannel({
           <ShieldAlert className="w-5 h-5 text-emerald-500" />
           Evidence Channel
         </CardTitle>
-        <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+        <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
           Immutable Communication Log · ID: {milestoneId}
         </p>
       </CardHeader>
@@ -115,7 +115,7 @@ export function EvidenceChannel({
                     {event.authorName}
                   </span>
                 )}
-                <span className="text-[10px] text-slate-600 flex items-center gap-1">
+                <span className="text-[10px] text-gray-400 flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {new Date(event.timestamp).toLocaleString(undefined, {
                     month: "short",
@@ -131,8 +131,8 @@ export function EvidenceChannel({
                 className={cn(
                   "p-3 rounded-lg text-sm leading-relaxed border",
                   event.type === EVIDENCE_TYPES.SYSTEM
-                    ? "bg-white/[0.02] border-white/5 text-slate-400 italic"
-                    : "bg-[#141416] border-white/10 text-slate-300"
+                    ? "bg-white/[0.02] border-white/5 text-gray-400 italic"
+                    : "bg-[#141416] border-white/10 text-gray-400"
                 )}
               >
                 {event.content}
@@ -143,7 +143,7 @@ export function EvidenceChannel({
           {/* Immutable Disclaimer */}
           <div className="flex items-center justify-center gap-2 py-4">
             <div className="h-px bg-white/5 w-12" />
-            <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">
+            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
               End of Ledger
             </p>
             <div className="h-px bg-white/5 w-12" />
@@ -166,7 +166,7 @@ export function EvidenceChannel({
             <Button
               variant="ghost"
               size="sm"
-              className="text-slate-500 hover:text-white"
+              className="text-gray-400 hover:text-white"
             >
               <Paperclip className="w-4 h-4 mr-2" />
               Attach Evidence
@@ -180,7 +180,7 @@ export function EvidenceChannel({
               <Send className="w-3 h-3 ml-2" />
             </Button>
           </div>
-          <p className="text-[10px] text-slate-600 text-center">
+          <p className="text-[10px] text-gray-400 text-center">
             All messages are cryptographically signed and stored as evidence for
             potential disputes.
           </p>

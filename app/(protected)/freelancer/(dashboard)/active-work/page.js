@@ -47,7 +47,7 @@ export default function ActiveWorkPage() {
     >
       {/* Breadcrumbs / Header */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 text-sm font-black text-slate-500 uppercase tracking-wide">
+        <div className="flex items-center gap-2 text-sm font-black text-gray-400 uppercase tracking-wide">
           <Link
             href="/freelancer"
             className="hover:text-white transition-colors"

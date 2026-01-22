@@ -89,7 +89,7 @@ export default function CardPaymentPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] text-slate-300 font-sans antialiased">
+        <div className="min-h-screen bg-[#050505] text-gray-400 font-sans antialiased">
             <AnimatePresence>
                 {isProcessing && <ProcessingOverlay amount={amount} />}
                 {paymentError && <FailureModal message={paymentError} onClose={() => setPaymentError(null)} />}
@@ -106,7 +106,7 @@ export default function CardPaymentPage() {
                         {step === 'form' && (
                             <button
                                 onClick={() => router.push(`/checkout/${params.vaultId}`)}
-                                className="flex items-center gap-2 text-slate-500 hover:text-emerald-500 transition-all text-sm font-medium mb-8 group"
+                                className="flex items-center gap-2 text-gray-400 hover:text-emerald-500 transition-all text-sm font-medium mb-8 group"
                             >
                                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                                 Change Payment Method
@@ -204,7 +204,7 @@ function InputField({ label, error, ...props }) {
     return (
         <div className="space-y-3">
             <label className="text-sm font-black uppercase text-white tracking-wide ml-1">{label}</label>
-            <input {...props} className={`w-full bg-white/[0.03] border ${error ? 'border-red-500' : 'border-white/10'} h-14 rounded-2xl px-4 text-white focus:border-emerald-500/50 outline-none transition-all placeholder:text-slate-600`} />
+            <input {...props} className={`w-full bg-white/[0.03] border ${error ? 'border-red-500' : 'border-white/10'} h-14 rounded-2xl px-4 text-white focus:border-emerald-500/50 outline-none transition-all placeholder:text-gray-400`} />
             {error && <p className="text-sm text-red-500 font-bold ml-1">{error}</p>}
         </div>
     );

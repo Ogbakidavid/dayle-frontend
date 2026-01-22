@@ -26,9 +26,9 @@ function SectionHeader({ icon: Icon, title, subtitle }) {
                     <Icon className="h-4 w-4 text-emerald-300" />
                 </div>
                 <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-sm font-bold uppercase tracking-normal text-white">{title}</p>
                     {subtitle ? (
-                        <p className="mt-0.5 text-xs text-white/50">{subtitle}</p>
+                        <p className="mt-0.5 text-xs text-white/50 font-bold uppercase tracking-normal">{subtitle}</p>
                     ) : null}
                 </div>
             </div>
@@ -52,8 +52,8 @@ function EmptyState({ title, description }) {
                     <Info className="h-4 w-4 text-white/60" />
                 </div>
                 <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white">{title}</p>
-                    <p className="mt-1 text-sm text-white/55">{description}</p>
+                    <p className="text-sm font-bold uppercase tracking-normal text-white">{title}</p>
+                    <p className="mt-1 text-sm text-white/55 font-bold uppercase tracking-normal">{description}</p>
                 </div>
             </div>
         </div>
@@ -70,12 +70,12 @@ function EvidenceItem({ topLeft, topRight, title, body, metaLeft, metaRight }) {
                         {topRight ? <div className="ml-auto">{topRight}</div> : null}
                     </div>
                     {title ? (
-                        <p className="mt-2 text-[15px] font-semibold leading-snug text-white">
+                        <p className="mt-2 text-[15px] font-bold uppercase tracking-normal leading-snug text-white">
                             {title}
                         </p>
                     ) : null}
                     {body ? (
-                        <p className="mt-2 text-sm leading-relaxed text-white/60">
+                        <p className="mt-2 text-sm leading-relaxed text-white/60 font-bold uppercase tracking-normal">
                             {body}
                         </p>
                     ) : null}
@@ -100,7 +100,7 @@ export function EvidencePanel({ milestone, evidence }) {
         return (
             <Card className="border-white/10 bg-[#0B0B0C]">
                 <CardHeader className="border-b border-white/5">
-                    <CardTitle className="text-white">Evidence</CardTitle>
+                    <CardTitle className="text-white text-lg font-bold uppercase tracking-normal">Evidence</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5">
                     <EmptyState
@@ -116,8 +116,8 @@ export function EvidencePanel({ milestone, evidence }) {
         <Card className="border-white/10 bg-[#0B0B0C]">
             <CardHeader className="border-b border-white/5">
                 <div className="space-y-1">
-                    <CardTitle className="text-white">Evidence</CardTitle>
-                    <p className="text-sm text-white/60 truncate">{milestone.title}</p>
+                    <CardTitle className="text-white text-lg font-bold uppercase tracking-normal">Evidence</CardTitle>
+                    <p className="text-sm text-white/60 font-bold uppercase tracking-normal mb-3">{milestone.title}</p>
                 </div>
             </CardHeader>
 

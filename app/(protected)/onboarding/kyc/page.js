@@ -221,7 +221,7 @@ export default function KYCPage() {
                         <div className="p-8 md:p-16 relative z-10">
                             {/* Step Indicator Text */}
                             <div className="flex justify-between items-center mb-12">
-                                <span className="text-sm font-black text-slate-500 uppercase tracking-[0.3em]">Phase {currentStep} of {totalSteps}</span>
+                                <span className="text-sm font-black text-gray-400 uppercase tracking-[0.3em]">Phase {currentStep} of {totalSteps}</span>
                                 <div className="flex gap-1.5">
                                     {[...Array(totalSteps)].map((_, i) => (
                                         <div key={i} className={`w-2 h-2 rounded-full transition-all duration-500 ${currentStep > i ? 'bg-emerald-500' : 'bg-white/10'}`}></div>
@@ -237,7 +237,7 @@ export default function KYCPage() {
                                             <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                                                 <UserCircle2 className="w-8 h-8 text-emerald-500" /> Legal Identity
                                             </h3>
-                                            <p className="text-sm font-medium text-slate-500">As shown on your official government documents.</p>
+                                            <p className="text-sm font-medium text-gray-400">As shown on your official government documents.</p>
                                         </div>
 
                                         <div className="space-y-8">
@@ -252,7 +252,7 @@ export default function KYCPage() {
 
                                             <div className="grid md:grid-cols-2 gap-8">
                                                 <div className="flex flex-col space-y-2">
-                                                    <label className="text-sm font-medium text-slate-500 uppercase tracking-wide">Date of Birth</label>
+                                                    <label className="text-sm font-medium text-gray-400 uppercase tracking-wide">Date of Birth</label>
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <Button
@@ -295,7 +295,7 @@ export default function KYCPage() {
                                             <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                                                 <CreditCard className="w-8 h-8 text-emerald-500" /> ID Document
                                             </h3>
-                                            <p className="text-sm font-medium text-slate-500">Upload a clear photo of your Passport or Driver's License.</p>
+                                            <p className="text-sm font-medium text-gray-400">Upload a clear photo of your Passport or Driver's License.</p>
                                         </div>
 
                                         <div
@@ -333,7 +333,7 @@ export default function KYCPage() {
                                                                     <CheckCircle2 className="w-6 h-6 text-black" />
                                                                 </div>
                                                                 <p className="text-sm font-black text-white uppercase tracking-wide">Document Verified</p>
-                                                                <button className="text-[9px] text-slate-500 hover:text-white underline uppercase tracking-tighter">Replace Document</button>
+                                                                <button className="text-[9px] text-gray-400 hover:text-white underline uppercase tracking-tighter">Replace Document</button>
                                                             </>
                                                         )}
                                                     </div>
@@ -341,11 +341,11 @@ export default function KYCPage() {
                                             ) : (
                                                 <>
                                                     <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                                                        <Globe className="w-8 h-8 text-slate-500 group-hover:text-emerald-500 transition-colors" />
+                                                        <Globe className="w-8 h-8 text-gray-400 group-hover:text-emerald-500 transition-colors" />
                                                     </div>
                                                     <div className="text-center">
                                                         <p className="text-sm font-black text-white uppercase tracking-wide">Click to upload document</p>
-                                                        <p className="text-sm font-medium text-slate-500 mt-1 uppercase tracking-tighter">PNG, JPG or PDF up to 10MB</p>
+                                                        <p className="text-sm font-medium text-gray-400 mt-1 uppercase tracking-tighter">PNG, JPG or PDF up to 10MB</p>
                                                     </div>
                                                 </>
                                             )}
@@ -359,7 +359,7 @@ export default function KYCPage() {
                                             <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center justify-center gap-3">
                                                 <Scan className="w-8 h-8 text-emerald-500" /> Live Identity
                                             </h3>
-                                            <p className="text-sm font-medium text-slate-500">Please position your face within the frame and look directly at the camera.</p>
+                                            <p className="text-sm font-medium text-gray-400">Please position your face within the frame and look directly at the camera.</p>
                                         </div>
 
                                         <div className="relative group/camera mx-auto w-full max-w-sm aspect-square">
@@ -454,7 +454,7 @@ export default function KYCPage() {
                                             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-4 w-max">
                                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#050505] border border-white/10 shadow-xl">
                                                     <Fingerprint className="w-3 h-3 text-emerald-500" />
-                                                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-wide">Biometric Encrypted</span>
+                                                    <span className="text-[8px] font-black text-gray-400 uppercase tracking-wide">Biometric Encrypted</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -467,7 +467,7 @@ export default function KYCPage() {
                                             <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                                                 <MapPin className="w-8 h-8 text-emerald-500" /> Residency
                                             </h3>
-                                            <p className="text-sm font-medium text-slate-500">Your current primary residence address.</p>
+                                            <p className="text-sm font-medium text-gray-400">Your current primary residence address.</p>
                                         </div>
 
                                         <div className="space-y-8">
@@ -516,7 +516,7 @@ export default function KYCPage() {
                                             <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                                                 <Building2 className="w-8 h-8 text-emerald-500" /> Business Entity
                                             </h3>
-                                            <p className="text-sm font-medium text-slate-500">Details for the legal entity funding the account.</p>
+                                            <p className="text-sm font-medium text-gray-400">Details for the legal entity funding the account.</p>
                                         </div>
 
                                         <div className="space-y-8">
@@ -547,7 +547,7 @@ export default function KYCPage() {
                                             <Button
                                                 type="button"
                                                 onClick={prevStep}
-                                                className="h-18 flex-1 bg-transparent border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white font-black uppercase tracking-wide text-sm rounded-2xl py-6 transition-all"
+                                                className="h-18 flex-1 bg-transparent border border-white/10 hover:bg-white/5 text-gray-400 hover:text-white font-black uppercase tracking-wide text-sm rounded-2xl py-6 transition-all"
                                             >
                                                 Back
                                             </Button>
@@ -574,8 +574,8 @@ export default function KYCPage() {
 
                                     {/* Security Notice */}
                                     <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex gap-4 items-center">
-                                        <AlertCircle className="w-5 h-5 text-slate-600 shrink-0" />
-                                        <p className="text-sm font-medium text-slate-500 leading-tight uppercase tracking-wide">
+                                        <AlertCircle className="w-5 h-5 text-gray-400 shrink-0" />
+                                        <p className="text-sm font-medium text-gray-400 leading-tight uppercase tracking-wide">
                                             Information is secured by military-grade AES-256 encryption. Our verification partners are SOC2 Type II compliant.
                                         </p>
                                     </div>

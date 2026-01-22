@@ -119,7 +119,7 @@ export function DisputeDetailView({ disputeId, role }) {
                         </div>
 
                         {/* Payload Content */}
-                        <div className="bg-[#141416] rounded-lg p-4 border border-white/5 text-sm text-slate-300 leading-relaxed">
+                        <div className="bg-[#141416] rounded-lg p-4 border border-white/5 text-sm text-gray-400 leading-relaxed">
                           {ev.payload?.summary ||
                             ev.payload?.note ||
                             ev.payload?.decision ||

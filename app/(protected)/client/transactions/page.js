@@ -150,7 +150,7 @@ export default function TransactionsPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30"
+      className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30"
     >
       <div className="max-w-7xl mx-auto px-6 space-y-10">
         {/* 1. TOP NAVIGATION / HEADER */}
@@ -159,7 +159,7 @@ export default function TransactionsPage() {
             <h1 className="text-3xl font-bold tracking-tight text-white uppercase">
               Transactions
             </h1>
-            <p className="text-sm text-slate-500 font-bold uppercase tracking-wide">
+            <p className="text-sm text-gray-400 font-bold uppercase tracking-wide">
               Financial activity and history
             </p>
           </motion.div>
@@ -168,14 +168,14 @@ export default function TransactionsPage() {
               variant="outline"
               className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all"
             >
-              <Download className="w-4 h-4 mr-2 text-slate-400" />
+              <Download className="w-4 h-4 mr-2 text-gray-400" />
               Export
             </Button>
             <Button
               variant="outline"
               className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all font-bold uppercase tracking-wide"
             >
-              <Filter className="w-4 h-4 mr-2 text-slate-400" />
+              <Filter className="w-4 h-4 mr-2 text-gray-400" />
               Filters
             </Button>
           </motion.div>
@@ -184,15 +184,15 @@ export default function TransactionsPage() {
         {/* 2. STATS */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl">
-            <p className="text-sm font-medium text-slate-500">Total Volume</p>
+            <p className="text-sm font-medium text-gray-400">Total Volume</p>
             <h2 className="text-3xl font-bold text-white mt-1">$42,500</h2>
           </div>
           <div className="bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl">
-            <p className="text-sm font-medium text-slate-500">Processing</p>
+            <p className="text-sm font-medium text-gray-400">Processing</p>
             <h2 className="text-3xl font-bold text-amber-500 mt-1">$11,500</h2>
           </div>
           <div className="bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl">
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-wide">
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">
               Available
             </p>
             <h2 className="text-3xl font-bold text-emerald-500 mt-1 tracking-tight">
@@ -203,7 +203,7 @@ export default function TransactionsPage() {
 
         {/* 3. SEARCH */}
         <motion.div variants={itemVariants} className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
           <input
             type="search"
             placeholder="Search by ID or counterparty..."
@@ -219,19 +219,19 @@ export default function TransactionsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
-                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wide">
                     Transaction
                   </th>
-                  <th className="hidden md:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="hidden md:table-cell px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wide">
                     Type
                   </th>
-                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wide">
                     Date
                   </th>
-                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide text-center sm:text-left">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wide text-center sm:text-left">
                     Status
                   </th>
-                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-wide text-right">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide text-right">
                     Amount
                   </th>
                 </tr>
@@ -244,7 +244,7 @@ export default function TransactionsPage() {
                   >
                     <td className="px-4 md:px-6 py-5">
                       <div className="flex items-center gap-3 md:gap-4">
-                        <div className="hidden xs:flex w-10 h-10 rounded-sm bg-white/5 border border-white/5 items-center justify-center text-slate-400 shrink-0">
+                        <div className="hidden xs:flex w-10 h-10 rounded-sm bg-white/5 border border-white/5 items-center justify-center text-gray-400 shrink-0">
                           {tx.type === "deposit" || tx.type === "payment" ? (
                             <ArrowDownLeft className="w-5 h-5 text-emerald-500" />
                           ) : tx.type === "withdrawal" ? (
@@ -257,22 +257,22 @@ export default function TransactionsPage() {
                           <p className="text-sm font-black text-white uppercase tracking-tight truncate">
                             {tx.id}
                           </p>
-                          <p className="text-xs md:text-sm text-slate-500 mt-0.5 font-bold uppercase tracking-wide truncate">
+                          <p className="text-xs md:text-sm text-gray-400 mt-0.5 font-bold uppercase tracking-wide truncate">
                             {tx.counterparty}
                           </p>
-                          <p className="md:hidden text-[10px] text-slate-600 font-bold uppercase tracking-wide mt-1">
+                          <p className="md:hidden text-[10px] text-gray-400 font-bold uppercase tracking-wide mt-1">
                             {tx.date} • {tx.type}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="hidden md:table-cell px-6 py-5">
-                      <span className="text-sm font-bold uppercase tracking-wide text-slate-400">
+                      <span className="text-sm font-bold uppercase tracking-wide text-gray-400">
                         {tx.type}
                       </span>
                     </td>
                     <td className="hidden sm:table-cell px-6 py-5">
-                      <span className="text-sm text-slate-400 font-bold uppercase tracking-wide">
+                      <span className="text-sm text-gray-400 font-bold uppercase tracking-wide">
                         {tx.date}
                       </span>
                     </td>
@@ -316,7 +316,7 @@ export default function TransactionsPage() {
                         {tx.type === "deposit" ? "+" : "-"}$
                         {tx.amount.toLocaleString()}
                       </p>
-                      <p className="text-[10px] md:text-sm text-slate-600 font-bold uppercase tracking-wide">
+                      <p className="text-[10px] md:text-sm text-gray-400 font-bold uppercase tracking-wide">
                         {tx.method}
                       </p>
                     </td>
@@ -329,7 +329,7 @@ export default function TransactionsPage() {
           {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="px-6 py-5 border-t border-white/5 flex items-center justify-between bg-white/[0.01]">
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-wide">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">
                 Page {currentPage} of {totalPages}
               </p>
               <div className="flex gap-2">
@@ -341,7 +341,7 @@ export default function TransactionsPage() {
                     setCurrentPage((prev) => Math.max(1, prev - 1));
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-wide"
+                  className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white transition-all font-bold uppercase tracking-wide"
                 >
                   Previous
                 </Button>
@@ -353,7 +353,7 @@ export default function TransactionsPage() {
                     setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all font-bold uppercase tracking-wide"
+                  className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white transition-all font-bold uppercase tracking-wide"
                 >
                   Next
                 </Button>

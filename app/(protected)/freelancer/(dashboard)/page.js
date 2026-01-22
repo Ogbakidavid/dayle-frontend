@@ -46,9 +46,9 @@ export default function FreelancerDashboard() {
 
   // Work categories
   const activeVaults = vaults.filter((v) =>
-    ["active", "pending", "review"].includes(v.status)
+    ["ACTIVE", "PENDING", "REVIEW"].includes(v.status)
   );
-  const completedVaults = vaults.filter((v) => v.status === "completed");
+  const completedVaults = vaults.filter((v) => v.status === "COMPLETED");
   const totalPending = activeVaults.reduce(
     (acc, v) => acc + (v.totalAmount || v.amount),
     0
@@ -104,7 +104,7 @@ export default function FreelancerDashboard() {
             <h2 className="text-4xl font-black text-white tracking-tighter">
               ${balance?.available?.toLocaleString() || "0.00"}
             </h2>
-            <div className="flex items-center gap-2 text-emerald-500 text-sm font-medium">
+            <div className="flex items-center gap-2 text-emerald-500 text-sm font-bold uppercase tracking-wide ">
               <Zap className="w-4 h-4" />
               Funds Liquid
             </div>

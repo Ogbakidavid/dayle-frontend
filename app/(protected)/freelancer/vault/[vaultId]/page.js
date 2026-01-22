@@ -86,7 +86,7 @@ export default function FreelancerVaultDetailPage() {
     // Update local state to simulate submission
     setMilestoneStates((prev) => ({
       ...prev,
-      [activeSubmit.id]: "awaiting_approval", // Move to review state
+      [activeSubmit.id]: "AWAITING_APPROVAL", // Move to review state
     }));
 
     setShowSuccess(true);
@@ -194,7 +194,7 @@ export default function FreelancerVaultDetailPage() {
         subtitle: "Automated Compliance Check",
         amount: 0,
         displayAmount: m.amount,
-        status: "verified", // Freelancer sees this as verified instantly in this mock
+        status: "VERIFIED", // Freelancer sees this as verified instantly in this mock
         type: "COMPLIANCE_AI",
         deliverable: m.deliverable || "General Deliverable",
         checks: ["Format Validation", "Virus Scan", "Metadata Verify"],
@@ -211,7 +211,7 @@ export default function FreelancerVaultDetailPage() {
         status:
           milestoneStates[approvalId] ||
           m.status ||
-          (idx === 0 ? "pending" : "pending"), // Default all to pending if no status
+          (idx === 0 ? "PENDING" : "PENDING"), // Default all to pending if no status
         type: "APPROVAL_HUMAN",
         deliverable: m.deliverable || "General Deliverable",
         deliverableId: m.deliverableId,
@@ -228,19 +228,21 @@ export default function FreelancerVaultDetailPage() {
 
   // Helper for status colors
   const getStatusColor = (status) => {
-    switch (status) {
-      case "verified":
-      case "approved":
+    const normalized = status?.toUpperCase();
+    switch (normalized) {
+      case "VERIFIED":
+      case "APPROVED":
         return "text-emerald-500";
-      case "awaiting_approval":
-      case "pending_review":
+      case "AWAITING_APPROVAL":
+      case "PENDING_REVIEW":
+      case "SUBMITTED":
         return "text-amber-500";
-      case "rejected":
-      case "failed":
-      case "disputed":
+      case "REJECTED":
+      case "FAILED":
+      case "DISPUTED":
         return "text-red-500";
       default:
-        return "text-slate-500";
+        return "text-gray-400";
     }
   };
 
@@ -262,7 +264,7 @@ export default function FreelancerVaultDetailPage() {
   });
 
   if (vaultsLoading) {
-    return <div className="p-10 text-slate-500">Loading vault details...</div>;
+    return <div className="p-10 text-gray-400">Loading vault details...</div>;
   }
 
   if (!vault) {
@@ -281,13 +283,13 @@ export default function FreelancerVaultDetailPage() {
   }
 
   return (
-    <div className="min-h-screen text-slate-300 font-sans selection:bg-emerald-500/30 pb-20">
+    <div className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30 pb-20">
       <div className="max-w-6xl mx-auto px-6 space-y-8">
         {/* HEADER */}
         <header className="pt-4 md:pt-8 bg-transparent">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-sm text-slate-500 hover:text-white transition-colors mb-4 md:mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
+            className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-4 md:mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -304,19 +306,19 @@ export default function FreelancerVaultDetailPage() {
                   {vault.status}
                 </Badge>
               </div>
-              <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide truncate">
+              <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-wide truncate">
                 Vault ID:{" "}
-                <span className="text-slate-400 font-mono">{vaultId}</span>
+                <span className="text-gray-400 font-mono">{vaultId}</span>
               </p>
             </div>
             <div className="text-left md:text-right border-t md:border-t-0 border-white/5 pt-4 md:pt-0">
-              <p className="text-[10px] md:text-sm text-slate-500 font-medium uppercase tracking-widest">
+              <p className="text-[10px] md:text-sm text-gray-400 font-bold uppercase tracking-widest">
                 Potential Earnings
               </p>
-              <p className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+              <p className="text-2xl md:text-3xl font-bold uppercase text-white tracking-tight">
                 ${vault.amount?.toLocaleString() || "0"}
               </p>
-              <p className="text-[10px] md:text-xs text-emerald-500 font-medium mt-1">
+              <p className="text-[10px] md:text-xs text-emerald-500 font-bold uppercase tracking-tight mt-1">
                 ${(vault.paidAmount || 0).toLocaleString()} Received
               </p>
             </div>
@@ -328,8 +330,8 @@ export default function FreelancerVaultDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             <Card className="bg-[#0D0D0E] border-white/5">
               <CardHeader>
-                <CardTitle className="text-white">Project Milestones</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-white font-bold uppercase tracking-wide">Project Milestones</CardTitle>
+                <CardDescription className="text-gray-400 uppercase font-bold tracking-normal pb-2">
                   Submit deliverables and track approval status
                 </CardDescription>
               </CardHeader>
@@ -392,7 +394,7 @@ export default function FreelancerVaultDetailPage() {
 
                           {milestone.deliverable && (
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 mb-1">
-                              <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold whitespace-nowrap">
+                              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold whitespace-nowrap">
                                 Required:
                               </span>
                               <span className="text-[12px] text-white font-bold uppercase tracking-wide break-words">
@@ -401,7 +403,7 @@ export default function FreelancerVaultDetailPage() {
                             </div>
                           )}
 
-                          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-slate-500">
+                          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs font-bold uppercase tracking-widest text-gray-400">
                             {milestone.type === "APPROVAL_HUMAN" && (
                               <>
                                 <span className="text-white">
@@ -418,7 +420,7 @@ export default function FreelancerVaultDetailPage() {
                             {getDisputeEligibility(milestone).eligible && (
                               <Link
                                 href={`/freelancer/disputes/create?vaultId=${vaultId}&milestoneId=${milestone.id}`}
-                                className="inline-flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded hover:bg-red-500/20 transition-colors"
+                                className="inline-flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded hover:bg-red-500/20 transition-colors font-bold uppercase tracking-normal"
                               >
                                 <Gavel className="w-3 h-3" />
                                 Open Case
@@ -433,7 +435,7 @@ export default function FreelancerVaultDetailPage() {
                         {milestone.type === "COMPLIANCE_AI" && (
                           <Badge
                             variant="outline"
-                            className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px] h-6 px-3 flex items-center gap-1.5"
+                            className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-wide text-[10px] h-6 px-3 flex items-center gap-1.5"
                           >
                             <CheckCircle className="w-3 h-3" />
                             Passed
@@ -441,14 +443,14 @@ export default function FreelancerVaultDetailPage() {
                         )}
 
                         {milestone.type === "APPROVAL_HUMAN" &&
-                          (milestone.status === "pending" ||
+                          (milestone.status === "PENDING" ||
                             !milestone.status) && (
                             <Sheet>
                               <SheetTrigger asChild>
                                 <Button
                                   size="sm"
                                   onClick={() => setActiveSubmit(milestone)}
-                                  className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold"
+                                  className="bg-emerald-500 text-black hover:bg-emerald-400 font-black uppercase tracking-normal"
                                 >
                                   Submit
                                   <Upload className="w-4 h-4 ml-2" />
@@ -456,10 +458,10 @@ export default function FreelancerVaultDetailPage() {
                               </SheetTrigger>
                               <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:max-w-[50vw] p-6 lg:p-8 overflow-y-auto">
                                 <SheetHeader className="mb-6">
-                                  <SheetTitle className="text-white text-2xl">
+                                  <SheetTitle className="text-white text-2xl font-bold uppercase tracking-normal">
                                     Submit Milestone
                                   </SheetTitle>
-                                  <SheetDescription className="text-slate-400">
+                                  <SheetDescription className="text-gray-400 font-bold uppercase tracking-normal">
                                     Upload your deliverables for client review.
                                   </SheetDescription>
                                 </SheetHeader>
@@ -470,7 +472,7 @@ export default function FreelancerVaultDetailPage() {
                                       <h4 className="text-sm font-bold text-emerald-500 mb-2 uppercase tracking-wide">
                                         Deliverable Required
                                       </h4>
-                                      <p className="text-sm text-emerald-200/70">
+                                      <p className="text-sm text-emerald-200/70 font-bold uppercase tracking-normal">
                                         Please upload:{" "}
                                         <span className="text-white font-bold">
                                           {activeSubmit.deliverable}
@@ -481,7 +483,7 @@ export default function FreelancerVaultDetailPage() {
                                     <div className="space-y-4">
                                       <div className="space-y-2">
                                         <div className="space-y-2">
-                                          <Label className="text-white">
+                                          <Label className="text-white font-bold uppercase tracking-normal">
                                             Submission
                                           </Label>
                                           {(() => {
@@ -517,12 +519,12 @@ export default function FreelancerVaultDetailPage() {
                                                   type="file"
                                                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                 />
-                                                <Upload className="w-8 h-8 text-slate-500 mx-auto mb-3 group-hover:text-emerald-500 transition-colors" />
+                                                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-3 group-hover:text-emerald-500 transition-colors" />
                                                 <p className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">
                                                   Drop files here or click to
                                                   upload
                                                 </p>
-                                                <p className="text-xs text-slate-500 mt-1">
+                                                <p className="text-xs text-gray-400 mt-1">
                                                   Max 50MB
                                                 </p>
                                               </div>
@@ -532,7 +534,7 @@ export default function FreelancerVaultDetailPage() {
                                       </div>
 
                                       <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-white font-bold uppercase tracking-normal">
                                           Comments
                                         </Label>
                                         <Textarea
@@ -546,7 +548,7 @@ export default function FreelancerVaultDetailPage() {
                                       <SheetClose asChild>
                                         <Button
                                           onClick={handleSubmit}
-                                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-normal"
                                         >
                                           Submit for Review
                                         </Button>
@@ -554,7 +556,7 @@ export default function FreelancerVaultDetailPage() {
                                       <SheetClose asChild>
                                         <Button
                                           variant="outline"
-                                          className="border-white/10 hover:bg-white/5 text-slate-400 hover:text-white"
+                                          className="border-white/10 hover:bg-white/5 text-gray-400 hover:text-white font-bold uppercase tracking-normal"
                                         >
                                           Cancel
                                         </Button>
@@ -567,19 +569,19 @@ export default function FreelancerVaultDetailPage() {
                           )}
 
                         {milestone.type === "APPROVAL_HUMAN" &&
-                          milestone.status === "awaiting_approval" && (
+                          milestone.status === "AWAITING_APPROVAL" && (
                             <Button
                               size="sm"
                               variant="outline"
                               disabled
-                              className="border-amber-500/20 text-amber-500 bg-amber-500/5"
+                              className="border-amber-500/20 text-amber-500 bg-amber-500/5 font-bold uppercase tracking-normal"
                             >
                               <Clock className="w-4 h-4 mr-2" />
                               In Review
                             </Button>
                           )}
 
-                        {milestone.status === "approved" &&
+                        {milestone.status === "VERIFIED" &&
                           milestone.type === "APPROVAL_HUMAN" && (
                             <div className="flex items-center text-emerald-500 text-xs font-bold uppercase tracking-wider bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10">
                               <CheckCircle className="w-3 h-3 mr-1.5" />
@@ -605,15 +607,15 @@ export default function FreelancerVaultDetailPage() {
             {/* Verification Summary */}
             <Card className="bg-[#0D0D0E] border-white/5">
               <CardHeader>
-                <CardTitle className="text-white text-lg">
+                <CardTitle className="text-white text-lg font-bold uppercase tracking-normal">
                   Verification Summary
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Requirements Met</span>
-                    <span className="text-emerald-500 font-bold">12/12</span>
+                    <span className="text-gray-400 font-bold uppercase tracking-normal">Requirements Met</span>
+                    <span className="text-emerald-500 font-bold uppercase tracking-normal">12/12</span>
                   </div>
                   <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                     <div className="h-full bg-emerald-500 w-full" />
@@ -621,8 +623,8 @@ export default function FreelancerVaultDetailPage() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Checks Summary</span>
-                    <span className="text-emerald-500 font-bold">A+</span>
+                    <span className="text-gray-400 font-bold uppercase tracking-normal">Checks Summary</span>
+                    <span className="text-emerald-500 font-bold uppercase tracking-normal">A+</span>
                   </div>
                   <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                     <div className="h-full bg-emerald-500 w-full" />
@@ -639,20 +641,20 @@ export default function FreelancerVaultDetailPage() {
               )}
             >
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
+                <CardTitle className="flex items-center gap-2 text-white font-bold uppercase tracking-normal">
                   <Gavel className="w-5 h-5 text-amber-500" />
-                  Cases / Disputes
+                  Case Files
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="font-bold uppercase tracking-normal pb-3">
                   {anyEligibleForDispute
-                    ? "Open a formal case if work does not meet requirements."
-                    : "No eligible cases for this vault right now. Disputes are only allowed for specific reason codes tied to a milestone."}
+                    ? "Open a formal case file if work does not meet requirements."
+                    : "No eligible case files for this vault right now. Case files are only allowed for specific reason codes tied to a milestone."}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button
                   variant="outline"
-                  className="w-full border-white/10 hover:bg-white/5 text-white"
+                  className="w-full border-white/10 hover:bg-white/5 text-white font-bold uppercase tracking-normal"
                   disabled={!anyEligibleForDispute}
                   asChild={anyEligibleForDispute}
                 >

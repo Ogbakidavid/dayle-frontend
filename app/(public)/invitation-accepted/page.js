@@ -60,7 +60,7 @@ export default function InvitationAcceptedPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#050505] text-slate-300 font-sans selection:bg-emerald-500/30 pb-20">
+        <div className="min-h-screen bg-[#050505] text-gray-400 font-sans selection:bg-emerald-500/30 pb-20">
             <div className="max-w-4xl mx-auto px-6 py-12 text-center space-y-8">
                 <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20">
                     <CheckCircle className="w-10 h-10 text-emerald-500" />
@@ -70,7 +70,7 @@ export default function InvitationAcceptedPage() {
                     <h1 className="text-4xl font-black text-white uppercase tracking-tighter mb-4">
                         Invitation Accepted
                     </h1>
-                    <p className="text-xl text-slate-400 max-w-lg mx-auto">
+                    <p className="text-xl text-gray-400 max-w-lg mx-auto">
                         You have successfully accepted the invitation for <span className="text-white font-bold">{vault.title}</span>.
                     </p>
                 </div>
@@ -78,17 +78,17 @@ export default function InvitationAcceptedPage() {
                 <Card className="bg-[#0D0D0E] border-white/5 max-w-xl mx-auto text-left">
                     <CardContent className="p-6 space-y-4">
                         <div className="flex justify-between items-center py-2 border-b border-white/5">
-                            <span className="text-slate-500 text-sm uppercase tracking-wide">Status</span>
+                            <span className="text-gray-400 text-sm uppercase tracking-wide">Status</span>
                             <Badge variant="outline" className="text-emerald-500 bg-emerald-500/10 border-emerald-500/20">
                                 {vault.status}
                             </Badge>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b border-white/5">
-                            <span className="text-slate-500 text-sm uppercase tracking-wide">Client</span>
+                            <span className="text-gray-400 text-sm uppercase tracking-wide">Client</span>
                             <span className="text-white font-bold">{vault.clientName || 'Client'}</span>
                         </div>
                         <div className="flex justify-between items-center py-2">
-                            <span className="text-slate-500 text-sm uppercase tracking-wide">Total Value</span>
+                            <span className="text-gray-400 text-sm uppercase tracking-wide">Total Value</span>
                             <span className="text-white font-bold">${vault.amount.toLocaleString()}</span>
                         </div>
                     </CardContent>
