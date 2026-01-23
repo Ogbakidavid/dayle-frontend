@@ -166,7 +166,7 @@ export default function TransactionsPage() {
           <motion.div variants={itemVariants} className="flex items-center gap-3">
             <Button
               variant="outline"
-              className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all"
+              className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all font-bold uppercase tracking-wide"
             >
               <Download className="w-4 h-4 mr-2 text-gray-400" />
               Export
@@ -184,11 +184,11 @@ export default function TransactionsPage() {
         {/* 2. STATS */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl">
-            <p className="text-sm font-medium text-gray-400">Total Volume</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-gray-400">Total Volume</p>
             <h2 className="text-3xl font-bold text-white mt-1">$42,500</h2>
           </div>
           <div className="bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl">
-            <p className="text-sm font-medium text-gray-400">Processing</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-gray-400">Processing</p>
             <h2 className="text-3xl font-bold text-amber-500 mt-1">$11,500</h2>
           </div>
           <div className="bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl">
@@ -222,13 +222,13 @@ export default function TransactionsPage() {
                   <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wide">
                     Transaction
                   </th>
-                  <th className="hidden md:table-cell px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wide">
+                  <th className="hidden md:table-cell px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide">
                     Type
                   </th>
-                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wide">
+                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide">
                     Date
                   </th>
-                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wide text-center sm:text-left">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide text-center sm:text-left">
                     Status
                   </th>
                   <th className="px-4 md:px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide text-right">

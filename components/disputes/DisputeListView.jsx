@@ -130,7 +130,7 @@ function StatCard({ title, value, hint, icon: Icon, tone = "neutral" }) {
               <p className="mt-2 text-3xl font-semibold tracking-tight text-white">
                 {value}
               </p>
-              {hint ? <p className="mt-1 text-xs text-white/45">{hint}</p> : null}
+              {hint ? <p className="mt-1 text-xs text-white/45 font-bold uppercase tracking-wide">{hint}</p> : null}
             </div>
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-black/30">
               <Icon className="h-5 w-5 text-white/70" />
@@ -251,7 +251,7 @@ export function DisputeListView({ role }) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <motion.div variants={itemVariants} className="space-y-1">
           <div className="flex items-center gap-3">
-            <div className="hidden xs:flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] shrink-0">
+            <div className="hidden xs:flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/3 shrink-0">
               <Gavel className="h-5 w-5 text-amber-300" />
             </div>
             <div>
@@ -269,7 +269,7 @@ export function DisputeListView({ role }) {
 
         <motion.div variants={itemVariants}>
           <Link href={`/${role}/disputes/create`} className="w-full sm:w-auto">
-            <Button className="h-11 w-full sm:w-auto bg-amber-500 px-5 font-bold text-black hover:bg-amber-400">
+            <Button className="h-11 w-full sm:w-auto bg-amber-500 px-5 font-bold text-black hover:bg-amber-400 uppercase ">
               <Plus className="mr-2 h-5 w-5" />
               Open dispute
             </Button>
@@ -345,7 +345,7 @@ export function DisputeListView({ role }) {
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-11 w-full sm:w-auto border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.06] hover:text-white"
+                  className="h-11 w-full sm:w-auto border-white/10 bg-white/3 text-white/70 hover:bg-white/6 hover:text-white font-bold uppercase tracking-wide"
                   onClick={() =>
                     setSortKey((s) => (s === "newest" ? "oldest" : "newest"))
                   }
@@ -366,10 +366,10 @@ export function DisputeListView({ role }) {
                     type="button"
                     onClick={() => setStatusFilter(t.key)}
                     className={cn(
-                      "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition",
+                      "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition",
                       active
                         ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
-                        : "border-white/10 bg-white/[0.03] text-white/60 hover:bg-white/[0.06] hover:text-white"
+                        : "border-white/10 bg-white/3 text-white/60 hover:bg-white/6 hover:text-white"
                     )}
                   >
                     <Filter
@@ -405,10 +405,10 @@ export function DisputeListView({ role }) {
             <CardTitle className="flex items-center justify-between gap-3 text-white">
               <div className="flex items-center gap-2">
                 <Gavel className="h-5 w-5 text-amber-300" />
-                <span className="text-lg font-semibold tracking-tight">
+                <span className="text-lg font-semibold tracking-wider uppercase">
                   Cases
                 </span>
-                <span className="text-sm font-normal text-white/40">
+                <span className="text-sm font-normal uppercase text-white/40">
                   ({filtered.length})
                 </span>
               </div>
@@ -418,14 +418,14 @@ export function DisputeListView({ role }) {
           <CardContent className="p-0">
             {filtered.length === 0 ? (
               <div className="p-10 md:p-14">
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
+                <div className="rounded-2xl border border-white/10 bg-white/3 p-8 text-center">
                   <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-black/30">
                     <Gavel className="h-6 w-6 text-white/60" />
                   </div>
-                  <p className="text-base font-semibold text-white">
+                  <p className="text-base font-semibold uppercase tracking-wide text-white">
                     No disputes found
                   </p>
-                  <p className="mt-1 text-sm text-white/50">
+                  <p className="mt-1 text-sm uppercase tracking-wide text-white/50">
                     Try adjusting filters or open a new dispute.
                   </p>
                   <div className="mt-5 flex justify-center">
@@ -444,7 +444,7 @@ export function DisputeListView({ role }) {
                   return (
                     <div
                       key={dispute.id}
-                      className="group px-5 py-5 transition-colors hover:bg-white/[0.02] md:px-6"
+                      className="group px-5 py-5 transition-colors hover:bg-white/2 md:px-6"
                     >
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         {/* Left */}
@@ -453,7 +453,7 @@ export function DisputeListView({ role }) {
 
                           <div className="min-w-0">
                             {/* Primary line: Vault title */}
-                            <p className="truncate text-[15px] font-medium leading-snug text-white">
+                            <p className="truncate text-[15px] font-bold uppercase tracking-wide leading-snug text-white">
                               {dispute.vaultTitle}
                             </p>
 
@@ -466,7 +466,7 @@ export function DisputeListView({ role }) {
                             </div>
 
                             {/* Metadata */}
-                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-white/45">
+                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] font-bold text-white/45">
                               <span>
                                 Milestone:{" "}
                                 <span className="text-white/70">
@@ -497,7 +497,7 @@ export function DisputeListView({ role }) {
                                 {dispute.summary}
                               </p>
                             ) : (
-                              <p className="mt-3 text-[13px] text-white/35">
+                              <p className="mt-3 text-[13px] text-white/35 font-bold uppercase">
                                 No summary provided.
                               </p>
                             )}
@@ -510,9 +510,9 @@ export function DisputeListView({ role }) {
                             <Button
                               variant="outline"
                               className="
-                        h-10 border-white/10 bg-white/[0.03]
-                        text-white/70 hover:bg-white/[0.06] hover:text-white
-                        group-hover:border-white/20
+                        h-10 border-white/10 bg-white/3
+                        text-white/70 hover:bg-white/6 hover:text-white
+                        group-hover:border-white/20 font-bold uppercase tracking-wide
                       "
                             >
                               View details

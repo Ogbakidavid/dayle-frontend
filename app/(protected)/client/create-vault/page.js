@@ -317,17 +317,14 @@ export default function CreateVaultPage() {
 
                     <div className="space-y-2">
                       <Label className="text-sm text-white-200 font-bold uppercase tracking-wide">
-                        Brief Description (Optional)
+                        Brief Description
                       </Label>
                       <Textarea
                         value={vaultDescription}
                         onChange={(e) => setVaultDescription(e.target.value)}
-                        placeholder="Optional context for the freelancer + future disputes..."
+                        placeholder="Describe the overall scope and deliverables...."
                         className="bg-black border-gray-800 min-h-[120px] focus:border-emerald-500 text-white placeholder:text-gray-400"
                       />
-                      <p className="text-xs text-white/40 font-medium">
-                        This can appear in the vault detail screen later and helps with clarity during reviews.
-                      </p>
                     </div>
                   </div>
                 </div>

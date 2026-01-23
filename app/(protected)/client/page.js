@@ -194,7 +194,12 @@ export default function ClientDashboard() {
                           {vault.status}
                         </span>
                       </div>
-                      <p className="text-sm font-bold uppercase tracking-wide text-gray-400 truncate">
+                      {vault.description && (
+                        <p className="text-gray-400 mb-2 line-clamp-1 max-w-xl font-bold uppercase tracking-wide truncate">
+                          {vault.description}
+                        </p>
+                      )}
+                      <p className="text-sm font-bold uppercase tracking-wide text-white/50 truncate">
                         {vault.freelancerEmail ||
                           vault.freelancer?.email ||
                           "Unassigned"}

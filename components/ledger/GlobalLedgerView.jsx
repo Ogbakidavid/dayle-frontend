@@ -166,10 +166,10 @@ export function GlobalLedgerView({ role }) {
                           </div>
                         </td>
                         <td className="hidden md:table-cell px-6 py-4">
-                          <p className="text-sm text-white/70">
+                          <p className="text-sm text-white/70 font-bold uppercase">
                             {vault?.title || "Vault"}
                           </p>
-                          <p className="text-xs text-white">
+                          <p className="text-xs text-white font-bold uppercase">
                             {new Date(entry.date).toLocaleDateString()}
                           </p>
                         </td>

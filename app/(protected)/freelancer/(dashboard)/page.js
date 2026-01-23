@@ -214,6 +214,11 @@ export default function FreelancerDashboard() {
                         {vault.status}
                       </span>
                     </div>
+                    {vault.description && (
+                      <p className="text-gray-400 mb-2 line-clamp-1 max-w-xl font-bold uppercase tracking-wide truncate">
+                        {vault.description}
+                      </p>
+                    )}
                     <p className="text-sm text-white/50 uppercase font-bold tracking-wide truncate">
                       Client: {vault.clientName || "Dayle Client"}
                     </p>

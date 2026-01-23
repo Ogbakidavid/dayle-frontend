@@ -81,7 +81,7 @@ export default function WalletPageContent() {
                         <p className="text-xs md:text-sm text-white/50 font-bold uppercase tracking-wide">Manage your vault earnings and global settlements</p>
                     </motion.div>
                     <motion.div variants={itemVariants} className="flex items-center gap-3">
-                        <Button variant="outline" className="w-full md:w-auto gap-2 font-bold h-11 px-6 border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80 shrink-0">
+                        <Button variant="outline" className="w-full md:w-auto gap-2 font-bold h-11 px-6 border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80 shrink-0 uppercase tracking-wide">
                             <Download size={16} />
                             Export Ledger
                         </Button>
