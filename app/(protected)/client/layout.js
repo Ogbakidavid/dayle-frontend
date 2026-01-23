@@ -121,7 +121,7 @@ export default function ClientLayout({ children }) {
                             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-white">{user?.name || 'Alex Johnson'}</p>
+                            <p className="text-sm font-bold uppercase tracking-wide text-white">{user?.name || 'Alex Johnson'}</p>
                         </div>
                     </div>
 
@@ -131,7 +131,7 @@ export default function ClientLayout({ children }) {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-full text-sm border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80"
+                                className="h-9 w-full text-sm font-bold uppercase tracking-wide border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80"
                             >
                                 <Settings className="w-3.5 h-3.5 mr-2" />
                                 Settings
@@ -141,7 +141,7 @@ export default function ClientLayout({ children }) {
                             variant="outline"
                             size="sm"
                             onClick={logout}
-                            className="h-9 text-sm border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
+                            className="h-9 text-sm font-bold uppercase tracking-wide border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
                         >
                             <LogOut className="w-3.5 h-3.5 mr-2" />
                             Sign out

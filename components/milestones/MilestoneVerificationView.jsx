@@ -12,6 +12,8 @@ import { BadgeCheck, Ban, ChevronLeft, ShieldCheck } from 'lucide-react';
 const statusStyles = {
     PASS: 'text-emerald-400',
     FAIL: 'text-red-400',
+    FLAGGED: 'text-amber-400',
+    HUMAN_REVIEW: 'text-sky-400',
     PENDING: 'text-amber-400'
 };
 
@@ -82,11 +84,19 @@ export function MilestoneVerificationView({ vaultId, milestoneId, role }) {
                         <CardContent className="space-y-3">
                             {isPass ? (
                                 <p className="text-sm text-white/70">
-                                    Compliance passed. Funds are auto-releasing and will show as processing in the ledger.
+                                    AI audit passed. Awaiting client approval for fund release.
                                 </p>
                             ) : isFail ? (
                                 <p className="text-sm text-white/70">
                                     Compliance failed. Update evidence and resubmit for verification.
+                                </p>
+                            ) : verificationStatus === 'FLAGGED' ? (
+                                <p className="text-sm text-white/70">
+                                    AI audit flagged potential issues. Awaiting human advisor review or client override.
+                                </p>
+                            ) : verificationStatus === 'HUMAN_REVIEW' ? (
+                                <p className="text-sm text-white/70">
+                                    Awaiting manual audit by a human advisor.
                                 </p>
                             ) : (
                                 <p className="text-sm text-white/70">

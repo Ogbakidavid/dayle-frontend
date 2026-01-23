@@ -269,7 +269,7 @@ export function DisputeListView({ role }) {
 
         <motion.div variants={itemVariants}>
           <Link href={`/${role}/disputes/create`} className="w-full sm:w-auto">
-            <Button className="h-11 w-full sm:w-auto bg-amber-500 px-5 font-bold text-black hover:bg-amber-400 uppercase ">
+            <Button className="h-11 w-full sm:w-auto bg-amber-500 px-5 font-black text-black hover:bg-amber-400 uppercase tracking-wide">
               <Plus className="mr-2 h-5 w-5" />
               Open dispute
             </Button>

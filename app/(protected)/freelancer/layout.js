@@ -155,11 +155,11 @@ export default function FreelancerLayout({ children }) {
         {/* User Section */}
         <div className="p-4 border-t border-gray-900 mt-auto">
           <div className="flex items-center gap-3 p-3 rounded-lg">
-            <div className="w-9 h-9 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center text-white font-medium text-sm border border-gray-700">
+            <div className="w-9 h-9 bg-linear-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center text-white font-bold uppercase text-sm border border-gray-700">
               {user?.name?.charAt(0)?.toUpperCase() || "U"}
             </div>
             <div>
-              <p className="text-sm font-medium text-white">
+              <p className="text-sm font-bold uppercase tracking-wide text-white">
                 {user?.name || "Jane Smith"}
               </p>
             </div>
@@ -171,7 +171,7 @@ export default function FreelancerLayout({ children }) {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 w-full text-sm border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80 font-medium"
+                className="h-9 w-full text-sm font-bold uppercase tracking-wide border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80"
               >
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
@@ -181,7 +181,7 @@ export default function FreelancerLayout({ children }) {
               variant="outline"
               size="sm"
               onClick={logout}
-              className="h-9 text-sm border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 font-medium"
+              className="h-9 text-sm font-bold uppercase tracking-wide border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
             >
               <LogOut className="w-3.5 h-3.5 mr-2" />
               Sign out

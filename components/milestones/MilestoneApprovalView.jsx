@@ -109,7 +109,7 @@ export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
                                 ) : (
                                     <Clock className="w-4 h-4 text-amber-400" />
                                 )}
-                                <span>{approvalStatus}</span>
+                                <span>{approvalStatus === 'approved' ? 'VERIFIED' : approvalStatus}</span>
                             </div>
                             <p className="text-xs text-white">
                                 Approved milestones release after client sign-off. Processing states will appear in the ledger.

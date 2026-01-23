@@ -116,23 +116,6 @@ export default function ClientDashboard() {
             </p>
           </div>
         </motion.div>
-
-        {/* <Link href="/client/create-vault">
-          <div className="bg-emerald-600 hover:bg-emerald-700 p-6 rounded-sm transition-colors cursor-pointer h-full flex flex-col justify-between group">
-            <div className="flex justify-between items-start">
-              <Plus className="w-8 h-8 text-white" />
-              <div className="w-10 h-10 bg-white/10 rounded-sm flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                <ArrowUpRight className="w-5 h-5 text-white" />
-              </div>
-            </div>
-            <h3 className="text-xl font-black uppercase tracking-tight text-white mt-4">
-              New Vault
-            </h3>
-            <p className="text-emerald-100 text-sm mt-1 font-bold uppercase tracking-wide">
-              Create secure escrow
-            </p>
-          </div>
-        </Link> */}
       </div>
 
       {/* Active Vaults Section */}

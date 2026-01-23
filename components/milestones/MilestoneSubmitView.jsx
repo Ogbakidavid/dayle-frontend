@@ -79,12 +79,12 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
                             <CardTitle className="text-white">Requirement Checklist</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {(milestone.requirements || []).map((req) => (
+                            {(milestone.requirementItemsJson || []).map((req) => (
                                 <div key={req.reqId} className="flex items-start gap-3 border border-white/5 bg-black/40 rounded-lg p-4">
                                     <FileText className="w-4 h-4 text-emerald-500 mt-0.5" />
                                     <div>
                                         <p className="text-sm text-white font-semibold">{req.reqId} · {req.label}</p>
-                                        <p className="text-xs text-white">{req.acceptance}</p>
+                                        <p className="text-xs text-white">{req.required ? 'Mandatory' : 'Optional'}</p>
                                     </div>
                                 </div>
                             ))}

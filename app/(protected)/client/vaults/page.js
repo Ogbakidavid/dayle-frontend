@@ -106,13 +106,13 @@ export default function VaultsPage() {
           <motion.div variants={itemVariants} className="flex items-center gap-3">
             <Button
               variant="outline"
-              className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all"
+              className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all font-bold uppercase tracking-wide"
             >
               <Filter className="w-4 h-4 mr-2 text-gray-400" />
               Filters
             </Button>
             <Link href="/client/create-vault" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto bg-white text-black hover:bg-emerald-400 hover:text-black h-11 px-6 rounded-xl font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all">
+              <Button className="w-full sm:w-auto bg-white text-black hover:bg-emerald-400 hover:text-black h-11 px-6 rounded-xl font-black uppercase tracking-wide shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all">
                 <Plus className="w-4 h-4 mr-2" strokeWidth={3} />
                 New Vault
               </Button>
@@ -128,7 +128,7 @@ export default function VaultsPage() {
               key={i}
               className="relative group bg-[#0D0D0E] border border-white/5 p-6 rounded-2xl overflow-hidden hover:border-white/10 transition-all"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/[0.02] rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-white/[0.04] transition-all" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/2 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-white/4 transition-all" />
               <div className="flex justify-between items-start mb-4">
                 <div
                   className={cn(
@@ -169,7 +169,7 @@ export default function VaultsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
-                <tr className="border-b border-white/5 bg-white/[0.01]">
+                <tr className="border-b border-white/5 bg-white/1">
                   <th className="px-4 md:px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide">
                     Vault Detail
                   </th>
@@ -189,7 +189,7 @@ export default function VaultsPage() {
                 {paginatedVaults.map((vault) => (
                   <tr
                     key={vault.id}
-                    className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
+                    className="group hover:bg-white/2 transition-colors cursor-pointer"
                     onClick={() =>
                       (window.location.href = `/client/vault/${vault.id}`)
                     }

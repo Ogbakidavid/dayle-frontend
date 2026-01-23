@@ -105,17 +105,17 @@ export function GlobalLedgerView({ role }) {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search ledger entries..."
-            className="w-full pl-10 pr-4 py-2 bg-[#111111] border border-white/10 rounded-lg text-sm text-white focus:border-emerald-500/40"
+            className="w-full pl-10 pr-4 py-2 bg-[#111111] font-bold uppercase tracking-wide border border-white/10 rounded-lg text-sm text-white focus:border-emerald-500/40"
           />
         </div>
-        <Link href={`/${role}`} className="w-full sm:w-auto">
+        {/* <Link href={`/${role}`} className="w-full sm:w-auto">
           <Button
             variant="outline"
             className="w-full sm:w-auto border-white/10 text-white/70 hover:text-white"
           >
             Back to dashboard
           </Button>
-        </Link>
+        </Link> */}
       </motion.div>
 
       <motion.div variants={itemVariants}>
@@ -141,12 +141,14 @@ export function GlobalLedgerView({ role }) {
                             <div
                               className={cn(
                                 "hidden xs:flex w-9 h-9 rounded-lg items-center justify-center border shrink-0",
-                                entry.type === "release"
+                                entry.type === "RELEASE" || entry.type === "DEPOSIT"
                                   ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                  : entry.type === "LOCK" || entry.type === "REFUND"
+                                  ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
                                   : "bg-blue-500/10 border-blue-500/20 text-blue-400"
                               )}
                             >
-                              {entry.type === "release" ? (
+                              {entry.type === "RELEASE" || entry.type === "WITHDRAW" ? (
                                 <ArrowUpRight className="w-4 h-4" />
                               ) : (
                                 <ArrowDownLeft className="w-4 h-4" />
