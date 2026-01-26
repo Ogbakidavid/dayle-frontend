@@ -141,11 +141,11 @@ export default function ClientDashboard() {
           <motion.div variants={itemVariants} className="py-16 text-center bg-[#111111] border border-white/10 rounded-sm">
             <Activity className="w-12 h-12 text-white mx-auto mb-4" />
             <p className="text-white font-bold uppercase tracking-wide">No active vaults</p>
-            <p className="text-sm text-white mt-2">
+            <p className="text-sm text-white mt-2 font-bold uppercase tracking-wide">
               Get started by creating your first vault
             </p>
             <Link href="/client/create-vault">
-              <Button className="mt-6 bg-emerald-600 hover:bg-emerald-700 font-bold uppercase tracking-wide">
+              <Button className="mt-6 bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-wide">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Vault
               </Button>

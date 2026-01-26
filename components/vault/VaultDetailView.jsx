@@ -17,11 +17,6 @@ import {
     ClipboardList
 } from 'lucide-react';
 
-const typeStyles = {
-    COMPLIANCE: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    APPROVAL: 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-};
-
 export function VaultDetailView({ vaultId, role }) {
     const vault = useMemo(() => getVaultById(vaultId), [vaultId]);
     const milestones = vault?.milestones || [];
@@ -97,9 +92,9 @@ export function VaultDetailView({ vaultId, role }) {
                         <div className="space-y-4">
                             {milestones.map((milestone) => {
                                 const milestoneBase = `/${role}/vault/${vault.id}/milestones/${milestone.id}`;
-                                const showVerification = milestone.type === 'COMPLIANCE';
-                                const showApproval = milestone.type === 'APPROVAL';
                                 const active = milestone.id === activeMilestoneId;
+                                const hasVerification = milestone.verification?.result;
+                                
                                 return (
                                     <Card
                                         key={milestone.id}
@@ -114,22 +109,19 @@ export function VaultDetailView({ vaultId, role }) {
                                                 <CardTitle className="text-white text-lg">
                                                     {milestone.title}
                                                 </CardTitle>
-                                                <div className={cn(
-                                                    'px-2 py-1 text-sm font-bold uppercase tracking-wide rounded-full border',
-                                                    typeStyles[milestone.type]
-                                                )}>
-                                                    {milestone.type}
-                                                </div>
+                                                <StatusBadge status={milestone.status} />
                                             </div>
                                             <div className="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-wide text-white">
                                                 <span className="flex items-center gap-2">
                                                     <Calendar className="w-3.5 h-3.5" />
                                                     Due {milestone.dueDate}
                                                 </span>
-                                                <span className="flex items-center gap-2">
-                                                    <BadgeCheck className="w-3.5 h-3.5" />
-                                                    {MILESTONE_STATUS_LABELS[milestone.status] || milestone.status}
-                                                </span>
+                                                {hasVerification && (
+                                                    <span className="flex items-center gap-2">
+                                                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                                        AI: {milestone.verification.result}
+                                                    </span>
+                                                )}
                                             </div>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
@@ -146,17 +138,15 @@ export function VaultDetailView({ vaultId, role }) {
                                                             </Button>
                                                         </Link>
                                                     )}
-                                                    {showVerification && (
-                                                        <Link href={`${milestoneBase}/verification`}>
+                                                    <Link href={`${milestoneBase}/verification`}>
+                                                        <Button size="sm" variant="outline" className="border-white/10 text-white/70 hover:text-white">
+                                                            Verification
+                                                        </Button>
+                                                    </Link>
+                                                    {role === 'client' && (
+                                                        <Link href={`${milestoneBase}/review`}>
                                                             <Button size="sm" variant="outline" className="border-white/10 text-white/70 hover:text-white">
-                                                                Verification
-                                                            </Button>
-                                                        </Link>
-                                                    )}
-                                                    {showApproval && (
-                                                        <Link href={`${milestoneBase}/approval`}>
-                                                            <Button size="sm" variant="outline" className="border-white/10 text-white/70 hover:text-white">
-                                                                Approval Review
+                                                                Review
                                                             </Button>
                                                         </Link>
                                                     )}

@@ -103,7 +103,7 @@ export default function SignupPage() {
             {/* RIGHT SIDE: Form (The Action) */}
             <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-24 bg-[#050505] relative overflow-hidden">
                 {/* Subtle Form Background Detail */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/[0.02] blur-[100px] rounded-full pointer-events-none"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/2 blur-[100px] rounded-full pointer-events-none"></div>
 
                 <div className="w-full max-w-[440px] relative z-10">
                     <div className="mb-10">
@@ -114,7 +114,7 @@ export default function SignupPage() {
                     <div className="space-y-6">
                         <Button
                             variant="outline"
-                            className="w-full h-14 bg-white/[0.03] border-white/10 hover:bg-white/[0.08] hover:border-white/20 text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all"
+                            className="w-full h-14 bg-white/3 border-white/10 hover:bg-white/8 hover:border-white/20 text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all"
                             onClick={() => console.log("Google Signup")}
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -171,7 +171,7 @@ export default function SignupPage() {
                                         name="password"
                                         placeholder="••••••••"
                                         required
-                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/8 focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
                                     />
                                 </div>
                             </div>
@@ -184,7 +184,7 @@ export default function SignupPage() {
                                         name="confirmPassword"
                                         placeholder="••••••••"
                                         required
-                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/8 focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
                                     />
                                 </div>
                             </div>
