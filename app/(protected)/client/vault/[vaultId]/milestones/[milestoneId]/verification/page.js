@@ -97,18 +97,18 @@ export default function ClientVerificationPage() {
                     </span>
                     <span className="text-xs text-gray-400">2.4 MB</span>
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between h-auto py-3 border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white"
-                  >
-                    <span className="flex items-center gap-2">
-                      <ExternalLink className="w-4 h-4" />
-                      Blockchain Proof
-                    </span>
-                    <span className="text-xs text-gray-400 font-mono">
-                      0x7f...3a9
-                    </span>
-                  </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between h-auto py-3 border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white"
+                    >
+                      <span className="flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4" />
+                        Audit Certificate
+                      </span>
+                      <span className="text-xs text-gray-400 font-mono">
+                        V-CL-24-12
+                      </span>
+                    </Button>
                 </div>
               </div>
             </div>

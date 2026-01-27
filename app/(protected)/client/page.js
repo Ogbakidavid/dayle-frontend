@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useVault } from "@/lib/store/vault-context";
 import { useWallet } from "@/lib/store/wallet-context";
 import {
-  Wallet,
-  Plus,
+  CreditCard,
+  Landmark,
   Shield,
   Activity,
   ArrowUpRight,
@@ -76,11 +76,11 @@ export default function ClientDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
         <motion.div
           variants={itemVariants}
-          className="bg-[#111111] border border-white/10 p-6 rounded-sm hover:border-white/20 transition-colors"
+          className="bg-muted border border-white/10 p-6 rounded-sm hover:border-white/20 transition-colors"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
-              <Wallet className="w-4 h-4 text-emerald-500" />
+              <Landmark className="w-4 h-4 text-emerald-500" />
             </div>
             <span className="text-sm font-bold uppercase tracking-wide text-white">
               Available Balance
@@ -99,7 +99,7 @@ export default function ClientDashboard() {
 
         <motion.div
           variants={itemVariants}
-          className="bg-[#111111] border border-white/10 p-6 rounded-sm hover:border-white/20 transition-colors"
+          className="bg-muted border border-white/10 p-6 rounded-sm hover:border-white/20 transition-colors"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
@@ -140,7 +140,7 @@ export default function ClientDashboard() {
             ))}
           </div>
         ) : activeVaults.length === 0 ? (
-          <motion.div variants={itemVariants} className="py-16 text-center bg-[#111111] border border-white/10 rounded-sm">
+          <motion.div variants={itemVariants} className="py-16 text-center bg-muted border border-white/10 rounded-sm">
             <Activity className="w-12 h-12 text-white mx-auto mb-4" />
             <p className="text-white font-bold uppercase tracking-wide">No active vaults</p>
             <p className="text-sm text-white mt-2 font-bold uppercase tracking-wide">
@@ -170,7 +170,7 @@ export default function ClientDashboard() {
                 >
                   <motion.div
                     variants={itemVariants}
-                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-[#111111] border border-white/10 rounded-sm hover:border-white/20 transition-colors gap-8"
+                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-muted border border-white/10 rounded-sm hover:border-white/20 transition-colors gap-8"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-2">

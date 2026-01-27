@@ -16,7 +16,7 @@ import {
   ArrowRight,
   ArrowLeft,
   Check,
-  Hash,
+  Info,
   DollarSign,
   TrendingDown,
   AlertCircle,
@@ -78,7 +78,7 @@ export default function CreateVaultPage() {
   ]);
 
   const steps = [
-    { id: 1, name: "Basics", icon: Hash },
+    { id: 1, name: "Basics", icon: Info },
     { id: 2, name: "Milestones", icon: ListChecks },
     { id: 3, name: "Assign", icon: Users },
     { id: 4, name: "Review", icon: ShieldCheck },

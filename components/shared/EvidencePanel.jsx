@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, FileText, CheckCircle2, Info } from "lucide-react";
+import { MessageSquare, FileText, CheckCircle2, Info, ShieldCheck, AlertCircle, Cpu } from "lucide-react";
 
 function cx(...classes) {
     return classes.filter(Boolean).join(" ");
@@ -22,7 +22,7 @@ function SectionHeader({ icon: Icon, title, subtitle }) {
     return (
         <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03]">
+                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/3">
                     <Icon className="h-4 w-4 text-emerald-300" />
                 </div>
                 <div className="min-w-0">
@@ -38,7 +38,7 @@ function SectionHeader({ icon: Icon, title, subtitle }) {
 
 function MetaPill({ children }) {
     return (
-        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium text-white/60">
+        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-[11px] font-medium text-white/60">
             {children}
         </span>
     );
@@ -46,7 +46,7 @@ function MetaPill({ children }) {
 
 function EmptyState({ title, description }) {
     return (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+        <div className="rounded-2xl border border-white/10 bg-white/2 p-6">
             <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-black/30">
                     <Info className="h-4 w-4 text-white/60" />
@@ -62,7 +62,7 @@ function EmptyState({ title, description }) {
 
 function EvidenceItem({ topLeft, topRight, title, body, metaLeft, metaRight }) {
     return (
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4 transition-colors hover:border-white/15 hover:bg-white/[0.03]">
+        <div className="rounded-2xl border border-white/10 bg-black/30 p-4 transition-colors hover:border-white/15 hover:bg-white/3">
             <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -122,6 +122,64 @@ export function EvidencePanel({ milestone, evidence }) {
             </CardHeader>
 
             <CardContent className="space-y-8 p-5">
+                {/* AI Audit Result */}
+                <div className={cx(
+                    "rounded-2xl border p-4 flex items-start gap-4 transition-all",
+                    milestone.verification?.result === "FAIL" 
+                        ? "bg-red-500/10 border-red-500/20" 
+                        : milestone.verification?.result === "FLAGGED"
+                        ? "bg-amber-500/10 border-amber-500/20"
+                        : "bg-emerald-500/10 border-emerald-500/20"
+                )}>
+                    <div className={cx(
+                        "mt-1 flex h-10 w-10 items-center justify-center rounded-xl border",
+                        milestone.verification?.result === "FAIL" 
+                            ? "bg-red-500/20 border-red-500/30" 
+                            : milestone.verification?.result === "FLAGGED"
+                            ? "bg-amber-500/20 border-amber-500/30"
+                            : "bg-emerald-500/20 border-emerald-500/30"
+                    )}>
+                        {milestone.verification?.result === "FAIL" ? (
+                            <AlertCircle className="h-5 w-5 text-red-400" />
+                        ) : milestone.verification?.result === "FLAGGED" ? (
+                            <AlertCircle className="h-5 w-5 text-amber-400" />
+                        ) : (
+                            <ShieldCheck className="h-5 w-5 text-emerald-400" />
+                        )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 flex items-center gap-1">
+                                <Cpu className="h-3 w-3" /> AI Verification Engine
+                            </span>
+                            <span className={cx(
+                                "ml-auto px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                                milestone.verification?.result === "FAIL" 
+                                    ? "bg-red-500 text-white" 
+                                    : milestone.verification?.result === "FLAGGED"
+                                    ? "bg-amber-500 text-black"
+                                    : "bg-emerald-500 text-black"
+                            )}>
+                                {milestone.verification?.result || "PASS"}
+                            </span>
+                        </div>
+                        <p className="text-sm font-bold text-white mb-1">
+                            {milestone.verification?.result === "FAIL" 
+                                ? "Compliance Check Failed" 
+                                : milestone.verification?.result === "FLAGGED"
+                                ? "Manual Review Recommended"
+                                : "Automated Compliance Passed"}
+                        </p>
+                        <p className="text-xs text-white/60 leading-relaxed font-bold uppercase tracking-normal">
+                            {milestone.verification?.result === "FAIL" 
+                                ? "Critical discrepancies found in submitted deliverables vs contract requirements." 
+                                : milestone.verification?.result === "FLAGGED"
+                                ? "Metadata anomalies detected. Verification requires human oversight."
+                                : "Deliverables verified against contract metadata. No anomalies detected in cryptographic proof."}
+                        </p>
+                    </div>
+                </div>
+
                 {/* Clarifications */}
                 <section className="space-y-4">
                     <SectionHeader
@@ -174,7 +232,7 @@ export function EvidencePanel({ milestone, evidence }) {
                                 <EvidenceItem
                                     key={item.id}
                                     topLeft={
-                                        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] font-semibold text-white/70">
+                                        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-[11px] font-semibold text-white/70">
                                             {item.fileName}
                                         </span>
                                     }

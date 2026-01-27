@@ -600,7 +600,7 @@ export default function FreelancerWithdrawPage() {
                                         <p className="text-sm font-bold text-white uppercase tracking-wide leading-relaxed">Your settlement has been authorized and dispatched.</p>
                                     </div>
 
-                                    <div className="bg-[#111111] border border-gray-900 rounded-3xl p-8 space-y-6">
+                                    <div className="bg-muted border border-gray-900 rounded-3xl p-8 space-y-6">
                                         <div className="flex justify-between items-center text-sm font-black uppercase tracking-wide">
                                             <span className="text-white">Amount Sent</span>
                                             <span className="text-white text-lg font-bold">${amount.toLocaleString()}</span>
@@ -637,7 +637,7 @@ export default function FreelancerWithdrawPage() {
                                             Retry Transfer
                                         </Button>
                                         <Button onClick={() => router.push('/freelancer/wallet')} className="h-14 bg-white text-black font-black uppercase text-sm tracking-wide rounded-xl transition-all shadow-xl">
-                                            Exit to Wallet
+                                            Exit to Account
                                         </Button>
                                     </div>
                                 </motion.div>

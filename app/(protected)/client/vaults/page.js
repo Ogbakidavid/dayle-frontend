@@ -100,7 +100,7 @@ export default function VaultsPage() {
               Financial Vaults
             </h1>
             <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-wide">
-              Overview of your smart-escrow deployments
+              Overview of your secured financial vaults
             </p>
           </motion.div>
           <motion.div variants={itemVariants} className="flex items-center gap-3">

@@ -10,7 +10,7 @@ import {
   ArrowUpRight,
   TrendingUp,
   Clock,
-  Wallet,
+  Landmark,
   Shield,
   Activity,
   LayoutGrid,
@@ -81,7 +81,7 @@ export default function FreelancerDashboard() {
         </motion.div>
         <motion.div variants={itemVariants} className="flex gap-3">
           <Link href="/freelancer/wallet" className="w-full sm:w-auto">
-            <Button className="w-full sm:w-auto bg-[#111111] border border-gray-800 hover:bg-gray-800 text-white font-bold uppercase tracking-wide">
+            <Button className="w-full sm:w-auto bg-muted border border-gray-800 hover:bg-gray-800 text-white font-bold uppercase tracking-wide">
               Withdraw Funds
             </Button>
           </Link>
@@ -92,11 +92,11 @@ export default function FreelancerDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <motion.div
           variants={itemVariants}
-          className="bg-[#111111] border border-gray-900 p-6 rounded-sm hover:border-gray-800 transition-colors"
+          className="bg-muted border border-gray-900 p-6 rounded-sm hover:border-gray-800 transition-colors"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
-              <Wallet className="w-4 h-4 text-emerald-500" />
+              <Landmark className="w-4 h-4 text-emerald-500" />
             </div>
             <span className="text-sm font-medium uppercase tracking-wide text-white-300">
               Available to Withdraw
@@ -115,7 +115,7 @@ export default function FreelancerDashboard() {
 
         <motion.div
           variants={itemVariants}
-          className="bg-[#111111] border border-gray-900 p-6 rounded-sm hover:border-gray-800 transition-colors"
+          className="bg-muted border border-gray-900 p-6 rounded-sm hover:border-gray-800 transition-colors"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
@@ -137,7 +137,7 @@ export default function FreelancerDashboard() {
 
         <motion.div
           variants={itemVariants}
-          className="bg-[#111111] border border-gray-900 p-6 rounded-sm hover:border-gray-800 transition-colors"
+          className="bg-muted border border-gray-900 p-6 rounded-sm hover:border-gray-800 transition-colors"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
@@ -181,10 +181,10 @@ export default function FreelancerDashboard() {
           ))}
         </div>
       ) : activeVaults.length === 0 ? (
-        <motion.div variants={itemVariants} className="py-16 text-center bg-[#111111] border border-gray-900 rounded-sm">
+        <motion.div variants={itemVariants} className="py-16 text-center bg-muted border border-gray-900 rounded-sm">
           <Activity className="w-12 h-12 text-white-700 mx-auto mb-4" />
-          <p className="text-white-400 font-medium">No active assignments</p>
-          <p className="text-sm text-white-500 mt-2">
+          <p className="text-white-400 font-bold uppercase tracking-wide">No active assignments</p>
+          <p className="text-sm text-white-500 mt-2 font-bold uppercase tracking-wide">
             Projects will appear here once secured by clients
           </p>
         </motion.div>
@@ -205,7 +205,7 @@ export default function FreelancerDashboard() {
               >
                 <motion.div
                   variants={itemVariants}
-                  className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-[#111111] border border-gray-900 rounded-sm hover:border-gray-800 transition-colors gap-4"
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-muted border border-gray-900 rounded-sm hover:border-gray-800 transition-colors gap-4"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-2">

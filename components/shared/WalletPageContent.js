@@ -65,7 +65,7 @@ export default function WalletPageContent() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="min-h-screen bg-[#0A0A0A] pb-20 text-white"
+            className="min-h-screen bg-background pb-20 text-white"
         >
             {/* Header */}
             <header className="mb-6 md:mb-10 px-4 md:px-0">
@@ -73,7 +73,7 @@ export default function WalletPageContent() {
                     <motion.div variants={itemVariants} className="space-y-1">
                         <div className="flex items-center gap-2 text-[10px] md:text-sm font-black text-emerald-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2">
                             <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                            Secured Settlement Wallet
+                            Secured Settlement Account
                         </div>
                         <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight flex items-center gap-3">
                             Financial Center
@@ -91,7 +91,7 @@ export default function WalletPageContent() {
 
             <div className="space-y-10">
                 {/* Balance Visualization */}
-                <motion.div variants={itemVariants} className="bg-[#111111] border border-gray-900 rounded-sm p-1">
+                <motion.div variants={itemVariants} className="bg-muted border border-gray-900 rounded-sm p-1">
                     <WalletBalance balance={balance} role="freelancer" />
                 </motion.div>
 
@@ -99,7 +99,7 @@ export default function WalletPageContent() {
                     {/* Withdrawal Interface */}
                     <div className="lg:col-span-1">
                         <motion.div variants={itemVariants}>
-                            <Card className="bg-[#111111] border-gray-900 overflow-hidden sticky top-32 rounded-sm shadow-2xl">
+                            <Card className="bg-muted border-gray-900 overflow-hidden sticky top-32 rounded-sm shadow-2xl">
                                 <div className="bg-emerald-600/10 border-b border-emerald-500/10 py-4 px-6">
                                     <h3 className="text-emerald-500 font-black uppercase tracking-wide text-sm">Instant Withdrawal</h3>
                                 </div>
@@ -159,7 +159,7 @@ export default function WalletPageContent() {
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-bold text-white flex items-center gap-3 tracking-tight">
                                 <History className="w-5 h-5 text-emerald-500" />
-                                Transaction Ledger
+                                Settlement Ledger
                             </h2>
                             <div className="flex items-center gap-3">
                                 <div className="relative">
@@ -167,13 +167,13 @@ export default function WalletPageContent() {
                                     <input
                                         type="text"
                                         placeholder="Search ledger..."
-                                        className="pl-10 pr-4 py-2 bg-[#111111] border border-white/5 rounded-sm text-sm font-medium outline-none focus:border-emerald-500/50 transition-all text-white w-64 placeholder:text-white"
+                                        className="pl-10 pr-4 py-2 bg-muted border border-white/5 rounded-sm text-sm font-medium outline-none focus:border-emerald-500/50 transition-all text-white w-64 placeholder:text-white"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-[#111111] border border-gray-900 rounded-sm overflow-hidden shadow-2xl">
+                        <div className="bg-muted border border-gray-900 rounded-sm overflow-hidden shadow-2xl">
                             <table className="w-full border-collapse">
                                 <thead className="bg-black/20 border-b border-white/5">
                                     <tr>
@@ -182,7 +182,7 @@ export default function WalletPageContent() {
                                         <th className="px-4 md:px-6 py-5 text-right text-[11px] font-black text-white/30 uppercase tracking-wide">Amount</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-white/[0.03]">
+                                <tbody className="divide-y divide-white/5">
                                     {loading ? (
                                         <tr>
                                             <td colSpan="3" className="py-20 text-center">
@@ -197,7 +197,7 @@ export default function WalletPageContent() {
                                         </tr>
                                     ) : (
                                         paginatedTransactions.map((tx) => (
-                                            <tr key={tx.id} className="hover:bg-white/[0.02] transition-colors group">
+                                            <tr key={tx.id} className="hover:bg-white/2 transition-colors group">
                                                 <td className="px-4 md:px-6 py-6">
                                                     <div className="flex items-center gap-3 md:gap-5">
                                                         <div className={`hidden xs:flex w-10 h-10 md:w-11 md:h-11 rounded-sm items-center justify-center shrink-0 border transition-colors ${tx.amount < 0

@@ -7,7 +7,8 @@ import {
   Shield,
   LayoutDashboard,
   Briefcase,
-  Wallet,
+  CreditCard,
+  Landmark,
   LogOut,
   Settings,
   Bell,
@@ -24,6 +25,7 @@ import { useUser } from "@/lib/store/user-context";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import UserAvatar from "@/components/shared/UserAvatar";
 
 const sidebarVariants = {
   hidden: { x: -280, opacity: 0 },
@@ -53,7 +55,7 @@ const navigation = [
     icon: Briefcase,
     badge: "2",
   },
-  { name: "Wallet", href: "/freelancer/wallet", icon: Wallet, badge: null },
+  { name: "Financials", href: "/freelancer/wallet", icon: Landmark, badge: null },
   { name: "Ledger", href: "/freelancer/ledger", icon: PieChart, badge: null },
   { name: "Disputes", href: "/freelancer/disputes", icon: Gavel, badge: null },
 ];
@@ -152,11 +154,20 @@ export default function FreelancerLayout({ children }) {
           </p>
         </div>
 
-        {/* User Section */}
         <div className="p-4 border-t border-gray-900 mt-auto">
           <div className="flex items-center gap-3 p-3 rounded-lg">
-            <div className="w-9 h-9 bg-linear-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center text-white font-bold uppercase text-sm border border-gray-700">
-              {user?.name?.charAt(0)?.toUpperCase() || "U"}
+            <div className="relative group">
+              <UserAvatar 
+                identifier={user?.id || user?.email || "guest"} 
+                src={user?.profileImage}
+                size={36} 
+                className="font-bold uppercase text-sm border border-gray-700"
+              />
+              {user?.kycStatus === 'VERIFIED' && (
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-muted flex items-center justify-center">
+                  <Shield className="w-2 h-2 text-black" strokeWidth={4} />
+                </div>
+              )}
             </div>
             <div>
               <p className="text-sm font-bold uppercase tracking-wide text-white">
@@ -179,7 +190,7 @@ export default function FreelancerLayout({ children }) {
               {user?.kycStatus !== 'approved' && (
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-[#111111]"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-muted"></span>
                 </span>
               )}
             </Link>

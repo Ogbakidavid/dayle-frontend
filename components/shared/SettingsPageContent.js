@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -14,11 +14,38 @@ import {
 } from 'lucide-react';
 import { useUser } from '@/lib/store/user-context';
 import { cn } from "@/lib/utils";
+import UserAvatar from '@/components/shared/UserAvatar';
 
 export default function SettingsPageContent({ role = 'client' }) {
     const router = useRouter();
-    const { user, logout } = useUser();
+    const { user, logout, refreshUser } = useUser();
     const [activeTab, setActiveTab] = useState('profile');
+    const fileInputRef = useRef(null);
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Basic validation
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64String = reader.result;
+            try {
+                // In a real app, you'd upload to S3/Cloudinary.
+                // Here we use the mock API which perists to localStorage.
+                await api.auth.updateProfile({ profileImage: base64String });
+                await refreshUser();
+            } catch (error) {
+                console.error('Failed to upload image:', error);
+            }
+        };
+        reader.readAsDataURL(file);
+    };
 
     const isClient = role === 'client';
 
@@ -37,10 +64,10 @@ export default function SettingsPageContent({ role = 'client' }) {
         ] : [
             { id: 1, type: 'kyc', title: 'Identity Verification Required', message: 'Complete your KYC verification to unlock full platform access and payments', timestamp: new Date(Date.now() - 1000 * 60 * 30), read: false, action: '/onboarding/kyc?role=freelancer' },
             { id: 2, type: 'milestone', title: 'Milestone Approved', message: 'Client approved milestone "Phase 1 Development" - $2,500 released to escrow', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), read: false },
-            { id: 3, type: 'payment', title: 'Payment Received', message: '$2,500 has been deposited to your wallet', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), read: true },
+            { id: 3, type: 'payment', title: 'Payment Received', message: '$2,500 has been settled in your account', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), read: true },
             { id: 4, type: 'security', title: 'New Login Detected', message: 'Login from Chrome on MacBook Pro in New York, US', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), read: true },
             { id: 5, type: 'milestone', title: 'Milestone Submitted', message: 'Your submission for "API Integration" is under review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), read: true },
-            { id: 6, type: 'payment', title: 'Payment Received', message: '$1,800 has been deposited to your wallet', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), read: true },
+            { id: 6, type: 'payment', title: 'Payment Received', message: '$1,800 has been settled in your account', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), read: true },
             { id: 7, type: 'security', title: 'Password Changed', message: 'Your account password was successfully updated', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), read: true },
             { id: 8, type: 'milestone', title: 'Milestone Approved', message: 'Client approved milestone "Database Setup" - $1,200 released', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), read: true },
             { id: 9, type: 'general', title: 'Welcome to Dayle', message: 'Complete your profile to start receiving work opportunities', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14), read: true },
@@ -121,8 +148,18 @@ export default function SettingsPageContent({ role = 'client' }) {
                         <span className="text-sm font-black text-white uppercase tracking-wide">Account Center</span>
                         <div className="h-4 w-px bg-white/5" />
                         <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                <span className="text-emerald-500 text-sm font-bold">{userInitials}</span>
+                                <div className="relative group">
+                                    <UserAvatar 
+                                        identifier={user?.id || user?.email || "guest"} 
+                                        src={user?.profileImage}
+                                        size={24} 
+                                        className="h-6 w-6 rounded bg-emerald-500/10 border border-emerald-500/20"
+                                    />
+                                    {user?.kycStatus === 'VERIFIED' && (
+                                    <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-[#050505] flex items-center justify-center">
+                                        <CheckCircle2 className="w-1.5 h-1.5 text-black" strokeWidth={4} />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -186,14 +223,31 @@ export default function SettingsPageContent({ role = 'client' }) {
                             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 <div className="flex items-end gap-6">
                                     <div className="relative group">
-                                        <div className="w-20 h-20 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center overflow-hidden">
-                                            <span className="text-2xl font-light text-zinc-400 group-hover:scale-110 transition-transform">
-                                                {isClient ? (user?.name?.charAt(0) || 'U') : userInitials}
-                                            </span>
-                                        </div>
-                                        <button className="absolute -bottom-2 -right-2 p-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-400 hover:text-emerald-500 transition-colors shadow-xl">
+                                        <UserAvatar 
+                                            identifier={user?.id || user?.email || "guest"} 
+                                            src={user?.profileImage}
+                                            size={80} 
+                                            className="h-20 w-20 rounded-2xl bg-zinc-900 border border-zinc-800"
+                                        />
+                                        {user?.kycStatus === 'VERIFIED' && (
+                                            <div className="absolute -top-2 -right-2 bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg shadow-emerald-500/10">
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" strokeWidth={3} />
+                                                <span className="text-[10px] font-black uppercase tracking-tighter text-emerald-500">Verified</span>
+                                            </div>
+                                        )}
+                                        <button 
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="absolute -bottom-2 -right-2 p-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-400 hover:text-emerald-500 transition-colors shadow-xl"
+                                        >
                                             <Plus className="w-3 h-3" />
                                         </button>
+                                        <input 
+                                            type="file" 
+                                            ref={fileInputRef} 
+                                            onChange={handleImageUpload} 
+                                            className="hidden" 
+                                            accept="image/*" 
+                                        />
                                     </div>
                                     <div className="pb-1">
                                         <h3 className="text-lg font-black text-white uppercase tracking-tight">
@@ -248,7 +302,7 @@ export default function SettingsPageContent({ role = 'client' }) {
                                         { type: 'MAST', last4: '8833', exp: '09/26', primary: false }
                                     ] : [
                                         { type: 'BANK', label: 'US BANKING •••• 1122', primary: true },
-                                        { type: 'CRYP', label: 'WALLET •••• 7x92', primary: false }
+                                        { type: 'CRYP', label: 'ACCOUNT •••• 7x92', primary: false }
                                     ]).map((item, i) => (
                                         <div key={i} className="group flex items-center justify-between p-4 bg-zinc-900/40 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
                                             <div className="flex items-center gap-4">

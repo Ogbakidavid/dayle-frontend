@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Wallet, Clock, ShieldCheck, Zap } from "lucide-react";
+import { Landmark, Clock, ShieldCheck, Zap } from "lucide-react";
 
 export function WalletBalance({ balance, role = "client" }) {
     return (
@@ -9,7 +9,7 @@ export function WalletBalance({ balance, role = "client" }) {
             {/* Available Funds - The High Value Side */}
             <Card className="bg-[#111111] border-white/5 shadow-2xl overflow-hidden relative group rounded-sm">
                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-700 ease-in-out">
-                    <Wallet size={120} className="text-white rotate-12" />
+                    <Landmark size={120} className="text-white rotate-12" />
                 </div>
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-transparent" />
                 <CardContent className="p-8 relative z-10">

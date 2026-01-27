@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Shield, LayoutDashboard, Plus, Wallet, LogOut, Settings, Bell, Search, ChevronDown, PieChart, FileText, Users, CreditCard, Lock, HelpCircle, Gavel, Menu, X } from 'lucide-react';
+import { Shield, LayoutDashboard, Plus, Landmark, LogOut, Settings, Bell, Search, ChevronDown, PieChart, FileText, Users, CreditCard, Lock, HelpCircle, Gavel, Menu, X } from 'lucide-react';
 import { useUser } from '@/lib/store/user-context';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import UserAvatar from '@/components/shared/UserAvatar';
 
 const sidebarVariants = {
     hidden: { x: -280, opacity: 0 },
@@ -114,11 +115,20 @@ export default function ClientLayout({ children }) {
                     })}
                 </nav>
 
-                {/* User Section */}
                 <div className="p-4 border-t border-gray-900 mt-auto">
                     <div className="flex items-center gap-3 p-3 rounded-lg">
-                        <div className="w-9 h-9 bg-linear-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center text-white font-medium text-sm border border-gray-700">
-                            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                        <div className="relative group">
+                            <UserAvatar 
+                                identifier={user?.id || user?.email || "guest"} 
+                                src={user?.profileImage}
+                                size={36} 
+                                className="font-medium text-sm border border-gray-700"
+                            />
+                            {user?.kycStatus === 'VERIFIED' && (
+                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-muted flex items-center justify-center">
+                                    <Shield className="w-2 h-2 text-black" strokeWidth={4} />
+                                </div>
+                            )}
                         </div>
                         <div>
                             <p className="text-sm font-bold uppercase tracking-wide text-white">{user?.name || 'Alex Johnson'}</p>

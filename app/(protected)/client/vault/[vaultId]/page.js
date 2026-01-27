@@ -22,6 +22,7 @@ import {
   Check,
   Gavel,
   ExternalLink,
+  CreditCard,
 } from "lucide-react";
 import {
   Card,
@@ -113,21 +114,21 @@ export default function ClientVaultDetailPage() {
         baseMilestones.push(
           {
             title: "GitHub Repository Setup",
-            amount: vault.amount * 0.2,
-            deliverableId: "github_repo",
-            deliverable: "GitHub Repository",
+            displayAmount: vault.totalAmount * 0.2,
+            deliverableTypeId: "github_repo",
+            deliverableMode: "LINK",
           },
           {
             title: "Core API Implementation",
-            amount: vault.amount * 0.4,
-            deliverableId: "api_endpoint",
-            deliverable: "Live API Endpoint",
+            displayAmount: vault.totalAmount * 0.4,
+            deliverableTypeId: "api_endpoint",
+            deliverableMode: "LINK",
           },
           {
             title: "Production Deployment",
-            amount: vault.amount * 0.4,
-            deliverableId: "live_webapp",
-            deliverable: "Deployed Web App",
+            displayAmount: vault.totalAmount * 0.4,
+            deliverableTypeId: "live_webapp",
+            deliverableMode: "LINK",
           }
         );
       } else if (vault.type === "design") {
@@ -175,9 +176,9 @@ export default function ClientVaultDetailPage() {
       } else {
         baseMilestones.push({
           title: "Project Deliverable",
-          amount: vault.amount,
-          deliverableId: "doc_submission",
-          deliverable: "General Document",
+          displayAmount: vault.totalAmount || vault.amount,
+          deliverableTypeId: "doc_submission",
+          deliverableMode: "FILE",
         });
       }
     }
@@ -188,13 +189,10 @@ export default function ClientVaultDetailPage() {
       return {
         ...m,
         id: id,
-        type: "APPROVAL", // Primary type for dispute rules
-        // AI Phase: In MVP, these are automated checks that usually pass instantly upon submission
-        complianceStatus: "PASSED",
-        checks: ["Format Validation", "Virus Scan", "Metadata Verify"],
-        // Human Phase: The actual client approval/rejection cycle
+        type: "APPROVAL",
+        complianceStatus: m.verification?.result || "PENDING",
         status: milestoneStates[id] || m.status || "AWAITING_APPROVAL",
-        displayAmount: m.amount,
+        displayAmount: m.totalAmount || m.amount || m.displayAmount,
       };
     });
   }, [vault, milestoneStates]);
@@ -283,14 +281,14 @@ export default function ClientVaultDetailPage() {
       if (hasWork && m.deliverable) {
         // Attempt to find metadata from constants to see if it's a file or link
         const purpose = vault.type;
-        const deliverableMeta = VAULT_PURPOSE_MAPPING[purpose]?.deliverables?.find(d => d.label === m.deliverable || d.id === m.deliverableId);
+        const deliverableMeta = VAULT_PURPOSE_MAPPING[purpose]?.deliverables?.find(d => d.id === m.deliverableTypeId);
         
         list.push({
           id: `${m.id}_deliverable`,
-          name: m.deliverable,
+          name: deliverableMeta?.label || m.deliverableTypeId,
           milestoneName: m.title,
-          type: deliverableMeta?.type || (m.deliverable.toLowerCase().includes("link") || m.deliverable.toLowerCase().includes("url") ? "link" : "file"),
-          url: "#", // Mocked URL
+          type: deliverableMeta?.type || (m.deliverableTypeId?.toLowerCase().includes("link") ? "link" : "file"),
+          url: "#", 
         });
       }
     });
@@ -299,7 +297,7 @@ export default function ClientVaultDetailPage() {
 
   if (vaultsLoading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white">
+      <div className="min-h-screen bg-background flex items-center justify-center text-white">
         Loading Vault...
       </div>
     );
@@ -307,7 +305,7 @@ export default function ClientVaultDetailPage() {
 
   if (!vault) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white">
+      <div className="min-h-screen bg-background flex items-center justify-center text-white">
         Vault Not Found
       </div>
     );
@@ -360,6 +358,18 @@ export default function ClientVaultDetailPage() {
                 >
                   {vault.status}
                 </Badge>
+                {(vault.status === "DRAFT" || vault.status === "PENDING_FUNDING") && (
+                  <Button 
+                    size="sm" 
+                    className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3"
+                    onClick={() => {
+                      toast.success("Funding flow initiated. Mocking vault activation...");
+                    }}
+                  >
+                    <CreditCard className="w-3.5 h-3.5 mr-1.5" />
+                    Fund Vault
+                  </Button>
+                )}
               </div>
               <p className="text-gray-400 font-bold uppercase tracking-wide">
                 Vault ID:{" "}
@@ -433,14 +443,14 @@ export default function ClientVaultDetailPage() {
                             </div>
                           </div>
 
-                          {milestone.deliverable && (
+                          {milestone.deliverableTypeId && (
                             <div className="mt-3 flex items-center gap-3">
                               <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gray-500 font-black">
                                 <FileText className="w-3 h-3" />
-                                Deliverable:
+                                Protocol:
                               </div>
                               <span className="text-[11px] text-gray-300 font-bold uppercase bg-white/5 px-2 py-0.5 rounded border border-white/5">
-                                {milestone.deliverable}
+                                {milestone.deliverableTypeId}
                               </span>
                             </div>
                           )}
@@ -523,11 +533,11 @@ export default function ClientVaultDetailPage() {
                                     </div>
 
                                     <div className="relative flex items-center py-2">
-                                      <div className="flex-grow border-t border-white/10"></div>
-                                      <span className="flex-shrink-0 mx-4 text-white/30 text-xs font-bold uppercase tracking-wide">
+                                      <div className="grow border-t border-white/10"></div>
+                                      <span className="shrink-0 mx-4 text-white/30 text-xs font-bold uppercase tracking-wide">
                                         Or Request Changes
                                       </span>
-                                      <div className="flex-grow border-t border-white/10"></div>
+                                      <div className="grow border-t border-white/10"></div>
                                     </div>
 
                                     {/* Revision / Reject */}
@@ -567,7 +577,7 @@ export default function ClientVaultDetailPage() {
                                       </div>
 
                                       {reviewAction && (
-                                        <div className="space-y-4 p-4 rounded-lg bg-white/[0.02] border border-white/10 animate-in slide-in-from-top-2">
+                                        <div className="space-y-4 p-4 rounded-lg bg-white/2 border border-white/10 animate-in slide-in-from-top-2">
                                           <div className="space-y-2">
                                             <Label>
                                               Reason codes (required)
@@ -576,9 +586,8 @@ export default function ClientVaultDetailPage() {
                                               onValueChange={setReviewReason}
                                             >
                                               <SelectTrigger className="bg-black/40 border-white/10">
-                                                <SelectValue placeholder="Select reason..." />
                                               </SelectTrigger>
-                                              <SelectContent className="bg-[#141416] border-white/10 text-white">
+                                              <SelectContent className="bg-[#141416] border-white/10 text-white max-h-[300px]">
                                                 {APPROVAL_REJECTION_CODES.filter(
                                                   (c) =>
                                                     reviewAction === "REJECTED"
@@ -589,13 +598,13 @@ export default function ClientVaultDetailPage() {
                                                   <SelectItem
                                                     key={c.code}
                                                     value={c.code}
-                                                    className="focus:bg-white/10 focus:text-white"
+                                                    className="focus:bg-white/10 focus:text-white border-b border-white/5 last:border-0"
                                                   >
-                                                    <div className="flex flex-col">
-                                                      <span className="font-bold">
+                                                    <div className="flex flex-col py-1">
+                                                      <span className="font-bold text-xs uppercase tracking-wide">
                                                         {c.label}
                                                       </span>
-                                                      <span className="text-xs text-white/50">
+                                                      <span className="text-[10px] text-white/40 font-bold uppercase mt-0.5">
                                                         {c.description}
                                                       </span>
                                                     </div>
@@ -603,6 +612,14 @@ export default function ClientVaultDetailPage() {
                                                 ))}
                                               </SelectContent>
                                             </Select>
+                                            
+                                            {/* Visual Reason Indicator */}
+                                            {reviewReason && (
+                                              <div className="mt-2 p-3 bg-white/3 border border-white/5 rounded-lg">
+                                                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">Target Protocol:</p>
+                                                <p className="text-sm font-bold text-white uppercase">{APPROVAL_REJECTION_CODES.find(c => c.code === reviewReason)?.label}</p>
+                                              </div>
+                                            )}
                                           </div>
                                           <div className="space-y-2">
                                             <Label>Notes (Optional)</Label>
