@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +16,7 @@ import { useUser } from '@/lib/store/user-context';
 import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
+    const router = useRouter();
     const { user, logout } = useUser();
     const [activeTab, setActiveTab] = useState('profile');
     const [notifications, setNotifications] = useState({
@@ -388,7 +390,12 @@ export default function SettingsPage() {
                                                         ? "bg-zinc-900/20 border-zinc-800/30 hover:border-zinc-700"
                                                         : "bg-zinc-900/50 border-zinc-800/50 hover:border-zinc-700"
                                                 )}
-                                                onClick={() => markAsRead(notification.id)}
+                                                onClick={() => {
+                                                    markAsRead(notification.id);
+                                                    if (notification.action) {
+                                                        router.push(notification.action);
+                                                    }
+                                                }}
                                             >
                                                 <div className="flex items-start gap-4">
                                                     {/* Icon */}
