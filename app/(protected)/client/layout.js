@@ -46,7 +46,7 @@ export default function ClientLayout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A] text-white flex">
+        <div className="min-h-screen bg-background text-white flex">
             {/* Mobile Overlay */}
             {sidebarOpen && (
                 <div
@@ -61,14 +61,14 @@ export default function ClientLayout({ children }) {
                 animate="visible"
                 variants={sidebarVariants}
                 className={cn(
-                    "w-[280px] border-r border-gray-900 bg-[#111111] flex flex-col h-screen transition-transform duration-300 ease-in-out",
+                    "w-[280px] border-r border-gray-900 bg-muted flex flex-col h-screen transition-transform duration-300 ease-in-out",
                     "fixed lg:sticky top-0 z-50 lg:z-auto",
                     sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                 )}>
                 {/* Logo & Brand */}
                 <div className="p-6 pb-4">
                     <Link href="/client" className="flex items-center gap-3 group">
-                        <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-emerald-500/20">
+                        <div className="w-8 h-8 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-emerald-500/20">
                             <Shield className="w-5 h-5 text-black" strokeWidth={2.5} />
                         </div>
                         <div>
@@ -117,7 +117,7 @@ export default function ClientLayout({ children }) {
                 {/* User Section */}
                 <div className="p-4 border-t border-gray-900 mt-auto">
                     <div className="flex items-center gap-3 p-3 rounded-lg">
-                        <div className="w-9 h-9 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center text-white font-medium text-sm border border-gray-700">
+                        <div className="w-9 h-9 bg-linear-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center text-white font-medium text-sm border border-gray-700">
                             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                         <div>
@@ -127,7 +127,7 @@ export default function ClientLayout({ children }) {
 
                     {/* Quick Actions */}
                     <div className="grid grid-cols-2 gap-2 mt-4">
-                        <Link href="/settings" className="relative group">
+                        <Link href="/client/settings" className="relative group">
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -139,7 +139,7 @@ export default function ClientLayout({ children }) {
                             {user?.kycStatus !== 'approved' && (
                                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-[#111111]"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-muted"></span>
                                 </span>
                             )}
                         </Link>
@@ -159,7 +159,7 @@ export default function ClientLayout({ children }) {
             {/* Main Content */}
             < div className="flex-1 flex flex-col min-w-0" >
                 {/* Mobile Header */}
-                < div className="lg:hidden sticky top-0 z-30 bg-[#111111] border-b border-gray-900 p-4 flex items-center justify-between" >
+                < div className="lg:hidden sticky top-0 z-30 bg-muted border-b border-gray-900 p-4 flex items-center justify-between" >
                     <Button
                         variant="ghost"
                         size="sm"
@@ -173,7 +173,7 @@ export default function ClientLayout({ children }) {
                 </div >
 
                 {/* Content Area */}
-                < main className="flex-1 overflow-y-auto bg-[#0A0A0A]" >
+                < main className="flex-1 overflow-y-auto bg-background" >
                     <div className="p-4 lg:p-8">
                         <div className="max-w-7xl mx-auto">
                             {children}
