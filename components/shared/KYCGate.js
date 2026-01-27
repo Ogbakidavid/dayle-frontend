@@ -37,11 +37,11 @@ export function KYCGate({ children }) {
             return;
         }
 
-        // Enforce KYC completion
-        if (user.kycStatus !== 'approved') {
-            router.push('/onboarding/kyc');
-            return;
-        }
+        // Enforce KYC completion - REMOVED to allow dashboard access with alert
+        // if (user.kycStatus !== 'approved') {
+        //     router.push('/onboarding/kyc');
+        //     return;
+        // }
 
         // User is fully onboarded - allow access
     }, [user, loading, pathname, router]);

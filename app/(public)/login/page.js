@@ -198,7 +198,7 @@ export default function LoginPage() {
           <p className="mt-12 text-center text-white text-sm font-bold uppercase tracking-wide">
             Don't have an account?{' '}
             <Link
-              href={returnTo ? `/signup?returnTo=${encodeURIComponent(returnTo)}` : "/signup"}
+              href={returnTo ? `/onboarding/role?returnTo=${encodeURIComponent(returnTo)}` : "/onboarding/role"}
               className="text-white hover:text-emerald-500 font-black transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-emerald-500/50"
             >
               Create account

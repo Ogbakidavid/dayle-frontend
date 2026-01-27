@@ -12,17 +12,10 @@ export default function RoleSelectionPage() {
     const { refreshUser } = useUser();
     const [loading, setLoading] = useState(null);
 
-    async function handleSelect(role) {
+    function handleSelect(role) {
         setLoading(role);
-        try {
-            await api.auth.updateProfile(role);
-            await refreshUser();
-            router.push(`/onboarding/kyc?role=${role}`);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(null);
-        }
+        // Redirect to signup with selected role
+        router.push(`/signup?role=${role}`);
     }
 
     return (
@@ -64,7 +57,7 @@ export default function RoleSelectionPage() {
                             </div>
                             <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-4">I'm a Client</h3>
                             <p className="text-white text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
-                                I want to hire talent, create secure payment vaults, and release funds only after work is verified.
+                                I want to hire contractors, create secure payment vaults, and release funds only after work is verified.
                             </p>
                             <Button
                                 variant="ghost"
@@ -85,7 +78,7 @@ export default function RoleSelectionPage() {
                             <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center mb-8 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all">
                                 <Briefcase className="w-8 h-8 text-emerald-500" />
                             </div>
-                            <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-4">I'm a Talent</h3>
+                            <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-4">I'm a Contractor</h3>
                             <p className="text-white text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
                                 I want to work with verified clients and receive guaranteed, milestone-based payouts for my projects.
                             </p>
@@ -93,7 +86,7 @@ export default function RoleSelectionPage() {
                                 variant="ghost"
                                 className="p-0 text-emerald-500 font-black uppercase tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
                             >
-                                {loading === UserRole.FREELANCER ? <Loader2 className="w-5 h-5 animate-spin" /> : <span className="flex items-center gap-2">Setup Talent Account <ArrowRight className="w-5 h-5" /></span>}
+                                {loading === UserRole.FREELANCER ? <Loader2 className="w-5 h-5 animate-spin" /> : <span className="flex items-center gap-2">Setup Contractor Account <ArrowRight className="w-5 h-5" /></span>}
                             </Button>
                         </div>
                     </div>

@@ -2,12 +2,16 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useUser } from '@/lib/store/user-context';
 import { Button } from '@/components/ui/button';
 import { Shield, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
+import { api } from '@/lib/mock-api';
 
 export default function VerifyEmailPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const { user } = useUser();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -29,12 +33,14 @@ export default function VerifyEmailPage() {
         if (resendCooldown > 0 || isResending) return;
 
         setIsResending(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsResending(false);
+        try {
+            await api.auth.sendVerificationEmail(user?.email || "");
             setResendCooldown(60); // 60 seconds cooldown
-            // Optional: Show a success message or toast here
-        }, 1500);
+        } catch (err) {
+            setError('Failed to resend verification email.');
+        } finally {
+            setIsResending(false);
+        }
     };
 
     const handleOtpChange = (index, value) => {
@@ -78,12 +84,26 @@ export default function VerifyEmailPage() {
         setLoading(true);
         setError('');
 
-        // Simulate API call
-        setTimeout(() => {
-            // Success
+        try {
+            await api.auth.verifyEmail(code);
+
+            // Get role from URL params or user context
+            const role = searchParams.get('role') || user?.role;
+
+            // Redirect to appropriate dashboard based on role
+            if (role === 'client') {
+                router.push('/client');
+            } else if (role === 'freelancer') {
+                router.push('/freelancer');
+            } else {
+                // Fallback to role selection if no role found
+                router.push('/onboarding/role');
+            }
+        } catch (err) {
+            setError(err.message || 'Invalid verification code. Please try again.');
+        } finally {
             setLoading(false);
-            router.push('/onboarding/role');
-        }, 1500);
+        }
     }
 
     return (

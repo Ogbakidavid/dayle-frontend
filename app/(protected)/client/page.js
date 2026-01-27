@@ -15,6 +15,7 @@ import {
   LayoutGrid,
   Zap,
 } from "lucide-react";
+import { KYCAlert } from "@/components/shared/KYCAlert";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -59,6 +60,7 @@ export default function ClientDashboard() {
       animate="visible"
       className=" space-y-8 max-w-6xl mx-auto"
     >
+      <KYCAlert />
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <motion.div variants={itemVariants} className="space-y-1">

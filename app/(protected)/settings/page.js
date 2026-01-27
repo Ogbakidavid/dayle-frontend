@@ -9,11 +9,12 @@ import { Switch } from '@/components/ui/switch';
 import {
     User, CreditCard, Lock, Bell,
     LogOut, Shield, Mail,
-    ChevronLeft, Smartphone, Plus, Trash2, Key, AlertTriangle
+    ChevronLeft, Smartphone, Plus, Trash2, Key, AlertTriangle, CheckCircle2
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useUser } from '@/lib/store/user-context';
 
 export default function SettingsPage() {
+    const { user, logout } = useUser();
     const [activeTab, setActiveTab] = useState('profile');
     const [notifications, setNotifications] = useState({
         milestones: true,
@@ -22,6 +23,68 @@ export default function SettingsPage() {
         digest: true,
         marketing: false
     });
+
+    // Notification center state
+    const [notificationList, setNotificationList] = useState([
+        { id: 1, type: 'kyc', title: 'Identity Verification Required', message: 'Complete your KYC verification to unlock full platform access and vault creation', timestamp: new Date(Date.now() - 1000 * 60 * 30), read: false, action: '/onboarding/kyc?role=client' },
+        { id: 2, type: 'milestone', title: 'Milestone Completed', message: 'Freelancer completed milestone "Phase 1 Development" - ready for review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), read: false },
+        { id: 3, type: 'payment', title: 'Payment Processed', message: '$2,500 has been transferred to escrow for "API Integration"', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), read: true },
+        { id: 4, type: 'security', title: 'New Login Detected', message: 'Login from Chrome on MacBook Pro in New York, US', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), read: true },
+        { id: 5, type: 'milestone', title: 'Milestone Approved', message: 'You approved milestone "Database Setup" - $1,200 released to freelancer', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), read: true },
+        { id: 6, type: 'payment', title: 'Vault Created', message: 'New vault "Mobile App Development" created with $10,000 budget', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), read: true },
+        { id: 7, type: 'security', title: 'Password Changed', message: 'Your account password was successfully updated', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), read: true },
+        { id: 8, type: 'milestone', title: 'Milestone Submitted', message: 'Freelancer submitted milestone "UI Design" for review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), read: true },
+        { id: 9, type: 'general', title: 'Welcome to Dayle', message: 'Start creating vaults and hiring freelancers securely', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14), read: true },
+    ]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 4;
+
+    const getRelativeTime = (timestamp) => {
+        const seconds = Math.floor((new Date() - timestamp) / 1000);
+        if (seconds < 60) return 'Just now';
+        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+        if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+        return `${Math.floor(seconds / 604800)}w ago`;
+    };
+
+    const getNotificationIcon = (type) => {
+        switch (type) {
+            case 'kyc': return Shield;
+            case 'milestone': return CheckCircle2;
+            case 'payment': return CreditCard;
+            case 'security': return Lock;
+            case 'general': return Bell;
+            default: return Bell;
+        }
+    };
+
+    const getNotificationColor = (type) => {
+        switch (type) {
+            case 'kyc': return 'amber';
+            case 'milestone': return 'emerald';
+            case 'payment': return 'blue';
+            case 'security': return 'red';
+            case 'general': return 'zinc';
+            default: return 'zinc';
+        }
+    };
+
+    const markAllAsRead = () => {
+        setNotificationList(prev => prev.map(n => ({ ...n, read: true })));
+    };
+
+    const markAsRead = (id) => {
+        setNotificationList(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    };
+
+    const unreadCount = notificationList.filter(n => !n.read).length;
+    const totalPages = Math.ceil(notificationList.length / itemsPerPage);
+    const paginatedNotifications = notificationList.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
 
     const tabs = [
         { id: 'profile', label: 'Profile', icon: User },
@@ -99,7 +162,7 @@ export default function SettingsPage() {
                                 <div className="flex items-end gap-6">
                                     <div className="relative group">
                                         <div className="w-20 h-20 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center overflow-hidden">
-                                            <span className="text-2xl font-light text-zinc-400 group-hover:scale-110 transition-transform">JD</span>
+                                            <span className="text-2xl font-light text-zinc-400 group-hover:scale-110 transition-transform">{user?.name?.charAt(0) || 'U'}</span>
                                         </div>
                                         <button className="absolute -bottom-2 -right-2 p-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-400 hover:text-emerald-500 transition-colors shadow-xl">
                                             <Plus className="w-3 h-3" />
@@ -114,11 +177,11 @@ export default function SettingsPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
                                     <div className="space-y-2">
                                         <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">Full Name</Label>
-                                        <Input defaultValue="John Doe" className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
+                                        <Input defaultValue={user?.name || "John Doe"} className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">Email Address</Label>
-                                        <Input defaultValue="john@example.com" className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
+                                        <Input defaultValue={user?.email || "john@example.com"} className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
                                     </div>
                                     <div className="space-y-2 sm:col-span-2">
                                         <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">Company</Label>
@@ -280,66 +343,222 @@ export default function SettingsPage() {
 
                         {/* Notifications Section */}
                         {activeTab === 'notifications' && (
-                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                <div>
-                                    <h3 className="text-sm font-black text-white uppercase tracking-wide mb-1">Notification Preferences</h3>
-                                    <p className="text-sm font-bold text-white uppercase tracking-wide">Manage how you receive updates about your account</p>
-                                </div>
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                {(() => {
+                                    const [notificationList, setNotificationList] = useState([
+                                        { id: 1, type: 'kyc', title: 'Identity Verification Required', message: 'Complete your KYC verification to unlock full platform access and vault creation', timestamp: new Date(Date.now() - 1000 * 60 * 30), read: false, action: '/onboarding/kyc?role=client' },
+                                        { id: 2, type: 'milestone', title: 'Milestone Completed', message: 'Freelancer completed milestone "Phase 1 Development" - ready for review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), read: false },
+                                        { id: 3, type: 'payment', title: 'Payment Processed', message: '$2,500 has been transferred to escrow for "API Integration"', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), read: true },
+                                        { id: 4, type: 'security', title: 'New Login Detected', message: 'Login from Chrome on MacBook Pro in New York, US', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), read: true },
+                                        { id: 5, type: 'milestone', title: 'Milestone Approved', message: 'You approved milestone "Database Setup" - $1,200 released to freelancer', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), read: true },
+                                        { id: 6, type: 'payment', title: 'Vault Created', message: 'New vault "Mobile App Development" created with $10,000 budget', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), read: true },
+                                        { id: 7, type: 'security', title: 'Password Changed', message: 'Your account password was successfully updated', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), read: true },
+                                        { id: 8, type: 'milestone', title: 'Milestone Submitted', message: 'Freelancer submitted milestone "UI Design" for review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), read: true },
+                                        { id: 9, type: 'general', title: 'Welcome to Dayle', message: 'Start creating vaults and hiring freelancers securely', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14), read: true },
+                                    ]);
+                                    const [currentPage, setCurrentPage] = useState(1);
+                                    const itemsPerPage = 10;
 
-                                {/* Email Notifications */}
-                                <div className="space-y-3">
-                                    <h4 className="text-sm font-bold text-zinc-400 uppercase tracking-wide">Email Notifications</h4>
+                                    const getRelativeTime = (timestamp) => {
+                                        const seconds = Math.floor((new Date() - timestamp) / 1000);
+                                        if (seconds < 60) return 'Just now';
+                                        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+                                        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+                                        if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+                                        return `${Math.floor(seconds / 604800)}w ago`;
+                                    };
 
-                                    {[
-                                        { id: 'milestones', label: 'Milestone Completions', desc: 'Get notified when vault milestones are completed', checked: notifications.milestones },
-                                        { id: 'releases', label: 'Fund Releases', desc: 'Receive alerts when funds are released from escrow', checked: notifications.releases },
-                                        { id: 'logins', label: 'Login Attempts', desc: 'Security alerts for new login attempts', checked: notifications.logins },
-                                        { id: 'digest', label: 'Weekly Digest', desc: 'Summary of your account activity every week', checked: notifications.digest }
-                                    ].map((item) => (
-                                        <div key={item.id} className="flex items-center justify-between p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
-                                            <div className="flex-1">
-                                                <p className="text-sm font-bold text-white uppercase tracking-tight">{item.label}</p>
-                                                <p className="text-sm font-bold text-white uppercase tracking-wide mt-1">{item.desc}</p>
+                                    const getNotificationIcon = (type) => {
+                                        switch (type) {
+                                            case 'kyc': return Shield;
+                                            case 'milestone': return CheckCircle2;
+                                            case 'payment': return CreditCard;
+                                            case 'security': return Lock;
+                                            case 'general': return Bell;
+                                            default: return Bell;
+                                        }
+                                    };
+
+                                    const getNotificationColor = (type) => {
+                                        switch (type) {
+                                            case 'kyc': return 'amber';
+                                            case 'milestone': return 'emerald';
+                                            case 'payment': return 'blue';
+                                            case 'security': return 'red';
+                                            case 'general': return 'zinc';
+                                            default: return 'zinc';
+                                        }
+                                    };
+
+                                    const markAllAsRead = () => {
+                                        setNotificationList(prev => prev.map(n => ({ ...n, read: true })));
+                                    };
+
+                                    const toggleRead = (id) => {
+                                        setNotificationList(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
+                                    };
+
+                                    const unreadCount = notificationList.filter(n => !n.read).length;
+                                    const totalPages = Math.ceil(notificationList.length / itemsPerPage);
+                                    const paginatedNotifications = notificationList.slice(
+                                        (currentPage - 1) * itemsPerPage,
+                                        currentPage * itemsPerPage
+                                    );
+
+                                    return (
+                                        <>
+                                            {/* Header */}
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <div className="flex items-center gap-3">
+                                                        <h3 className="text-sm font-black text-white uppercase tracking-wide">Notifications</h3>
+                                                        {unreadCount > 0 && (
+                                                            <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full">
+                                                                {unreadCount} new
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-white/60 leading-relaxed mt-1">Stay updated on your account activity</p>
+                                                </div>
+                                                {unreadCount > 0 && (
+                                                    <Button
+                                                        onClick={markAllAsRead}
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-bold uppercase tracking-wide text-xs"
+                                                    >
+                                                        Mark all read
+                                                    </Button>
+                                                )}
                                             </div>
-                                            <Switch
-                                                checked={item.checked}
-                                                onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, [item.id]: checked }))}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
 
-                                {/* Marketing */}
-                                <div className="pt-6 border-t border-zinc-900 space-y-3">
-                                    <h4 className="text-sm font-bold text-zinc-400 uppercase tracking-wide">Marketing</h4>
+                                            {/* Notification List */}
+                                            <div className="space-y-2">
+                                                {paginatedNotifications.map((notification) => {
+                                                    const Icon = getNotificationIcon(notification.type);
+                                                    const color = getNotificationColor(notification.type);
 
-                                    <div className="flex items-center justify-between p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
-                                        <div className="flex-1">
-                                            <p className="text-sm font-bold text-white uppercase tracking-tight">Product Updates & News</p>
-                                            <p className="text-sm font-bold text-white uppercase tracking-wide mt-1">Occasional emails about new features and improvements</p>
-                                        </div>
-                                        <Switch
-                                            checked={notifications.marketing}
-                                            onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, marketing: checked }))}
-                                        />
-                                    </div>
-                                </div>
+                                                    return (
+                                                        <div
+                                                            key={notification.id}
+                                                            className={cn(
+                                                                "group p-4 border rounded-xl transition-all cursor-pointer",
+                                                                notification.read
+                                                                    ? "bg-zinc-900/20 border-zinc-800/30 hover:border-zinc-700"
+                                                                    : "bg-zinc-900/50 border-zinc-800/50 hover:border-zinc-700"
+                                                            )}
+                                                            onClick={() => markAsRead(notification.id)}
+                                                        >
+                                                            <div className="flex items-start gap-4">
+                                                                {/* Icon */}
+                                                                <div className={cn(
+                                                                    "p-2 rounded-lg shrink-0",
+                                                                    color === 'amber' && "bg-amber-500/10",
+                                                                    color === 'emerald' && "bg-emerald-500/10",
+                                                                    color === 'blue' && "bg-blue-500/10",
+                                                                    color === 'red' && "bg-red-500/10",
+                                                                    color === 'zinc' && "bg-zinc-500/10"
+                                                                )}>
+                                                                    <Icon className={cn(
+                                                                        "w-4 h-4",
+                                                                        color === 'amber' && "text-amber-500",
+                                                                        color === 'emerald' && "text-emerald-500",
+                                                                        color === 'blue' && "text-blue-500",
+                                                                        color === 'red' && "text-red-500",
+                                                                        color === 'zinc' && "text-zinc-500"
+                                                                    )} />
+                                                                </div>
 
-                                {/* Email Preferences */}
-                                <div className="pt-6 border-t border-zinc-900">
-                                    <div className="p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl">
-                                        <div className="flex items-start gap-3">
-                                            <Mail className="w-5 h-5 text-zinc-500 flex-shrink-0 mt-0.5" />
-                                            <div className="flex-1">
-                                                <h4 className="text-sm font-black text-white uppercase tracking-tight mb-1">Email Address</h4>
-                                                <p className="text-sm font-bold text-white uppercase tracking-wide mb-3">Notifications will be sent to: <span className="text-emerald-500/80">john@example.com</span></p>
-                                                <Button variant="link" className="text-emerald-500 text-sm font-black uppercase tracking-wide p-0 h-auto">
-                                                    Change Email
-                                                </Button>
+                                                                {/* Content */}
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="flex items-start justify-between gap-3">
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <p className={cn(
+                                                                                    "text-sm font-bold uppercase tracking-tight",
+                                                                                    notification.read ? "text-white/70" : "text-white"
+                                                                                )}>
+                                                                                    {notification.title}
+                                                                                </p>
+                                                                                {!notification.read && (
+                                                                                    <span className="w-2 h-2 bg-emerald-500 rounded-full shrink-0"></span>
+                                                                                )}
+                                                                            </div>
+                                                                            <p className={cn(
+                                                                                "text-xs mt-1",
+                                                                                notification.read ? "text-white/40" : "text-white/60"
+                                                                            )}>
+                                                                                {notification.message}
+                                                                            </p>
+                                                                            <p className="text-xs text-white/30 mt-2">
+                                                                                {getRelativeTime(notification.timestamp)}
+                                                                            </p>
+                                                                        </div>
+                                                                        {notification.action && !notification.read && (
+                                                                            <Link href={notification.action} onClick={(e) => e.stopPropagation()}>
+                                                                                <Button size="sm" className={cn(
+                                                                                    "font-bold uppercase tracking-wide text-xs h-8 px-3 shrink-0",
+                                                                                    color === 'amber' && "bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                                                                                )}>
+                                                                                    Action
+                                                                                </Button>
+                                                                            </Link>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
+
+                                            {/* Pagination */}
+                                            {totalPages > 1 && (
+                                                <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
+                                                    <p className="text-xs text-white/40">
+                                                        Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, notificationList.length)} of {notificationList.length}
+                                                    </p>
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                                            disabled={currentPage === 1}
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-8 px-3 text-xs font-bold uppercase tracking-wide disabled:opacity-30"
+                                                        >
+                                                            Previous
+                                                        </Button>
+                                                        <div className="flex items-center gap-1">
+                                                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                                                <button
+                                                                    key={page}
+                                                                    onClick={() => setCurrentPage(page)}
+                                                                    className={cn(
+                                                                        "w-8 h-8 rounded-lg text-xs font-bold transition-all",
+                                                                        currentPage === page
+                                                                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+                                                                            : "text-white/40 hover:bg-white/5"
+                                                                    )}
+                                                                >
+                                                                    {page}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        <Button
+                                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                                            disabled={currentPage === totalPages}
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-8 px-3 text-xs font-bold uppercase tracking-wide disabled:opacity-30"
+                                                        >
+                                                            Next
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </div>
                         )}
                     </section>

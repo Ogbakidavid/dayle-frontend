@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { AmountDisplay } from "@/components/ui/amount-display";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { KYCAlert } from "@/components/shared/KYCAlert";
 
 import { useState } from "react";
 
@@ -67,6 +68,7 @@ export default function FreelancerDashboard() {
       animate="visible"
       className="space-y-8 max-w-6xl mx-auto"
     >
+      <KYCAlert />
       {/* Header */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
         <motion.div variants={itemVariants} className="space-y-1">

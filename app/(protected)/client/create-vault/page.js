@@ -98,7 +98,7 @@ export default function CreateVaultPage() {
 
   const canContinue = step === 1 ? isStep1Complete : step === 2 ? isStep2Complete : step === 3 ? isStep3Complete : true;
 
-  const updateMilestone = (index  , field, value) => {
+  const updateMilestone = (index, field, value) => {
     const updated = [...milestones];
     updated[index][field] = value;
     setMilestones(updated);
@@ -113,7 +113,7 @@ export default function CreateVaultPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-emerald-500/30 selection:text-emerald-400">
+    <div className="min-h-screen text-white selection:bg-emerald-500/30 selection:text-emerald-400">
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 rounded-full blur-[120px]" />
@@ -121,7 +121,7 @@ export default function CreateVaultPage() {
       </div>
 
       <div className="relative max-w-4xl mx-auto px-6 py-12 lg:py-20">
-        
+
         {/* Header Section */}
         <header className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
@@ -152,7 +152,7 @@ export default function CreateVaultPage() {
 
         {/* Main Interface */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           <main className="lg:col-span-8">
             <div className="relative min-h-[500px] bg-[#0A0A0A] border border-white/5 rounded-3xl p-8 shadow-2xl backdrop-blur-xl overflow-hidden">
               <AnimatePresence mode="wait" custom={direction}>
@@ -180,8 +180,8 @@ export default function CreateVaultPage() {
                                 onClick={() => setVaultPurpose(key)}
                                 className={cn(
                                   "group relative flex flex-col items-center gap-3 p-4 rounded-2xl border transition-all duration-300",
-                                  isActive 
-                                    ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" 
+                                  isActive
+                                    ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
                                     : "bg-white/2 border-white/5 hover:border-white/20"
                                 )}
                               >
@@ -221,13 +221,13 @@ export default function CreateVaultPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">4. Brief Description</Label>
-                            <Textarea
-                                value={vaultDescription}
-                                onChange={(e) => setVaultDescription(e.target.value)}
-                                placeholder="Describe the overall scope..."
-                                className="bg-white/3 border-white/5 min-h-[120px] focus:border-emerald-500/50 rounded-xl text-white/80"
-                            />
+                          <Label className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">4. Brief Description</Label>
+                          <Textarea
+                            value={vaultDescription}
+                            onChange={(e) => setVaultDescription(e.target.value)}
+                            placeholder="Describe the overall scope..."
+                            className="bg-white/3 border-white/5 min-h-[120px] focus:border-emerald-500/50 rounded-xl text-white/80"
+                          />
                         </div>
                       </div>
                     </div>
@@ -238,9 +238,9 @@ export default function CreateVaultPage() {
                     <div className="space-y-6">
                       <div className="flex items-center justify-between border-b border-white/5 pb-4">
                         <h2 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-500">Phases & Governance</h2>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => setMilestones([...milestones, { title: "", amount: "", dueDate: "", deliverableType: "", aiVerificationEnabled: true, requirementItemsJson: [] }])}
                           className="text-[10px] uppercase tracking-widest hover:bg-emerald-500/10 hover:text-emerald-400"
                         >
@@ -254,7 +254,7 @@ export default function CreateVaultPage() {
                             <div className="flex items-start justify-between gap-4 mb-4">
                               <div className="flex-1">
                                 <Input
-                                  placeholder={`Phase 0${i+1} Deliverable Name`}
+                                  placeholder={`Phase 0${i + 1} Deliverable Name`}
                                   value={m.title}
                                   onChange={(e) => updateMilestone(i, "title", e.target.value)}
                                   className="bg-transparent border-0 border-b border-b-white/20 rounded-none px-0 pb-2 text-sm font-bold uppercase tracking-wider placeholder:text-white/20 h-auto focus-visible:ring-0 focus-visible:border-0 focus-visible:border-b focus-visible:border-b-emerald-500 transition-colors"
@@ -264,17 +264,17 @@ export default function CreateVaultPage() {
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
-                            
+
                             <div className="grid grid-cols-2 gap-3 mb-4">
                               <div className="bg-black/40 rounded-xl p-3 border border-white/3">
                                 <Label className="text-[12px] uppercase text-white/30 font-bold block mb-1">Release Amount</Label>
                                 <div className="flex items-center gap-2">
                                   <DollarSign className="w-3 h-3 text-emerald-500" />
-                                  <input 
-                                    type="number" 
+                                  <input
+                                    type="number"
                                     value={m.amount}
                                     onChange={(e) => updateMilestone(i, "amount", e.target.value)}
-                                    className="bg-transparent border-none text-[12px] font-mono focus:outline-none focus-visible:border-0 focus-visible:border-b focus-visible:border-b-emerald-500 focus-visible:ring-0 w-full" 
+                                    className="bg-transparent border-none text-[12px] font-mono focus:outline-none focus-visible:border-0 focus-visible:border-b focus-visible:border-b-emerald-500 focus-visible:ring-0 w-full"
                                     placeholder="0"
                                   />
                                 </div>
@@ -283,25 +283,25 @@ export default function CreateVaultPage() {
                                 <Label className="text-[12px] uppercase text-white/30 font-bold block mb-1">Deadline</Label>
                                 <div className="flex items-center gap-2">
                                   <Calendar className="w-3 h-3 text-blue-500" />
-                                  <input 
-                                    type="date" 
+                                  <input
+                                    type="date"
                                     value={m.dueDate}
                                     onChange={(e) => updateMilestone(i, "dueDate", e.target.value)}
-                                    className="bg-transparent border-none text-[12px] focus:outline-none w-full scheme-dark" 
+                                    className="bg-transparent border-none text-[12px] focus:outline-none w-full scheme-dark"
                                   />
                                 </div>
                               </div>
                             </div>
 
                             <select
-                                value={m.deliverableType}
-                                onChange={(e) => updateMilestone(i, "deliverableType", e.target.value)}
-                                className="w-full bg-black border border-white/5 text-[12px] p-3 rounded-xl focus:border-emerald-500/50 outline-none font-bold uppercase tracking-widest text-white/60"
+                              value={m.deliverableType}
+                              onChange={(e) => updateMilestone(i, "deliverableType", e.target.value)}
+                              className="w-full bg-black border border-white/5 text-[12px] p-3 rounded-xl focus:border-emerald-500/50 outline-none font-bold uppercase tracking-widest text-white/60"
                             >
-                                <option value="">Select Deliverable Type</option>
-                                {VAULT_PURPOSE_MAPPING[vaultPurpose]?.deliverables.map((d) => (
-                                    <option key={d.id} value={d.id}>{d.label}</option>
-                                ))}
+                              <option value="">Select Deliverable Type</option>
+                              {VAULT_PURPOSE_MAPPING[vaultPurpose]?.deliverables.map((d) => (
+                                <option key={d.id} value={d.id}>{d.label}</option>
+                              ))}
                             </select>
                           </div>
                         ))}
@@ -313,32 +313,32 @@ export default function CreateVaultPage() {
                   {step === 3 && (
                     <div className="max-w-md mx-auto py-10 space-y-8">
                       <div className="text-center space-y-2">
-                          <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl rotate-12 flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
-                            <Users className="w-10 h-10 text-emerald-500 -rotate-12" />
-                          </div>
-                          <h2 className="text-2xl font-black uppercase italic tracking-tighter">Assign Operator</h2>
-                          <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Identify the vault beneficiary</p>
+                        <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl rotate-12 flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
+                          <Users className="w-10 h-10 text-emerald-500 -rotate-12" />
+                        </div>
+                        <h2 className="text-2xl font-black uppercase italic tracking-tighter">Assign Operator</h2>
+                        <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Identify the vault beneficiary</p>
                       </div>
-                      
+
                       <div className="space-y-4">
-                          <Input 
-                            value={freelancerEmail}
-                            onChange={(e) => setFreelancerEmail(e.target.value)}
-                            placeholder="OPERATOR EMAIL" 
-                            className="bg-white/3 border-white/5 h-14 rounded-xl text-center font-bold tracking-widest"
-                          />
-                          <Input 
-                            value={freelancerName}
-                            onChange={(e) => setFreelancerName(e.target.value)}
-                            placeholder="FULL NAME (OPTIONAL)" 
-                            className="bg-white/3 border-white/5 h-14 rounded-xl text-center font-bold tracking-widest"
-                          />
-                          <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 flex gap-3 items-center">
-                            <ShieldCheck className="w-5 h-5 text-blue-500 shrink-0" />
-                            <p className="text-[10px] text-blue-200/60 leading-relaxed uppercase font-bold">
-                              Vault protocol will verify user identity upon acceptance.
-                            </p>
-                          </div>
+                        <Input
+                          value={freelancerEmail}
+                          onChange={(e) => setFreelancerEmail(e.target.value)}
+                          placeholder="OPERATOR EMAIL"
+                          className="bg-white/3 border-white/5 h-14 rounded-xl text-center font-bold tracking-widest"
+                        />
+                        <Input
+                          value={freelancerName}
+                          onChange={(e) => setFreelancerName(e.target.value)}
+                          placeholder="FULL NAME (OPTIONAL)"
+                          className="bg-white/3 border-white/5 h-14 rounded-xl text-center font-bold tracking-widest"
+                        />
+                        <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 flex gap-3 items-center">
+                          <ShieldCheck className="w-5 h-5 text-blue-500 shrink-0" />
+                          <p className="text-[10px] text-blue-200/60 leading-relaxed uppercase font-bold">
+                            Vault protocol will verify user identity upon acceptance.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -468,10 +468,10 @@ export default function CreateVaultPage() {
                   <span className="text-[10px] text-white/20 uppercase font-bold">of ${budget}</span>
                 </div>
                 <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     className={cn("h-full", totalAmount > budget ? "bg-red-500" : "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]")}
                     initial={{ width: 0 }}
-                    animate={{ width: `${Math.min((totalAmount/budget)*100 || 0, 100)}%` }}
+                    animate={{ width: `${Math.min((totalAmount / budget) * 100 || 0, 100)}%` }}
                   />
                 </div>
                 {totalAmount > budget && (

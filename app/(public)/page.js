@@ -90,7 +90,7 @@ export default function LandingPage() {
                                 Sign In
                             </Button>
                         </Link>
-                        <Link href="/signup">
+                        <Link href="/onboarding/role">
                             <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-black rounded-xl px-6 h-10 text-sm uppercase tracking-wide transition-all">
                                 Sign Up
                             </Button>
@@ -129,7 +129,7 @@ export default function LandingPage() {
                                         Sign In
                                     </Button>
                                 </Link>
-                                <Link href="/signup" className="w-full">
+                                <Link href="/onboarding/role" className="w-full">
                                     <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-black rounded-xl h-10 text-sm uppercase tracking-wide transition-all">
                                         Sign Up
                                     </Button>
@@ -167,7 +167,7 @@ export default function LandingPage() {
                         </motion.p>
 
                         <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 md:gap-6">
-                            <Link href="/signup" className="w-full sm:w-auto">
+                            <Link href="/onboarding/role" className="w-full sm:w-auto">
                                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                     <Button size="lg" className="rounded-xl md:rounded-2xl px-8 md:px-12 h-14 md:h-20 font-black text-base md:text-xl w-full shadow-xl group transition-all bg-white text-black hover:bg-slate-200">
                                         <span className="hidden sm:inline">Start Your First Vault</span>

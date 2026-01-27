@@ -3,18 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser } from '@/lib/store/user-context';
-import { api } from '@/lib/mock-api';
+import { api, UserRole } from '@/lib/mock-api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
 import {
     Shield,
     CheckCircle2,
@@ -175,9 +167,16 @@ export default function KYCPage() {
         setLoading(true);
         try {
             await api.auth.updateProfile({ kycStatus: 'approved', ...formData });
-            await refreshUser();
-            const dashboardPath = isClient ? '/client' : '/freelancer';
-            router.push(dashboardPath);
+            const freshUser = await refreshUser();
+
+            // Re-evaluate role after refresh to be sure
+            const currentUserRole = roleParam || freshUser?.role || user?.role;
+
+            if (currentUserRole === 'client' || currentUserRole === UserRole.CLIENT) {
+                router.push('/client');
+            } else {
+                router.push('/freelancer');
+            }
         } catch (error) {
             console.error('KYC update failed:', error);
         } finally {
@@ -253,28 +252,15 @@ export default function KYCPage() {
                                             <div className="grid md:grid-cols-2 gap-8">
                                                 <div className="flex flex-col space-y-2">
                                                     <label className="text-sm font-medium text-gray-400 uppercase tracking-wide">Date of Birth</label>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <Button
-                                                                variant={"outline"}
-                                                                className={cn(
-                                                                    "w-full justify-start text-left font-normal !bg-[#050505] !border-white/10 !text-white !h-16 rounded-xl hover:bg-white/5",
-                                                                    !formData.dateOfBirth && "text-muted-foreground"
-                                                                )}
-                                                            >
-                                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                                {formData.dateOfBirth ? format(new Date(formData.dateOfBirth), "PPP") : <span className="text-gray-400">Pick a date</span>}
-                                                            </Button>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-auto p-0" align="start">
-                                                            <Calendar
-                                                                mode="single"
-                                                                selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined}
-                                                                onSelect={(date) => setFormData({ ...formData, dateOfBirth: date ? date.toISOString().split('T')[0] : '' })}
-                                                                initialFocus
-                                                            />
-                                                        </PopoverContent>
-                                                    </Popover>
+                                                    <div className="relative group">
+                                                        <input
+                                                            type="date"
+                                                            value={formData.dateOfBirth}
+                                                            onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                                                            className="w-full h-16 bg-[#050505] border border-white/10 rounded-xl px-4 text-white font-bold uppercase tracking-tight focus:border-emerald-500/50 focus:bg-white/[0.05] focus:outline-none transition-all [color-scheme:dark]"
+                                                            required
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <Input
                                                     label="SSN / National ID"
@@ -515,26 +501,25 @@ export default function KYCPage() {
                                         <div className="space-y-2">
                                             <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                                                 <Building2 className="w-8 h-8 text-emerald-500" /> Business Entity
+                                                <span className="text-sm bg-white/10 px-2 py-0.5 rounded text-white/50 ml-auto">Optional</span>
                                             </h3>
-                                            <p className="text-sm font-medium text-gray-400">Details for the legal entity funding the account.</p>
+                                            <p className="text-sm font-medium text-gray-400">Details for the legal entity funding the account (Optional).</p>
                                         </div>
 
                                         <div className="space-y-8">
                                             <Input
-                                                label="Legal Business Name"
+                                                label="Legal Business Name (Optional)"
                                                 placeholder="Acme Holdings Inc."
                                                 value={formData.businessName}
                                                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                                                 className="!bg-[#050505] !border-white/10 !text-white !h-16 placeholder:text-gray-400"
-                                                required
                                             />
                                             <Input
-                                                label="EIN / Business ID"
+                                                label="EIN / Business ID (Optional)"
                                                 placeholder="XX-XXXXXXX"
                                                 value={formData.ein}
                                                 onChange={(e) => setFormData({ ...formData, ein: e.target.value })}
                                                 className="!bg-[#050505] !border-white/10 !text-white !h-16 placeholder:text-gray-400"
-                                                required
                                             />
                                         </div>
                                     </div>

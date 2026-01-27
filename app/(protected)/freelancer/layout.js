@@ -167,7 +167,7 @@ export default function FreelancerLayout({ children }) {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 gap-2 mt-4">
-            <Link href="/freelancer/settings">
+            <Link href="/freelancer/settings" className="relative group">
               <Button
                 variant="outline"
                 size="sm"
@@ -176,6 +176,12 @@ export default function FreelancerLayout({ children }) {
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
               </Button>
+              {user?.kycStatus !== 'approved' && (
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-[#111111]"></span>
+                </span>
+              )}
             </Link>
             <Button
               variant="outline"

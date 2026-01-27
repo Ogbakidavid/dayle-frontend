@@ -8,13 +8,13 @@ import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { api } from '@/lib/mock-api';
-import { ArrowRight, CheckCircle2, Loader2, Shield, User } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Loader2, Shield, User, Mail } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { useUser } from '@/lib/store/user-context';
 
 export default function SignupPage() {
     const router = useRouter();
-    const { signup: contextSignup } = useUser();
+    const { signup: contextSignup, refreshUser } = useUser();
     const searchParams = useSearchParams();
     const returnTo = searchParams.get('returnTo');
     const [loading, setLoading] = useState(false);
@@ -25,9 +25,12 @@ export default function SignupPage() {
         setError('');
 
         const formData = new FormData(e.target);
+        const name = formData.get('name');
         const email = formData.get('email');
         const password = formData.get('password');
         const confirmPassword = formData.get('confirmPassword');
+        // Get role from search params
+        const role = searchParams.get('role');
 
         if (password !== confirmPassword) {
             setError('Passwords do not match.');
@@ -41,15 +44,25 @@ export default function SignupPage() {
 
         setLoading(true);
         try {
-            await contextSignup(email, password);
+            await contextSignup(email, password, name, role);
+
+            // If role was selected in previous step, update it now
+            if (role) {
+                await api.auth.updateProfile({ role });
+                // Refresh user context immediately so everything else knows the correct role
+                await refreshUser();
+            }
 
             if (returnTo) {
                 router.push(returnTo);
                 return;
             }
 
-            router.push('/verify-email');
+            // Always redirect to email verification with role parameter
+            const verifyUrl = role ? `/verify-email?role=${role}` : '/verify-email';
+            router.push(verifyUrl);
         } catch (err) {
+            console.error(err);
             setError('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
@@ -149,6 +162,21 @@ export default function SignupPage() {
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
+                                <Label htmlFor="name" className="text-sm font-black uppercase tracking-wide text-white ml-1">Full Name</Label>
+                                <div className="relative group">
+                                    <Input
+                                        id="name"
+                                        name="name"
+                                        type="text"
+                                        placeholder="John Doe"
+                                        required
+                                        className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+                                    />
+                                    <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
                                 <Label htmlFor="email" className="text-sm font-black uppercase tracking-wide text-white ml-1">Email Address</Label>
                                 <div className="relative group">
                                     <Input
@@ -159,7 +187,7 @@ export default function SignupPage() {
                                         required
                                         className="!bg-[#0a0a0a] border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:!bg-white/[0.08] focus:ring-0 transition-all !text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
                                     />
-                                    <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                                    <Mail className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                                 </div>
                             </div>
 
