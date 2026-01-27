@@ -312,8 +312,7 @@ export default function FreelancerSettingsPage() {
                         {activeTab === 'notifications' && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 {/* State and helper functions moved out of IIFE */}
-                                {(() => { /* This IIFE is now empty, but the content below is the target */ })()}
-                                {/* The content of the IIFE starts here */}
+                                {/* Notifications Content */}
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <div className="flex items-center gap-3">

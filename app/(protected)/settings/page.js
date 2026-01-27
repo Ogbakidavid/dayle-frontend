@@ -12,6 +12,7 @@ import {
     ChevronLeft, Smartphone, Plus, Trash2, Key, AlertTriangle, CheckCircle2
 } from 'lucide-react';
 import { useUser } from '@/lib/store/user-context';
+import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
     const { user, logout } = useUser();
@@ -146,7 +147,10 @@ export default function SettingsPage() {
                         </nav>
 
                         <div className="mt-12 pt-8 border-t border-white/5">
-                            <button className="flex items-center gap-3 px-3 py-2 text-sm font-black uppercase tracking-wide text-white hover:text-red-400 transition-colors w-full">
+                            <button
+                                onClick={logout}
+                                className="flex items-center gap-3 px-3 py-2 text-sm font-black uppercase tracking-wide text-white hover:text-red-400 transition-colors w-full"
+                            >
                                 <LogOut className="w-4 h-4" />
                                 Sign Out
                             </button>
@@ -344,221 +348,155 @@ export default function SettingsPage() {
                         {/* Notifications Section */}
                         {activeTab === 'notifications' && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                {(() => {
-                                    const [notificationList, setNotificationList] = useState([
-                                        { id: 1, type: 'kyc', title: 'Identity Verification Required', message: 'Complete your KYC verification to unlock full platform access and vault creation', timestamp: new Date(Date.now() - 1000 * 60 * 30), read: false, action: '/onboarding/kyc?role=client' },
-                                        { id: 2, type: 'milestone', title: 'Milestone Completed', message: 'Freelancer completed milestone "Phase 1 Development" - ready for review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), read: false },
-                                        { id: 3, type: 'payment', title: 'Payment Processed', message: '$2,500 has been transferred to escrow for "API Integration"', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), read: true },
-                                        { id: 4, type: 'security', title: 'New Login Detected', message: 'Login from Chrome on MacBook Pro in New York, US', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), read: true },
-                                        { id: 5, type: 'milestone', title: 'Milestone Approved', message: 'You approved milestone "Database Setup" - $1,200 released to freelancer', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), read: true },
-                                        { id: 6, type: 'payment', title: 'Vault Created', message: 'New vault "Mobile App Development" created with $10,000 budget', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), read: true },
-                                        { id: 7, type: 'security', title: 'Password Changed', message: 'Your account password was successfully updated', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), read: true },
-                                        { id: 8, type: 'milestone', title: 'Milestone Submitted', message: 'Freelancer submitted milestone "UI Design" for review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), read: true },
-                                        { id: 9, type: 'general', title: 'Welcome to Dayle', message: 'Start creating vaults and hiring freelancers securely', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14), read: true },
-                                    ]);
-                                    const [currentPage, setCurrentPage] = useState(1);
-                                    const itemsPerPage = 10;
-
-                                    const getRelativeTime = (timestamp) => {
-                                        const seconds = Math.floor((new Date() - timestamp) / 1000);
-                                        if (seconds < 60) return 'Just now';
-                                        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-                                        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-                                        if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-                                        return `${Math.floor(seconds / 604800)}w ago`;
-                                    };
-
-                                    const getNotificationIcon = (type) => {
-                                        switch (type) {
-                                            case 'kyc': return Shield;
-                                            case 'milestone': return CheckCircle2;
-                                            case 'payment': return CreditCard;
-                                            case 'security': return Lock;
-                                            case 'general': return Bell;
-                                            default: return Bell;
-                                        }
-                                    };
-
-                                    const getNotificationColor = (type) => {
-                                        switch (type) {
-                                            case 'kyc': return 'amber';
-                                            case 'milestone': return 'emerald';
-                                            case 'payment': return 'blue';
-                                            case 'security': return 'red';
-                                            case 'general': return 'zinc';
-                                            default: return 'zinc';
-                                        }
-                                    };
-
-                                    const markAllAsRead = () => {
-                                        setNotificationList(prev => prev.map(n => ({ ...n, read: true })));
-                                    };
-
-                                    const toggleRead = (id) => {
-                                        setNotificationList(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
-                                    };
-
-                                    const unreadCount = notificationList.filter(n => !n.read).length;
-                                    const totalPages = Math.ceil(notificationList.length / itemsPerPage);
-                                    const paginatedNotifications = notificationList.slice(
-                                        (currentPage - 1) * itemsPerPage,
-                                        currentPage * itemsPerPage
-                                    );
-
-                                    return (
-                                        <>
-                                            {/* Header */}
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <div className="flex items-center gap-3">
-                                                        <h3 className="text-sm font-black text-white uppercase tracking-wide">Notifications</h3>
-                                                        {unreadCount > 0 && (
-                                                            <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full">
-                                                                {unreadCount} new
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-sm text-white/60 leading-relaxed mt-1">Stay updated on your account activity</p>
-                                                </div>
-                                                {unreadCount > 0 && (
-                                                    <Button
-                                                        onClick={markAllAsRead}
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-bold uppercase tracking-wide text-xs"
-                                                    >
-                                                        Mark all read
-                                                    </Button>
-                                                )}
-                                            </div>
-
-                                            {/* Notification List */}
-                                            <div className="space-y-2">
-                                                {paginatedNotifications.map((notification) => {
-                                                    const Icon = getNotificationIcon(notification.type);
-                                                    const color = getNotificationColor(notification.type);
-
-                                                    return (
-                                                        <div
-                                                            key={notification.id}
-                                                            className={cn(
-                                                                "group p-4 border rounded-xl transition-all cursor-pointer",
-                                                                notification.read
-                                                                    ? "bg-zinc-900/20 border-zinc-800/30 hover:border-zinc-700"
-                                                                    : "bg-zinc-900/50 border-zinc-800/50 hover:border-zinc-700"
-                                                            )}
-                                                            onClick={() => markAsRead(notification.id)}
-                                                        >
-                                                            <div className="flex items-start gap-4">
-                                                                {/* Icon */}
-                                                                <div className={cn(
-                                                                    "p-2 rounded-lg shrink-0",
-                                                                    color === 'amber' && "bg-amber-500/10",
-                                                                    color === 'emerald' && "bg-emerald-500/10",
-                                                                    color === 'blue' && "bg-blue-500/10",
-                                                                    color === 'red' && "bg-red-500/10",
-                                                                    color === 'zinc' && "bg-zinc-500/10"
-                                                                )}>
-                                                                    <Icon className={cn(
-                                                                        "w-4 h-4",
-                                                                        color === 'amber' && "text-amber-500",
-                                                                        color === 'emerald' && "text-emerald-500",
-                                                                        color === 'blue' && "text-blue-500",
-                                                                        color === 'red' && "text-red-500",
-                                                                        color === 'zinc' && "text-zinc-500"
-                                                                    )} />
-                                                                </div>
-
-                                                                {/* Content */}
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="flex items-start justify-between gap-3">
-                                                                        <div className="flex-1 min-w-0">
-                                                                            <div className="flex items-center gap-2">
-                                                                                <p className={cn(
-                                                                                    "text-sm font-bold uppercase tracking-tight",
-                                                                                    notification.read ? "text-white/70" : "text-white"
-                                                                                )}>
-                                                                                    {notification.title}
-                                                                                </p>
-                                                                                {!notification.read && (
-                                                                                    <span className="w-2 h-2 bg-emerald-500 rounded-full shrink-0"></span>
-                                                                                )}
-                                                                            </div>
-                                                                            <p className={cn(
-                                                                                "text-xs mt-1",
-                                                                                notification.read ? "text-white/40" : "text-white/60"
-                                                                            )}>
-                                                                                {notification.message}
-                                                                            </p>
-                                                                            <p className="text-xs text-white/30 mt-2">
-                                                                                {getRelativeTime(notification.timestamp)}
-                                                                            </p>
-                                                                        </div>
-                                                                        {notification.action && !notification.read && (
-                                                                            <Link href={notification.action} onClick={(e) => e.stopPropagation()}>
-                                                                                <Button size="sm" className={cn(
-                                                                                    "font-bold uppercase tracking-wide text-xs h-8 px-3 shrink-0",
-                                                                                    color === 'amber' && "bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                                                                                )}>
-                                                                                    Action
-                                                                                </Button>
-                                                                            </Link>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-
-                                            {/* Pagination */}
-                                            {totalPages > 1 && (
-                                                <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
-                                                    <p className="text-xs text-white/40">
-                                                        Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, notificationList.length)} of {notificationList.length}
-                                                    </p>
-                                                    <div className="flex items-center gap-2">
-                                                        <Button
-                                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                                            disabled={currentPage === 1}
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="h-8 px-3 text-xs font-bold uppercase tracking-wide disabled:opacity-30"
-                                                        >
-                                                            Previous
-                                                        </Button>
-                                                        <div className="flex items-center gap-1">
-                                                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                                                                <button
-                                                                    key={page}
-                                                                    onClick={() => setCurrentPage(page)}
-                                                                    className={cn(
-                                                                        "w-8 h-8 rounded-lg text-xs font-bold transition-all",
-                                                                        currentPage === page
-                                                                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
-                                                                            : "text-white/40 hover:bg-white/5"
-                                                                    )}
-                                                                >
-                                                                    {page}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                        <Button
-                                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                                            disabled={currentPage === totalPages}
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="h-8 px-3 text-xs font-bold uppercase tracking-wide disabled:opacity-30"
-                                                        >
-                                                            Next
-                                                        </Button>
-                                                    </div>
-                                                </div>
+                                {/* Header */}
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <div className="flex items-center gap-3">
+                                            <h3 className="text-sm font-black text-white uppercase tracking-wide">Notifications</h3>
+                                            {unreadCount > 0 && (
+                                                <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full">
+                                                    {unreadCount} new
+                                                </span>
                                             )}
-                                        </>
-                                    );
-                                })()}
+                                        </div>
+                                        <p className="text-sm text-white/60 leading-relaxed mt-1">Stay updated on your account activity</p>
+                                    </div>
+                                    {unreadCount > 0 && (
+                                        <Button
+                                            onClick={markAllAsRead}
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-bold uppercase tracking-wide text-xs"
+                                        >
+                                            Mark all read
+                                        </Button>
+                                    )}
+                                </div>
+
+                                {/* Notification List */}
+                                <div className="space-y-2">
+                                    {paginatedNotifications.map((notification) => {
+                                        const Icon = getNotificationIcon(notification.type);
+                                        const color = getNotificationColor(notification.type);
+
+                                        return (
+                                            <div
+                                                key={notification.id}
+                                                className={cn(
+                                                    "group p-4 border rounded-xl transition-all cursor-pointer",
+                                                    notification.read
+                                                        ? "bg-zinc-900/20 border-zinc-800/30 hover:border-zinc-700"
+                                                        : "bg-zinc-900/50 border-zinc-800/50 hover:border-zinc-700"
+                                                )}
+                                                onClick={() => markAsRead(notification.id)}
+                                            >
+                                                <div className="flex items-start gap-4">
+                                                    {/* Icon */}
+                                                    <div className={cn(
+                                                        "p-2 rounded-lg shrink-0",
+                                                        color === 'amber' && "bg-amber-500/10",
+                                                        color === 'emerald' && "bg-emerald-500/10",
+                                                        color === 'blue' && "bg-blue-500/10",
+                                                        color === 'red' && "bg-red-500/10",
+                                                        color === 'zinc' && "bg-zinc-500/10"
+                                                    )}>
+                                                        <Icon className={cn(
+                                                            "w-4 h-4",
+                                                            color === 'amber' && "text-amber-500",
+                                                            color === 'emerald' && "text-emerald-500",
+                                                            color === 'blue' && "text-blue-500",
+                                                            color === 'red' && "text-red-500",
+                                                            color === 'zinc' && "text-zinc-500"
+                                                        )} />
+                                                    </div>
+
+                                                    {/* Content */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-start justify-between gap-3">
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2">
+                                                                    <p className={cn(
+                                                                        "text-sm font-bold uppercase tracking-tight",
+                                                                        notification.read ? "text-white/70" : "text-white"
+                                                                    )}>
+                                                                        {notification.title}
+                                                                    </p>
+                                                                    {!notification.read && (
+                                                                        <span className="w-2 h-2 bg-emerald-500 rounded-full shrink-0"></span>
+                                                                    )}
+                                                                </div>
+                                                                <p className={cn(
+                                                                    "text-xs mt-1",
+                                                                    notification.read ? "text-white/40" : "text-white/60"
+                                                                )}>
+                                                                    {notification.message}
+                                                                </p>
+                                                                <p className="text-xs text-white/30 mt-2">
+                                                                    {getRelativeTime(notification.timestamp)}
+                                                                </p>
+                                                            </div>
+                                                            {notification.action && !notification.read && (
+                                                                <Link href={notification.action} onClick={(e) => e.stopPropagation()}>
+                                                                    <Button size="sm" className={cn(
+                                                                        "font-bold uppercase tracking-wide text-xs h-8 px-3 shrink-0",
+                                                                        color === 'amber' && "bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                                                                    )}>
+                                                                        Action
+                                                                    </Button>
+                                                                </Link>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
+                                        <p className="text-xs text-white/40">
+                                            Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, notificationList.length)} of {notificationList.length}
+                                        </p>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                                disabled={currentPage === 1}
+                                                variant="outline"
+                                                size="sm"
+                                                className="h-8 px-3 text-xs font-bold uppercase tracking-wide disabled:opacity-30"
+                                            >
+                                                Previous
+                                            </Button>
+                                            <div className="flex items-center gap-1">
+                                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                                    <button
+                                                        key={page}
+                                                        onClick={() => setCurrentPage(page)}
+                                                        className={cn(
+                                                            "w-8 h-8 rounded-lg text-xs font-bold transition-all",
+                                                            currentPage === page
+                                                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+                                                                : "text-white/40 hover:bg-white/5"
+                                                        )}
+                                                    >
+                                                        {page}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <Button
+                                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                                disabled={currentPage === totalPages}
+                                                variant="outline"
+                                                size="sm"
+                                                className="h-8 px-3 text-xs font-bold uppercase tracking-wide disabled:opacity-30"
+                                            >
+                                                Next
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </section>
