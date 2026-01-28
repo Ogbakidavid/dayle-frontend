@@ -304,6 +304,84 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* Premium Settlement Matrix Section */}
+            <section id="coverage" className="py-32 px-6 border-t border-white/5 bg-[#050505] relative overflow-hidden">
+                {/* Background Visuals */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
+                <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+                <div className="max-w-7xl mx-auto relative z-10">
+                    {/* Elite Header */}
+                    <div className="flex flex-col items-center text-center mb-24">
+                        <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full mb-8"
+                        >
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">Global Scale / Local Payouts</span>
+                        </motion.div>
+                        <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tight text-white mb-8 leading-[0.9]">
+                            Our <span className="text-emerald-500 italic">Global</span> Network.
+                        </h2>
+                        <p className="text-lg font-bold text-white/40 uppercase tracking-tight max-w-2xl leading-relaxed">
+                            A curated network of 10 primary settlement nodes providing instant liquidity across Africa, Asia, and Latin America.
+                        </p>
+                    </div>
+
+                    {/* Unified Global Matrix */}
+                    <motion.div
+                        variants={staggerContainer}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6"
+                    >
+                        {[
+                            { country: "Nigeria", code: "NGN", flag: "🇳🇬", chs: ["Bank", "Mobile"], region: "Africa" },
+                            { country: "Kenya", code: "KES", flag: "🇰🇪", chs: ["Bank", "Mobile"], region: "Africa" },
+                            { country: "Ghana", code: "GHS", flag: "🇬🇭", chs: ["Bank", "Mobile"], region: "Africa" },
+                            { country: "Uganda", code: "UGX", flag: "🇺🇬", chs: ["Bank", "Mobile"], region: "Africa" },
+                            { country: "Tanzania", code: "TZS", flag: "🇹🇿", chs: ["Bank", "Mobile"], region: "Africa" },
+                            { country: "Malawi", code: "MWK", flag: "🇲🇼", chs: ["Bank", "Mobile"], region: "Africa" },
+                            { country: "Benin", code: "XOF", flag: "🇧🇯", chs: ["Mobile"], region: "Africa" },
+                            { country: "Côte d'Ivoire", code: "XOF", flag: "🇨🇮", chs: ["Mobile"], region: "Africa" },
+                            { country: "Brazil", code: "BRL", flag: "🇧🇷", chs: ["Mobile (PIX)"], region: "Americas" },
+                            { country: "India", code: "INR", flag: "🇮🇳", chs: ["Bank", "Mobile (UPI)"], region: "Asia" },
+                        ].map((node, i) => (
+                            <motion.div
+                                key={i}
+                                variants={fadeInUp}
+                                whileHover={{ y: -8, scale: 1.02 }}
+                                className="group p-8 rounded-[32px] border border-white/5 bg-white/[0.02] hover:bg-emerald-500/[0.02] hover:border-emerald-500/30 transition-all duration-500 relative overflow-hidden cursor-default flex flex-col h-full"
+                            >
+                                <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)] animate-pulse"></div>
+                                </div>
+
+                                <div className="flex justify-between items-start mb-8">
+                                    <div className="text-4xl transform group-hover:scale-110 transition-transform duration-500">{node.flag}</div>
+                                    <span className="text-xs font-black text-white/40 uppercase tracking-widest">{node.region}</span>
+                                </div>
+
+                                <div className="mb-8">
+                                    <h4 className="text-2xl font-black text-white uppercase tracking-tighter mb-2 group-hover:text-emerald-500 transition-colors leading-none">{node.country}</h4>
+                                    <span className="text-xs font-black text-white/40 uppercase tracking-[0.25em]">{node.code}</span>
+                                </div>
+
+                                <div className="mt-auto flex flex-wrap gap-2">
+                                    {node.chs.map((ch, idx) => (
+                                        <span key={idx} className="text-[11px] font-black uppercase text-white/60 bg-white/5 border border-white/10 px-3 py-1.5 rounded-[6px] group-hover:text-white/80 transition-colors">
+                                            {ch}
+                                        </span>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                </div>
+            </section>
+
             {/* Feature Matrix */}
             <section className="py-32 px-6 border-t transition-colors border-white/5 bg-[#080808]">
                 <div className="max-w-7xl mx-auto">
