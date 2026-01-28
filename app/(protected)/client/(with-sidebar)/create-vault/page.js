@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
+import { api } from "@/lib/mock-api";
 
 const variants = {
   enter: (direction) => ({
@@ -106,10 +107,31 @@ export default function CreateVaultPage() {
   };
 
   const handleDeploy = () => {
-    setIsDeploying(true);
-    setTimeout(() => {
-      router.push("/checkout/new-vault-id");
-    }, 1200);
+    // Create vault via API with idempotency to simulate safe money action
+    const makeIdempotencyKey = () => `idem_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+
+    (async () => {
+      setIsDeploying(true);
+      const idempotencyKey = makeIdempotencyKey();
+      try {
+        const payload = {
+          title: vaultTitle,
+          purpose: vaultPurpose,
+          description: vaultDescription,
+          totalAmount: totalAmount,
+          milestones,
+          freelancerEmail,
+          freelancerName,
+          idempotencyKey,
+        };
+        const newVault = await api.vaults.create(payload);
+        router.push(`/checkout/${newVault.id}?idem=${idempotencyKey}`);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsDeploying(false);
+      }
+    })();
   };
 
   return (
@@ -400,7 +422,7 @@ export default function CreateVaultPage() {
                         <div>
                           <h4 className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Escrow Verification Protocol</h4>
                           <p className="text-[10px] text-white/50 mt-1 leading-relaxed uppercase font-bold">
-                            Funds are locked in a smart vault. Release requires <span className="text-white">AI Deliverable Audit</span> and <span className="text-white">Manual Client Sign-off</span>.
+                            Funds are locked in a secure escrow vault. Release requires <span className="text-white">AI Deliverable Audit</span> and <span className="text-white">Manual Client Sign-off</span>.
                           </p>
                         </div>
                       </div>

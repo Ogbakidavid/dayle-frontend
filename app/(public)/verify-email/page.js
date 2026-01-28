@@ -6,12 +6,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser } from '@/lib/store/user-context';
 import { Button } from '@/components/ui/button';
 import { Shield, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
-import { api } from '@/lib/mock-api';
+import { api, UserRole } from '@/lib/mock-api';
 
 export default function VerifyEmailPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { user } = useUser();
+    const { user, refreshUser } = useUser();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -86,14 +86,15 @@ export default function VerifyEmailPage() {
 
         try {
             await api.auth.verifyEmail(code);
+            await refreshUser();
 
             // Get role from URL params or user context
             const role = searchParams.get('role') || user?.role;
 
-            // Redirect to appropriate dashboard based on role
-            if (role === 'client') {
+            // Redirect to appropriate dashboard based on role (using canonical UserRole)
+            if (role === UserRole.CLIENT) {
                 router.push('/client');
-            } else if (role === 'freelancer') {
+            } else if (role === UserRole.FREELANCER) {
                 router.push('/freelancer');
             } else {
                 // Fallback to role selection if no role found

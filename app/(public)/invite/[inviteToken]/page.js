@@ -281,7 +281,7 @@ export default function InvitePage() {
                                             {vault.isFunded ? "Funds Verified & Secured" : "Awaiting Client Funding"}
                                         </p>
                                         <p className="text-white/40 text-xs font-medium mt-0.5">
-                                            {vault.isFunded ? "Capital is held in a smart vault." : "Funds must be secured before work begins."}
+                                            {vault.isFunded ? "Capital is held in a secure escrow vault." : "Funds must be secured before work begins."}
                                         </p>
                                     </div>
                                 </div>

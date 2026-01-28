@@ -60,6 +60,17 @@ export default function WalletPageContent() {
         currentPage * itemsPerPage
     );
 
+    const formatRef = (id) => {
+        if (!id) return '';
+        try {
+            const s = String(id);
+            if (s.length <= 12) return s;
+            return `${s.slice(0, 6)}...${s.slice(-4)}`;
+        } catch (e) {
+            return id;
+        }
+    };
+
     return (
         <motion.div
             variants={containerVariants}
@@ -211,7 +222,7 @@ export default function WalletPageContent() {
                                                             <div className="text-[10px] md:text-sm text-white/30 font-black uppercase tracking-wide mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                                                                 {new Date(tx.date).toLocaleDateString()}
                                                                 <span className="hidden md:block w-1 h-1 rounded-full bg-white/10" />
-                                                                <span className="truncate">ID: {tx.id}</span>
+                                                                <span className="truncate">Ref: {formatRef(tx.id)}</span>
                                                                 <span className="sm:hidden px-1.5 py-0.5 rounded-sm bg-white/5 border border-white/10 text-[9px]">
                                                                     {tx.status}
                                                                 </span>

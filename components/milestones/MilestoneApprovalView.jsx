@@ -9,6 +9,7 @@ import { DisputeInitiationPanel } from '@/components/disputes/DisputeInitiationP
 import { getEvidenceForMilestone, getMilestoneById, getVaultById } from '@/lib/mock';
 import { APPROVAL_REJECTION_CODES, MILESTONE_STATUS_LABELS } from '@/lib/rules/milestones';
 import { BadgeCheck, ChevronLeft, XCircle, Clock } from 'lucide-react';
+import { api } from '@/lib/mock-api';
 
 export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
     const vault = getVaultById(vaultId);
@@ -54,7 +55,22 @@ export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex flex-wrap gap-3">
-                                <Button className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold" disabled={!canAct}>
+                                <Button
+                                    className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
+                                    disabled={!canAct}
+                                    onClick={async () => {
+                                        if (!canAct) return;
+                                        const idempotencyKey = `rel_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+                                        try {
+                                            await api.vaults.releaseMilestone(vaultId, milestoneId, { idempotencyKey });
+                                            // Simple refresh to show updated status in mock
+                                            window.location.reload();
+                                        } catch (err) {
+                                            console.error(err);
+                                            alert(err.message || 'Release failed');
+                                        }
+                                    }}
+                                >
                                     Approve & Release
                                 </Button>
                                 <Button

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useUser } from '@/lib/store/user-context';
+import { UserRole } from '@/lib/mock-api';
 
 const ALLOWED_PATHS_WITHOUT_KYC = [
     '/login',
@@ -32,7 +33,7 @@ export function KYCGate({ children }) {
         if (isAllowedPath) return;
 
         // Enforce role selection
-        if (!user.role) {
+        if (!user.role || user.role === UserRole.NONE) {
             router.push('/onboarding/role');
             return;
         }

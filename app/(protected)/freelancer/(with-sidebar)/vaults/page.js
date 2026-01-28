@@ -279,7 +279,7 @@ export default function FreelancerVaultsPage() {
         <footer className="flex items-center justify-between py-6 border-t border-white/5">
           <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">
             Displaying {paginatedVaults.length} of {filteredVaults.length}{" "}
-            smart-vaults
+            escrow vaults
           </p>
           <div className="flex gap-2">
             <Button

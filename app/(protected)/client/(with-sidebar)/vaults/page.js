@@ -292,7 +292,7 @@ export default function VaultsPage() {
         <footer className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-white/5">
           <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wide text-center sm:text-left">
             Displaying {paginatedVaults.length} of {filteredVaults.length}{" "}
-            smart-vaults
+            escrow vaults
           </p>
           <div className="flex gap-2">
             <Button

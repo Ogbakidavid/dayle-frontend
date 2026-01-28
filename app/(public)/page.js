@@ -37,7 +37,7 @@ export default function LandingPage() {
     const faqs = [
         {
             q: "How does the 'Autonomous Vault' actually work?",
-            a: "When a contract is initiated, funds are transferred into a non-custodial smart vault. These funds are locked and can only be released when pre-defined milestone conditions are met or if both parties agree to a refund."
+            a: "When a contract is initiated, funds are transferred into a secure escrow vault. These funds are locked and can only be released when pre-defined milestone conditions are met or if both parties agree to a refund."
         },
         {
             q: "What happens if a client refuses to approve a milestone?",
