@@ -8,13 +8,15 @@ const SettlementMatrix = () => {
 
     const nodes = [
         { id: 'ng', country: "Nigeria", code: "NGN", flag: "🇳🇬", chs: ["Bank Transfer", "Mobile Money"], region: "Africa", x: "48%", y: "58%" },
-        { id: 'ke', country: "Kenya", code: "KES", flag: "🇰🇪", chs: ["M-Pesa", "Bank Transfer"], region: "Africa", x: "54%", y: "62%" },
-        { id: 'gh', country: "Ghana", code: "GHS", flag: "🇬🇭", chs: ["Mobile Money", "Bank"], region: "Africa", x: "46%", y: "60%" },
-        { id: 'ug', country: "Uganda", code: "UGX", flag: "🇺🇬", chs: ["Mobile Money"], region: "Africa", x: "53%", y: "60%" },
-        { id: 'tz', country: "Tanzania", code: "TZS", flag: "🇹🇿", chs: ["Bank", "Mobile"], region: "Africa", x: "54%", y: "65%" },
-        { id: 'br', country: "Brazil", code: "BRL", flag: "🇧🇷", chs: ["PIX Instant", "Bank"], region: "Americas", x: "32%", y: "72%" },
-        { id: 'in', country: "India", code: "INR", flag: "🇮🇳", chs: ["UPI", "IMPS Bank"], region: "Asia", x: "68%", y: "50%" },
-        { id: 'ci', country: "Côte d'Ivoire", code: "XOF", flag: "🇨🇮", chs: ["Orange Money", "MTN"], region: "Africa", x: "45%", y: "61%" },
+        { id: 'ke', country: "Kenya", code: "KES", flag: "🇰🇪", chs: ["Bank Transfer", "Mobile Money"], region: "Africa", x: "54%", y: "62%" },
+        { id: 'gh', country: "Ghana", code: "GHS", flag: "🇬🇭", chs: ["Bank Transfer", "Mobile Money"], region: "Africa", x: "46%", y: "60%" },
+        { id: 'ug', country: "Uganda", code: "UGX", flag: "🇺🇬", chs: ["Bank Transfer", "Mobile Money"], region: "Africa", x: "53%", y: "60%" },
+        { id: 'tz', country: "Tanzania", code: "TZS", flag: "🇹🇿", chs: ["Bank Transfer", "Mobile Money"], region: "Africa", x: "54%", y: "65%" },
+        { id: 'mw', country: "Malawi", code: "MWK", flag: "��", chs: ["Bank Transfer", "Mobile Money"], region: "Africa", x: "55%", y: "68%" },
+        { id: 'bj', country: "Benin", code: "XOF", flag: "��", chs: ["Mobile Money"], region: "Africa", x: "47%", y: "59%" },
+        { id: 'ci', country: "Côte d'Ivoire", code: "XOF", flag: "🇨🇮", chs: ["Mobile Money"], region: "Africa", x: "45%", y: "61%" },
+        { id: 'br', country: "Brazil", code: "BRL", flag: "🇧🇷", chs: ["Mobile (PIX)"], region: "Americas", x: "32%", y: "72%" },
+        { id: 'in', country: "India", code: "INR", flag: "🇮🇳", chs: ["Bank Transfer", "Mobile (UPI)"], region: "Asia", x: "68%", y: "50%" },
     ];
 
     const regions = ['All', 'Africa', 'Americas', 'Asia'];
@@ -47,9 +49,9 @@ const SettlementMatrix = () => {
                         {/* Statistics Grid */}
                         <div className="grid grid-cols-3 gap-8 mt-12">
                             {[
-                                { label: "Supported Countries", value: "8+", sub: "Emerging Markets" },
+                                { label: "Supported Countries", value: "10+", sub: "Emerging Markets" },
                                 { label: "Global Regions", value: "3", sub: "Africa, Asia, Americas" },
-                                { label: "Payout Methods", value: "10+", sub: "Bank & Mobile Money" }
+                                { label: "Payout Methods", value: "12+", sub: "Bank & Mobile Money" }
                             ].map((stat, i) => (
                                 <motion.div
                                     key={stat.label}
