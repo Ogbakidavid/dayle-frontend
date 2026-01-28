@@ -217,7 +217,7 @@ export default function ClientVaultDetailPage() {
           fileName: `${(milestone.deliverable || "deliverable")
             .toLowerCase()
             .replace(/ /g, "_")}_v1.zip`,
-          requirementId: "REQ-AUTO-01",
+          requirementRef: "REQ-AUTO-01",
           comment: "Automated scan complete. No PII detected.",
           author: "Dayle AI",
           createdAt: new Date().toISOString(),
@@ -282,13 +282,13 @@ export default function ClientVaultDetailPage() {
         // Attempt to find metadata from constants to see if it's a file or link
         const purpose = vault.type;
         const deliverableMeta = VAULT_PURPOSE_MAPPING[purpose]?.deliverables?.find(d => d.id === m.deliverableTypeId);
-        
+
         list.push({
           id: `${m.id}_deliverable`,
           name: deliverableMeta?.label || m.deliverableTypeId,
           milestoneName: m.title,
           type: deliverableMeta?.type || (m.deliverableTypeId?.toLowerCase().includes("link") ? "link" : "file"),
-          url: "#", 
+          url: "#",
         });
       }
     });
@@ -359,8 +359,8 @@ export default function ClientVaultDetailPage() {
                   {vault.status}
                 </Badge>
                 {(vault.status === "DRAFT" || vault.status === "PENDING_FUNDING") && (
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3"
                     onClick={() => {
                       toast.success("Funding flow initiated. Mocking vault activation...");
@@ -457,17 +457,17 @@ export default function ClientVaultDetailPage() {
                         </div>
                       </div>
 
-                        <div className="flex flex-col items-end gap-2 shrink-0">
-                          <div className="text-right">
-                            <p className="text-lg font-bold text-white">
-                              ${milestone.displayAmount?.toLocaleString()}
+                      <div className="flex flex-col items-end gap-2 shrink-0">
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-white">
+                            ${milestone.displayAmount?.toLocaleString()}
+                          </p>
+                          {milestone.dueDate && (
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
+                              Due: {milestone.dueDate}
                             </p>
-                            {milestone.dueDate && (
-                              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
-                                Due: {milestone.dueDate}
-                              </p>
-                            )}
-                          </div>
+                          )}
+                        </div>
 
                         {milestone.status === "AWAITING_APPROVAL" ? (
                           <Sheet>
@@ -548,8 +548,8 @@ export default function ClientVaultDetailPage() {
                                           className={cn(
                                             "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400 font-bold uppercase tracking-wide",
                                             reviewAction ===
-                                              "REVISION_REQUESTED" &&
-                                              "bg-amber-500/10 ring-1 ring-amber-500"
+                                            "REVISION_REQUESTED" &&
+                                            "bg-amber-500/10 ring-1 ring-amber-500"
                                           )}
                                           onClick={() => {
                                             setReviewAction(
@@ -565,7 +565,7 @@ export default function ClientVaultDetailPage() {
                                           className={cn(
                                             "border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 font-bold uppercase tracking-wide",
                                             reviewAction === "REJECTED" &&
-                                              "bg-red-500/10 ring-1 ring-red-500"
+                                            "bg-red-500/10 ring-1 ring-red-500"
                                           )}
                                           onClick={() => {
                                             setReviewAction("REJECTED");
@@ -592,7 +592,7 @@ export default function ClientVaultDetailPage() {
                                                   (c) =>
                                                     reviewAction === "REJECTED"
                                                       ? c.code !==
-                                                        "REVISION_REQUIRED"
+                                                      "REVISION_REQUIRED"
                                                       : true
                                                 ).map((c) => (
                                                   <SelectItem
@@ -612,7 +612,7 @@ export default function ClientVaultDetailPage() {
                                                 ))}
                                               </SelectContent>
                                             </Select>
-                                            
+
                                             {/* Visual Reason Indicator */}
                                             {reviewReason && (
                                               <div className="mt-2 p-3 bg-white/3 border border-white/5 rounded-lg">
@@ -679,7 +679,7 @@ export default function ClientVaultDetailPage() {
                             )}
                           >
                             {milestone.status === "VERIFIED" ||
-                            milestone.status === "APPROVED" ? (
+                              milestone.status === "APPROVED" ? (
                               <CheckCircle className="w-3.5 h-3.5" />
                             ) : (
                               <Clock className="w-3.5 h-3.5" />

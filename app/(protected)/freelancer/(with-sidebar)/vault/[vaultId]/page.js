@@ -231,7 +231,7 @@ export default function FreelancerVaultDetailPage() {
         fileName: `${(milestone.deliverable || "deliverable")
           .toLowerCase()
           .replace(/ /g, "_")}_v1.zip`,
-        requirementId: "REQ-AUTO-01",
+        requirementRef: "REQ-AUTO-01",
         comment: "Automated scan complete. No PII detected.",
         author: "Dayle AI",
         createdAt: new Date().toISOString(),
@@ -377,132 +377,132 @@ export default function FreelancerVaultDetailPage() {
                         </div>
 
                         {(milestone.status === "PENDING" || !milestone.status) ? (
-                            <Sheet>
-                              <SheetTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  onClick={() => setActiveSubmit(milestone)}
-                                  className="bg-emerald-500 text-black hover:bg-emerald-400 font-black uppercase tracking-normal h-8"
-                                >
-                                  Submit
-                                  <Upload className="w-4 h-4 ml-2" />
-                                </Button>
-                              </SheetTrigger>
-                              <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:max-w-[50vw] p-6 lg:p-8 overflow-y-auto">
-                                <SheetHeader className="mb-6">
-                                  <SheetTitle className="text-white text-2xl font-bold uppercase tracking-normal">
-                                    Submit Milestone
-                                  </SheetTitle>
-                                  <SheetDescription className="text-gray-400 font-bold uppercase tracking-normal">
-                                    Upload your deliverables for client review.
-                                  </SheetDescription>
-                                </SheetHeader>
+                          <Sheet>
+                            <SheetTrigger asChild>
+                              <Button
+                                size="sm"
+                                onClick={() => setActiveSubmit(milestone)}
+                                className="bg-emerald-500 text-black hover:bg-emerald-400 font-black uppercase tracking-normal h-8"
+                              >
+                                Submit
+                                <Upload className="w-4 h-4 ml-2" />
+                              </Button>
+                            </SheetTrigger>
+                            <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:max-w-[50vw] p-6 lg:p-8 overflow-y-auto">
+                              <SheetHeader className="mb-6">
+                                <SheetTitle className="text-white text-2xl font-bold uppercase tracking-normal">
+                                  Submit Milestone
+                                </SheetTitle>
+                                <SheetDescription className="text-gray-400 font-bold uppercase tracking-normal">
+                                  Upload your deliverables for client review.
+                                </SheetDescription>
+                              </SheetHeader>
 
-                                {activeSubmit && (
-                                  <div className="space-y-6">
-                                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                                      <h4 className="text-sm font-bold text-emerald-500 mb-2 uppercase tracking-wide">
-                                        Deliverable Required
-                                      </h4>
-                                      <p className="text-sm text-emerald-200/70 font-bold uppercase tracking-normal">
-                                        Please upload:{" "}
-                                        <span className="text-white font-bold">
-                                          {activeSubmit.deliverable}
-                                        </span>
-                                      </p>
-                                    </div>
+                              {activeSubmit && (
+                                <div className="space-y-6">
+                                  <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                                    <h4 className="text-sm font-bold text-emerald-500 mb-2 uppercase tracking-wide">
+                                      Deliverable Required
+                                    </h4>
+                                    <p className="text-sm text-emerald-200/70 font-bold uppercase tracking-normal">
+                                      Please upload:{" "}
+                                      <span className="text-white font-bold">
+                                        {activeSubmit.deliverable}
+                                      </span>
+                                    </p>
+                                  </div>
 
-                                    <div className="space-y-4">
-                                      <div className="space-y-2">
-                                        <Label className="text-white font-bold uppercase tracking-normal">
-                                          Submission
-                                        </Label>
-                                        {(() => {
-                                          const purpose = VAULT_PURPOSE_MAPPING[vault.type];
-                                          const deliverableDef = purpose?.deliverables?.find(d => d.id === activeSubmit.deliverableId);
-                                          const isLink = deliverableDef?.type === "link";
+                                  <div className="space-y-4">
+                                    <div className="space-y-2">
+                                      <Label className="text-white font-bold uppercase tracking-normal">
+                                        Submission
+                                      </Label>
+                                      {(() => {
+                                        const purpose = VAULT_PURPOSE_MAPPING[vault.type];
+                                        const deliverableDef = purpose?.deliverables?.find(d => d.id === activeSubmit.deliverableId);
+                                        const isLink = deliverableDef?.type === "link";
 
-                                          if (isLink) {
-                                            return (
-                                              <div className="relative">
-                                                <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-                                                <Input
-                                                  placeholder={`Paste ${deliverableDef?.label || "Link"} URL...`}
-                                                  className="bg-black/30 border-white/10 text-white pl-10"
-                                                />
-                                              </div>
-                                            );
-                                          }
-
+                                        if (isLink) {
                                           return (
-                                            <div className="relative border-2 border-dashed border-white/10 rounded-xl p-8 hover:bg-white/2 transition-colors text-center cursor-pointer group">
-                                              <input
-                                                type="file"
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                            <div className="relative">
+                                              <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                                              <Input
+                                                placeholder={`Paste ${deliverableDef?.label || "Link"} URL...`}
+                                                className="bg-black/30 border-white/10 text-white pl-10"
                                               />
-                                              <Upload className="w-8 h-8 text-gray-400 mx-auto mb-3 group-hover:text-emerald-500 transition-colors" />
-                                              <p className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">
-                                                Drop files here or click to upload
-                                              </p>
-                                              <p className="text-xs text-gray-400 mt-1">
-                                                Max 50MB
-                                              </p>
                                             </div>
                                           );
-                                        })()}
-                                      </div>
+                                        }
 
-                                      <div className="space-y-2">
-                                        <Label className="text-white font-bold uppercase tracking-normal">
-                                          Comments
-                                        </Label>
-                                        <Textarea
-                                          placeholder="Add notes for the client..."
-                                          className="bg-black/30 border-white/10 text-white min-h-[100px]"
-                                        />
-                                      </div>
+                                        return (
+                                          <div className="relative border-2 border-dashed border-white/10 rounded-xl p-8 hover:bg-white/2 transition-colors text-center cursor-pointer group">
+                                            <input
+                                              type="file"
+                                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                            />
+                                            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-3 group-hover:text-emerald-500 transition-colors" />
+                                            <p className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">
+                                              Drop files here or click to upload
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-1">
+                                              Max 50MB
+                                            </p>
+                                          </div>
+                                        );
+                                      })()}
                                     </div>
 
-                                    <div className="flex gap-3 pt-6 border-t border-white/10">
-                                      <SheetClose asChild>
-                                        <Button
-                                          onClick={handleSubmit}
-                                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-normal"
-                                        >
-                                          Submit for Review
-                                        </Button>
-                                      </SheetClose>
-                                      <SheetClose asChild>
-                                        <Button
-                                          variant="outline"
-                                          className="border-white/10 hover:bg-white/5 text-gray-400 hover:text-white font-bold uppercase tracking-normal"
-                                        >
-                                          Cancel
-                                        </Button>
-                                      </SheetClose>
+                                    <div className="space-y-2">
+                                      <Label className="text-white font-bold uppercase tracking-normal">
+                                        Comments
+                                      </Label>
+                                      <Textarea
+                                        placeholder="Add notes for the client..."
+                                        className="bg-black/30 border-white/10 text-white min-h-[100px]"
+                                      />
                                     </div>
                                   </div>
-                                )}
-                              </SheetContent>
-                            </Sheet>
-                          ) : (
-                            <Badge
-                              variant="outline"
-                              className={cn(
-                                "uppercase tracking-widest text-[10px] h-7 px-3 flex items-center gap-1.5",
-                                getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
-                                getStatusColor(milestone.status),
-                                getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20")
+
+                                  <div className="flex gap-3 pt-6 border-t border-white/10">
+                                    <SheetClose asChild>
+                                      <Button
+                                        onClick={handleSubmit}
+                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-normal"
+                                      >
+                                        Submit for Review
+                                      </Button>
+                                    </SheetClose>
+                                    <SheetClose asChild>
+                                      <Button
+                                        variant="outline"
+                                        className="border-white/10 hover:bg-white/5 text-gray-400 hover:text-white font-bold uppercase tracking-normal"
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </SheetClose>
+                                  </div>
+                                </div>
                               )}
-                            >
-                              {milestone.status === "VERIFIED" || milestone.status === "APPROVED" ? (
-                                <CheckCircle className="w-3.5 h-3.5" />
-                              ) : (
-                                <Clock className="w-3.5 h-3.5" />
-                              )}
-                              {milestone.status.replace("_", " ")}
-                            </Badge>
-                          )}
+                            </SheetContent>
+                          </Sheet>
+                        ) : (
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "uppercase tracking-widest text-[10px] h-7 px-3 flex items-center gap-1.5",
+                              getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
+                              getStatusColor(milestone.status),
+                              getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20")
+                            )}
+                          >
+                            {milestone.status === "VERIFIED" || milestone.status === "APPROVED" ? (
+                              <CheckCircle className="w-3.5 h-3.5" />
+                            ) : (
+                              <Clock className="w-3.5 h-3.5" />
+                            )}
+                            {milestone.status.replace("_", " ")}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </div>

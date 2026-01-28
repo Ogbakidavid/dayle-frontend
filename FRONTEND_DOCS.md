@@ -270,7 +270,8 @@ graph TD
   id: string;                    // e.g., "d_001"
   vaultId: string;
   milestoneId: string;
-  requirementId?: string;        // reqId if requirement-specific
+  requirementRef?: string;       // reqId if requirement-specific
+  disputeType: string;           // From DisputeType enum
   reasonCode: string;            // From DISPUTE_REASON_CODES
   openedByUserId: string;        // User ID
   openedByRole: "CLIENT" | "FREELANCER" | "ADMIN";
@@ -322,6 +323,7 @@ graph TD
 ```javascript
 {
   DRAFT: "DRAFT",                      // Initial creation state
+  AWAITING_FUNDING: "AWAITING_FUNDING", // Created but not yet funded
   INVITED: "INVITED",                  // Freelancer invited
   FUNDED_UNASSIGNED: "FUNDED_UNASSIGNED", // Funded but no freelancer
   FUNDED_ASSIGNED: "FUNDED_ASSIGNED",  // Funded with assigned freelancer

@@ -93,13 +93,13 @@ function EvidenceItem({ topLeft, topRight, title, body, metaLeft, metaRight }) {
 }
 
 export function EvidencePanel({ milestone, evidence }) {
-    const clarifications = useMemo(() => 
-        (Array.isArray(evidence) ? evidence : []).filter(e => e.type === 'CLARIFICATION_REQUEST'), 
-    [evidence]);
-    
-    const fileComments = useMemo(() => 
-        (Array.isArray(evidence) ? evidence : []).filter(e => e.type === 'FILE_COMMENT'), 
-    [evidence]);
+    const clarifications = useMemo(() =>
+        (Array.isArray(evidence) ? evidence : []).filter(e => e.type === 'CLARIFICATION_REQUEST'),
+        [evidence]);
+
+    const fileComments = useMemo(() =>
+        (Array.isArray(evidence) ? evidence : []).filter(e => e.type === 'FILE_COMMENT'),
+        [evidence]);
 
     if (!milestone) {
         return (
@@ -130,19 +130,19 @@ export function EvidencePanel({ milestone, evidence }) {
                 {/* AI Audit Result */}
                 <div className={cx(
                     "rounded-2xl border p-4 flex items-start gap-4 transition-all",
-                    milestone.verification?.result === "FAIL" 
-                        ? "bg-red-500/10 border-red-500/20" 
+                    milestone.verification?.result === "FAIL"
+                        ? "bg-red-500/10 border-red-500/20"
                         : milestone.verification?.result === "FLAGGED"
-                        ? "bg-amber-500/10 border-amber-500/20"
-                        : "bg-emerald-500/10 border-emerald-500/20"
+                            ? "bg-amber-500/10 border-amber-500/20"
+                            : "bg-emerald-500/10 border-emerald-500/20"
                 )}>
                     <div className={cx(
                         "mt-1 flex h-10 w-10 items-center justify-center rounded-xl border",
-                        milestone.verification?.result === "FAIL" 
-                            ? "bg-red-500/20 border-red-500/30" 
+                        milestone.verification?.result === "FAIL"
+                            ? "bg-red-500/20 border-red-500/30"
                             : milestone.verification?.result === "FLAGGED"
-                            ? "bg-amber-500/20 border-amber-500/30"
-                            : "bg-emerald-500/20 border-emerald-500/30"
+                                ? "bg-amber-500/20 border-amber-500/30"
+                                : "bg-emerald-500/20 border-emerald-500/30"
                     )}>
                         {milestone.verification?.result === "FAIL" ? (
                             <AlertCircle className="h-5 w-5 text-red-400" />
@@ -159,28 +159,28 @@ export function EvidencePanel({ milestone, evidence }) {
                             </span>
                             <span className={cx(
                                 "ml-auto px-2 py-0.5 rounded text-[10px] font-bold uppercase",
-                                milestone.verification?.result === "FAIL" 
-                                    ? "bg-red-500 text-white" 
+                                milestone.verification?.result === "FAIL"
+                                    ? "bg-red-500 text-white"
                                     : milestone.verification?.result === "FLAGGED"
-                                    ? "bg-amber-500 text-black"
-                                    : "bg-emerald-500 text-black"
+                                        ? "bg-amber-500 text-black"
+                                        : "bg-emerald-500 text-black"
                             )}>
                                 {milestone.verification?.result || "PASS"}
                             </span>
                         </div>
                         <p className="text-sm font-bold text-white mb-1">
-                            {milestone.verification?.result === "FAIL" 
-                                ? "Compliance Check Failed" 
+                            {milestone.verification?.result === "FAIL"
+                                ? "Compliance Check Failed"
                                 : milestone.verification?.result === "FLAGGED"
-                                ? "Manual Review Recommended"
-                                : "Automated Compliance Passed"}
+                                    ? "Manual Review Recommended"
+                                    : "Automated Compliance Passed"}
                         </p>
                         <p className="text-xs text-white/60 leading-relaxed font-bold uppercase tracking-normal">
-                            {milestone.verification?.result === "FAIL" 
-                                ? "Critical discrepancies found in submitted deliverables vs contract requirements." 
+                            {milestone.verification?.result === "FAIL"
+                                ? "Critical discrepancies found in submitted deliverables vs contract requirements."
                                 : milestone.verification?.result === "FLAGGED"
-                                ? "Metadata anomalies detected. Verification requires human oversight."
-                                : "Deliverables verified against contract metadata. No anomalies detected in cryptographic proof."}
+                                    ? "Metadata anomalies detected. Verification requires human oversight."
+                                    : "Deliverables verified against contract metadata. No anomalies detected in cryptographic proof."}
                         </p>
                     </div>
                 </div>
@@ -242,9 +242,9 @@ export function EvidencePanel({ milestone, evidence }) {
                                         </span>
                                     }
                                     topRight={
-                                        item.payloadJson?.requirementId ? (
+                                        item.payloadJson?.requirementRef ? (
                                             <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-200">
-                                                {item.payloadJson?.requirementId}
+                                                {item.payloadJson?.requirementRef}
                                             </span>
                                         ) : null
                                     }
