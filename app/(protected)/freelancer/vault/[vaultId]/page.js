@@ -106,7 +106,7 @@ export default function FreelancerVaultDetailPage() {
       baseMilestones = vault.milestones;
     } else {
       // If no milestones (e.g. freshly accepted invite), we might return empty or a placeholder
-      if (vault.status === "FUNDED_ASSIGNED" || vault.status === "AWAITING_FUNDING") {
+      if (vault.status === "FUNDED_ASSIGNED" || vault.status === "INVITED") {
         return [];
       }
 

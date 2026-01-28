@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Shield, CheckCircle2, Clock, AlertCircle, XCircle, Pause, FileText, Eye } from "lucide-react";
+import { Shield, CheckCircle2, Clock, AlertCircle, XCircle, Pause, FileText, Eye, Activity } from "lucide-react";
 
 export function StatusBadge({ status, className }) {
     // Normalize to uppercase for matching
@@ -14,11 +14,6 @@ export function StatusBadge({ status, className }) {
         },
         INVITED: {
             label: "Invited",
-            icon: Clock,
-            className: "badge-pending",
-        },
-        AWAITING_FUNDING: {
-            label: "Awaiting Funding",
             icon: Clock,
             className: "badge-pending",
         },

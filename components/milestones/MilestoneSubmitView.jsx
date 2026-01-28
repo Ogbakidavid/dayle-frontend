@@ -101,7 +101,7 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
                                 Submitted {milestone.submission?.submittedAt ? new Date(milestone.submission.submittedAt).toLocaleDateString() : 'Not submitted'}
                             </div>
                             <p className="text-sm text-white/60">
-                                {milestone.submission?.summary || 'Provide a structured summary of the evidence.'}
+                                {milestone.submission?.notes || 'Provide a structured summary of the evidence.'}
                             </p>
                             {role === 'freelancer' ? (
                                 <Button className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold">

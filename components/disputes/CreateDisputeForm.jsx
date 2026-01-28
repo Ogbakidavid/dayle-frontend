@@ -95,7 +95,7 @@ export function CreateDisputeForm({ role, initialVaultId }) {
   const [selectedMilestoneId, setSelectedMilestoneId] = useState("");
   const [selectedRequirementId, setSelectedRequirementId] = useState("");
   const [selectedReasonCode, setSelectedReasonCode] = useState("");
-  const [summary, setSummary] = useState("");
+  const [description, setDescription] = useState("");
 
   const [files, setFiles] = useState([]);
   const [fileError, setFileError] = useState("");
@@ -169,7 +169,7 @@ export function CreateDisputeForm({ role, initialVaultId }) {
     setSelectedMilestoneId("");
     setSelectedRequirementId("");
     setSelectedReasonCode("");
-    setSummary("");
+    setDescription("");
     setFiles([]);
     setFileError("");
     setFormError("");
@@ -178,7 +178,7 @@ export function CreateDisputeForm({ role, initialVaultId }) {
   const resetReasonAndBelow = useCallback(() => {
     setSelectedRequirementId("");
     setSelectedReasonCode("");
-    setSummary("");
+    setDescription("");
     setFiles([]);
     setFileError("");
     setFormError("");
@@ -256,7 +256,7 @@ export function CreateDisputeForm({ role, initialVaultId }) {
         milestoneId: selectedMilestoneId,
         requirementRef: selectedRequirementId || null,
         reasonCode: selectedReasonCode,
-        summary,
+        description,
       });
 
       console.log("Submitted dispute", {
@@ -264,7 +264,7 @@ export function CreateDisputeForm({ role, initialVaultId }) {
         selectedMilestoneId,
         selectedRequirementId,
         selectedReasonCode,
-        summary,
+        description,
         files,
       });
 
@@ -678,19 +678,19 @@ export function CreateDisputeForm({ role, initialVaultId }) {
                   <div className="space-y-2">
                     <div className="flex items-end justify-between gap-3">
                       <Label className="text-sm font-medium text-white">
-                        Summary{" "}
+                        Description{" "}
                         <span className="text-xs font-normal text-white/40">
                           (optional)
                         </span>
                       </Label>
                       <div className="text-xs text-white/40">
-                        {summary.length}/600
+                        {description.length}/600
                       </div>
                     </div>
 
                     <Textarea
-                      value={summary}
-                      onChange={(e) => setSummary(e.target.value.slice(0, 600))}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value.slice(0, 600))}
                       placeholder="State facts. Timeline. What you delivered vs what was agreed. Avoid emotions."
                       className="min-h-[140px] resize-none border-white/10 bg-black/40 text-white hover:border-white/20 focus:ring-2 focus:ring-amber-500/30"
                     />

@@ -35,9 +35,8 @@ const navigation = [
     { name: 'Overview', href: '/client', icon: LayoutDashboard, badge: null },
     { name: 'Vaults', href: '/client/vaults', icon: Lock, badge: '3' },
     { name: 'Create Vault', href: '/client/create-vault', icon: Plus, badge: null },
-    { name: 'Ledger', href: '/client/ledger', icon: PieChart, badge: null },
+    { name: 'Transaction History', href: '/client/ledger', icon: PieChart, badge: null },
     { name: 'Disputes', href: '/client/disputes', icon: Gavel, badge: null },
-    { name: 'Transactions', href: '/client/transactions', icon: CreditCard, badge: null },
 ];
 
 export default function ClientLayout({ children }) {

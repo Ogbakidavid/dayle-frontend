@@ -93,8 +93,13 @@ function EvidenceItem({ topLeft, topRight, title, body, metaLeft, metaRight }) {
 }
 
 export function EvidencePanel({ milestone, evidence }) {
-    const clarifications = useMemo(() => evidence?.clarifications || [], [evidence]);
-    const fileComments = useMemo(() => evidence?.fileComments || [], [evidence]);
+    const clarifications = useMemo(() => 
+        (Array.isArray(evidence) ? evidence : []).filter(e => e.type === 'CLARIFICATION_REQUEST'), 
+    [evidence]);
+    
+    const fileComments = useMemo(() => 
+        (Array.isArray(evidence) ? evidence : []).filter(e => e.type === 'FILE_COMMENT'), 
+    [evidence]);
 
     if (!milestone) {
         return (
@@ -203,10 +208,10 @@ export function EvidencePanel({ milestone, evidence }) {
                                             Clarification
                                         </span>
                                     }
-                                    title={item.question}
-                                    body={item.answer}
-                                    metaLeft={`${item.askedBy} → ${item.answeredBy}`}
-                                    metaRight={formatDate(item.answeredAt)}
+                                    title={item.payloadJson?.question}
+                                    body={item.payloadJson?.answer}
+                                    metaLeft={`${item.payloadJson?.askedByUserId || item.payloadJson?.askedBy} → ${item.payloadJson?.answeredByUserId || item.payloadJson?.answeredBy}`}
+                                    metaRight={formatDate(item.createdAt)}
                                 />
                             ))}
                         </div>
@@ -233,21 +238,21 @@ export function EvidencePanel({ milestone, evidence }) {
                                     key={item.id}
                                     topLeft={
                                         <span className="inline-flex items-center rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-[11px] font-semibold text-white/70">
-                                            {item.fileName}
+                                            {item.payloadJson?.fileName}
                                         </span>
                                     }
                                     topRight={
-                                        item.requirementId ? (
+                                        item.payloadJson?.requirementId ? (
                                             <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-200">
-                                                {item.requirementId}
+                                                {item.payloadJson?.requirementId}
                                             </span>
                                         ) : null
                                     }
-                                    body={item.comment}
+                                    body={item.payloadJson?.comment}
                                     metaLeft={
                                         <span className="inline-flex items-center gap-1.5">
                                             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
-                                            {item.author}
+                                            {item.payloadJson?.authorId || item.payloadJson?.author}
                                         </span>
                                     }
                                     metaRight={formatDate(item.createdAt)}

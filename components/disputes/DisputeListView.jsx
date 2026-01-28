@@ -210,7 +210,7 @@ export function DisputeListView({ role }) {
           d.vaultTitle,
           d.milestoneId,
           d.requirementRef || "",
-          d.summary || "",
+          d.description || "",
           d.status,
         ]
           .join(" ")
@@ -492,13 +492,13 @@ export function DisputeListView({ role }) {
                             </div>
 
                             {/* Summary */}
-                            {dispute.summary ? (
+                            {dispute.description ? (
                               <p className="mt-3 line-clamp-2 max-w-2xl text-[13px] leading-relaxed text-white/55">
-                                {dispute.summary}
+                                {dispute.description}
                               </p>
                             ) : (
                               <p className="mt-3 text-[13px] text-white/35 font-bold uppercase">
-                                No summary provided.
+                                No description provided.
                               </p>
                             )}
                           </div>

@@ -120,7 +120,7 @@ export function DisputeDetailView({ disputeId, role }) {
 
                         {/* Payload Content */}
                         <div className="bg-[#141416] rounded-lg p-4 border border-white/5 text-sm text-gray-400 leading-relaxed">
-                          {ev.payload?.summary ||
+                          {ev.payloadJson?.notes ||
                             ev.payload?.note ||
                             ev.payload?.decision ||
                             JSON.stringify(ev.payload)}

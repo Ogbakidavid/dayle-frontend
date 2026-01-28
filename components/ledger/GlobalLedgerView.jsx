@@ -26,9 +26,9 @@ const itemVariants = {
 };
 
 const statusStyles = {
-  completed: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  processing: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  pending: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  CONFIRMED: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  PROCESSING: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  PENDING: "bg-blue-500/10 text-blue-400 border-blue-500/20",
 };
 
 export function GlobalLedgerView({ role }) {
@@ -39,17 +39,17 @@ export function GlobalLedgerView({ role }) {
     const vault = getVaultById(entry.vaultId);
     return (
       entry.id.toLowerCase().includes(search.toLowerCase()) ||
-      entry.description.toLowerCase().includes(search.toLowerCase()) ||
+      (entry.description || "").toLowerCase().includes(search.toLowerCase()) ||
       (vault?.title || "").toLowerCase().includes(search.toLowerCase())
     );
   });
 
   const processingTotal = entries
-    .filter((entry) => ["processing", "pending"].includes(entry.status))
+    .filter((entry) => ["PROCESSING", "PENDING"].includes(entry.status))
     .reduce((sum, entry) => sum + entry.amount, 0);
 
   const completedTotal = entries
-    .filter((entry) => entry.status === "completed")
+    .filter((entry) => entry.status === "CONFIRMED")
     .reduce((sum, entry) => sum + entry.amount, 0);
 
   return (
@@ -61,13 +61,13 @@ export function GlobalLedgerView({ role }) {
     >
       <header className="space-y-2">
         <motion.div variants={itemVariants} className="text-xs font-black uppercase tracking-wide text-emerald-400">
-          Global Ledger
+          Financial Activity
         </motion.div>
         <motion.h1 variants={itemVariants} className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase">
-          Settlement Activity
+          Transaction History
         </motion.h1>
         <motion.p variants={itemVariants} className="text-sm font-bold text-white uppercase tracking-wide">
-          USD-only ledger view with processing states for all vault movements.
+          USD-only transaction log with processing states for all vault movements.
         </motion.p>
       </header>
 
@@ -78,13 +78,13 @@ export function GlobalLedgerView({ role }) {
             value: `$${processingTotal.toLocaleString()}`,
           },
           { label: "Completed", value: `$${completedTotal.toLocaleString()}` },
-          { label: "Entries", value: `${entries.length}` },
+          { label: "Transactions", value: `${entries.length}` },
         ].map((stat) => (
           <motion.div
             variants={itemVariants}
             key={stat.label}
           >
-            <Card className="bg-[#111111] border-white/10">
+            <Card className="bg-muted border-white/10">
               <CardContent className="py-6">
                 <p className="text-xs font-black uppercase tracking-wide text-white/30">
                   {stat.label}
@@ -105,21 +105,13 @@ export function GlobalLedgerView({ role }) {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search ledger entries..."
-            className="w-full pl-10 pr-4 py-2 bg-[#111111] font-bold uppercase tracking-wide border border-white/10 rounded-lg text-sm text-white focus:border-emerald-500/40"
+            className="w-full pl-10 pr-4 py-2 bg-muted font-bold uppercase tracking-wide border border-white/10 rounded-lg text-sm text-white focus:border-emerald-500/40"
           />
         </div>
-        {/* <Link href={`/${role}`} className="w-full sm:w-auto">
-          <Button
-            variant="outline"
-            className="w-full sm:w-auto border-white/10 text-white/70 hover:text-white"
-          >
-            Back to dashboard
-          </Button>
-        </Link> */}
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <Card className="bg-[#111111] border-white/10">
+        <Card className="bg-muted border-white/10">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -135,7 +127,7 @@ export function GlobalLedgerView({ role }) {
                   {filtered.map((entry) => {
                     const vault = getVaultById(entry.vaultId);
                     return (
-                      <tr key={entry.id} className="hover:bg-white/[0.02]">
+                      <tr key={entry.id} className="hover:bg-white/2">
                         <td className="px-4 md:px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div
@@ -156,13 +148,13 @@ export function GlobalLedgerView({ role }) {
                             </div>
                             <div className="min-w-0">
                               <p className="text-sm text-white font-black uppercase tracking-tight truncate">
-                                {entry.description}
+                                {entry.description || entry.id}
                               </p>
                               <p className="text-[10px] md:text-sm uppercase font-black tracking-wide text-white/30 truncate">
                                 {entry.id}
                               </p>
                               <div className="md:hidden mt-1 text-[10px] text-white/50 font-bold uppercase tracking-wide">
-                                {vault?.title || "Vault"} • {new Date(entry.date).toLocaleDateString()}
+                                {vault?.title || "Vault"} • {new Date(entry.createdAt).toLocaleDateString()}
                               </div>
                             </div>
                           </div>
@@ -172,7 +164,7 @@ export function GlobalLedgerView({ role }) {
                             {vault?.title || "Vault"}
                           </p>
                           <p className="text-xs text-white font-bold uppercase">
-                            {new Date(entry.date).toLocaleDateString()}
+                            {new Date(entry.createdAt).toLocaleDateString()}
                           </p>
                         </td>
                         <td className="px-4 md:px-6 py-4">
