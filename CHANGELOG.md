@@ -1,5 +1,14 @@
 # Changelog
 
+## [2026-01-30] - Non-Custodial AA Transition (Restored)
+
+### Changed
+
+- **ARCHITECTURE.md**: Rewrote Custody Layer to use Non-Custodial Account Abstraction (Privy/Web3Auth). Updated all money-moving workflows to reflect provider-based execution.
+- **backend-prisma-schema.prisma**: Added `Wallet` model and enums for provider-backed wallets. Updated `User` relation. Removed `keyRef`.
+- **BACKEND_CONTRACT.md**: Added `POST /api/auth/wallet` for linking. Updated `fund` and `release-milestone` to return transaction initiation data.
+- **Project Root**: Restored [NON_CUSTODIAL_AA_NOTES.md](file:///home/creativeogbaki/Desktop/Cleard-Frontend/NON_CUSTODIAL_AA_NOTES.md) with security requirements and detailed change list.
+
 ## [2026-01-29] - Paid vs Approved Differentiation
 
 - **ARCHITECTURE.md**:

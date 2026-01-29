@@ -23,6 +23,7 @@
 12. [Upload Module](#upload-module)
 13. [Error Codes](#error-codes)
 14. [Idempotency](#idempotency)
+15. [Wallet & Provider Integration](#wallet--provider-integration)
 
 ---
 
@@ -305,6 +306,48 @@ class UpdateProfileDto {
 ```typescript
 User;
 ```
+
+---
+
+### POST /api/auth/wallet
+
+**Access**: Authenticated
+**Purpose**: Link non-custodial wallet from provider (Privy/Web3Auth)
+
+**Request DTO**:
+
+```typescript
+class LinkWalletDto {
+  @IsEnum(["PRIVY", "WEB3AUTH"])
+  provider: "PRIVY" | "WEB3AUTH";
+
+  @IsString()
+  providerUserId: string;
+
+  @IsString()
+  address: string;
+
+  @IsNumber()
+  @IsOptional()
+  chainId?: number;
+}
+```
+
+**Response**:
+
+```typescript
+{
+  id: string;
+  address: string;
+  provider: string;
+  status: "ACTIVE";
+}
+```
+
+**Errors**:
+
+- `WALLET_ALREADY_LINKED` (400): User already has a wallet
+- `ADDRESS_TAKEN` (409): Wallet address already associated with another user
 
 ---
 
@@ -636,7 +679,16 @@ class FundVaultDto {
 **Response**:
 
 ```typescript
-Vault; // with status updated
+{
+  vault: Vault;
+  transactionRequest?: {
+    to: string;
+    data: string;
+    value: string;
+    chainId: number;
+  };
+  checkoutUrl?: string; // For fiat ramp deposits
+}
 ```
 
 **State Transition**:
@@ -683,12 +735,10 @@ class ReleaseMilestoneDto {
 
 ```typescript
 {
-  milestone: {
-    ...Milestone,
-    status: "VERIFIED",
-    payoutStatus: "CONFIRMED" | "PENDING"
-  };
-  ledgerEntry: LedgerEntry; // RELEASE entry
+  milestone: Milestone;
+  ledgerEntry: LedgerEntry;
+  transactionHash?: string; // If auto-released via Paymaster
+  userOperation?: any; // For client-side signing if needed
 }
 ```
 
@@ -1645,5 +1695,25 @@ If the key is missing, the server MUST return:
 - Cleanup job runs daily to remove expired records
 
 ---
+
+## 15. Wallet & Provider Integration
+
+### Non-Custodial Workflow
+
+1. **Frontend**: User authenticates with Privy/Web3Auth.
+2. **Frontend**: Retrieves `accessToken`, `providerUserId`, and `address`.
+3. **Frontend**: Calls `POST /api/auth/wallet` to link address to Dayle account.
+4. **Backend**: Verifies provider token (if applicable) and stores wallet metadata.
+
+### Money Actions (AA)
+
+- **Initiation**: Backend returns `transactionRequest` or `userOperation`.
+- **Execution**: Frontend signs/submits via Provider SDK.
+- **Confirmation**: Backend listens for Provider Webhooks or Chain Events.
+
+### Webhook Verification
+
+- All incoming webhooks from Privy/Web3Auth MUST be signature-verified using the provider's public key or shared secret.
+- Webhook events are stored in `WebhookEvent` table before processing for replay protection.
 
 **End of Backend API Contract**

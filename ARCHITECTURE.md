@@ -103,21 +103,13 @@ idempotent for money-moving actions
 
 audit-trail complete for evidence and disputes
 
-C. Custody Layer (Wallets & Signing)
-Because Dayle uses custodial wallets (abstracted away from users):
-generates wallet addresses at signup
+C. Wallet Abstraction Layer (Non-Custodial AA)
+Instead of managing keys, Dayle uses an embedded wallet provider (Privy/Web3Auth) for Account Abstraction (AA):
 
-signs on-chain transactions for:
-
-funding escrow
-
-releasing milestone payouts
-
-refunds/cancellations
-
-stores keys in KMS / MPC / custody provider (never DB)
-
-exposes signing as a secure internal service
+- **User Ownership**: Keys are generated and stored by the provider (securely enclave-bound or social-shard based). Dayle NEVER sees seed phrases or private keys.
+- **Smart Accounts**: Users interact with the chain through an AA Smart Account (ERC-4337 or similar).
+- **Relayer/Paymaster**: Backend facilitates gasless transactions by sponsoring gas fees, maintaining the "Invisible Blockchain" UX.
+- **Transaction Initiation**: Backend initiates money actions; User signs via Provider UI (or sessions) to authorize.
 
 D. Smart Contract Escrow (On-chain)
 Minimal escrow contract:
@@ -233,14 +225,14 @@ createdAt
 
 Wallets
 id
-
 userId
-
-address
-
-keyRef (pointer to custody/KMS)
-
-chain
+provider (PRIVY | WEB3AUTH)
+providerUserId (unique identifier from provider)
+address (public wallet address)
+chainId (target network)
+status (ACTIVE | SUSPENDED)
+createdAt
+updatedAt
 
 createdAt
 
@@ -765,18 +757,16 @@ Mismatch rule:
 if reconciliation finds mismatch → auto-freeze affected vault/user
 
 4. Workflows (End-to-End)
-   Workflow A: Signup → Wallet Created
-   user signs up (role chosen)
+   Workflow A: Signup → Wallet Associated
+   User signs up via email/social through the Provider (Privy/Web3Auth).
 
-backend creates user record
+Backend receives:
 
-backend calls custody service:
+- providerUserId
+- publicAddress
 
-generate wallet address + keyRef
-
-store wallet address + keyRef
-
-user sees dashboard with $0
+Backend creates user record and associates the Non-Custodial Wallet.
+status = ACTIVE
 
 Freelancer gating:
 status = PENDING_APPROVAL until reviewed
@@ -819,7 +809,9 @@ freelancer is ACTIVE (if assigned)
 
 backend creates ledger LOCK PENDING
 
-custody signs tx fundVault(vaultId)
+backend initiates deposit session via ramp/provider
+
+client approves transaction via Provider UI (if required)
 
 chain emits VaultFunded
 
@@ -872,7 +864,9 @@ Client must acknowledge warning: acknowledgeAuditWarning = true
 Release flow:
 backend creates ledger RELEASE PENDING
 
-custody signs tx releaseMilestone(vaultId, milestoneId)
+backend initiates Release request via Provider SDK (using paymaster for gas)
+
+Backend verifies request matches verified milestone status
 
 chain emits MilestoneReleased
 
