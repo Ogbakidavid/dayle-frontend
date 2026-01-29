@@ -131,7 +131,7 @@ export function EvidenceChannel({
                 className={cn(
                   "p-3 rounded-lg text-sm leading-relaxed border",
                   event.type === EVIDENCE_TYPES.SYSTEM
-                    ? "bg-white/[0.02] border-white/5 text-gray-400 italic"
+                    ? "bg-white/2 border-white/5 text-gray-400 italic"
                     : "bg-[#141416] border-white/10 text-gray-400"
                 )}
               >

@@ -135,6 +135,7 @@ graph TD
 6. **Vault Funding** is a distinct action initiated by the client via the "Fund Vault" button on DRAFT or PENDING_FUNDING vaults.
 7. **Status enums** are stored and transmitted in **UPPERCASE** only.
 8. **All milestones follow the same workflow**: Freelancer submits → AI audit (advisory) → Client approval (mandatory).
+9. **Invisible Blockchain**: The UI MUST NOT display technical chain terms (wallet, token, gas, chain, hash). Use generic terms like 'Balance', 'Processing', 'Funds'.
 
 ## Canonical Data Contracts
 

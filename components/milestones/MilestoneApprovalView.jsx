@@ -27,6 +27,34 @@ export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
         );
     };
 
+    const handleReview = async (outcome) => {
+        // Validate negative outcomes
+        if (outcome !== 'APPROVE' && rejectionCodes.length === 0) {
+            alert('Please select at least one reason code for this decision.');
+            return;
+        }
+
+        const idempotencyKey = `rev_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+
+        try {
+            if (outcome === 'APPROVE') {
+                // Approval triggers money movement, so we use releaseMilestone which does both verification and release in this mock
+                await api.vaults.releaseMilestone(vaultId, milestoneId, { idempotencyKey });
+            } else {
+                // Rejection / Revision updates status but moves no money
+                await api.milestones.review(milestoneId, {
+                    outcome,
+                    reasonCodes: rejectionCodes,
+                    notes: `Client decision: ${outcome}`
+                });
+            }
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
+            alert(err.message || 'Review action failed');
+        }
+    };
+
     const canReject = rejectionCodes.length > 0;
     const canAct = role === 'client';
     const approvalStatus = milestone.approval?.status || 'pending';
@@ -58,18 +86,7 @@ export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
                                 <Button
                                     className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
                                     disabled={!canAct}
-                                    onClick={async () => {
-                                        if (!canAct) return;
-                                        const idempotencyKey = `rel_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
-                                        try {
-                                            await api.vaults.releaseMilestone(vaultId, milestoneId, { idempotencyKey });
-                                            // Simple refresh to show updated status in mock
-                                            window.location.reload();
-                                        } catch (err) {
-                                            console.error(err);
-                                            alert(err.message || 'Release failed');
-                                        }
-                                    }}
+                                    onClick={() => handleReview('APPROVE')}
                                 >
                                     Approve & Release
                                 </Button>
@@ -77,8 +94,17 @@ export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
                                     variant="outline"
                                     className="border-white/10 text-white/70 hover:text-white"
                                     disabled={!canReject || !canAct}
+                                    onClick={() => handleReview('REQUEST_CHANGES')}
                                 >
                                     Request Changes
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="border-red-500/20 text-red-400 hover:bg-red-500/10"
+                                    disabled={!canReject || !canAct}
+                                    onClick={() => handleReview('REJECT')}
+                                >
+                                    Reject (Terminal)
                                 </Button>
                             </div>
                             <p className="text-xs text-white/50">

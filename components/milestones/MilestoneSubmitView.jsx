@@ -1,5 +1,8 @@
 'use client';
 
+import { useState } from 'react';
+import { api } from '@/lib/mock-api';
+
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,10 +15,46 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
     const vault = getVaultById(vaultId);
     const milestone = getMilestoneById(vaultId, milestoneId);
     const evidence = milestone ? getEvidenceForMilestone(milestone.id) : null;
+    
+    // State for submission
+    const [notes, setNotes] = useState(milestone?.submission?.notes || '');
+    const [files, setFiles] = useState(milestone?.submission?.files || []);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     if (!vault || !milestone) {
         return <div className="text-white/70">Milestone not found.</div>;
     }
+
+    const handleUpload = () => {
+        // Mock upload action
+        const newFile = {
+            name: `mock_deliverable_${Date.now()}.zip`,
+            size: `${(Math.random() * 10 + 1).toFixed(1)}MB`,
+            tag: 'Deliverable',
+            url: 'https://example.com/mock-file'
+        };
+        setFiles([...files, newFile]);
+    };
+
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        try {
+            await api.milestones.submit(milestoneId, {
+                notes,
+                filesJson: files
+            });
+            // Reload to show updated status
+            window.location.reload();
+        } catch (error) {
+            console.error("Submission failed:", error);
+            alert("Failed to submit milestone: " + error.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const canSubmit = role === 'freelancer' && (files.length > 0 || notes.length > 5);
+    const isSubmitted = milestone.status === 'SUBMITTED' || milestone.status === 'VERIFIED' || milestone.status === 'AWAITING_APPROVAL';
 
     return (
         <div className="space-y-8">
@@ -46,18 +85,22 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
                                 <p className="mt-3 text-sm text-white/60">
                                     Upload deliverables tied to milestone requirements.
                                 </p>
-                                {role === 'freelancer' && (
-                                    <Button variant="outline" className="mt-4 border-white/10 text-white/70 hover:text-white">
-                                        Upload Files
+                                {role === 'freelancer' && !isSubmitted && (
+                                    <Button 
+                                        variant="outline" 
+                                        className="mt-4 border-white/10 text-white/70 hover:text-white"
+                                        onClick={handleUpload}
+                                    >
+                                        Upload Files (Mock)
                                     </Button>
                                 )}
                             </div>
 
                             <div className="space-y-3">
                                 <p className="text-xs font-bold uppercase tracking-wide text-white">Current files</p>
-                                {milestone.submission?.files?.length ? (
-                                    milestone.submission.files.map((file) => (
-                                        <div key={file.name} className="flex items-center justify-between border border-white/5 bg-black/40 rounded-lg px-4 py-3">
+                                {files.length ? (
+                                    files.map((file, idx) => (
+                                        <div key={idx} className="flex items-center justify-between border border-white/5 bg-black/40 rounded-lg px-4 py-3">
                                             <div>
                                                 <p className="text-sm text-white font-semibold">{file.name}</p>
                                                 <p className="text-xs text-white">{file.size} · {file.tag}</p>
@@ -100,13 +143,34 @@ export function MilestoneSubmitView({ vaultId, milestoneId, role }) {
                                 <Calendar className="w-4 h-4" />
                                 Submitted {milestone.submission?.submittedAt ? new Date(milestone.submission.submittedAt).toLocaleDateString() : 'Not submitted'}
                             </div>
-                            <p className="text-sm text-white/60">
-                                {milestone.submission?.notes || 'Provide a structured summary of the evidence.'}
-                            </p>
+                            
+                            {role === 'freelancer' && !isSubmitted ? (
+                                <textarea
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white h-32"
+                                    placeholder="Provide a structured summary..."
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                />
+                            ) : (
+                                <p className="text-sm text-white/60">
+                                    {milestone.submission?.notes || notes || 'No notes provided.'}
+                                </p>
+                            )}
+
                             {role === 'freelancer' ? (
-                                <Button className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold">
-                                    Submit for Verification
-                                </Button>
+                                !isSubmitted ? (
+                                    <Button 
+                                        className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
+                                        disabled={!canSubmit || isSubmitting}
+                                        onClick={handleSubmit}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit for Verification'}
+                                    </Button>
+                                ) : (
+                                    <Button disabled className="w-full border-white/10 text-white/70">
+                                        Submitted
+                                    </Button>
+                                )
                             ) : (
                                 <Button variant="outline" className="w-full border-white/10 text-white/70 hover:text-white">
                                     Submission Received

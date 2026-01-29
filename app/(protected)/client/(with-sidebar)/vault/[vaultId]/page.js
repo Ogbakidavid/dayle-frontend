@@ -60,16 +60,16 @@ import {
 } from "@/lib/rules/disputes";
 import { APPROVAL_REJECTION_CODES } from "@/lib/rules/milestones";
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
+import { VaultStatus, MilestoneStatus } from "@/lib/domain/enums";
 
 export default function ClientVaultDetailPage() {
   const params = useParams();
   const router = useRouter();
   const vaultId = params.vaultId;
-  const { vaults, loading: vaultsLoading } = useVault();
+  const { vaults, loading: vaultsLoading, refreshVaults } = useVault();
 
   // Local State for interactive mock
   const [activeReview, setActiveReview] = useState(null); // The milestone being reviewed
-  const [milestoneStates, setMilestoneStates] = useState({}); // Track approvals { [id]: 'approved' }
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Review Modal State
@@ -88,7 +88,7 @@ export default function ClientVaultDetailPage() {
   // Fetch latest invitation status for this vault
   useEffect(() => {
     async function fetchInviteStatus() {
-      if (!vault || (vault.status !== "FUNDED_UNASSIGNED" && vault.status !== "INVITED")) return;
+      if (!vault || (vault.status !== VaultStatus.FUNDED_UNASSIGNED && vault.status !== VaultStatus.INVITED)) return;
       try {
         const data = await api.invites.getByVaultId(vault.id);
         setLatestInvite(data);
@@ -191,11 +191,11 @@ export default function ClientVaultDetailPage() {
         id: id,
         type: "APPROVAL",
         complianceStatus: m.verification?.result || "PENDING",
-        status: milestoneStates[id] || m.status || "AWAITING_APPROVAL",
+        status: m.status || MilestoneStatus.AWAITING_APPROVAL,
         displayAmount: m.totalAmount || m.amount || m.displayAmount,
       };
     });
-  }, [vault, milestoneStates]);
+  }, [vault]);
 
   // Mock Evidence Generator for the Review Panel
   const getMockEvidence = (milestone) => {
@@ -226,44 +226,53 @@ export default function ClientVaultDetailPage() {
     };
   };
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     if (activeReview) {
-      setMilestoneStates((prev) => ({
-        ...prev,
-        [activeReview.id]: "VERIFIED",
-      }));
-      setActiveReview(null);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      try {
+        // API call to release funds and update status
+        await api.vaults.releaseMilestone(
+          vault.id,
+          activeReview.id,
+          { idempotencyKey: `rel_${activeReview.id}_${Date.now()}` }
+        );
+
+        // Refresh vault data to see new status
+        await refreshVaults(); 
+
+        setActiveReview(null);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      } catch (err) {
+        console.error("Release failed:", err);
+        toast.error("Failed to release funds. Please try again.");
+      }
     }
   };
 
-  const handleReviewSubmit = () => {
+  const handleReviewSubmit = async () => {
     if (!activeReview || !reviewAction || !reviewReason) return;
 
-    // Create structured record
-    const record = {
-      milestoneId: activeReview.id,
-      reviewerUserId: "current-client-id", // mock
-      outcome: reviewAction,
-      reasonCodes: [reviewReason],
-      notes: reviewFeedback,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      const outcome = reviewAction === "REJECTED" ? "REJECT" : "REQUEST_CHANGES";
 
-    console.log("Submitting Review Record:", record);
+      await api.milestones.review(activeReview.id, {
+        outcome: outcome,
+        reasonCodes: [reviewReason],
+        notes: reviewFeedback,
+      });
 
-    setMilestoneStates((prev) => ({
-      ...prev,
-      [activeReview.id]:
-        reviewAction === "REJECTED" ? "REJECTED" : "REVISION_REQUESTED",
-    }));
+      await refreshVaults(); // Refresh to catch status change
 
-    // Reset
-    setActiveReview(null);
-    setReviewAction(null);
-    setReviewReason("");
-    setReviewFeedback("");
+      // Reset
+      setActiveReview(null);
+      setReviewAction(null);
+      setReviewReason("");
+      setReviewFeedback("");
+      toast.success("Review submitted successfully");
+    } catch (err) {
+      console.error("Review failed:", err);
+      toast.error("Failed to submit review");
+    }
   };
 
   // Check if any milestone is eligible for dispute
@@ -277,7 +286,7 @@ export default function ClientVaultDetailPage() {
     displayMilestones.forEach((m) => {
       // Logic: If status is VERIFIED, APPROVED, or AWAITING_APPROVAL, the freelancer has submitted work.
       // In MVP mock, if there is a 'deliverableId' and 'deliverable' name, we treat it as a potential link/file.
-      const hasWork = ["VERIFIED", "APPROVED", "AWAITING_APPROVAL", "SUBMITTED"].includes(m.status);
+      const hasWork = [MilestoneStatus.VERIFIED, "APPROVED", MilestoneStatus.AWAITING_APPROVAL, MilestoneStatus.SUBMITTED].includes(m.status);
       if (hasWork && m.deliverable) {
         // Attempt to find metadata from constants to see if it's a file or link
         const purpose = vault.type;
@@ -316,9 +325,9 @@ export default function ClientVaultDetailPage() {
     const normalized = status?.toUpperCase();
     if (normalized === "VERIFIED" || normalized === "APPROVED")
       return "text-emerald-500";
-    if (normalized === "AWAITING_APPROVAL" || normalized === "PENDING" || normalized === "SUBMITTED")
+    if (normalized === MilestoneStatus.AWAITING_APPROVAL || normalized === MilestoneStatus.PENDING || normalized === MilestoneStatus.SUBMITTED)
       return "text-amber-500";
-    if (normalized === "REJECTED" || normalized === "REVISION_REQUESTED")
+    if (normalized === MilestoneStatus.REJECTED || normalized === MilestoneStatus.REVISION_REQUESTED)
       return "text-red-500";
     return "text-gray-400";
   };
@@ -358,7 +367,7 @@ export default function ClientVaultDetailPage() {
                 >
                   {vault.status}
                 </Badge>
-                {(vault.status === "DRAFT" || vault.status === "PENDING_FUNDING") && (
+                {(vault.status === VaultStatus.DRAFT || vault.status === "PENDING_FUNDING") && (
                   <Button
                     size="sm"
                     className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3"
@@ -469,7 +478,7 @@ export default function ClientVaultDetailPage() {
                           )}
                         </div>
 
-                        {milestone.status === "AWAITING_APPROVAL" ? (
+                        {milestone.status === MilestoneStatus.AWAITING_APPROVAL ? (
                           <Sheet>
                             <SheetTrigger asChild>
                               <Button

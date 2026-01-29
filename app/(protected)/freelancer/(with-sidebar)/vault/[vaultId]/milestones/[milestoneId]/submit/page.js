@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Upload, File as FileIcon, X } from "lucide-react";
+import { ArrowLeft, Upload, File as FileIcon, X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { api } from "@/lib/mock-api";
 import {
   Card,
   CardContent,
@@ -23,6 +25,7 @@ export default function SubmissionPage() {
 
   const [files, setFiles] = useState([]);
   const [comment, setComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -34,24 +37,35 @@ export default function SubmissionPage() {
     setFiles(files.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Mock submission logic
-    console.log("Submitting:", { files, comment });
-    router.push(`/freelancer/vault/${vaultId}`);
+    setIsSubmitting(true);
+    try {
+      await api.milestones.submit(milestoneId, {
+        files: files.map(f => ({ name: f.name, size: f.size })), // Mock file upload
+        comments: comment
+      });
+      toast.success("Work submitted successfully");
+      router.replace(`/freelancer/vault/${vaultId}`);
+    } catch (err) {
+      console.error("Submission failed:", err);
+      toast.error("Failed to submit work");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30 pb-20">
       <div className="max-w-3xl mx-auto px-6 space-y-8">
         <header className="pt-8">
-          <Link
-            href={`/freelancer/vault/${vaultId}/milestones/${milestoneId}`}
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Milestone
-          </Link>
+            Back
+          </button>
           <h1 className="text-3xl font-bold text-white">Submit Work</h1>
           <p className="text-gray-400 mt-2">
             Upload deliverables and provide comments for the client.
@@ -122,20 +136,27 @@ export default function SubmissionPage() {
               </div>
 
               <div className="pt-4 border-t border-white/5 flex justify-end gap-3">
-                <Link href={`/freelancer/vault/${vaultId}`}>
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    className="text-gray-400 hover:text-white"
-                  >
-                    Cancel
-                  </Button>
-                </Link>
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => router.back()}
+                  className="text-gray-400 hover:text-white"
+                >
+                  Cancel
+                </Button>
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold px-8"
                 >
-                  Submit for Review
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    "Submit for Review"
+                  )}
                 </Button>
               </div>
             </form>

@@ -94,7 +94,7 @@ export default function FreelancerMilestoneDetailPage() {
                 {mockMilestone.deliverables.map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/5"
+                    className="flex items-center gap-3 p-3 rounded-lg bg-white/2 border border-white/5"
                   >
                     <FileText className="w-4 h-4 text-emerald-500" />
                     <span className="text-gray-400 text-sm">{item}</span>
