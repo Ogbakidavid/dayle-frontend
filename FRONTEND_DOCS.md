@@ -1,148 +1,401 @@
-# Cleard Frontend Documentation
+# Cleard Frontend Contract Specification
 
-Welcome to the frontend documentation for **Cleard (Dayle)**, a high-trust settlement and secure escrow platform. This project is built with a focus on visual excellence, security, and architectural integrity.
+**Version**: 2.0  
+**Last Updated**: 2026-01-29  
+**Purpose**: Verification-ready contract specification for backend implementation
+
+---
+
+## Table of Contents
+
+1. [Tech Stack](#tech-stack)
+2. [App Routes Map](#app-routes-map)
+3. [Frontend State Model](#frontend-state-model)
+4. [Canonical Domain Enums](#canonical-domain-enums)
+5. [Data Contracts](#data-contracts)
+6. [Backend API Contract](#backend-api-contract)
+7. [State Machine Specifications](#state-machine-specifications)
+8. [Validation Rules](#validation-rules)
+9. [Dispute & Approval Codes](#dispute--approval-codes)
+10. [Open Questions / TODO](#open-questions--todo)
+11. [Changelog](#changelog)
+
+---
 
 ## Tech Stack
 
-- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
-- **Runtime/Logic**: [React 19](https://react.dev/)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) (Vanilla CSS approach)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **UI Components**: [Radix UI](https://www.radix-ui.com/) & [Lucide Icons](https://lucide.dev/)
+- **Framework**: Next.js 16 (App Router)
+- **Runtime**: React 19
+- **Styling**: Tailwind CSS 4
+- **Animations**: Framer Motion
+- **UI Components**: Radix UI + Lucide Icons
 - **State Management**: React Context API (`UserContext`, `WalletContext`, `VaultContext`)
-- **Data Fetching**: Mock API System (Simulated Latency)
+- **Data Fetching**: Mock API System (`lib/mock-api.js`)
 
-## Comprehensive Architecture Diagram
+---
 
-```mermaid
-%%{init: {
-  'theme': 'dark',
-  'themeVariables': {
-    'fontFamily': 'Inter, sans-serif',
-    'fontSize': '22px',
-    'nodeSpacing': 100,
-    'rankSpacing': 100
-  }
-}}%%
+## App Routes Map
 
-graph TD
-    %% Optimized Styles for Extreme Visibility
-    classDef page fill:#111827,stroke:#10b981,stroke-width:8px,color:#fff,font-weight:bold,font-size:32px;
-    classDef component fill:#1f2937,stroke:#64748b,stroke-width:4px,color:#fff,font-size:28px;
-    classDef context fill:#064e3b,stroke:#fbbf24,stroke-width:6px,color:#fbbf24,font-weight:bold,font-size:30px;
-    classDef advisory fill:#451a03,stroke:#f59e0b,stroke-width:6px,color:#fef3c7,font-weight:900,font-size:30px;
-    classDef ui fill:#000,stroke:#334155,stroke-width:2px,color:#94a3b8,font-size:20px;
+### Public Routes
 
-    %% 1. GLOBAL STATE LAYER
-    subgraph Layer_Context ["GLOBAL DATA & AUTH"]
-        UC["User Context<br/>(Auth/Roles/KYC)"]:::context
-        WC["Wallet Context<br/>(Ledger/USD Balance)"]:::context
-        VC["Vault Context<br/>(Escrow/Milestones)"]:::context
-    end
+| Route                   | Access | Purpose                      | Data Read       | Actions                    |
+| ----------------------- | ------ | ---------------------------- | --------------- | -------------------------- |
+| `/`                     | Public | Landing page                 | None            | Navigate to login/signup   |
+| `/login`                | Public | User login                   | None            | `api.auth.login()`         |
+| `/signup`               | Public | User registration            | None            | `api.auth.signup()`        |
+| `/forgot-password`      | Public | Password reset request       | None            | Email reset link           |
+| `/reset-password`       | Public | Password reset form          | None            | Update password            |
+| `/verify-email`         | Public | Email verification           | None            | Verify email token         |
+| `/verification`         | Public | Public vault verification    | Vault by ID     | Display vault status       |
+| `/invite/[inviteToken]` | Public | Invitation acceptance        | Invite by token | `api.invites.respond()`    |
+| `/invitation-accepted`  | Public | Post-acceptance confirmation | None            | Display success            |
+| `/onboarding/role`      | Public | Role selection               | Current user    | `api.onboarding.setRole()` |
 
-    %% 2. PUBLIC & ONBOARDING
-    subgraph Layer_Public ["ENTRY & ONBOARDING"]
-        Landing["Landing Page"]:::page
-        Login["Login / Signup"]:::page
-        RolePick["Onboarding: Role Select"]:::page
-        KYCPage["Onboarding: KYC Gate"]:::page
-    end
+### Protected Routes - Client
 
-    %% 3. CLIENT DOMAIN
-    subgraph Layer_Client ["CLIENT WORKFLOWS"]
-        CD["Client Dashboard"]:::page
-        CreateVault["Create Vault<br/>(UUID Generation)"]:::page
-        CVDetail["Client Vault View"]:::page
-        CDisputes["Client Dispute Center"]:::page
-        CLedger["Client Settlement Activity"]:::page
-    end
+| Route                                                           | Access | Purpose              | Data Read                | Actions                   |
+| --------------------------------------------------------------- | ------ | -------------------- | ------------------------ | ------------------------- |
+| `/client`                                                       | Client | Dashboard            | Vaults list              | Navigate to vaults        |
+| `/client/create-vault`                                          | Client | Create new vault     | None                     | `api.vaults.create()`     |
+| `/client/vaults`                                                | Client | All vaults list      | Vaults list              | Filter/search vaults      |
+| `/client/vault/[vaultId]`                                       | Client | Vault detail         | Vault + milestones       | Review, release, fund     |
+| `/client/vault/[vaultId]/milestones/[milestoneId]`              | Client | Milestone detail     | Milestone + evidence     | View submission           |
+| `/client/vault/[vaultId]/milestones/[milestoneId]/review`       | Client | Review milestone     | Milestone + submission   | `api.milestones.review()` |
+| `/client/vault/[vaultId]/milestones/[milestoneId]/verification` | Client | Verification results | Milestone + verification | View AI audit             |
+| `/client/ledger`                                                | Client | Settlement activity  | Ledger entries           | View transactions         |
+| `/client/disputes`                                              | Client | Dispute center       | Disputes list            | Create/view disputes      |
+| `/client/disputes/[disputeId]`                                  | Client | Dispute detail       | Dispute + evidence       | Add evidence              |
+| `/client/disputes/create`                                       | Client | Create dispute       | Vaults + milestones      | `api.disputes.create()`   |
+| `/client/wallet`                                                | Client | Wallet (unused)      | Wallet balance           | N/A                       |
+| `/client/settings`                                              | Client | User settings        | User profile             | Update profile            |
 
-    %% 4. FREELANCER DOMAIN
-    subgraph Layer_Freelancer ["FREELANCER WORKFLOWS"]
-        FD["Freelancer Dashboard"]:::page
-        InvitePage["Invitation Acceptance"]:::page
-        FVDetail["Freelancer Vault View"]:::page
-        FWallet["Freelancer Wallet"]:::page
-        FDisputes["Freelancer Dispute Center"]:::page
-    end
+### Protected Routes - Freelancer
 
-    %% 5. CORE LOGIC COMPONENTS
-    subgraph Layer_Logic ["CORE BUSINESS LOGIC"]
-        MVV["AI ADVISORY AUDIT<br/>(PASS/FAIL/FLAGGED)"]:::advisory
-        MAV["CLIENT APPROVAL<br/>(RELEASE SIGNAL)"]:::logic
-        MSV["FREELANCER SUBMISSION<br/>(EVIDENCE)"]:::logic
-        DLV["GLOBAL LEDGER ENGINE"]:::logic
-        Evidence["Evidence Panel & Timeline"]:::component
-        RequirementUI["Requirement Builder"]:::component
-    end
+| Route                                                               | Access     | Purpose              | Data Read                | Actions                   |
+| ------------------------------------------------------------------- | ---------- | -------------------- | ------------------------ | ------------------------- |
+| `/freelancer`                                                       | Freelancer | Dashboard            | Vaults + stats           | Navigate to work          |
+| `/freelancer/active-work`                                           | Freelancer | Active vaults        | Active vaults            | View work                 |
+| `/freelancer/wallet`                                                | Freelancer | Wallet & withdrawals | Balance + transactions   | `api.wallet.withdraw()`   |
+| `/freelancer/vaults`                                                | Freelancer | All vaults list      | Vaults list              | Filter vaults             |
+| `/freelancer/vault/[vaultId]`                                       | Freelancer | Vault detail         | Vault + milestones       | Submit work               |
+| `/freelancer/vault/[vaultId]/milestones/[milestoneId]`              | Freelancer | Milestone detail     | Milestone + evidence     | View requirements         |
+| `/freelancer/vault/[vaultId]/milestones/[milestoneId]/submit`       | Freelancer | Submit deliverable   | Milestone                | `api.milestones.submit()` |
+| `/freelancer/vault/[vaultId]/milestones/[milestoneId]/verification` | Freelancer | Verification results | Milestone + verification | View AI audit             |
+| `/freelancer/ledger`                                                | Freelancer | Earnings history     | Ledger entries           | View releases             |
+| `/freelancer/disputes`                                              | Freelancer | Dispute center       | Disputes list            | Create/view disputes      |
+| `/freelancer/disputes/[disputeId]`                                  | Freelancer | Dispute detail       | Dispute + evidence       | Add evidence              |
+| `/freelancer/disputes/create`                                       | Freelancer | Create dispute       | Vaults + milestones      | `api.disputes.create()`   |
+| `/freelancer/settings`                                              | Freelancer | User settings        | User profile             | Update profile            |
 
-    %% 6. ATOMIC UI (PARTIAL)
-    subgraph Layer_UI ["ATOMIC UI PRIMITIVES"]
-        Buttons["Buttons / Cards"]:::ui
-        Inputs["Inputs / Selects"]:::ui
-        Badges["Status Badges"]:::ui
-        Sheets["Modals / Sheets"]:::ui
-    end
+### Protected Routes - Shared
 
-    %% RELATIONSHIPS: FLOWS
-    UC ==> RolePick
-    RolePick ==> KYCPage
-    KYCPage ==> CD
-    KYCPage ==> FD
+| Route                      | Access        | Purpose          | Data Read      | Actions                      |
+| -------------------------- | ------------- | ---------------- | -------------- | ---------------------------- |
+| `/onboarding/kyc`          | Authenticated | KYC verification | User           | `api.onboarding.submitKyc()` |
+| `/withdraw`                | Freelancer    | Withdrawal flow  | Wallet balance | `api.wallet.withdraw()`      |
+| `/checkout/[vaultId]`      | Client        | Vault funding    | Vault          | Fund vault                   |
+| `/checkout/[vaultId]/card` | Client        | Card payment     | Vault          | Process payment              |
+| `/checkout/[vaultId]/bank` | Client        | Bank transfer    | Vault          | Process transfer             |
 
-    %% Client Links
-    CD --> CreateVault
-    CreateVault --> RequirementUI
-    CD --> CVDetail
-    CVDetail --> MAV
-    CVDetail --> CDisputes
-    CD --> CLedger
+---
 
-    %% Freelancer Links
-    InvitePage --> FD
-    FD --> FVDetail
-    FVDetail --> MSV
-    FD --> FWallet
-    FD --> FDisputes
+## Frontend State Model
 
-    %% Component Dependencies
-    MSV --> MVV
-    MVV --> MAV
-    MAV --> WC
-    MSV --> Evidence
-    CDisputes --> Evidence
-    RequirementUI -- "reqId" --> MSV
+### UserContext (`lib/store/user-context.js`)
 
-    %% Global State Mapping
-    Layer_Context -. READ/WRITE .-> Layer_Client
-    Layer_Context -. READ/WRITE .-> Layer_Freelancer
-    Layer_Logic -. CONSUME .-> Layer_Context
+**State Shape**:
 
-    %% UI Usage
-    Layer_Logic --> Layer_UI
+```javascript
+{
+  user: {
+    id: string,
+    email: string,
+    name: string,
+    role: UserRole,           // NONE | CLIENT | FREELANCER | ADMIN
+    kycStatus: KycStatus,     // NONE | PENDING | VERIFIED | REJECTED
+    profileImage: string | null
+  } | null,
+  loading: boolean
+}
 ```
 
-## Canonical v2 Enforcement Rules
+**Actions**:
 
-> [!IMPORTANT]
-> These rules are **mandatory** and must be enforced server-side:
+- `login(email, password)` → Calls `api.auth.login()`, sets user
+- `signup(email, password, name, role)` → Calls `api.auth.signup()`, sets user
+- `logout()` → Calls `api.auth.logout()`, clears user, redirects to `/login`
+- `refreshUser()` → Calls `api.auth.getCurrentUser()`, updates user
 
-1. **AI results are advisory only** and never release funds automatically.
-2. **All money movement** is initiated only by explicit client approval actions.
-3. **Every milestone** follows strict status transitions enforced server-side.
-4. **Every dispute** must reference `vaultId` + `milestoneId` + `reasonCode`, and requirement disputes must include `reqId`.
-5. **AI Audit Results** are always displayed prominently in the Evidence Panel using the `EvidencePanel` component, showing PASS/FAIL/FLAGGED status.
-6. **Vault Funding** is a distinct action initiated by the client via the "Fund Vault" button on DRAFT or PENDING_FUNDING vaults.
-7. **Status enums** are stored and transmitted in **UPPERCASE** only.
-8. **All milestones follow the same workflow**: Freelancer submits → AI audit (advisory) → Client approval (mandatory).
-9. **Invisible Blockchain**: The UI MUST NOT display technical chain terms (wallet, token, gas, chain, hash). Use generic terms like 'Balance', 'Processing', 'Funds'.
+**Side Effects**:
 
-## Canonical Data Contracts
+- On mount: Checks session via `api.auth.getCurrentUser()`
+- On login/signup: Stores user in state
+- On logout: Clears state and localStorage
 
-> [!WARNING]
-> Frontend expects these exact shapes. Backend MUST match or provide adapters.
+**Caching**: User data persisted in localStorage via mock API
+
+---
+
+### VaultContext (`lib/store/vault-context.js`)
+
+**State Shape**:
+
+```javascript
+{
+  vaults: Vault[],
+  loading: boolean
+}
+```
+
+**Actions**:
+
+- `createVault(data)` → Calls `api.vaults.create()`, adds to vaults array
+- `refreshVaults()` → Calls `api.vaults.list()`, replaces vaults array
+
+**Side Effects**:
+
+- On user change: Fetches vaults via `api.vaults.list()`
+- On create: Optimistically adds vault to local state
+
+**Caching**: Vaults array cached in memory, refetched on user change
+
+---
+
+### WalletContext (`lib/store/wallet-context.js`)
+
+**State Shape**:
+
+```javascript
+{
+  balance: {
+    available: number,      // USD available for withdrawal
+    pending: number,        // USD pending confirmation
+    total: number          // available + pending
+  },
+  transactions: Transaction[],
+  loading: boolean
+}
+```
+
+**Actions**:
+
+- `withdraw(amount, bankDetails)` → Calls `api.wallet.withdraw()`, updates balance
+- `refreshBalance()` → Calls `api.wallet.getBalance()`, updates balance
+- `refreshTransactions()` → Calls `api.wallet.getTransactions()`, updates transactions
+
+**Side Effects**:
+
+- On mount: Fetches balance and transactions
+- On withdraw: Moves funds from `available` to `pending`, polls for confirmation
+- Polling: Checks transaction status every 2s for 10s max, updates when status changes to `CONFIRMED`
+
+**Caching**: Balance and transactions cached in memory, refetched on mount
+
+**Reconciliation Model**:
+
+- Withdrawal initiation: `available -= amount`, `pending += amount`
+- Withdrawal confirmation: `pending -= amount`
+- Transaction status: `PENDING` → `CONFIRMED` (NOT `COMPLETED`)
+
+---
+
+## Canonical Domain Enums
+
+**Source**: `lib/domain/enums.js` (SINGLE SOURCE OF TRUTH)
+
+### VaultStatus
+
+```javascript
+{
+  DRAFT: "DRAFT",                        // Initial creation state
+  AWAITING_FUNDING: "AWAITING_FUNDING",  // Created but not funded
+  INVITED: "INVITED",                    // Freelancer invited
+  FUNDED_UNASSIGNED: "FUNDED_UNASSIGNED",// Funded, no freelancer
+  FUNDED_ASSIGNED: "FUNDED_ASSIGNED",    // Funded with freelancer
+  ACTIVE: "ACTIVE",                      // Work in progress
+  IN_REVIEW: "IN_REVIEW",                // Under milestone review
+  COMPLETED: "COMPLETED",                // All milestones verified
+  CANCELLED: "CANCELLED",                // Vault cancelled
+  PAUSED: "PAUSED"                       // Temporarily paused
+}
+```
+
+### MilestoneStatus
+
+```javascript
+{
+  PENDING: "PENDING",                    // Not yet started
+  SUBMITTED: "SUBMITTED",                // Freelancer submitted work
+  AWAITING_APPROVAL: "AWAITING_APPROVAL",// Waiting for client review
+  VERIFIED: "VERIFIED",                  // Approved, funds released
+  REVISION_REQUESTED: "REVISION_REQUESTED", // Client requested changes
+  REJECTED: "REJECTED",                  // Client rejected
+  DISPUTED: "DISPUTED"                   // Under dispute resolution
+}
+```
+
+### VerificationResult
+
+```javascript
+{
+  PASS: "PASS",                          // All checks passed
+  FAIL: "FAIL",                          // Objective requirement failed
+  FLAGGED: "FLAGGED",                    // Suspicious data detected
+  HUMAN_REVIEW: "HUMAN_REVIEW"           // Needs manual review
+}
+```
+
+### MilestoneReviewOutcome
+
+```javascript
+{
+  APPROVE: "APPROVE",                    // Maps to VERIFIED
+  REQUEST_CHANGES: "REQUEST_CHANGES",    // Maps to REVISION_REQUESTED
+  REJECT: "REJECT"                       // Maps to REJECTED
+}
+```
+
+**CRITICAL**: Outcome ≠ Status. Backend must map outcome to status:
+
+- `APPROVE` → `MilestoneStatus.VERIFIED`
+- `REQUEST_CHANGES` → `MilestoneStatus.REVISION_REQUESTED`
+- `REJECT` → `MilestoneStatus.REJECTED`
+
+### TransactionStatus / LedgerEntryStatus
+
+```javascript
+{
+  PENDING: "PENDING",                    // Transaction initiated
+  CONFIRMED: "CONFIRMED",                // Transaction confirmed (NOT COMPLETED)
+  FAILED: "FAILED"                       // Transaction failed
+}
+```
+
+**CRITICAL**: Use `CONFIRMED`, NOT `COMPLETED`
+
+### DisputeStatus
+
+```javascript
+{
+  OPEN: "OPEN",                          // Dispute opened
+  UNDER_REVIEW: "UNDER_REVIEW",          // Being reviewed
+  NEEDS_INFO: "NEEDS_INFO",              // Awaiting information
+  RESOLVED: "RESOLVED",                  // Dispute resolved
+  REJECTED: "REJECTED"                   // Dispute rejected
+}
+```
+
+### UserRole
+
+```javascript
+{
+  NONE: "NONE",                          // Unauthenticated/onboarding only
+  CLIENT: "CLIENT",                      // Client role
+  FREELANCER: "FREELANCER",              // Freelancer role
+  ADMIN: "ADMIN"                         // Admin role
+}
+```
+
+### KycStatus
+
+```javascript
+{
+  NONE: "NONE",                          // No KYC submitted
+  PENDING: "PENDING",                    // KYC under review
+  VERIFIED: "VERIFIED",                  // KYC approved
+  REJECTED: "REJECTED"                   // KYC rejected
+}
+```
+
+### LedgerEntryType
+
+```javascript
+{
+  DEPOSIT: "DEPOSIT",                    // Funds added to vault
+  LOCK: "LOCK",                          // Funds locked in escrow
+  RELEASE: "RELEASE",                    // Funds released to freelancer
+  REFUND: "REFUND",                      // Funds returned to client
+  WITHDRAW: "WITHDRAW",                  // Funds withdrawn from wallet
+  FEE: "FEE"                            // Platform/transaction fee
+}
+```
+
+### InviteStatus
+
+```javascript
+{
+  PENDING: "PENDING",                    // Invitation sent
+  ACCEPTED: "ACCEPTED",                  // Invitation accepted
+  DECLINED: "DECLINED",                  // Invitation declined
+  EXPIRED: "EXPIRED"                     // Invitation expired
+}
+```
+
+### DisputeType
+
+```javascript
+{
+  VERIFICATION_ERROR: "VERIFICATION_ERROR",
+  REQUIREMENT_MISMATCH: "REQUIREMENT_MISMATCH",
+  SCOPE_CHANGE: "SCOPE_CHANGE",
+  BAD_FAITH: "BAD_FAITH",
+  FRAUD: "FRAUD",
+  PROCESS_BREACH: "PROCESS_BREACH",
+  SECURITY: "SECURITY"
+}
+```
+
+### Forbidden / Removed Literals
+
+❌ **DO NOT USE**:
+
+- `"APPROVED"` → Use `MilestoneStatus.VERIFIED`
+- `"PENDING_FUNDING"` → Use `VaultStatus.AWAITING_FUNDING`
+- `"PASSED"` → Use `VerificationResult.PASS`
+- `"FAILED"` (as milestone status) → Use `MilestoneStatus.REJECTED` or `VerificationResult.FAIL`
+- `TransactionStatus.COMPLETED` → Use `TransactionStatus.CONFIRMED`
+- Any lowercase status values
+
+---
+
+## Data Contracts
+
+### User
+
+**Source**: `lib/mock-api.js` (mockUser)
+
+```typescript
+{
+  id: string;                    // e.g., "u_client_1"
+  email: string;
+  name: string;
+  role: UserRole;                // NONE | CLIENT | FREELANCER | ADMIN
+  kycStatus: KycStatus;          // NONE | PENDING | VERIFIED | REJECTED
+  profileImage?: string | null;
+  emailVerified?: boolean;
+  createdAt?: string;            // ISO 8601
+}
+```
+
+**Example**:
+
+```json
+{
+  "id": "u_client_1",
+  "email": "client@example.com",
+  "name": "Demo Client",
+  "role": "CLIENT",
+  "kycStatus": "VERIFIED",
+  "profileImage": null,
+  "emailVerified": true
+}
+```
+
+---
 
 ### Vault
+
+**Source**: `lib/mock/vaults.js`
 
 ```typescript
 {
@@ -152,76 +405,142 @@ graph TD
   type: string;                  // "development" | "design" | "content_ai" | "consulting"
   status: VaultStatus;           // UPPERCASE enum
   totalAmount: number;           // Total vault value (USD)
-  paidAmount: number;            // Total released to freelancer
   clientId: string;
   clientName?: string;
-  clientEmail: string;
-  freelancerId?: string;
+  freelancerId?: string | null;
   freelancerName?: string;
-  freelancerEmail?: string;
+  escrowRef?: string;            // Blockchain reference (hidden from UI)
   createdAt: string;             // ISO 8601
-  updatedAt: string;             // ISO 8601
   milestones: Milestone[];       // Embedded array
 }
 ```
 
+**Example**:
+
+```json
+{
+  "id": "v_1",
+  "title": "Enterprise CRM Migration",
+  "description": "Migration of legacy CRM data",
+  "type": "development",
+  "status": "ACTIVE",
+  "totalAmount": 15000,
+  "clientId": "u_client_1",
+  "clientName": "Demo Client",
+  "freelancerId": "u_freelancer_1",
+  "freelancerName": "Demo Freelancer",
+  "escrowRef": "v_1",
+  "createdAt": "2025-01-10T10:00:00Z",
+  "milestones": [...]
+}
+```
+
+---
+
 ### Milestone
 
-> [!NOTE]
-> **No milestone "type" field** - all milestones follow the same workflow: AI audit (advisory) → Client approval (mandatory).
+**Source**: `lib/mock/vaults.js`
 
 ```typescript
 {
   id: string;                    // e.g., "m_101"
-  vaultId: string;
   title: string;
   status: MilestoneStatus;       // UPPERCASE enum
   amount: number;                // Release amount (USD)
   dueDate?: string;              // ISO 8601
-  deliverableTypeId: string;     // e.g., "github_repo"
-  deliverableMode: "LINK" | "FILE";
-  auditEnabled: boolean;
-  requirementItemsJson: RequirementItem[];  // Array of unique requirements
+  deliverableTypeId?: string;    // e.g., "github_repo"
+  deliverableMode?: "LINK" | "FILE";
+  auditEnabled?: boolean;        // Default true
+  requirementItemsJson?: RequirementItem[];
   submission?: Submission;       // Embedded if exists
-  verification?: Verification;   // Embedded if exists (AI audit result)
+  verification?: Verification;   // Embedded if exists
   review?: MilestoneReview;      // Embedded if exists (client decision)
-  createdAt: string;
-  updatedAt: string;
+  approval?: {                   // Legacy field (same as review)
+    status: string;
+    decidedAt: string;
+    reasonCodes: string[];
+  };
 }
 ```
+
+**Example**:
+
+```json
+{
+  "id": "m_101",
+  "title": "Export integrity audit",
+  "status": "VERIFIED",
+  "amount": 5000,
+  "dueDate": "2025-01-25",
+  "deliverableTypeId": "github_repo",
+  "deliverableMode": "LINK",
+  "auditEnabled": true,
+  "requirementItemsJson": [
+    {
+      "reqId": "REQ-101",
+      "label": "CSV export delivered",
+      "required": true
+    }
+  ],
+  "submission": {...},
+  "verification": {...}
+}
+```
+
+---
 
 ### RequirementItem
 
+**Source**: `lib/mock/vaults.js`
+
 ```typescript
 {
-  reqId: string; // UUID (crypto.randomUUID())
-  label: string; // e.g., "CSV export delivered"
-  required: boolean; // true = mandatory, false = optional
+  reqId: string;                 // UUID (crypto.randomUUID())
+  label: string;                 // e.g., "CSV export delivered"
+  required?: boolean;            // Default true
+  acceptance?: string;           // Acceptance criteria
 }
 ```
+
+---
 
 ### Submission
 
+**Source**: `lib/mock/vaults.js`
+
 ```typescript
 {
-  milestoneId: string;
-  submittedBy: string;           // User ID
+  milestoneId?: string;
   submittedAt: string;           // ISO 8601
+  submittedBy?: string;          // User ID
   notes?: string;
-  deliverableType: "link" | "file";
-
-  // If deliverableType === "link"
-  url?: string;
-
-  // If deliverableType === "file"
-  fileUrl?: string;
+  filesJson?: SubmissionFile[];  // Array of uploaded files
+  deliverableType?: "link" | "file";
+  url?: string;                  // If deliverableType === "link"
+  fileUrl?: string;              // If deliverableType === "file"
   fileHash?: string;
   fileSize?: number;
   fileMime?: string;
-
-  filesJson?: SubmissionFile[];  // Array of uploaded files
 }
 ```
+
+**Example**:
+
+```json
+{
+  "submittedAt": "2025-01-20T09:00:00Z",
+  "notes": "Export bundle uploaded",
+  "filesJson": [
+    {
+      "name": "crm_export.csv",
+      "size": "18MB",
+      "tag": "Primary export"
+    }
+  ]
+}
+```
+
+---
 
 ### SubmissionFile
 
@@ -229,42 +548,95 @@ graph TD
 {
   name: string;
   size: string;                  // e.g., "2.4 MB"
-  tag: string;                   // e.g., "Source Code"
+  tag?: string;                  // e.g., "Source Code"
   url?: string;
 }
 ```
 
+---
+
 ### Verification
+
+**Source**: `lib/mock/vaults.js`
 
 ```typescript
 {
-  milestoneId: string;
-  result: VerificationResult;    // "PASS" | "FAIL" | "FLAGGED" | "HUMAN_REVIEW"
-  confidence?: number;           // 0-100 (only for deterministic checks)
-  checksCompleted: number;       // e.g., 12
-  checksTotal: number;           // e.g., 12
+  milestoneId?: string;
+  result: VerificationResult;    // PASS | FAIL | FLAGGED | HUMAN_REVIEW
+  verifiedAt: string | null;     // ISO 8601
+  verifiedBy?: "AI" | "HUMAN";
+  confidence?: number;           // 0-100
+  checksCompleted?: number;
+  checksTotal?: number;
   riskLevel?: "LOW" | "MEDIUM" | "HIGH";
-  flags?: string[];              // Array of issue codes
-  verifiedAt: string;            // ISO 8601
-  verifiedBy: "AI" | "HUMAN";
+  flags?: string[];
+  checks?: string[];             // Array of check descriptions
+  ruleResultsJson?: {
+    code: string;
+    passed: boolean;
+    message: string;
+  }[];
   notes?: string;
 }
 ```
 
+**Example**:
+
+```json
+{
+  "result": "PASS",
+  "verifiedAt": "2025-01-22T13:10:00Z",
+  "verifiedBy": "AI",
+  "ruleResultsJson": [
+    {
+      "code": "ROW_COUNT",
+      "passed": true,
+      "message": "Row count matches signed brief"
+    }
+  ]
+}
+```
+
+---
+
 ### MilestoneReview
+
+**Source**: `lib/mock-api.js` (milestones.review)
 
 ```typescript
 {
   milestoneId: string;
-  reviewerId: string;            // Client user ID
-  outcome: "VERIFIED" | "REJECTED" | "REVISION_REQUESTED";
-  reasonCodes: string[];         // From APPROVAL_REJECTION_CODES
+  reviewerId?: string;           // Client user ID
+  outcome: MilestoneReviewOutcome; // APPROVE | REQUEST_CHANGES | REJECT
+  reasonCodes?: string[];        // From APPROVAL_REJECTION_CODES
   notes?: string;
   reviewedAt: string;            // ISO 8601
 }
 ```
 
-### CaseFile (Dispute)
+**CRITICAL**: `outcome` is NOT the same as `milestone.status`. Backend must map:
+
+- `APPROVE` → `status = VERIFIED`
+- `REQUEST_CHANGES` → `status = REVISION_REQUESTED`
+- `REJECT` → `status = REJECTED`
+
+**Example**:
+
+```json
+{
+  "milestoneId": "m_101",
+  "outcome": "APPROVE",
+  "reasonCodes": [],
+  "notes": "Looks good!",
+  "reviewedAt": "2025-01-22T14:00:00Z"
+}
+```
+
+---
+
+### Dispute
+
+**Source**: `lib/mock/disputes.js`
 
 ```typescript
 {
@@ -272,36 +644,92 @@ graph TD
   vaultId: string;
   milestoneId: string;
   requirementRef?: string;       // reqId if requirement-specific
-  disputeType: string;           // From DisputeType enum
+  disputeType: DisputeType;      // From DisputeType enum
   reasonCode: string;            // From DISPUTE_REASON_CODES
-  openedByUserId: string;        // User ID
-  openedByRole: "CLIENT" | "FREELANCER" | "ADMIN";
-  status: "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "CLOSED";
+  openedByUserId: string;
+  openedByRole: UserRole;        // CLIENT | FREELANCER | ADMIN
+  status: DisputeStatus;         // OPEN | UNDER_REVIEW | NEEDS_INFO | RESOLVED | REJECTED
   description: string;
   evidence?: string[];           // Array of evidence URLs
   resolution?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string;             // ISO 8601
+  updatedAt?: string;
   resolvedAt?: string;
 }
 ```
 
-### LedgerEntry
+**Example**:
+
+```json
+{
+  "id": "d_001",
+  "vaultId": "v_1",
+  "milestoneId": "m_101",
+  "disputeType": "VERIFICATION_ERROR",
+  "reasonCode": "VERIFICATION_ERROR",
+  "openedByUserId": "u_freelancer_1",
+  "openedByRole": "FREELANCER",
+  "status": "OPEN",
+  "description": "AI incorrectly flagged valid CSV export",
+  "createdAt": "2025-01-23T10:00:00Z"
+}
+```
+
+---
+
+### LedgerEntry / Transaction
+
+**Source**: `lib/mock/ledger.js`
 
 ```typescript
 {
   id: string;                    // e.g., "lg_1001"
   date: string;                  // ISO 8601
-  vaultId: string;
+  vaultId?: string;
   milestoneId?: string;
-  type: LedgerEntryType;         // "DEPOSIT" | "LOCK" | "RELEASE" | etc.
-  status: "completed" | "processing" | "pending";
+  type: LedgerEntryType;         // DEPOSIT | LOCK | RELEASE | REFUND | WITHDRAW | FEE
+  status: TransactionStatus;     // PENDING | CONFIRMED | FAILED
   amount: number;                // USD
   description: string;
+  completedAt?: string;          // ISO 8601
 }
 ```
 
+**Example**:
+
+```json
+{
+  "id": "lg_1001",
+  "date": "2025-01-22T14:00:00Z",
+  "vaultId": "v_1",
+  "milestoneId": "m_101",
+  "type": "RELEASE",
+  "status": "CONFIRMED",
+  "amount": 5000,
+  "description": "Milestone m_101 released",
+  "completedAt": "2025-01-22T14:00:05Z"
+}
+```
+
+---
+
+### WalletBalance
+
+**Source**: `lib/mock-api.js` (wallet.getBalance)
+
+```typescript
+{
+  available: number; // USD available for withdrawal
+  pending: number; // USD pending confirmation
+  total: number; // available + pending
+}
+```
+
+---
+
 ### Invite
+
+**Source**: `lib/mock/invites.js`
 
 ```typescript
 {
@@ -309,307 +737,948 @@ graph TD
   token: string;                 // Unique invite token
   vaultId: string;
   email: string;                 // Invited freelancer email
-  status: "PENDING" | "ACCEPTED" | "DECLINED" | "EXPIRED";
+  status: InviteStatus;          // PENDING | ACCEPTED | DECLINED | EXPIRED
   invitedAt: string;             // ISO 8601
   expiresAt: string;             // ISO 8601
-  respondedAt?: string;          // ISO 8601
+  respondedAt?: string;
   declineReason?: string;
 }
 ```
 
-## Canonical Enums
+---
 
-### VaultStatus
+## Backend API Contract
 
-```javascript
+**Source**: `lib/mock-api.js`
+
+All endpoints must return structured error responses with `code`, `message`, and relevant context.
+
+### Authentication & User Management
+
+#### `POST /api/auth/signup`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.auth.signup`
+
+**Request**:
+
+```typescript
 {
-  DRAFT: "DRAFT",                      // Initial creation state
-  AWAITING_FUNDING: "AWAITING_FUNDING", // Created but not yet funded
-  INVITED: "INVITED",                  // Freelancer invited
-  FUNDED_UNASSIGNED: "FUNDED_UNASSIGNED", // Funded but no freelancer
-  FUNDED_ASSIGNED: "FUNDED_ASSIGNED",  // Funded with assigned freelancer
-  ACTIVE: "ACTIVE",                    // Work in progress
-  IN_REVIEW: "IN_REVIEW",              // Under milestone review
-  COMPLETED: "COMPLETED",              // All milestones verified
-  CANCELLED: "CANCELLED",              // Vault cancelled
-  PAUSED: "PAUSED"                     // Temporarily paused
+  email: string;                 // Valid email
+  password: string;              // Min 8 chars
+  name: string;
+  role?: UserRole;               // Optional initial role
 }
 ```
 
-### MilestoneStatus
+**Response**:
 
-```javascript
+```typescript
+User;
+```
+
+**Errors**:
+
+- `EMAIL_EXISTS`: Email already registered
+- `INVALID_EMAIL`: Invalid email format
+- `WEAK_PASSWORD`: Password too weak
+
+---
+
+#### `POST /api/auth/login`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.auth.login`
+
+**Request**:
+
+```typescript
 {
-  PENDING: "PENDING",                  // Not yet started
-  SUBMITTED: "SUBMITTED",              // Freelancer submitted work
-  AWAITING_APPROVAL: "AWAITING_APPROVAL", // Waiting for client review
-  VERIFIED: "VERIFIED",                // Approved and funds released
-  REJECTED: "REJECTED",                // Client rejected
-  REVISION_REQUESTED: "REVISION_REQUESTED", // Client requested changes
-  DISPUTED: "DISPUTED"                 // Under dispute resolution
+  email: string;
+  password: string;
 }
 ```
 
-### VerificationResult
+**Response**:
 
-```javascript
+```typescript
+User;
+```
+
+**Errors**:
+
+- `INVALID_CREDENTIALS`: Email or password incorrect
+- `ACCOUNT_SUSPENDED`: Account suspended
+
+---
+
+#### `POST /api/auth/logout`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.auth.logout`
+
+**Request**: None
+
+**Response**:
+
+```typescript
 {
-  PASS: "PASS",                    // All objective checks passed
-  FAIL: "FAIL",                    // Objective requirement failed
-  FLAGGED: "FLAGGED",              // Suspicious/inconsistent data
-  HUMAN_REVIEW: "HUMAN_REVIEW"     // Needs manual advisor review
+  success: boolean;
 }
 ```
 
-### LedgerEntryType
+---
 
-```javascript
+#### `GET /api/auth/me`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.auth.getCurrentUser`
+
+**Request**: None (uses session/token)
+
+**Response**:
+
+```typescript
+User;
+```
+
+**Errors**:
+
+- `UNAUTHORIZED`: No valid session
+
+---
+
+### Onboarding
+
+#### `PATCH /api/onboarding/role`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.onboarding.setRole`
+
+**Request**:
+
+```typescript
 {
-  DEPOSIT: "DEPOSIT",    // Funds added to vault
-  LOCK: "LOCK",          // Funds locked in escrow
-  RELEASE: "RELEASE",    // Funds released to freelancer
-  REFUND: "REFUND",      // Funds returned to client
-  WITHDRAW: "WITHDRAW",  // Funds withdrawn from wallet
-  FEE: "FEE"            // Platform or transaction fee
+  role: UserRole; // CLIENT | FREELANCER
 }
 ```
 
-### UserRole
+**Response**:
 
-```javascript
+```typescript
+User;
+```
+
+**Errors**:
+
+- `INVALID_ROLE`: Role must be CLIENT or FREELANCER
+- `ROLE_ALREADY_SET`: Cannot change role after KYC
+
+---
+
+#### `POST /api/onboarding/kyc`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.onboarding.submitKyc`
+
+**Request**:
+
+```typescript
 {
-  CLIENT: "CLIENT",
-  FREELANCER: "FREELANCER",
-  ADMIN: "ADMIN",
-  NONE: "NONE"
+  fullName: string;
+  dateOfBirth: string; // ISO 8601
+  address: string;
+  idDocument: string; // File URL or base64
+  // Additional KYC fields
 }
 ```
 
-### KycStatus
+**Response**:
 
-```javascript
+```typescript
+User;
+```
+
+**Errors**:
+
+- `KYC_INCOMPLETE`: Missing required fields
+- `KYC_ALREADY_VERIFIED`: KYC already verified
+
+---
+
+#### `GET /api/onboarding/status`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.onboarding.getStatus`
+
+**Request**: None
+
+**Response**:
+
+```typescript
 {
-  PENDING: "PENDING",
-  VERIFIED: "VERIFIED",
-  REJECTED: "REJECTED",
-  NONE: "NONE"
+  roleSet: boolean;
+  kycVerified: boolean;
+  emailVerified: boolean;
 }
 ```
 
-## Verification Outcome Matrix
+---
 
-| AI Result        | Meaning                               | Can Client Release?             | Can Freelancer Resubmit? | UI Behavior                                              |
-| ---------------- | ------------------------------------- | ------------------------------- | ------------------------ | -------------------------------------------------------- |
-| **PASS**         | All objective checks passed           | ✅ Yes (client action required) | Optional                 | Show "AI Audit Passed. Awaiting client approval."        |
-| **FAIL**         | Objective requirement failed          | ❌ No                           | ✅ Yes                   | Show "AI Audit Failed. Freelancer must resubmit."        |
-| **FLAGGED**      | Suspicious/inconsistent data detected | ❌ No until reviewed            | Depends on review        | Show "Flagged for Review. Manual verification required." |
-| **HUMAN_REVIEW** | Needs advisor/manual review           | ❌ No until reviewed            | ❌ No                    | Show "Under Manual Review. Awaiting advisor decision."   |
+### Vault Management
 
-### Verification Display Rules
+#### `POST /api/vaults`
 
-- **Never** use letter grades (A+, B-, etc.) — AI does not judge creative quality
-- **Always** show objective metrics: "Objective Checks: 12/12"
-- **Optional** show AI confidence only if based on deterministic checks: "AI Confidence: 99.8%"
-- **Always** show risk level: "Risk Flag: LOW / MEDIUM / HIGH"
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.vaults.create`
 
-## State Machine: Milestone Status Transitions
+**Request**:
+
+```typescript
+{
+  title: string;                 // Required
+  description?: string;
+  type: string;                  // "development" | "design" | "content_ai" | "consulting"
+  totalAmount: number;           // USD, > 0
+  milestones: {
+    title: string;
+    amount: number;
+    dueDate?: string;
+    deliverableTypeId?: string;
+    deliverableMode?: "LINK" | "FILE";
+    auditEnabled?: boolean;
+    requirementItemsJson?: RequirementItem[];
+  }[];
+  idempotencyKey?: string;       // Optional for create operations
+}
+```
+
+**Response**:
+
+```typescript
+Vault;
+```
+
+**Validation**:
+
+- `totalAmount` must equal sum of milestone amounts
+- At least 1 milestone required
+- Each milestone amount > 0
+
+**Errors**:
+
+- `AMOUNT_MISMATCH`: Total doesn't match milestone sum
+- `NO_MILESTONES`: At least 1 milestone required
+- `DUPLICATE_REQUEST`: Idempotency key already used
+
+---
+
+#### `GET /api/vaults`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.vaults.list`
+
+**Request**: None (filtered by user role)
+
+**Response**:
+
+```typescript
+Vault[]
+```
+
+**Filtering**:
+
+- Client: Returns vaults where `clientId === user.id`
+- Freelancer: Returns vaults where `freelancerId === user.id`
+
+---
+
+#### `GET /api/vaults/:id`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.vaults.getById`
+
+**Request**: None
+
+**Response**:
+
+```typescript
+Vault;
+```
+
+**Errors**:
+
+- `VAULT_NOT_FOUND`: Vault doesn't exist
+- `UNAUTHORIZED`: User not authorized to view vault
+
+---
+
+#### `POST /api/vaults/:id/fund`
+
+**Used by Frontend**: ❌ Not implemented (checkout flow incomplete)  
+**Required for Backend**: ✅ Yes
+
+**Request**:
+
+```typescript
+{
+  paymentMethod: "card" | "bank";
+  paymentDetails: object; // Payment provider specific
+  idempotencyKey: string; // Required for money operations
+}
+```
+
+**Response**:
+
+```typescript
+Vault;
+```
+
+**State Transition**:
+
+- `DRAFT` → `AWAITING_FUNDING` → `FUNDED_UNASSIGNED` or `FUNDED_ASSIGNED`
+
+**Errors**:
+
+- `PAYMENT_FAILED`: Payment processing failed
+- `INVALID_STATE`: Vault not in DRAFT or AWAITING_FUNDING
+- `DUPLICATE_FUNDING`: Idempotency key already used
+
+---
+
+#### `POST /api/vaults/:id/release-milestone`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.vaults.releaseMilestone`
+
+**Request**:
+
+```typescript
+{
+  milestoneId: string;
+  idempotencyKey: string; // Required for money operations
+}
+```
+
+**Response**:
+
+```typescript
+Milestone;
+```
+
+**State Guards** (MUST ENFORCE):
+
+1. Milestone status must be `AWAITING_APPROVAL`
+2. If `auditEnabled !== false`:
+   - `milestone.verification` must exist
+   - `milestone.verification.result` must NOT be `FAIL`
+3. Caller must be vault client
+
+**State Transition**:
+
+- `AWAITING_APPROVAL` → `VERIFIED`
+- Creates `RELEASE` ledger entry
+- Updates freelancer wallet balance
+
+**Errors**:
+
+- `INVALID_STATE_TRANSITION`: Milestone not in AWAITING_APPROVAL
+- `VERIFICATION_REQUIRED`: Verification missing when audit enabled
+- `VERIFICATION_FAILED`: Verification result is FAIL
+- `UNAUTHORIZED`: Caller is not vault client
+- `DUPLICATE_RELEASE`: Idempotency key already used
+
+**Code Location**: `lib/mock-api.js:vaults.releaseMilestone` (lines 367-440)
+
+---
+
+### Invitations
+
+#### `POST /api/invites`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.invites.create`
+
+**Request**:
+
+```typescript
+{
+  vaultId: string;
+  email: string;                 // Freelancer email
+  expiresIn?: number;            // Days until expiration (default 7)
+}
+```
+
+**Response**:
+
+```typescript
+Invite;
+```
+
+**Errors**:
+
+- `VAULT_NOT_FOUND`: Vault doesn't exist
+- `UNAUTHORIZED`: Caller is not vault client
+- `ALREADY_ASSIGNED`: Vault already has freelancer
+
+---
+
+#### `GET /api/invites/token/:token`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.invites.getByToken`
+
+**Request**: None
+
+**Response**:
+
+```typescript
+Invite;
+```
+
+**Errors**:
+
+- `INVITE_NOT_FOUND`: Invalid token
+- `INVITE_EXPIRED`: Invitation expired
+
+---
+
+#### `POST /api/invites/:token/respond`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.invites.respond`
+
+**Request**:
+
+```typescript
+{
+  action: "accept" | "decline";
+  declineReason?: string;        // Required if action === "decline"
+}
+```
+
+**Response**:
+
+```typescript
+{
+  invite: Invite;
+  vault?: Vault;                 // Included if accepted
+}
+```
+
+**State Transition** (if accepted):
+
+- Invite: `PENDING` → `ACCEPTED`
+- Vault: `FUNDED_UNASSIGNED` → `FUNDED_ASSIGNED`
+
+**Errors**:
+
+- `INVITE_EXPIRED`: Invitation expired
+- `INVITE_ALREADY_RESPONDED`: Already accepted/declined
+- `UNAUTHORIZED`: User email doesn't match invite
+
+---
+
+### Milestone Workflow
+
+#### `POST /api/milestones/:id/submit`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.milestones.submit`
+
+**Request**:
+
+```typescript
+{
+  files?: { name: string; size: number }[];
+  comments?: string;
+  url?: string;                  // If deliverableMode === "LINK"
+  fileUrl?: string;              // If deliverableMode === "FILE"
+}
+```
+
+**Response**:
+
+```typescript
+Milestone;
+```
+
+**State Guards**:
+
+- Milestone status must be `PENDING`, `REVISION_REQUESTED`, or `REJECTED`
+
+**State Transition**:
+
+- `PENDING` | `REVISION_REQUESTED` | `REJECTED` → `SUBMITTED`
+- Triggers AI verification (async)
+
+**Errors**:
+
+- `INVALID_STATE_TRANSITION`: Cannot submit from current status
+- `UNAUTHORIZED`: Caller is not vault freelancer
+
+**Code Location**: `lib/mock-api.js:milestones.submit` (lines 625-662)
+
+---
+
+#### `POST /api/milestones/:id/verify`
+
+**Used by Frontend**: ❌ Not directly called (system-triggered)  
+**Required for Backend**: ✅ Yes
+
+**Request**: None (system-triggered after submission)
+
+**Response**:
+
+```typescript
+Milestone;
+```
+
+**State Transition**:
+
+- `SUBMITTED` → `AWAITING_APPROVAL`
+- Creates `verification` object with result
+
+**AI Verification Logic**:
+
+- Runs objective checks (file presence, format validation, etc.)
+- Sets `result`: `PASS` | `FAIL` | `FLAGGED` | `HUMAN_REVIEW`
+- Never automatically releases funds
+
+**Code Location**: `lib/mock-api.js:milestones.verify` (lines 664-707)
+
+---
+
+#### `POST /api/milestones/:id/review`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.milestones.review`
+
+**Request**:
+
+```typescript
+{
+  outcome: MilestoneReviewOutcome; // APPROVE | REQUEST_CHANGES | REJECT
+  reasonCodes?: string[];        // From APPROVAL_REJECTION_CODES
+  notes?: string;
+}
+```
+
+**Response**:
+
+```typescript
+Milestone;
+```
+
+**State Guards**:
+
+- Milestone status must be `AWAITING_APPROVAL`
+
+**Outcome → Status Mapping** (CRITICAL):
+
+- `APPROVE` → `VERIFIED`
+- `REQUEST_CHANGES` → `REVISION_REQUESTED`
+- `REJECT` → `REJECTED`
+
+**State Transition**:
+
+- `AWAITING_APPROVAL` → `VERIFIED` | `REVISION_REQUESTED` | `REJECTED`
+
+**Errors**:
+
+- `INVALID_STATE_TRANSITION`: Milestone not in AWAITING_APPROVAL
+- `INVALID_REVIEW_OUTCOME`: Invalid outcome value
+- `UNAUTHORIZED`: Caller is not vault client
+
+**Code Location**: `lib/mock-api.js:milestones.review` (lines 750-801)
+
+---
+
+#### `GET /api/milestones/:id/evidence`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.milestones.getEvidence`
+
+**Request**: None
+
+**Response**:
+
+```typescript
+Evidence[]
+```
+
+**Evidence Types**:
+
+- `CLARIFICATION_REQUEST`
+- `REQUIREMENT_CONFIRMATION`
+- `FILE_COMMENT`
+- `DISPUTE_NOTE`
+- `DISPUTE_OPENED`
+- `DISPUTE_EVIDENCE`
+- `DISPUTE_DECISION`
+
+---
+
+### Dispute Management
+
+#### `POST /api/disputes`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.disputes.create`
+
+**Request**:
+
+```typescript
+{
+  vaultId: string;
+  milestoneId: string;
+  requirementRef?: string;       // reqId if requirement-specific
+  disputeType: DisputeType;
+  reasonCode: string;            // From DISPUTE_REASON_CODES
+  description: string;
+}
+```
+
+**Response**:
+
+```typescript
+Dispute;
+```
+
+**Validation**:
+
+- `disputeType` must be valid DisputeType
+- `reasonCode` must match dispute eligibility rules
+- If `requiresRequirementRef`, `requirementRef` must be provided
+
+**Errors**:
+
+- `INVALID_DISPUTE_TYPE`: Invalid dispute type
+- `INELIGIBLE_DISPUTE`: Dispute not allowed for current milestone state
+- `MISSING_REQUIREMENT_REF`: requirementRef required but not provided
+
+**Code Location**: `lib/mock-api.js:disputes.create` (lines 485-530)
+
+---
+
+#### `GET /api/disputes`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.disputes.list`
+
+**Request**: None (filtered by user role)
+
+**Response**:
+
+```typescript
+Dispute[]
+```
+
+**Filtering**:
+
+- Returns disputes where user is involved (client or freelancer of vault)
+
+---
+
+#### `GET /api/disputes/:id`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.disputes.getById`
+
+**Request**: None
+
+**Response**:
+
+```typescript
+Dispute;
+```
+
+**Errors**:
+
+- `DISPUTE_NOT_FOUND`: Dispute doesn't exist
+- `UNAUTHORIZED`: User not authorized to view dispute
+
+---
+
+### Financial & Ledger
+
+#### `GET /api/wallet/balance`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.wallet.getBalance`
+
+**Request**: None
+
+**Response**:
+
+```typescript
+{
+  available: number;
+  pending: number;
+  total: number;
+}
+```
+
+---
+
+#### `GET /api/wallet/transactions`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.wallet.getTransactions`
+
+**Request**: None
+
+**Response**:
+
+```typescript
+Transaction[]
+```
+
+---
+
+#### `POST /api/wallet/withdraw`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.wallet.withdraw`
+
+**Request**:
+
+```typescript
+{
+  amount: number; // USD, > 0
+  bankDetails: {
+    accountNumber: string;
+    routingNumber: string;
+    accountName: string;
+  }
+  idempotencyKey: string; // Required for money operations
+}
+```
+
+**Response**:
+
+```typescript
+Transaction;
+```
+
+**Reconciliation Model**:
+
+1. Initiation: Move funds from `available` to `pending`
+2. Confirmation (async): Decrement `pending`, update transaction status to `CONFIRMED`
+
+**State Transition**:
+
+- Transaction: `PENDING` → `CONFIRMED` (after ~3s in mock)
+
+**Errors**:
+
+- `INSUFFICIENT_FUNDS`: Amount exceeds available balance
+- `INVALID_AMOUNT`: Amount <= 0
+- `DUPLICATE_WITHDRAWAL`: Idempotency key already used
+
+**Code Location**: `lib/mock-api.js:wallet.withdraw` (lines 276-317)
+
+---
+
+#### `GET /api/ledger`
+
+**Used by Frontend**: ✅ Yes  
+**Location**: `lib/mock-api.js:api.ledger.getEntries`
+
+**Request**: Query params for filtering
+
+**Response**:
+
+```typescript
+LedgerEntry[]
+```
+
+**Filtering**:
+
+- By user role (client sees deposits/refunds, freelancer sees releases/withdrawals)
+- By vault ID
+- By date range
+
+---
+
+## State Machine Specifications
+
+### Milestone Status Transitions
+
+**Source**: `lib/mock-api.js` (state transition guards)
 
 ```mermaid
 stateDiagram-v2
     [*] --> PENDING
     PENDING --> SUBMITTED: Freelancer submits
     SUBMITTED --> AWAITING_APPROVAL: AI verification complete
-    AWAITING_APPROVAL --> VERIFIED: Client approves
-    AWAITING_APPROVAL --> REJECTED: Client rejects
-    AWAITING_APPROVAL --> REVISION_REQUESTED: Client requests changes
+    AWAITING_APPROVAL --> VERIFIED: Client approves (APPROVE)
+    AWAITING_APPROVAL --> REVISION_REQUESTED: Client requests changes (REQUEST_CHANGES)
+    AWAITING_APPROVAL --> REJECTED: Client rejects (REJECT)
     REJECTED --> SUBMITTED: Freelancer resubmits
     REVISION_REQUESTED --> SUBMITTED: Freelancer resubmits
     VERIFIED --> [*]: Terminal state
     DISPUTED --> SUBMITTED: Dispute resolved, resubmit
     DISPUTED --> VERIFIED: Dispute resolved, approve
-
-    note right of VERIFIED
-        Terminal state
-        Funds released
-    end note
 ```
 
-### Allowed Transitions
+**Allowed Transitions**:
 
-| From               | To                 | Trigger                  | Actor             |
-| ------------------ | ------------------ | ------------------------ | ----------------- |
-| PENDING            | SUBMITTED          | Submit deliverable       | Freelancer        |
-| SUBMITTED          | AWAITING_APPROVAL  | AI verification complete | System            |
-| AWAITING_APPROVAL  | VERIFIED           | Approve milestone        | Client            |
-| AWAITING_APPROVAL  | REJECTED           | Reject milestone         | Client            |
-| AWAITING_APPROVAL  | REVISION_REQUESTED | Request changes          | Client            |
-| REJECTED           | SUBMITTED          | Resubmit work            | Freelancer        |
-| REVISION_REQUESTED | SUBMITTED          | Resubmit work            | Freelancer        |
-| \*                 | DISPUTED           | File dispute             | Client/Freelancer |
-| DISPUTED           | SUBMITTED          | Dispute resolved         | System            |
-| DISPUTED           | VERIFIED           | Dispute resolved         | System            |
+| From               | To                 | Trigger                                   | Actor             | Code Location              |
+| ------------------ | ------------------ | ----------------------------------------- | ----------------- | -------------------------- |
+| PENDING            | SUBMITTED          | Submit deliverable                        | Freelancer        | `milestones.submit` (L625) |
+| REVISION_REQUESTED | SUBMITTED          | Resubmit work                             | Freelancer        | `milestones.submit` (L625) |
+| REJECTED           | SUBMITTED          | Resubmit work                             | Freelancer        | `milestones.submit` (L625) |
+| SUBMITTED          | AWAITING_APPROVAL  | AI verification complete                  | System            | `milestones.verify` (L664) |
+| AWAITING_APPROVAL  | VERIFIED           | Client approves (APPROVE)                 | Client            | `milestones.review` (L750) |
+| AWAITING_APPROVAL  | REVISION_REQUESTED | Client requests changes (REQUEST_CHANGES) | Client            | `milestones.review` (L750) |
+| AWAITING_APPROVAL  | REJECTED           | Client rejects (REJECT)                   | Client            | `milestones.review` (L750) |
+| \*                 | DISPUTED           | File dispute                              | Client/Freelancer | `disputes.create` (L485)   |
 
-### Forbidden Transitions
+**Forbidden Transitions**:
 
-- ❌ VERIFIED → any state (terminal)
-- ❌ PENDING → VERIFIED (must go through submission)
-- ❌ SUBMITTED → VERIFIED (must go through approval)
-- ❌ Any status → PENDING (cannot reset)
+- ❌ `VERIFIED` → any state (terminal)
+- ❌ `PENDING` → `VERIFIED` (must go through submission)
+- ❌ `SUBMITTED` → `VERIFIED` (must go through approval)
+- ❌ Any status → `PENDING` (cannot reset)
 
-## Deliverable Type Payload Rules
+---
 
-### Link Deliverables
+### Vault Status Transitions
 
-Required fields when `deliverableType === "link"`:
+**Source**: `lib/mock-api.js`
 
-```typescript
-{
-  url: string;              // Valid URL
-  notes?: string;
-  submittedAt: string;
-  milestoneId: string;
-}
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT
+    DRAFT --> AWAITING_FUNDING: Create vault
+    AWAITING_FUNDING --> FUNDED_UNASSIGNED: Fund vault (no freelancer)
+    AWAITING_FUNDING --> FUNDED_ASSIGNED: Fund vault (with freelancer)
+    FUNDED_UNASSIGNED --> INVITED: Send invitation
+    INVITED --> FUNDED_ASSIGNED: Freelancer accepts
+    FUNDED_ASSIGNED --> ACTIVE: Work begins
+    ACTIVE --> IN_REVIEW: Milestone submitted
+    IN_REVIEW --> ACTIVE: Milestone reviewed
+    ACTIVE --> COMPLETED: All milestones verified
+    * --> CANCELLED: Cancel vault
+    * --> PAUSED: Pause vault
 ```
 
-Examples: GitHub repo, Figma file, Live API endpoint
+---
 
-### File Deliverables
+### Release Safety Conditions
 
-Required fields when `deliverableType === "file"`:
+**Source**: `lib/mock-api.js:vaults.releaseMilestone` (L367-440)
 
-```typescript
-{
-  fileUrl: string;          // S3/CDN URL
-  fileHash: string;         // SHA-256 hash
-  fileSize: number;         // Bytes
-  fileMime: string;         // MIME type
-  notes?: string;
-  submittedAt: string;
-  milestoneId: string;
-}
-```
+**MUST ENFORCE** (Backend):
 
-Examples: Asset packs, documents, datasets, model weights
+1. **State Guard**: Milestone status === `AWAITING_APPROVAL`
+2. **Verification Guard** (if `auditEnabled !== false`):
+   - `milestone.verification` must exist
+   - `milestone.verification.result` must NOT be `FAIL`
+   - Allowed results: `PASS`, `FLAGGED`, `HUMAN_REVIEW`
+3. **Authorization Guard**: Caller must be vault client
+4. **Idempotency**: Use `idempotencyKey` to prevent duplicate releases
 
-## Backend MUST Enforce
+**Error Codes**:
 
-> [!CAUTION]
-> Frontend can simulate anything. Backend must enforce these rules:
+- `INVALID_STATE_TRANSITION`
+- `VERIFICATION_REQUIRED`
+- `VERIFICATION_FAILED`
+- `UNAUTHORIZED`
+- `DUPLICATE_RELEASE`
 
-1. ✅ **Client is the ONLY actor** allowed to release funds
-2. ✅ **AI PASS never triggers release** by itself
-3. ✅ **Disputes are gated** by `milestone.verification.result` + `milestone.status` + `reasonCode`
-4. ✅ **All status enums** are UPPERCASE
-5. ✅ **Milestone state transitions** follow the state machine exactly
-6. ✅ **RequirementItem.reqId** must be unique (UUID)
-7. ✅ **Verification.result** cannot be changed after `VERIFIED` status
-8. ✅ **LedgerEntry** records are append-only (immutable)
-9. ✅ **All milestones** undergo AI verification before client approval (no bypass)
+---
 
-## Dispute Eligibility Logic
+## Validation Rules
 
-Disputes are gated by **verification result** + **milestone status**, not by milestone type:
+### Frontend Validations
 
-### AI Verification Disputes
+**Source**: Various form components
 
-When `verification.result === "FAIL"` or `"FLAGGED"`:
+#### Vault Creation
 
-- Freelancer can dispute if AI audit was incorrect
-- Allowed codes: `VERIFICATION_ERROR`, `REQUIREMENT_MISMATCH`, `FRAUD`, `SECURITY`, `PROCESS_BREACH`
+- `title`: Required, 1-200 chars
+- `description`: Optional, max 1000 chars
+- `type`: Required, one of: `development`, `design`, `content_ai`, `consulting`
+- `totalAmount`: Required, > 0, must equal sum of milestone amounts
+- `milestones`: At least 1 required
+  - `title`: Required, 1-200 chars
+  - `amount`: Required, > 0
+  - `dueDate`: Optional, must be future date
+  - `requirementItemsJson`: Optional array
+    - `reqId`: Auto-generated UUID
+    - `label`: Required, 1-200 chars
 
-### Client Approval Disputes
+#### Milestone Submission
 
-When `verification.result === "PASS"`:
+- `files` OR `url`: At least one required
+- `comments`: Optional, max 1000 chars
 
-- Freelancer can dispute if client rejection was unfair
-- Allowed codes: `BAD_FAITH`, `SCOPE_CHANGE`, `FRAUD`, `SECURITY`, `PROCESS_BREACH`
+#### Milestone Review
 
-### Post-Approval Disputes
+- `outcome`: Required, one of: `APPROVE`, `REQUEST_CHANGES`, `REJECT`
+- `reasonCodes`: Optional array of strings
+- `notes`: Optional, max 1000 chars
 
-When `status === "VERIFIED"`:
+#### Dispute Creation
 
-- Either party can dispute after funds released (rare)
-- Allowed codes: `FRAUD`, `SECURITY`, `PROCESS_BREACH`
+- `vaultId`: Required
+- `milestoneId`: Required
+- `disputeType`: Required, valid DisputeType
+- `reasonCode`: Required, valid reason code
+- `description`: Required, 10-2000 chars
+- `requirementRef`: Required if dispute type requires it
 
-## Expected Backend API Endpoints
+#### Wallet Withdrawal
 
-> [!NOTE]
-> Frontend is currently mocked. Backend implementation should match these contracts.
+- `amount`: Required, > 0, <= available balance
+- `bankDetails.accountNumber`: Required
+- `bankDetails.routingNumber`: Required
+- `bankDetails.accountName`: Required
 
-### Authentication & User Management
+---
 
-```
-POST   /api/auth/signup               Create account
-POST   /api/auth/login                Login
-POST   /api/auth/logout               Logout
-GET    /api/auth/me                   Get current user
-POST   /api/auth/verify-email         Verify email
-PATCH  /api/auth/profile              Update user profile
-```
+### Backend-Only Validations
 
-### Onboarding
+**MUST ENFORCE** (even if frontend checks):
 
-```
-PATCH  /api/onboarding/role           Set user role (client/freelancer)
-PATCH  /api/onboarding/kyc            Submit KYC information
-GET    /api/onboarding/status         Get onboarding completion status
-```
+1. **Money Operations**:
+   - All amounts must be positive
+   - Vault total must equal milestone sum
+   - Withdrawal amount must not exceed available balance
+   - Idempotency keys required for all money operations
 
-### Vault Management
+2. **State Transitions**:
+   - All milestone status transitions must follow state machine
+   - Release safety conditions must be enforced
+   - Cannot modify terminal states (VERIFIED)
 
-```
-POST   /api/vaults                    Create new vault
-GET    /api/vaults                    List vaults (filtered by user)
-GET    /api/vaults/:id                Get vault details
-PATCH  /api/vaults/:id                Update vault
-POST   /api/vaults/:id/fund           Fund vault (client only)
-PATCH  /api/vaults/:id/status         Update vault status
-DELETE /api/vaults/:id                Cancel vault
-```
+3. **Authorization**:
+   - Clients can only access their vaults
+   - Freelancers can only access assigned vaults
+   - Only vault client can approve/release milestones
+   - Only vault freelancer can submit work
 
-### Invitations
+4. **Data Integrity**:
+   - RequirementItem.reqId must be unique within milestone
+   - Ledger entries are append-only (immutable)
+   - Verification result cannot change after VERIFIED status
 
-```
-POST   /api/invites                   Create invitation (client only)
-GET    /api/invites/token/:token      Get invite by token
-GET    /api/invites/vault/:vaultId    Get invites for vault
-POST   /api/invites/:token/respond    Accept/decline invitation (freelancer)
-```
+5. **File Uploads**:
+   - Max file size: 100MB (configurable)
+   - Allowed types: PDF, ZIP, PNG, JPG, CSV, XLSX, etc.
+   - Files must be virus-scanned before storage
 
-### Milestone Workflow
+---
 
-```
-POST   /api/milestones/:id/submit     Submit deliverable (freelancer)
-POST   /api/milestones/:id/verify     Trigger AI verification (system)
-POST   /api/milestones/:id/review     Approve/reject milestone (client)
-GET    /api/milestones/:id            Get milestone details
-GET    /api/milestones/:id/evidence   Get evidence panel data
-```
+## Dispute & Approval Codes
 
-### Dispute Management
+### Dispute Reason Codes
 
-```
-POST   /api/disputes                  Create dispute
-GET    /api/disputes                  List disputes (filtered by role)
-GET    /api/disputes/:id              Get dispute details
-GET    /api/disputes/vault/:vaultId   List disputes for vault
-PATCH  /api/disputes/:id              Update dispute status
-POST   /api/disputes/:id/resolve      Resolve dispute
-```
+**Source**: `lib/rules/disputes.js`
 
-### Financial & Ledger
-
-```
-GET    /api/wallet/balance            Get wallet balance
-GET    /api/wallet/transactions       Get transaction history
-POST   /api/wallet/withdraw           Withdraw funds
-GET    /api/ledger                    Get ledger entries (filtered)
-GET    /api/ledger/vault/:vaultId     Get ledger for specific vault
-```
-
-## Dispute Reason Codes
-
-### AI Verification Disputes
+#### AI Verification Disputes
 
 ```javascript
 [
@@ -632,7 +1701,30 @@ GET    /api/ledger/vault/:vaultId     Get ledger for specific vault
 ];
 ```
 
-### Process & Security Disputes
+#### Client Approval Disputes
+
+```javascript
+[
+  {
+    code: "BAD_FAITH",
+    label: "Bad Faith Rejection",
+    description: "Client rejected valid work repeatedly/maliciously.",
+    verificationResults: ["PASS"],
+    statuses: ["REJECTED"],
+    requiresRequirementRef: false,
+  },
+  {
+    code: "SCOPE_CHANGE",
+    label: "Scope Change",
+    description: "Rejection due to requirements not in original scope.",
+    verificationResults: ["PASS"],
+    statuses: ["REJECTED"],
+    requiresRequirementRef: false,
+  },
+];
+```
+
+#### Process & Security Disputes
 
 ```javascript
 [
@@ -663,30 +1755,11 @@ GET    /api/ledger/vault/:vaultId     Get ledger for specific vault
 ];
 ```
 
-### Client Approval Disputes
+---
 
-```javascript
-[
-  {
-    code: "BAD_FAITH",
-    label: "Bad Faith Rejection",
-    description: "Client rejected valid work repeatedly/maliciously.",
-    verificationResults: ["PASS"],
-    statuses: ["REJECTED"],
-    requiresRequirementRef: false,
-  },
-  {
-    code: "SCOPE_CHANGE",
-    label: "Scope Change",
-    description: "Rejection due to requirements not in original scope.",
-    verificationResults: ["PASS"],
-    statuses: ["REJECTED"],
-    requiresRequirementRef: false,
-  },
-];
-```
+### Approval Rejection Codes
 
-## Approval Rejection Codes
+**Source**: `lib/rules/milestones.js`
 
 ```javascript
 [
@@ -713,23 +1786,94 @@ GET    /api/ledger/vault/:vaultId     Get ledger for specific vault
 ];
 ```
 
-## Mock System
+---
 
-The project uses a sophisticated mock API located in `lib/mock/`.
+## Open Questions / TODO
 
-- `mock-api.js`: Simulates backend services (Auth, Wallet, Vaults, Disputes, Invites).
-- `vaults.js`, `disputes.js`, `ledger.js`, `invites.js`: Seed data for development and demonstration.
-- **Latency**: Simulated `DELAY_MS` (600ms) to ensure UI loaders and transitions are properly tested.
+### Ambiguities
 
-## Development Scripts
+1. **deliverableTypeId vs deliverableId**:
+   - Some milestones use `deliverableTypeId` (e.g., "github_repo")
+   - Some use `deliverableId` (e.g., "live_webapp")
+   - **Recommendation**: Standardize on `deliverableTypeId`
 
-```bash
-npm run dev    # Start development server
-npm run build  # Create production build
-npm run lint   # Run ESLint checks
-```
+2. **approval vs review**:
+   - Mock data uses both `approval` and `review` fields
+   - **Recommendation**: Use `review` as canonical, deprecate `approval`
+
+3. **Vault paidAmount**:
+   - Not present in mock data
+   - **Recommendation**: Add `paidAmount` field (sum of VERIFIED milestone amounts)
+
+4. **Transaction polling**:
+   - Frontend polls for transaction status updates
+   - **Recommendation**: Implement webhooks or SSE for real-time updates
+
+5. **File upload flow**:
+   - Frontend doesn't implement actual file uploads
+   - **Recommendation**: Define S3/CDN upload flow with presigned URLs
 
 ---
 
-> [!NOTE]
-> All UI text and interactions are designed to feel premium and "alive". Hover effects, stagger animations, and consistent tracking are mandatory across all new components.
+### Proposed Backend Additions
+
+**NOT CANONICAL** (not in frontend yet):
+
+1. **Webhook Endpoints**:
+   - `POST /api/webhooks/transaction-confirmed`
+   - `POST /api/webhooks/verification-complete`
+
+2. **Admin Endpoints**:
+   - `GET /api/admin/users`
+   - `PATCH /api/admin/users/:id/suspend`
+   - `GET /api/admin/disputes`
+   - `POST /api/admin/disputes/:id/resolve`
+
+3. **Analytics Endpoints**:
+   - `GET /api/analytics/vault-stats`
+   - `GET /api/analytics/milestone-completion-rate`
+
+4. **Notification Endpoints**:
+   - `GET /api/notifications`
+   - `PATCH /api/notifications/:id/read`
+
+---
+
+## Changelog
+
+### Changes from Previous Version
+
+1. **Enums Updated**:
+   - Added `IN_REVIEW`, `PAUSED` to `VaultStatus`
+   - Changed `VerificationResult`: `PASSED`/`FAILED` → `PASS`/`FAIL`
+   - Added `FLAGGED`, `HUMAN_REVIEW` to `VerificationResult`
+   - Added `MilestoneReviewOutcome` enum
+   - Changed `TransactionStatus`: `COMPLETED` → `CONFIRMED`
+   - Added `NONE`, `ADMIN` to `UserRole`
+   - Added `NEEDS_INFO`, `REJECTED` to `DisputeStatus`
+
+2. **Non-Canonical Literals Removed**:
+   - Removed `"APPROVED"` (use `MilestoneStatus.VERIFIED`)
+   - Removed `"PENDING_FUNDING"` (use `VaultStatus.AWAITING_FUNDING`)
+   - Removed `"PASSED"` (use `VerificationResult.PASS`)
+   - Removed `"FAILED"` as milestone status
+
+3. **API Contract Clarifications**:
+   - Added state transition guards documentation
+   - Added error code specifications
+   - Added idempotency key requirements
+   - Documented wallet reconciliation model
+
+4. **Data Contract Updates**:
+   - Added `WalletBalance` contract
+   - Clarified `MilestoneReview` vs `approval` field
+   - Added `TransactionStatus` to ledger entries
+
+5. **State Machine Documentation**:
+   - Added code locations for all transitions
+   - Documented release safety conditions
+   - Added forbidden transitions list
+
+---
+
+**End of Frontend Contract Specification**

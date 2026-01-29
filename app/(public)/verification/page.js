@@ -3,7 +3,8 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Shield, Clock, CheckCircle2, AlertCircle, ArrowLeft, Lock, Globe } from 'lucide-react';
-import { api, VaultStatus } from '@/lib/mock-api';
+import { api } from '@/lib/mock-api';
+import { VaultStatus } from '@/lib/domain/enums';
 import { Button } from '@/components/ui/button';
 
 function VerificationStatusContent() {
@@ -63,7 +64,7 @@ function VerificationStatusContent() {
     }
 
     const isVerified = vault.status === VaultStatus.COMPLETED;
-    const isReview = vault.status === VaultStatus.REVIEW;
+    const isReview = vault.status === VaultStatus.IN_REVIEW;
 
     return (
         <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 font-['Poppins',_sans-serif]">

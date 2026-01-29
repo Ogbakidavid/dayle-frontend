@@ -46,7 +46,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { EvidencePanel } from "@/components/shared/EvidencePanel";
 import { cn } from "@/lib/utils";
 import { getDisputeEligibility } from "@/lib/rules/disputes";
-import { VaultStatus, MilestoneStatus } from "@/lib/domain/enums";
+import { VaultStatus, MilestoneStatus, VerificationResult } from "@/lib/domain/enums";
 
 export default function FreelancerVaultDetailPage() {
   const params = useParams();
@@ -171,7 +171,7 @@ export default function FreelancerVaultDetailPage() {
       return {
         ...m,
         id: id,
-        complianceStatus: "PASSED", // In MVP, these are automated checks that pass instantly
+        complianceStatus: VerificationResult.PASS, // In MVP, these are automated checks that pass instantly
         status: m.status || MilestoneStatus.PENDING,
         displayAmount: m.amount,
       };
@@ -188,14 +188,12 @@ export default function FreelancerVaultDetailPage() {
     const normalized = status?.toUpperCase();
     switch (normalized) {
       case MilestoneStatus.VERIFIED:
-      case "APPROVED":
         return "text-emerald-500";
       case MilestoneStatus.AWAITING_APPROVAL:
       case "PENDING_REVIEW":
       case MilestoneStatus.SUBMITTED:
         return "text-amber-500";
       case MilestoneStatus.REJECTED:
-      case "FAILED":
       case MilestoneStatus.DISPUTED:
         return "text-red-500";
       default:
@@ -377,7 +375,7 @@ export default function FreelancerVaultDetailPage() {
                               getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20")
                             )}
                           >
-                            {milestone.status === MilestoneStatus.VERIFIED || milestone.status === "APPROVED" ? (
+                            {milestone.status === MilestoneStatus.VERIFIED ? (
                               <CheckCircle className="w-3.5 h-3.5" />
                             ) : (
                               <Clock className="w-3.5 h-3.5" />

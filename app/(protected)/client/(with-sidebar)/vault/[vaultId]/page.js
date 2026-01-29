@@ -284,9 +284,9 @@ export default function ClientVaultDetailPage() {
   const submittedDeliverables = useMemo(() => {
     const list = [];
     displayMilestones.forEach((m) => {
-      // Logic: If status is VERIFIED, APPROVED, or AWAITING_APPROVAL, the freelancer has submitted work.
+      // Logic: If status is VERIFIED or AWAITING_APPROVAL, the freelancer has submitted work.
       // In MVP mock, if there is a 'deliverableId' and 'deliverable' name, we treat it as a potential link/file.
-      const hasWork = [MilestoneStatus.VERIFIED, "APPROVED", MilestoneStatus.AWAITING_APPROVAL, MilestoneStatus.SUBMITTED].includes(m.status);
+      const hasWork = [MilestoneStatus.VERIFIED, MilestoneStatus.AWAITING_APPROVAL, MilestoneStatus.SUBMITTED].includes(m.status);
       if (hasWork && m.deliverable) {
         // Attempt to find metadata from constants to see if it's a file or link
         const purpose = vault.type;
@@ -323,7 +323,7 @@ export default function ClientVaultDetailPage() {
   // Helper for status colors
   const getStatusColor = (status) => {
     const normalized = status?.toUpperCase();
-    if (normalized === "VERIFIED" || normalized === "APPROVED")
+    if (normalized === MilestoneStatus.VERIFIED)
       return "text-emerald-500";
     if (normalized === MilestoneStatus.AWAITING_APPROVAL || normalized === MilestoneStatus.PENDING || normalized === MilestoneStatus.SUBMITTED)
       return "text-amber-500";
@@ -367,7 +367,7 @@ export default function ClientVaultDetailPage() {
                 >
                   {vault.status}
                 </Badge>
-                {(vault.status === VaultStatus.DRAFT || vault.status === "PENDING_FUNDING") && (
+                {(vault.status === VaultStatus.DRAFT || vault.status === VaultStatus.AWAITING_FUNDING) && (
                   <Button
                     size="sm"
                     className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3"
@@ -688,7 +688,7 @@ export default function ClientVaultDetailPage() {
                             )}
                           >
                             {milestone.status === "VERIFIED" ||
-                              milestone.status === "APPROVED" ? (
+                              milestone.status === MilestoneStatus.VERIFIED ? (
                               <CheckCircle className="w-3.5 h-3.5" />
                             ) : (
                               <Clock className="w-3.5 h-3.5" />
