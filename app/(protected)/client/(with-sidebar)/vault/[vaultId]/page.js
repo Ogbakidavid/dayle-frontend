@@ -88,7 +88,7 @@ export default function ClientVaultDetailPage() {
   // Fetch latest invitation status for this vault
   useEffect(() => {
     async function fetchInviteStatus() {
-      if (!vault || (vault.status !== VaultStatus.FUNDED_UNASSIGNED && vault.status !== VaultStatus.INVITED)) return;
+      if (!vault || vault.status !== VaultStatus.FUNDED) return;
       try {
         const data = await api.invites.getByVaultId(vault.id);
         setLatestInvite(data);
@@ -233,8 +233,9 @@ export default function ClientVaultDetailPage() {
         await api.vaults.releaseMilestone(
           vault.id,
           activeReview.id,
-          { idempotencyKey: `rel_${activeReview.id}_${Date.now()}` }
+          { idempotencyKey: crypto.randomUUID() }
         );
+
 
         // Refresh vault data to see new status
         await refreshVaults(); 
@@ -248,6 +249,22 @@ export default function ClientVaultDetailPage() {
       }
     }
   };
+
+  const handleFund = async () => {
+    try {
+      await api.vaults.fund(vault.id, {
+        paymentMethod: "bank",
+        paymentDetails: {},
+        idempotencyKey: crypto.randomUUID()
+      });
+      await refreshVaults();
+      toast.success("Vault successfully funded!");
+    } catch (err) {
+      console.error("Funding failed:", err);
+      toast.error(err.message || "Failed to fund vault.");
+    }
+  };
+
 
   const handleReviewSubmit = async () => {
     if (!activeReview || !reviewAction || !reviewReason) return;
@@ -367,13 +384,11 @@ export default function ClientVaultDetailPage() {
                 >
                   {vault.status}
                 </Badge>
-                {(vault.status === VaultStatus.DRAFT || vault.status === VaultStatus.AWAITING_FUNDING) && (
+                {vault.status === VaultStatus.DRAFT && (
                   <Button
                     size="sm"
                     className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3"
-                    onClick={() => {
-                      toast.success("Funding flow initiated. Mocking vault activation...");
-                    }}
+                    onClick={handleFund}
                   >
                     <CreditCard className="w-3.5 h-3.5 mr-1.5" />
                     Fund Vault
@@ -592,11 +607,13 @@ export default function ClientVaultDetailPage() {
                                               Reason codes (required)
                                             </Label>
                                             <Select
+                                              value={reviewReason}
                                               onValueChange={setReviewReason}
                                             >
-                                              <SelectTrigger className="bg-black/40 border-white/10">
+                                              <SelectTrigger className="w-full bg-black/40 border-white/10">
+                                                <SelectValue placeholder="Select reason code..." />
                                               </SelectTrigger>
-                                              <SelectContent className="bg-[#141416] border-white/10 text-white max-h-[300px]">
+                                              <SelectContent className="bg-[#141416] border-white/10 text-white max-h-[300px] z-60">
                                                 {APPROVAL_REJECTION_CODES.filter(
                                                   (c) =>
                                                     reviewAction === "REJECTED"

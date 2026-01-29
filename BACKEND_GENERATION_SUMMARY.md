@@ -114,7 +114,7 @@ All enums match `lib/domain/enums.js` exactly:
 
 - ✅ `CONFIRMED` (not COMPLETED)
 - ✅ `VERIFIED` (not APPROVED)
-- ✅ `AWAITING_FUNDING` (not PENDING_FUNDING)
+- ✅ `FUNDED` (not AWAITING_FUNDING)
 - ✅ `PASS`/`FAIL` (not PASSED/FAILED)
 
 ---
@@ -182,8 +182,13 @@ if (milestone.auditEnabled !== false) {
   if (!milestone.verification) {
     throw VERIFICATION_REQUIRED;
   }
-  if (milestone.verification.result === "FAIL") {
-    throw VERIFICATION_FAILED;
+  // AI is advisory only - FAIL does not block
+  if (milestone.auditStatus === "FAIL" && !acknowledgeAuditWarning) {
+    throw AUDIT_WARNING_NOT_ACKNOWLEDGED;
+  }
+  // Log warning if approving despite FAIL
+  if (milestone.auditStatus === "FAIL") {
+    logger.warn(`Client approved milestone despite AI FAIL`);
   }
 }
 ```
@@ -218,7 +223,8 @@ if (requestHash differs) → Return DUPLICATE_REQUEST error
 - [ ] Cannot verify from PENDING
 - [ ] Cannot review from SUBMITTED
 - [ ] Cannot release without verification (when enabled)
-- [ ] Cannot release with FAIL verification
+- [ ] Can release with FAIL verification if acknowledged
+- [ ] Cannot release with FAIL without acknowledgment
 
 ### Money Safety
 

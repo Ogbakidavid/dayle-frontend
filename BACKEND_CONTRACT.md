@@ -10,18 +10,19 @@
 ## Table of Contents
 
 1. [Authentication & Authorization](#authentication--authorization)
-2. [Auth Module](#auth-module)
-3. [Onboarding Module](#onboarding-module)
-4. [Vault Module](#vault-module)
-5. [Milestone Module](#milestone-module)
-6. [Invite Module](#invite-module)
-7. [Wallet Module](#wallet-module)
-8. [Ledger Module](#ledger-module)
-9. [Dispute Module](#dispute-module)
-10. [Evidence Module](#evidence-module)
-11. [Upload Module](#upload-module)
-12. [Error Codes](#error-codes)
-13. [Idempotency](#idempotency)
+2. [Canonical Domain Enums](#canonical-domain-enums)
+3. [Auth Module](#auth-module)
+4. [Onboarding Module](#onboarding-module)
+5. [Vault Module](#vault-module)
+6. [Milestone Module](#milestone-module)
+7. [Invite Module](#invite-module)
+8. [Wallet Module](#wallet-module)
+9. [Ledger Module](#ledger-module)
+10. [Dispute Module](#dispute-module)
+11. [Evidence Module](#evidence-module)
+12. [Upload Module](#upload-module)
+13. [Error Codes](#error-codes)
+14. [Idempotency](#idempotency)
 
 ---
 
@@ -56,7 +57,51 @@
 
 ---
 
-## Auth Module
+## Canonical Domain Enums
+
+These enums are the single source of truth for state values across the system. All API responses must use these uppercase literals.
+
+### VaultStatus
+
+| Value               | Description                                                     |
+| :------------------ | :-------------------------------------------------------------- |
+| `DRAFT`             | Initial creation state                                          |
+| `AWAITING_FUNDING`  | Created but not yet funded by client                            |
+| `INVITED`           | Freelancer has been invited to the vault                        |
+| `FUNDED_UNASSIGNED` | Vault is funded but no freelancer is assigned                   |
+| `FUNDED_ASSIGNED`   | Vault is funded and has an assigned freelancer (pre-activation) |
+| `ACTIVE`            | Work is in progress                                             |
+| `IN_REVIEW`         | One or more milestones are under review                         |
+| `COMPLETED`         | All milestones have been verified and released                  |
+| `CANCELLED`         | Vault has been cancelled                                        |
+| `DISPUTED`          | Vault is under dispute resolution                               |
+| `PAUSED`            | Vault is temporarily paused                                     |
+
+### MilestoneStatus
+
+| Value                | Description                                                                   |
+| :------------------- | :---------------------------------------------------------------------------- |
+| `PENDING`            | Not yet started                                                               |
+| `SUBMITTED`          | Freelancer has submitted work                                                 |
+| `AWAITING_APPROVAL`  | Waiting for client review/payout decision                                     |
+| `VERIFIED`           | Approved by client; eligible for explicit release                             |
+| `payoutStatus`       | _Internal Signal_: Read from `TransactionStatus` to confirm actual money move |
+| `REVISION_REQUESTED` | Client requested changes                                                      |
+| `REJECTED`           | Client rejected the submission                                                |
+| `DISPUTED`           | Under dispute resolution                                                      |
+
+### UserRole
+
+| Value        | Description                    |
+| :----------- | :----------------------------- |
+| `NONE`       | Unauthenticated or placeholder |
+| `CLIENT`     | Service buyer                  |
+| `FREELANCER` | Service provider               |
+| `ADMIN`      | Platform administrator         |
+
+---
+
+## 3. Auth Module
 
 ### POST /api/auth/signup
 
@@ -263,7 +308,7 @@ User;
 
 ---
 
-## Onboarding Module
+## 4. Onboarding Module
 
 ### PATCH /api/onboarding/role
 
@@ -371,7 +416,7 @@ User; // with kycStatus = PENDING
 
 ---
 
-## Vault Module
+## 5. Vault Module
 
 ### POST /api/vaults
 
@@ -596,19 +641,21 @@ Vault; // with status updated
 
 **State Transition**:
 
-- `DRAFT` → `AWAITING_FUNDING` → `FUNDED_UNASSIGNED` or `FUNDED_ASSIGNED`
+- `AWAITING_FUNDING` → `FUNDED_UNASSIGNED` (if no freelancer assigned)
+- `AWAITING_FUNDING` → `ACTIVE` (if freelancer already accepted/assigned)
 
 **Business Rules**:
 
 - Only vault client can fund
-- Vault must be in DRAFT or AWAITING_FUNDING
+- Vault must be in DRAFT status
 - Creates LOCK ledger entry
-- If freelancerId exists: FUNDED_ASSIGNED, else: FUNDED_UNASSIGNED
+- Moves status to FUNDED (if unassigned) or ACTIVE (if assigned)
 
 **Errors**:
 
 - `PAYMENT_FAILED` (402): Payment processing failed
-- `INVALID_STATE` (400): Vault not in DRAFT or AWAITING_FUNDING
+- `INVALID_STATE` (400): Vault not in DRAFT status
+- `VALIDATION_ERROR` (400): `idempotencyKey` is missing or invalid
 - `DUPLICATE_FUNDING` (409): Idempotency key already used
 - `UNAUTHORIZED` (403): Only vault client can fund
 
@@ -636,7 +683,11 @@ class ReleaseMilestoneDto {
 
 ```typescript
 {
-  milestone: Milestone; // with status VERIFIED
+  milestone: {
+    ...Milestone,
+    status: "VERIFIED",
+    payoutStatus: "CONFIRMED" | "PENDING"
+  };
   ledgerEntry: LedgerEntry; // RELEASE entry
 }
 ```
@@ -646,8 +697,11 @@ class ReleaseMilestoneDto {
 1. Milestone status must be `AWAITING_APPROVAL`
 2. If `auditEnabled !== false`:
    - `milestone.verification` must exist
-   - `milestone.verification.result` must NOT be `FAIL`
+   - `milestone.auditStatus` is advisory only (does not block)
 3. Caller must be vault client
+4. If `milestone.auditStatus === 'FAIL'`:
+   - Client must acknowledge warning via `acknowledgeAuditWarning: true`
+   - Log warning: "Client approved milestone despite AI FAIL"
 
 **State Transition**:
 
@@ -659,7 +713,7 @@ class ReleaseMilestoneDto {
 
 - `INVALID_STATE_TRANSITION` (400): Milestone not in AWAITING_APPROVAL
 - `VERIFICATION_REQUIRED` (400): Verification missing when audit enabled
-- `VERIFICATION_FAILED` (400): Verification result is FAIL
+- `AUDIT_WARNING_NOT_ACKNOWLEDGED` (400): Client must acknowledge AI warning when auditStatus = FAIL
 - `UNAUTHORIZED` (403): Caller is not vault client
 - `DUPLICATE_RELEASE` (409): Idempotency key already used
 
@@ -703,7 +757,7 @@ Vault;
 
 ---
 
-## Milestone Module
+## 6. Milestone Module
 
 ### POST /api/milestones/:id/submit
 
@@ -823,19 +877,26 @@ class ReviewMilestoneDto {
   @MaxLength(1000)
   @IsOptional()
   notes?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  acknowledgeAuditWarning?: boolean; // Required if auditStatus = FAIL and outcome = APPROVE
 }
 ```
 
 **Response**:
 
 ```typescript
-Milestone; // with review embedded
+Milestone; // with status VERIFIED, payoutStatus: null | "NONE"
 ```
 
 **State Guards**:
 
 - Milestone status must be `AWAITING_APPROVAL`
 - Caller must be vault client
+- If outcome = APPROVE and auditStatus = FAIL:
+  - `acknowledgeAuditWarning` must be true
+  - Log warning: "Client approved milestone {id} despite AI FAIL"
 
 **Outcome → Status Mapping** (CRITICAL):
 
@@ -850,6 +911,7 @@ Milestone; // with review embedded
 **Errors**:
 
 - `INVALID_STATE_TRANSITION` (400): Milestone not in AWAITING_APPROVAL
+- `AUDIT_WARNING_NOT_ACKNOWLEDGED` (400): Must acknowledge AI warning when approving despite FAIL
 - `INVALID_REVIEW_OUTCOME` (400): Invalid outcome value
 - `UNAUTHORIZED` (403): Caller is not vault client
 
@@ -868,17 +930,19 @@ Evidence[]
 
 **Evidence Types**:
 
-- `CLARIFICATION_REQUEST`
-- `REQUIREMENT_CONFIRMATION`
+- `SUBMISSION_CREATED`
+- `VERIFICATION_COMPLETED`
+- `REVIEW_SUBMITTED`
+- `MESSAGE_SENT`
+- `MESSAGE_EDITED`
 - `FILE_COMMENT`
-- `DISPUTE_NOTE`
 - `DISPUTE_OPENED`
 - `DISPUTE_EVIDENCE`
 - `DISPUTE_DECISION`
 
 ---
 
-## Invite Module
+## 7. Invite Module
 
 ### POST /api/invites
 
@@ -991,7 +1055,7 @@ class RespondInviteDto {
 **State Transition** (if accepted):
 
 - Invite: `PENDING` → `ACCEPTED`
-- Vault: `FUNDED_UNASSIGNED` → `FUNDED_ASSIGNED`
+- Vault: `INVITED` | `FUNDED_ASSIGNED` → `ACTIVE`
 
 **Business Rules**:
 
@@ -1008,7 +1072,7 @@ class RespondInviteDto {
 
 ---
 
-## Wallet Module
+## 8. Wallet Module
 
 ### GET /api/wallet/balance
 
@@ -1140,12 +1204,13 @@ class BankDetailsDto {
 
 - `INSUFFICIENT_FUNDS` (400): Amount exceeds available balance
 - `INVALID_AMOUNT` (400): Amount <= 0
+- `VALIDATION_ERROR` (400): `idempotencyKey` is missing or invalid
 - `DUPLICATE_WITHDRAWAL` (409): Idempotency key already used
 - `KYC_REQUIRED` (403): KYC verification required
 
 ---
 
-## Ledger Module
+## 9. Ledger Module
 
 ### GET /api/ledger
 
@@ -1203,7 +1268,7 @@ class ListLedgerQuery {
 
 ---
 
-## Dispute Module
+## 10. Dispute Module
 
 ### POST /api/disputes
 
@@ -1256,6 +1321,11 @@ class CreateDisputeDto {
   events: DisputeEvent[];
 }
 ```
+
+**State Transition**:
+
+- Vault: `ACTIVE` → `DISPUTED`
+- Dispute: `OPEN`
 
 **Validation**:
 
@@ -1337,7 +1407,87 @@ Dispute; // with events embedded
 
 ---
 
-## Upload Module
+## 11. Evidence Module
+
+### GET /api/evidence
+
+**Access**: Authenticated  
+**Purpose**: List evidence events / messages for a vault or milestone
+
+**Query Params**:
+
+```typescript
+class ListEvidenceQuery {
+  @IsUUID()
+  vaultId: string;
+
+  @IsUUID()
+  @IsOptional()
+  milestoneId?: string;
+
+  @IsEnum(EvidenceType)
+  @IsOptional()
+  type?: EvidenceType;
+}
+```
+
+**Response**:
+
+```typescript
+Evidence[]
+```
+
+**Business Rules**:
+
+- Returns only events for vaults the user is a party to.
+- If `milestoneId` is provided, filters for that milestone specifically.
+
+---
+
+### POST /api/evidence
+
+**Access**: Authenticated  
+**Purpose**: Post a new message or evidence event (Append-only)
+
+**Request DTO**:
+
+```typescript
+class CreateEvidenceDto {
+  @IsUUID()
+  vaultId: string;
+
+  @IsUUID()
+  @IsOptional()
+  milestoneId?: string;
+
+  @IsEnum(EvidenceType)
+  type: EvidenceType; // Usually MESSAGE_SENT for general chat
+
+  @IsObject()
+  payload: {
+    content: string;
+    filesJson?: string;
+    supersedesEventId?: string; // If this appends an "edit"
+  };
+}
+```
+
+**Response**:
+
+```typescript
+Evidence;
+```
+
+**Business Rules**:
+
+- Create an immutable record in the Evidence log.
+- Generate `contentHash` of the payload.
+- If `supersedesEventId` is provided, the referenced event is marked as superseded in the view layer.
+- Trigger notifications to other parties in the vault.
+
+---
+
+## 12. Upload Module
 
 ### POST /api/uploads/presigned-url
 
@@ -1387,7 +1537,7 @@ class GetPresignedUrlDto {
 
 ---
 
-## Error Codes
+## 13. Error Codes
 
 All errors follow this structure:
 
@@ -1445,11 +1595,18 @@ All errors follow this structure:
 
 ---
 
-## Idempotency
+## 14. Idempotency
 
 ### Money Operations (REQUIRED)
 
-All money-moving operations require `idempotencyKey`:
+All money-moving operations REQUIRE an `idempotencyKey` field in the JSON request body. The key MUST be a valid UUID v4.
+
+If the key is missing, the server MUST return:
+
+- **Status**: `400 Bad Request`
+- **Body**: `{ "code": "VALIDATION_ERROR", "message": "idempotencyKey is required for money operations", "field": "idempotencyKey" }`
+
+**Endpoints requiring idempotency**:
 
 - `POST /api/vaults/:id/fund`
 - `POST /api/vaults/:id/release-milestone`

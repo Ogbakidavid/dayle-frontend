@@ -350,7 +350,7 @@
 ❌ **DO NOT USE**:
 
 - `"APPROVED"` → Use `MilestoneStatus.VERIFIED`
-- `"PENDING_FUNDING"` → Use `VaultStatus.AWAITING_FUNDING`
+- `"PENDING_FUNDING"` → Use `VaultStatus.DRAFT` (funding is an action, not state)
 - `"PASSED"` → Use `VerificationResult.PASS`
 - `"FAILED"` (as milestone status) → Use `MilestoneStatus.REJECTED` or `VerificationResult.FAIL`
 - `TransactionStatus.COMPLETED` → Use `TransactionStatus.CONFIRMED`
@@ -747,6 +747,33 @@
 
 ---
 
+### Evidence
+
+**Source**: `lib/mock/evidence.js`
+Communication and milestones events are stored here as an append-only log.
+
+```typescript
+interface Evidence {
+  id: string; // e.g., "ev_101"
+  vaultId: string;
+  milestoneId?: string;
+  disputeId?: string;
+  type: EvidenceType; // MESSAGE_SENT | SUBMISSION_CREATED | etc.
+  actorUserId: string;
+  actorRole: UserRole;
+  payloadJson: {
+    content?: string; // Primary message content
+    filesJson?: string; // Optional attachments
+    supersedesEventId?: string; // If this is an edit of a previous event
+    [key: string]: any; // Event-specific data
+  };
+  contentHash: string; // SHA-256 for integrity
+  createdAt: string; // ISO 8601
+}
+```
+
+---
+
 ## Backend API Contract
 
 **Source**: `lib/mock-api.js`
@@ -1071,8 +1098,11 @@ Milestone;
 1. Milestone status must be `AWAITING_APPROVAL`
 2. If `auditEnabled !== false`:
    - `milestone.verification` must exist
-   - `milestone.verification.result` must NOT be `FAIL`
+   - `milestone.auditStatus` is advisory only (does not block)
 3. Caller must be vault client
+4. If `milestone.auditStatus === 'FAIL'`:
+   - Client must acknowledge warning via `acknowledgeAuditWarning: true`
+   - Log warning: "Client approved milestone despite AI FAIL"
 
 **State Transition**:
 
@@ -1084,7 +1114,7 @@ Milestone;
 
 - `INVALID_STATE_TRANSITION`: Milestone not in AWAITING_APPROVAL
 - `VERIFICATION_REQUIRED`: Verification missing when audit enabled
-- `VERIFICATION_FAILED`: Verification result is FAIL
+- `AUDIT_WARNING_NOT_ACKNOWLEDGED`: Client must acknowledge AI warning when auditStatus = FAIL
 - `UNAUTHORIZED`: Caller is not vault client
 - `DUPLICATE_RELEASE`: Idempotency key already used
 
@@ -1309,13 +1339,48 @@ Evidence[]
 
 **Evidence Types**:
 
-- `CLARIFICATION_REQUEST`
-- `REQUIREMENT_CONFIRMATION`
+- `SUBMISSION_CREATED`
+- `VERIFICATION_COMPLETED`
+- `REVIEW_SUBMITTED`
+- `MESSAGE_SENT`
+- `MESSAGE_EDITED`
 - `FILE_COMMENT`
-- `DISPUTE_NOTE`
 - `DISPUTE_OPENED`
 - `DISPUTE_EVIDENCE`
 - `DISPUTE_DECISION`
+
+---
+
+#### `POST /api/evidence`
+
+**Used by Frontend**: ✅ Yes (Redesigned from Comments)  
+**Purpose**: Post new message or evidence event (Append-only)
+
+**Request**:
+
+```typescript
+{
+  vaultId: string;
+  milestoneId?: string;
+  type: EvidenceType;
+  payload: {
+    content: string;
+    filesJson?: string;
+    supersedesEventId?: string; // For MESSAGE_EDITED
+  };
+}
+```
+
+**Response**:
+
+```typescript
+Evidence;
+```
+
+**Business Rules**:
+
+- Edits append a new `MESSAGE_EDITED` event.
+- Frontend should hide superseded events by default.
 
 ---
 
@@ -1551,18 +1616,31 @@ stateDiagram-v2
 ```mermaid
 stateDiagram-v2
     [*] --> DRAFT
-    DRAFT --> AWAITING_FUNDING: Create vault
-    AWAITING_FUNDING --> FUNDED_UNASSIGNED: Fund vault (no freelancer)
-    AWAITING_FUNDING --> FUNDED_ASSIGNED: Fund vault (with freelancer)
-    FUNDED_UNASSIGNED --> INVITED: Send invitation
-    INVITED --> FUNDED_ASSIGNED: Freelancer accepts
-    FUNDED_ASSIGNED --> ACTIVE: Work begins
-    ACTIVE --> IN_REVIEW: Milestone submitted
-    IN_REVIEW --> ACTIVE: Milestone reviewed
-    ACTIVE --> COMPLETED: All milestones verified
-    * --> CANCELLED: Cancel vault
-    * --> PAUSED: Pause vault
+    DRAFT --> FUNDED: Client Funds Vault
+    FUNDED --> ACTIVE: Freelancer Assigned/Accepts
+    ACTIVE --> COMPLETED: All Milestones Verified
+    ACTIVE --> DISPUTED: Dispute Opened
+    DISPUTED --> ACTIVE: Dispute Resolved (Resubmission)
+    DISPUTED --> COMPLETED: Dispute Resolved (Refund/Release)
+    * --> CANCELLED: Vault Cancelled
+    * --> PAUSED: Vault Paused
 ```
+
+**Allowed Transitions**:
+
+| From     | To        | Trigger                               | Actor        |
+| -------- | --------- | ------------------------------------- | ------------ |
+| DRAFT    | FUNDED    | Lock funds in escrow                  | Client       |
+| FUNDED   | ACTIVE    | Freelancer accepts invitation         | Freelancer   |
+| ACTIVE   | COMPLETED | Final milestone reaches VERIFIED      | System       |
+| ACTIVE   | DISPUTED  | Dispute record created                | Party        |
+| DISPUTED | ACTIVE    | Dispute resolved (allow resubmit)     | Admin        |
+| DISPUTED | COMPLETED | Dispute resolved (refund/release all) | Admin        |
+| \*       | CANCELLED | Kill switch triggered                 | Client/Admin |
+| \*       | PAUSED    | Temporary hold                        | Admin        |
+
+> [!NOTE]
+> Granular states like `AWAITING_FUNDING` or `INVITED` are **computed views** derived from the presence of transactions or invite records while the vault is in `DRAFT` or `FUNDED` states.
 
 ---
 
@@ -1575,16 +1653,18 @@ stateDiagram-v2
 1. **State Guard**: Milestone status === `AWAITING_APPROVAL`
 2. **Verification Guard** (if `auditEnabled !== false`):
    - `milestone.verification` must exist
-   - `milestone.verification.result` must NOT be `FAIL`
-   - Allowed results: `PASS`, `FLAGGED`, `HUMAN_REVIEW`
+   - `milestone.auditStatus` is advisory only (does not block)
 3. **Authorization Guard**: Caller must be vault client
-4. **Idempotency**: Use `idempotencyKey` to prevent duplicate releases
+4. **AI Advisory Guard**: If `auditStatus === 'FAIL'`:
+   - Require `acknowledgeAuditWarning: true`
+   - Log warning for audit trail
+5. **Idempotency**: Use `idempotencyKey` to prevent duplicate releases
 
 **Error Codes**:
 
 - `INVALID_STATE_TRANSITION`
 - `VERIFICATION_REQUIRED`
-- `VERIFICATION_FAILED`
+- `AUDIT_WARNING_NOT_ACKNOWLEDGED`
 - `UNAUTHORIZED`
 - `DUPLICATE_RELEASE`
 
@@ -1854,7 +1934,7 @@ stateDiagram-v2
 
 2. **Non-Canonical Literals Removed**:
    - Removed `"APPROVED"` (use `MilestoneStatus.VERIFIED`)
-   - Removed `"PENDING_FUNDING"` (use `VaultStatus.AWAITING_FUNDING`)
+   - Removed `"PENDING_FUNDING"` (use `VaultStatus.DRAFT`)
    - Removed `"PASSED"` (use `VerificationResult.PASS`)
    - Removed `"FAILED"` as milestone status
 

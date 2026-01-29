@@ -86,10 +86,11 @@ export default function FreelancerVaultDetailPage() {
     if (vault.milestones && vault.milestones.length > 0) {
       baseMilestones = vault.milestones;
     } else {
-      // If no milestones (e.g. freshly accepted invite), we might return empty or a placeholder
-      if (vault.status === VaultStatus.FUNDED_ASSIGNED || vault.status === VaultStatus.INVITED) {
+      // If vault is not yet active (e.g. DRAFT or just FUNDED but not accepted), we might return empty or a placeholder
+      if (vault.status === VaultStatus.DRAFT || vault.status === VaultStatus.FUNDED) {
         return [];
       }
+
 
       // Generate mock milestones based on type for other active states
       if (vault.type === "development") {

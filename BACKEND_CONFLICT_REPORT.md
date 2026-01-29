@@ -204,7 +204,7 @@ releaseMilestone: async (vaultId, milestoneId, opts = {}) => {
 - `POST /api/vaults/:id/release-milestone`
 - `POST /api/wallet/withdraw`
 
-**Frontend Changes Required**: ⚠️ **MINOR** - Frontend must always send idempotency key (currently optional)
+**Frontend Changes Required**: ✅ **IMPLEMENTED** - Frontend now always sends a UUID v4 idempotency key for money operations
 
 **Backend Implementation**: Return 400 error if idempotency key missing on money operations
 
@@ -330,19 +330,19 @@ releaseMilestone: async (vaultId, milestoneId, opts = {}) => {
 
 ### Enum Decisions
 
-| Enum               | Canonical Value    | Forbidden Values       |
-| ------------------ | ------------------ | ---------------------- |
-| TransactionStatus  | `CONFIRMED`        | ❌ `COMPLETED`         |
-| MilestoneStatus    | `VERIFIED`         | ❌ `APPROVED`          |
-| VaultStatus        | `AWAITING_FUNDING` | ❌ `PENDING_FUNDING`   |
-| VerificationResult | `PASS` / `FAIL`    | ❌ `PASSED` / `FAILED` |
+| Enum               | Canonical Value | Forbidden Values       |
+| ------------------ | --------------- | ---------------------- |
+| TransactionStatus  | `CONFIRMED`     | ❌ `COMPLETED`         |
+| MilestoneStatus    | `VERIFIED`      | ❌ `APPROVED`          |
+| VaultStatus        | `FUNDED`        | ❌ `AWAITING_FUNDING`  |
+| VerificationResult | `PASS` / `FAIL` | ❌ `PASSED` / `FAILED` |
 
 ### Endpoint Decisions
 
 | Endpoint                                 | Idempotency Required | State Guard                            |
 | ---------------------------------------- | -------------------- | -------------------------------------- |
 | `POST /api/vaults`                       | ✅ Yes               | None                                   |
-| `POST /api/vaults/:id/fund`              | ✅ Yes               | DRAFT or AWAITING_FUNDING              |
+| `POST /api/vaults/:id/fund`              | ✅ Yes               | DRAFT                                  |
 | `POST /api/vaults/:id/release-milestone` | ✅ Yes               | AWAITING_APPROVAL + verification check |
 | `POST /api/milestones/:id/submit`        | ❌ No                | PENDING/REVISION_REQUESTED/REJECTED    |
 | `POST /api/milestones/:id/review`        | ❌ No                | AWAITING_APPROVAL                      |
@@ -356,8 +356,8 @@ releaseMilestone: async (vaultId, milestoneId, opts = {}) => {
 
 **1. Idempotency Key Enforcement**
 
-**Current**: Frontend sends idempotency key optionally
-**Required**: Frontend must ALWAYS send idempotency key for money operations
+**Current**: Frontend sends idempotency key optionally (Legacy)
+**Status**: ✅ **IMPLEMENTED** - Frontend now ALWAYS sends idempotency key for money operations
 
 **Files to Update**:
 
@@ -522,7 +522,7 @@ The canonical backend contract in `BACKEND_CONTRACT.md` resolves all conflicts b
 4. ✅ Providing clear error codes and validation
 5. ✅ Supporting future extensibility
 
-**Total Frontend Changes Required**: 1 minor change (idempotency key enforcement)
+**Total Frontend Changes Required**: ✅ **COMPLETED** (Idempotency key enforcement implementation)
 
 **Backend Implementation Effort**: ~4 weeks for full implementation
 

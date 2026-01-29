@@ -307,7 +307,7 @@ This document provides sample JSON for the top 12 critical flows to ensure front
   "vault": {
     "id": "v_1",
     "title": "Enterprise CRM Migration",
-    "status": "FUNDED_ASSIGNED",
+    "status": "ACTIVE",
     "totalAmount": 15000,
     "clientName": "Demo Client",
     "freelancerId": "u_freelancer_1",
@@ -744,13 +744,87 @@ This document provides sample JSON for the top 12 critical flows to ensure front
 }
 ```
 
-### Idempotency Error
+### Idempotency Error (Duplicate Key)
+
+```json
+{
+  "code": "DUPLICATE_REQUEST",
+  "message": "Idempotency key already used with different requestHash",
+  "statusCode": 409
+}
+```
+
+---
+
+## 🚀 Idempotency Test Vectors
+
+Use these examples to verify idempotency enforcement on money operations (e.g., `POST /api/vaults/:id/release-milestone`).
+
+### TV-1: Success (Fresh Key)
+
+**Request**:
+
+```json
+{
+  "milestoneId": "m_101",
+  "idempotencyKey": "550e8400-e29b-41d4-a716-446655440002"
+}
+```
+
+**Response**: `200 OK` (Processes normally)
+
+### TV-2: Replay (Same Key, Same Body)
+
+**Request**:
+
+```json
+{
+  "milestoneId": "m_101",
+  "idempotencyKey": "550e8400-e29b-41d4-a716-446655440002"
+}
+```
+
+**Response**: `200 OK` (Returns cached response from TV-1, no new ledger entry)
+
+### TV-3: Conflict (Same Key, Different Body)
+
+**Request**:
+
+```json
+{
+  "milestoneId": "m_102",
+  "idempotencyKey": "550e8400-e29b-41d4-a716-446655440002"
+}
+```
+
+**Response**: `409 Conflict`
 
 ```json
 {
   "code": "DUPLICATE_REQUEST",
   "message": "Idempotency key already used with different request",
   "statusCode": 409
+}
+```
+
+### TV-4: Missing Key (Money Operation)
+
+**Request**:
+
+```json
+{
+  "milestoneId": "m_101"
+}
+```
+
+**Response**: `400 Bad Request`
+
+```json
+{
+  "code": "VALIDATION_ERROR",
+  "message": "idempotencyKey is required for money operations",
+  "field": "idempotencyKey",
+  "statusCode": 400
 }
 ```
 
