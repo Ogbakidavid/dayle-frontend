@@ -23,6 +23,7 @@ import {
   Gavel,
   ExternalLink,
   CreditCard,
+  RefreshCcw, // Added for Refund Icon
 } from "lucide-react";
 import {
   Card,
@@ -321,13 +322,24 @@ export default function ClientVaultDetailPage() {
 
       // Reset
       setActiveReview(null);
-      setReviewAction(null);
-      setReviewReason("");
       setReviewFeedback("");
       toast.success("Review submitted successfully");
     } catch (err) {
       console.error("Review failed:", err);
       toast.error("Failed to submit review");
+    }
+  };
+
+  const handleRefund = async (milestone) => {
+    try {
+        await api.vaults.refund(vault.id, milestone.id, {
+            idempotencyKey: crypto.randomUUID()
+        });
+        await refreshVaults();
+        toast.success("Refund process initiated.");
+    } catch (err) {
+        console.error("Refund failed:", err);
+        toast.error("Failed to process refund. " + (err.message || ""));
     }
   };
 
@@ -380,9 +392,14 @@ export default function ClientVaultDetailPage() {
   const getStatusDisplay = (milestone) => {
     const status = milestone.status?.toUpperCase();
     const releaseStatus = milestone.releaseStatus?.toUpperCase();
+    const refundStatus = milestone.refundStatus?.toUpperCase();
 
     if (releaseStatus === ReleaseStatus.CONFIRMED) {
       return { label: "PAID", color: "text-emerald-500", icon: CheckCircle };
+    }
+
+    if (refundStatus === ReleaseStatus.CONFIRMED) {
+      return { label: "REFUNDED", color: "text-neutral-400", icon: RefreshCcw };
     }
     
     if (status === MilestoneStatus.VERIFIED) {
@@ -771,6 +788,20 @@ export default function ClientVaultDetailPage() {
                           </Badge>
                         )}
                       </div>
+
+                      {/* Refund Action for Rejected Milestones */}
+                      {milestone.status === MilestoneStatus.REJECTED && !milestone.refundStatus && (
+                          <div className="flex justify-end w-full mt-2 pt-2 border-t border-white/5">
+                              <Button
+                                  size="sm"
+                                  onClick={() => handleRefund(milestone)}
+                                  className="bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3 border border-red-500/20"
+                              >
+                                  <RefreshCcw className="w-3 h-3 mr-1.5" />
+                                  Process Refund
+                              </Button>
+                          </div>
+                      )}
                     </div>
                   </div>
                 ))}
