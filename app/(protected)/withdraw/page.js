@@ -611,7 +611,7 @@ export default function FreelancerWithdrawPage() {
                                         </div>
                                     </div>
 
-                                    <Button onClick={() => router.push('/freelancer/wallet')} className="w-full h-16 bg-white text-black font-black uppercase text-sm tracking-wide rounded-2xl hover:bg-slate-200 transition-all shadow-xl active:scale-95">
+                                    <Button onClick={() => router.push('/freelancer/balance')} className="w-full h-16 bg-white text-black font-black uppercase text-sm tracking-wide rounded-2xl hover:bg-slate-200 transition-all shadow-xl active:scale-95">
                                         Back to Dashboard
                                     </Button>
                                 </motion.div>
@@ -636,7 +636,7 @@ export default function FreelancerWithdrawPage() {
                                         <Button variant="outline" onClick={() => { setStep('verification'); setShowOtp(false); setOtp(['', '', '', '', '', '']); }} className="h-14 font-black uppercase text-sm tracking-wide border-white/10 hover:bg-white/10 rounded-xl transition-all">
                                             Retry Transfer
                                         </Button>
-                                        <Button onClick={() => router.push('/freelancer/wallet')} className="h-14 bg-white text-black font-black uppercase text-sm tracking-wide rounded-xl transition-all shadow-xl">
+                                        <Button onClick={() => router.push('/freelancer/balance')} className="h-14 bg-white text-black font-black uppercase text-sm tracking-wide rounded-xl transition-all shadow-xl">
                                             Exit to Account
                                         </Button>
                                     </div>

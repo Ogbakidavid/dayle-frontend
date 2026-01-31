@@ -1,133 +1,229 @@
-Dayle System Design Architecture 0) Product Rules the Architecture Must Enforce
-These are hard constraints. If we break them, the product becomes Upwork + crypto confusion.
-Core Truths
+Dayle — System Design Architecture (v0)
+Table of Contents
+
+Product Rules (Non-Negotiables)
+
+Milestone Philosophy (Canonical Lifecycle)
+
+High-Level Architecture (Services & Responsibilities)
+
+Core Data Model (Entities & Key Fields)
+
+State Machines (Allowed Transitions + Guards)
+
+Truth & Reconciliation (DB vs Chain vs Ramp)
+
+End-to-End Workflows
+
+AI Audit (Objective Verification Only)
+
+Build Order (Phased Delivery)
+
+Failure Modes (What Breaks First)
+
+Minimal Diagram (Mental Model)
+
+1. Product Rules (Non-Negotiables)
+   1.1 Core Truths
+
 Vault is the source of truth for payment intent (off-chain record + on-chain escrow state).
 
-Money moves only on allowed state transitions (no freeform payouts).
+Money moves only on allowed state transitions via defined money actions. No manual/freeform payouts.
 
 AI never judges taste. AI verifies objective compliance only.
 
-AI never releases funds. AI can only produce an audit result.
+AI never releases funds. AI produces an audit result only.
 
 Client approval is always required to verify work.
 
-Even if AI audit passes, the client must explicitly approve the milestone before funds can be released.
+Even if AI audit passes, the client must explicitly approve the milestone before money can move.
 
-Review ≠ Release: Payout is an explicit, separate action taken AFTER approval.
+Review ≠ Release. Release is a separate explicit money action after approval.
 
-Communication is evidence, tied to milestones/submissions, not chat rooms.
+Communication is evidence tied to vaults/milestones/submissions (append-only), not chat rooms.
 
-Blockchain is invisible in UX: UI shows USD balances and processing states, never chain terms.
+Blockchain is invisible in UX. UI shows USD balances and processing states; never chain terms (wallets/tokens/gas/tx hashes).
 
-Custodial wallets are real custody: keys must not live in your DB.
+Dayle is non-custodial for user wallets. Private keys never touch Dayle systems (DB, logs, servers).
 
-Disputes are eligibility-gated: disputes only exist if tied to a specific milestone + requirement item or structured fraud/process/security reason codes.
+Embedded wallet provider manages key generation/storage (secure enclave / MPC / social recovery depending on provider).
 
-Creative work is supported: client can reject work for subjective reasons, but rejection is structured and does not automatically create a dispute.
+Dayle may control smart-contract escrow logic, but cannot sign user-wallet transactions or access user private keys.
 
-Milestone Philosophy (Canonical)
-Each milestone represents a deliverable and has one lifecycle:
-Freelancer submits deliverable (file/link)
+1.3 Invisible Blockchain
 
-System runs objective AI audit (optional but recommended)
+All blockchain-specific terminology (Wallet, Hash, Token, Gas) must be abstracted away in the UI.
 
-Client reviews submission + audit results
+- "Wallet" -> "Balance" or "Ledger"
+- "Tx Hash" -> "Reference ID" or "Transaction ID"
+- "Address" -> "Account Details"
 
-33. Client approves / requests changes / rejects
-34. Payout (Release): Explicit money-moving action taken after approval
-35. Approval records client intent; Release moves the money.
+If a flow requires Dayle to move funds without user authorization/signature, it is custodial and out-of-scope for v0.
 
-Only approve triggers money release
+Disputes are eligibility-gated. Disputes exist only if tied to:
 
-Milestones are not split into “Compliance vs Approval milestones.”
-They are one milestone with:
-Deliverable requirements
+a milestone + requirement item (reqId), or
 
-Submission
+structured fraud/process/security reason codes.
 
-AI audit result
+Creative work is supported. Client can reject for subjective reasons, but rejection is structured and does not automatically create a dispute.
 
-Client decision
+Freeze is a first-class safety mechanism. Any reconciliation mismatch/fraud trigger pauses affected vaults and blocks money movement until resolved.
 
-1. High-Level Architecture (Services + Responsibilities)
-   A. Frontend (Web2 UX)
-   What the frontend does:
-   Auth (email/password)
+1.2 Terminology (Prevent Misinterpretation)
+
+Custody refers strictly to private key control (wallet custody).
+
+Escrow custody is contract-based custody and does not imply key custody.
+
+2. Milestone Philosophy (Canonical Lifecycle)
+   2.1 One Milestone = One Lifecycle
+
+A milestone includes:
+
+Deliverable requirements (reqIds)
+
+Submission (file/link) with immutable hash
+
+AI audit result (advisory)
+
+Client decision (approve/request changes/reject)
+
+Money actions (release/refund) executed explicitly and confirmed
+
+Milestones are not split into “Compliance milestone vs Approval milestone.”
+
+2.2 Canonical Flow
+
+Freelancer submits deliverable (file/link).
+
+System runs objective AI audit (optional but recommended).
+
+Client reviews submission + audit results.
+
+Client chooses one:
+
+Approve (verify work)
+
+Request changes
+
+Reject (structured reason codes)
+
+Release is a separate explicit money action after approval.
+
+2.3 Key Rule
+
+Approval records intent.
+
+Release moves money.
+
+No release occurs without client approval.
+
+3. High-Level Architecture (Services & Responsibilities)
+   A) Frontend (Web2 UX)
+
+Responsibilities:
+
+Auth (email/password, social login as needed)
 
 Client dashboard + freelancer dashboard
 
-Vault creation & milestone definition
+Vault creation + milestone definition
 
 Submission upload UI (files + links)
 
-AI audit results UI (PASS / FAIL / FLAGGED)
+Audit results UI (PASS / FAIL / FLAGGED / HUMAN_REVIEW)
 
-Evidence channel (structured Q&A + file comments)
+Evidence channel (structured Q&A, comments, attachments)
 
-Ledger + reputation snapshot
+Ledger + balances snapshot (USD, processing states)
 
-“Add funds” / “Withdraw” via ramp embedded checkout UI
+Add funds / Withdraw via ramp embedded UI
 
 Dispute initiation UI (milestone-scoped; reason-code based)
 
 Dispute case view (timeline + evidence bundle + status)
 
 Client review screen:
+Approve
+Release (explicit money action)
 
-- Approve (Mark as VERIFIED)
-- Release (Explicit money-moving action)
-- Request changes
-- Reject (with reason codes)
+Request changes
 
-Frontend MUST NEVER:
-show wallets, tokens, gas, chain names, hashes
+Reject (reason codes)
 
-B. Backend API (Core System of Record)
-This is the brain (truth layer). It holds:
-users, roles, approval status
+Hard constraint:
 
-vaults, milestones, submissions
+Frontend must never display: wallets, tokens, gas, chain names, tx hashes.
 
-verification/audit results + reason codes
+UI must use derived status labels (e.g., "In progress" instead of "ACTIVE") to maintain the illusion of a standard fintech app.
 
-ledger entries (double-entry)
+B) Backend API (System of Record)
 
-dispute cases + eligibility gating
+Stores and enforces:
 
-orchestration to chain + ramp
+Users + roles + approval/KYC status
+
+Vaults + milestones + submissions
+
+Audit results + reason codes
+
+Evidence events (append-only)
+
+Money actions (releases/refunds) + ledger/journal
+
+Disputes + eligibility gating
+
+Orchestration to wallet provider + chain + ramp
+
+Reconciliation + freeze/hold logic
 
 Backend must be:
-state machine + reconciler
 
-idempotent for money-moving actions
+A state machine + reconciler
 
-audit-trail complete for evidence and disputes
+Idempotent for all money-moving actions
 
-C. Wallet Abstraction Layer (Non-Custodial AA)
-Instead of managing keys, Dayle uses an embedded wallet provider (Privy/Web3Auth) for Account Abstraction (AA):
+Audit-trail complete for evidence, disputes, and money actions
 
-- **User Ownership**: Keys are generated and stored by the provider (securely enclave-bound or social-shard based). Dayle NEVER sees seed phrases or private keys.
-- **Smart Accounts**: Users interact with the chain through an AA Smart Account (ERC-4337 or similar).
-- **Relayer/Paymaster**: Backend facilitates gasless transactions by sponsoring gas fees, maintaining the "Invisible Blockchain" UX.
-- **Transaction Initiation**: Backend initiates money actions; User signs via Provider UI (or sessions) to authorize.
+C) Wallet Abstraction Layer (Non-Custodial AA)
 
-D. Smart Contract Escrow (On-chain)
+Use an embedded wallet provider (Privy/Web3Auth or equivalent).
+
+Provider manages key generation/storage; Dayle never sees private keys.
+
+Users interact through AA smart accounts (ERC-4337 or similar).
+
+Backend can sponsor gas via relayer/paymaster for “invisible blockchain.”
+
+Backend orchestrates money actions; user signs when required via provider UI/session.
+
+Signature authorization primitives:
+
+Interactive: User signs each transaction manually via provider modal UI.
+
+Session Keys: User signs a one-time session grant (bound by time/allowance) allowing backend to sign specific money actions (e.g., releases below $1k) on their behalf.
+
+D) Smart Contract Escrow (On-Chain)
+
 Minimal escrow contract:
-holds stablecoin funds
 
-maps vaultId → escrow state
+Holds stablecoin funds
 
-allows:
+Maps vaultId → escrow state
+
+Allows:
 
 fundVault(vaultId)
 
-releaseMilestone(vaultId, milestoneId)
+releaseMilestone(vaultId, milestoneId, amount, recipient)
 
-refundVault(vaultId)
+refundVault(vaultId, amount, recipient)
 
 pauseVault(vaultId) (optional)
 
-Contract emits events:
+Events emitted:
+
 VaultFunded
 
 MilestoneReleased
@@ -136,84 +232,107 @@ VaultRefunded
 
 VaultPaused
 
-Contract is tiny:
-no AI
+Hard constraints:
 
-no files
+No AI logic
 
-no disputes logic
+No file storage
 
-E. Ramp Provider (Fiat On/Off-ramp)
-Deposit:
-fiat → stablecoin → user custodial wallet
+No dispute logic
 
-Withdraw:
-stablecoin from custodial wallet → fiat → bank/card
+E) Ramp Provider (Fiat On/Off-Ramp)
+
+Deposit and withdrawal must be abstracted because providers vary.
+
+Deposit behavior:
+
+Ramp processes fiat payment.
+
+Value settles either:
+
+on-chain to a destination address, or
+
+off-chain balance that later withdraws on-chain
+Backend supports both by treating deposit as provider settlement + optional chain confirmation.
+
+Withdraw behavior:
+
+stablecoin → fiat → bank/card (provider dependent)
 
 Backend integrates:
-checkout session creation
 
-webhook handlers (status updates)
+Checkout/session creation
 
-reconciliation with chain deposits/withdrawals
+Webhook handlers (status updates)
 
-F. AI Audit Service (Objective Verification Only)
-A separate service/module initially.
-It performs objective checks only:
-link validity
+Reconciliation with chain deposits/withdrawals
 
-file presence
+Manual review lane for mismatches
 
-file type/size
+F) AI Audit Service (Objective Verification Only)
 
-metadata extraction
+Performs objective checks only:
 
-formatting validation
+Link reachability/validity
 
-zip integrity scan
+File presence/type/size
 
-basic “not empty” detection
+Metadata extraction
 
-AI audit outputs:
+Formatting validation
+
+ZIP integrity scan
+
+Basic “not empty” detection
+
+Outputs:
+
 PASS / FAIL / FLAGGED / HUMAN_REVIEW
 
-structured reason codes
+Structured reason codes
 
-rule-level results
+Rule-level results referencing reqIds
 
-Important:
-Audit is advisory.
+Rules:
 
-AI does not release funds. 193. Client always approves work before release.
+Advisory only
 
-Human Advisor review (early MVP):
-can override audit and label outcome (training data)
+Never releases funds
 
-G. Storage
-Database: PostgreSQL (ACID + transactions)
+Client approval always required
 
-Object storage: S3/R2 for deliverable files
+Human advisor can override (becomes training data)
+
+G) Storage
+
+PostgreSQL (ACID transactions)
+
+Object storage: S3/R2 (deliverables + evidence attachments)
 
 Queue: BullMQ/Redis (or SQS later) for async jobs
 
 Cache (optional): Redis
 
-H. Observability & Security
-request + event logs
+H) Observability & Security
 
-metrics: failures, reconciliation mismatches, dispute rates
+Request + event logs (sensitive-safe)
 
-audit trails: every action tied to actor + timestamp
+Metrics: failure rates, reconciliation mismatches, dispute rate
 
-rate limits + fraud rules
+Audit trails: every action tied to actor + timestamp
 
-idempotency keys for money actions
+Rate limits + fraud rules
 
-2. Data Model (Core Entities)
-   Users
-   id
+Idempotency keys for money actions
 
-email
+Chain event dedupe by (txHash, logIndex) + confirmation threshold
+
+Freeze/hold mechanisms for anomalies
+
+4. Core Data Model (Entities & Key Fields)
+   4.1 Users
+
+id, email
 
 role: CLIENT | FREELANCER | ADMIN
 
@@ -223,20 +342,42 @@ kycStatus: NONE | PENDING | VERIFIED | REJECTED
 
 createdAt
 
-Wallets
-id
-userId
-provider (PRIVY | WEB3AUTH)
-providerUserId (unique identifier from provider)
-address (public wallet address)
-chainId (target network)
-status (ACTIVE | SUSPENDED)
-createdAt
-updatedAt
+4.2 Smart Accounts
 
-createdAt
+id, userId
 
-Vaults
+provider: PRIVY | WEB3AUTH
+
+providerUserId (unique)
+
+address (public)
+
+chainId
+
+status: ACTIVE | SUSPENDED
+
+createdAt, updatedAt
+
+4.3 Vaults
+
+Vault.status (authoritative, API-exposed):
+
+DRAFT
+
+AWAITING_FUNDING
+
+FUNDED
+
+PAUSED
+
+DISPUTED
+
+CANCELLED
+
+CLOSED
+
+Core fields:
+
 id (UUID)
 
 clientId
@@ -245,45 +386,45 @@ freelancerId (nullable)
 
 totalAmount
 
-status:
+status
 
-- DRAFT
-- AWAITING_FUNDING
-- INVITED
-- FUNDED_UNASSIGNED
-- FUNDED_ASSIGNED
-- ACTIVE
-- IN_REVIEW
-- COMPLETED
-- CANCELLED
-- DISPUTED
-- PAUSED
+lastTransitionAt, lastTransitionBy, lastTransitionReason
 
-> [!NOTE]
-> These statuses are directly exposed by the API to the frontend. Internally, some may be derived from the combination of vault state and presence of linked records (e.g., `INVITED`), but they must be returned as explicit enum values in API responses.
+escrowRef (vaultId used by contract mapping)
 
-lastTransitionAt
-
-lastTransitionBy (userId or SYSTEM)
-
-lastTransitionReason
-
-escrowRef (vaultId used in contract mapping)
-
-internalMetadata (admin-only, contains chain data)
+internalMetadata (admin-only; chain/provider details)
 
 createdAt
 
-Milestones
-id
+Pause fields:
 
-vaultId
+pausedReasonCode (enum)
 
-title
+pausedAt
 
-amount
+pausedBy (SYSTEM or admin)
 
-dueDate
+Derived fields (returned by API, computed only, not stored):
+
+assignmentStatus: UNASSIGNED | ASSIGNED
+
+progressStatus: NEEDS_SUBMISSION | NEEDS_REVIEW | VERIFIED_AWAITING_RELEASE | RELEASING | SETTLED
+
+settlementStatus: OPEN | PARTIAL | FULL
+
+Definition of CLOSED
+
+Vault may be CLOSED only when:
+
+escrow balance is zero, AND
+
+all releases/refunds are CONFIRMED, AND
+
+no open disputes exist.
+
+4.4 Milestones
+
+id, vaultId, title, amount, dueDate
 
 status:
 
@@ -301,102 +442,201 @@ REJECTED
 
 DISPUTED
 
-auditStatus (AI advisory only):
+auditStatus (advisory):
 
-PENDING
+PENDING | IN_PROGRESS | PASS | FAIL | FLAGGED | HUMAN_REVIEW | SKIPPED
 
-IN_PROGRESS
-
-PASS
-
-FAIL
-
-FLAGGED
-
-HUMAN_REVIEW
-
-SKIPPED
-
-deliverableTypeId (e.g. github_repo, figma_link)
+deliverableTypeId (e.g., github_repo, figma_link)
 
 deliverableMode: LINK | FILE
 
 auditEnabled: boolean
 
-requirementItemsJson: array of structured requirement items:
+requirementItemsJson: [{ reqId, label, type, field, operator, expectedValue, required }]
 
-{ reqId, label, type, field, operator, expectedValue, required }
+requirementSchemaVersion
 
 createdAt
 
-Client can approve milestone even if auditStatus = FAIL (with warning).
+Rules:
 
-### Determining "Paid" vs "Approved" in UI
+Client may approve even if auditStatus = FAIL (UI shows warning + requires explicit acknowledgement).
 
-The UI distinguishes between work that is approved by the client and work that has successfully moved funds:
+Requirements must be snapshotted into Evidence Events on review to prevent retroactive edits.
 
-- **Approved (Work Verified)**
-  - Milestone `status === "VERIFIED"`
-  - `payoutStatus` is `PENDING`, `FAILED`, or `null`
-  - UI displays: "Approved" (and "Processing Payout" if PENDING)
+4.5 Submissions (Immutable)
 
-- **Paid (Funds Released)**
-  - Milestone `status === "VERIFIED"`
-  - `payoutStatus === "CONFIRMED"`
-  - UI displays: "Paid" or "Released"
-
-This separation allows the system to remain idempotent and resilient to chain delays or failures while providing immediate feedback on work verification.
-
-Submissions
-id
-
-submittedByUserId
-
-notes
-
-submittedAt
+id, milestoneId, submittedByUserId, submittedAt, notes
 
 filesJson: [{ url, hash, type, size, metadata }]
 
 linksJson: [{ url, label, metadata }]
 
-Verifications (AI Audit Results)
-id
+contentHash (SHA256 of submission payload)
 
-submissionId
+hashAlgorithm (default SHA256)
+
+immutableAt, immutableBy
+
+Constraints:
+
+No updates after creation.
+
+Client approval must reference submissionId + submission.contentHash.
+
+4.6 Verifications (AI Audit Results)
+
+id, submissionId
 
 result: PASS | FAIL | FLAGGED | HUMAN_REVIEW
 
 confidenceScore (optional)
 
-ruleResultsJson: [{ code, passed, message, field }]
+ruleResultsJson: [{ code, passed, message, field, reqId }]
 
 reviewedBy: AI | HUMAN
 
 createdAt
 
-Milestone Reviews (Client Decision)
+4.7 Milestone Reviews (Client Decision)
+
 id
 
 milestoneId
+
+submissionId (must be the reviewed submission)
+
+submissionContentHash (must match submission)
 
 reviewerUserId (client)
 
 outcome: APPROVE | REQUEST_CHANGES | REJECT
 
-reasonCodes: array of enums (required if REQUEST_CHANGES or REJECT)
+reasonCodes: required if REQUEST_CHANGES or REJECT
 
 notes (optional)
 
+acknowledgeAuditWarning (boolean; required when approving with audit FAIL)
+
+Rule: Audit output is advisory only. Audit never sets status to REJECTED or REVISION_REQUESTED; only client decisions can trigger these terminal/loop states.
+
 createdAt
 
-Disputes (Case Files)
-Eligibility-gated. Only exists when tied to milestone + requirement or structured reason code.
+4.8 Money Actions: Releases (First-Class)
+
+Money does not “just happen”. It happens via explicit actions with durable records.
+
+Releases
+
 id
 
 vaultId
 
 milestoneId
+
+initiatedByUserId (client)
+
+amount
+
+currency (USD)
+
+feeAmount (explicit; assessed at release time)
+
+status:
+
+NOT_STARTED
+
+PENDING_SIGNATURE
+
+SUBMITTED
+
+CONFIRMED
+
+FAILED
+
+CANCELED
+
+idempotencyKey
+
+providerRef (wallet provider request/session id)
+
+chainTxHash (nullable until submitted)
+
+failureCode (enum)
+
+failureMessage (optional, admin-only)
+
+createdAt, updatedAt, confirmedAt
+
+Rule:
+
+No ledger posting for RELEASE is final until Release.status == CONFIRMED.
+
+4.9 Money Actions: Refund Requests (First-Class)
+
+Refunds are also explicit, idempotent, and chain-confirmed.
+
+Refunds
+
+id
+
+vaultId
+
+milestoneId (nullable; can refund remaining escrow after terminal outcomes)
+
+initiatedByUserId (client or admin; rule-gated)
+
+amount
+
+currency
+
+status: PENDING_SIGNATURE | SUBMITTED | CONFIRMED | FAILED | CANCELED
+
+idempotencyKey
+
+providerRef
+
+chainTxHash
+
+createdAt, updatedAt, confirmedAt
+
+Rule:
+
+Refund eligibility is policy-gated (see Disputes & Rejection Policy).
+
+4.10 Ramp Transactions (Provider Abstraction)
+
+RampTransactions
+
+id
+
+userId
+
+direction: DEPOSIT | WITHDRAW
+
+amount, currency
+
+status: INITIATED | PENDING | SETTLED | FAILED | CANCELED
+
+providerRef
+
+destinationAddress (nullable if off-chain settlement)
+
+chainTxHash (nullable)
+
+createdAt, updatedAt
+
+Rules:
+
+Ledger balances become available only after sufficient confirmation of settlement:
+
+Provider webhook SETTLED and, where applicable, chain confirmation.
+
+Manual review lane exists when webhook and chain disagree.
+
+4.11 Disputes (Eligibility-Gated Case Files)
+
+id, vaultId, milestoneId
 
 openedByUserId
 
@@ -420,11 +660,11 @@ SECURITY
 
 reasonCode (structured enum)
 
-requirementRef (reqId optional but required for requirement-based disputes)
+requirementRef (reqId; required for requirement-based disputes)
 
 status: OPEN | UNDER_REVIEW | NEEDS_INFO | RESOLVED | REJECTED
 
-outcome (set when resolved):
+outcome (on resolve):
 
 RELEASE_TO_FREELANCER
 
@@ -438,22 +678,21 @@ ESCALATE
 
 DISMISS
 
-outcomeReason (required when resolved)
+splitPercentage (required if SPLIT_PAYMENT)
 
-splitPercentage (1-99, required if outcome = SPLIT_PAYMENT)
+resolvedBy, createdAt, resolvedAt
 
-resolvedBy (admin userId)
+Dispute opening permissions:
 
-createdAt
+Client may open: VERIFICATION_ERROR, REQUIREMENT_MISMATCH, SCOPE_CHANGE, BAD_FAITH, FRAUD, PROCESS_BREACH, SECURITY
 
-resolvedAt
+Freelancer may open: BAD_FAITH, PROCESS_BREACH, REQUIREMENT_MISMATCH (reqId required), SCOPE_CHANGE
 
-Dispute Events
-id
+4.12 Dispute Events (Append-Only Timeline)
 
-disputeId
+id, disputeId
 
-actorUserId (or SYSTEM/ADVISOR)
+actorUserId (or SYSTEM)
 
 actorRole (optional)
 
@@ -472,172 +711,48 @@ CLIENT_RESPONSE
 FREELANCER_RESPONSE
 
 RESOLVED
-payloadJson (notes, attachments, decisions)
+
+payloadJson
 
 createdAt
 
-Accounts (Chart of Accounts)
-id
+4.13 Accounting (Simplified Ledger v0)
 
-code (e.g., "1000", "2000.u_client_1")
+v0 uses a single-entry ledger model for simplicity. Double-entry is deferred to v1.
 
-name
+LedgerEntries
 
-type: ASSET | LIABILITY | EQUITY | REVENUE | EXPENSE
+id, vaultId, milestoneId (optional), userId
 
-normalBalance: DEBIT | CREDIT
+type: DEPOSIT | RELEASE | REFUND | WITHDRAW | FEE
 
-userId (nullable, for user sub-accounts)
-
-vaultId (nullable, for vault escrow accounts)
-
-balance (cached)
-
-createdAt
-
-Standard Accounts:
-1000 - Cash (Ramp) - ASSET
-1100 - Cash (Chain) - ASSET
-1200.{vaultId} - Escrow (Vaults) - ASSET
-2000.{userId} - Client Deposits - LIABILITY
-2100.{userId} - Freelancer Earnings - LIABILITY
-3000 - Platform Equity - EQUITY
-4000 - Fee Revenue - REVENUE
-5000 - Ramp Fees - EXPENSE
-5100 - Gas Fees - EXPENSE
-
-Journal Entries (True Double-Entry)
-id
-
-entryNumber (sequential)
-
-entryDate
-
-description
-
-vaultId (nullable)
-
-milestoneId (nullable)
-
-userId (nullable)
-
-providerRef (rampTxId or chainTxHash)
-
-idempotencyKey
-
-status: PENDING | POSTED | REVERSED
-
-postedAt
-
-postedBy (userId or SYSTEM)
-
-chainMetadata (admin-only, contains tx details)
-
-createdAt
-
-Journal Entry Lines
-id
-
-journalEntryId
-
-lineNumber
-
-accountId
-
-debit (nullable, mutually exclusive with credit)
-
-credit (nullable, mutually exclusive with credit)
-
-memo
-
-Constraint: Every journal entry must balance (SUM(debits) = SUM(credits))
-
-Posting Rules Examples:
-
-1. Client Deposit: DR Cash-Ramp, CR Client Deposits
-2. Lock Escrow: DR Escrow-Vault, CR Client Deposits + Chain TX
-3. Release Milestone: DR Freelancer Earnings + DR Fee Revenue, CR Escrow-Vault + Chain TX
-4. Freelancer Withdrawal: DR Cash-Ramp + DR Ramp Fees, CR Freelancer Earnings
-5. Refund Vault: DR Client Deposits, CR Escrow-Vault + Chain TX
-
-Reconciliation Rules:
-
-- Daily: Verify all journal entries balance
-- Daily: Verify account balances = sum of posted lines
-- Daily: Verify chain escrow balances match DB escrow accounts
-- On mismatch: Auto-freeze affected vault/user
-
-Ledger Entries (View - Backward Compatibility)
-id
-
-userId
-
-vaultId (nullable)
-
-type:
-
-DEPOSIT
-
-LOCK
-
-RELEASE
-
-REFUND
-
-WITHDRAW
-
-FEE
-
-amount
-
-currency: USD
+amount, currency
 
 status: PENDING | CONFIRMED | FAILED
 
-providerRef (rampTxId or chainTxHash)
+idempotencyKey, providerRef
 
-disputeId (optional)
+chainTxHash (nullable)
 
-createdAt
+createdAt, confirmedAt
 
-Submissions (Immutable)
-id
+Rules:
 
-milestoneId
+sum(LedgerEntries(userId, CONFIRMED)) == current user balance
 
-submittedBy
+sum(LedgerEntries(vaultId, CONFIRMED)) == total released from vault
 
-submittedAt
+Refund Confirmed: Post LedgerEntry(REFUND, NEGATIVE amount)
 
-notes
+Release Confirmed: Post LedgerEntry(RELEASE, amount)
 
-filesJson
+4.14 Evidence Events (Append-Only Legal Record)
 
-url
+All communication is evidence events; no deletes.
 
-contentHash (SHA256 of submission content)
+id, eventNumber
 
-hashAlgorithm (default: SHA256)
-
-immutableAt
-
-immutableBy
-
-Constraint: Submissions cannot be updated after creation (trigger prevents updates)
-
-Evidence Events (Append-Only Legal Record)
-All evidence is structured, append-only event log. No updates or deletes allowed.
-Communication (Messages) are stored here as evidence.
-
-id
-
-eventNumber (sequential)
-
-vaultId
-
-milestoneId (optional)
-
-disputeId (optional)
+vaultId, milestoneId (optional), disputeId (optional)
 
 eventType:
 
@@ -647,9 +762,19 @@ VERIFICATION_COMPLETED
 
 REVIEW_SUBMITTED
 
-MESSAGE_SENT (Generic communication)
+REQUIREMENTS_SNAPSHOTTED
 
-MESSAGE_EDITED (References previous event)
+MESSAGE_SENT
+
+MESSAGE_EDITED (references previous event)
+
+RELEASE_INITIATED
+
+RELEASE_CONFIRMED
+
+REFUND_INITIATED
+
+REFUND_CONFIRMED
 
 DISPUTE_OPENED
 
@@ -663,273 +788,316 @@ VAULT_FUNDED
 
 VAULT_STATUS_CHANGED
 
-actorUserId
+VAULT_PAUSED
 
-actorRole
+actorUserId, actorRole
 
-payloadJson:
-content: string (for messages)
-supersedesEventId: string (optional, for MESSAGE_EDITED)
-filesJson: string (optional)
+payloadJson (content, supersedesEventId, attachments, snapshots)
 
-contentHash (SHA256 of payload for tamper detection)
+contentHash (SHA256)
 
 createdAt
 
-Constraint: Evidence events are append-only (triggers prevent updates and deletes). To "edit" a message, a new MESSAGE_EDITED event must be appended. UI displays the latest event in a thread but must allow viewing the full history.
+Threading:
 
-Communication Threading
-Communication is tied to either a Vault or a Milestone.
-All messages are Evidence Events.
-Querying: Clients should query Evidence Events by vaultId/milestoneId and filter for MESSAGE\_\* types.
-If an event has `payload.supersedesEventId`, it replaces the referenced event in the primary view.
-Historical Integrity: The original event remains in the log and cannot be changed.
+Messages are tied to vault or milestone.
 
-Reputation
-freelancerId
+MESSAGE_EDITED appends a new event that supersedes prior event in UI; original remains immutable.
 
-confidenceScore
+5. State Machines (Allowed Transitions + Guards)
+   5.1 Vault.status Allowed Transitions
 
-completedVaultCycles
+DRAFT → AWAITING_FUNDING
+Guard: vault created; milestones defined (optional depending on UX)
 
-onTimeRate
+AWAITING_FUNDING → FUNDED
+Guard: escrow funding CONFIRMED (chain + required confirmations)
 
-disputeRate
+FUNDED → PAUSED
+Guard: reconciliation mismatch, fraud trigger, admin pause
 
-lastActiveAt
+PAUSED → FUNDED
+Guard: mismatch resolved; admin/system unpauses with reason
 
-Invites
-id
+FUNDED → DISPUTED
+Guard: eligible dispute OPENED for a milestone
 
-token (unique invite token)
+DISPUTED → FUNDED
+Guard: dispute resolved without terminal outcome and vault continues
 
-vaultId
+FUNDED → CANCELLED
+Guard: only if no active dispute and refund policy satisfied for remaining funds
 
-email (invited freelancer email)
+FUNDED / CANCELLED / DISPUTED → CLOSED
+Guard: escrow balance zero AND all money actions CONFIRMED AND no open disputes
 
-status:
+Invariant:
 
-PENDING
+If Vault.status in {PAUSED, DISPUTED} → no money actions allowed except those explicitly executed by admin resolution paths.
 
-ACCEPTED
+5.2 Milestone.status Allowed Transitions
 
-DECLINED
+PENDING → SUBMITTED
+Guard: submission created (immutable) + hashes recorded
 
-EXPIRED
+SUBMITTED → AWAITING_APPROVAL
+Guard: audit job finished OR audit skipped; milestone ready for client review
 
-invitedAt
+AWAITING_APPROVAL → VERIFIED
+Guard: client submits MilestoneReview(APPROVE) referencing submissionId+contentHash
 
-expiresAt
+AWAITING_APPROVAL → REVISION_REQUESTED
+Guard: client submits MilestoneReview(REQUEST_CHANGES) + reason codes
 
-respondedAt (nullable)
+REVISION_REQUESTED → SUBMITTED
+Guard: new submission created (immutable)
 
-declineReason (nullable)
+AWAITING_APPROVAL → REJECTED
+Guard: client submits MilestoneReview(REJECT) + reason codes
 
-3. Sync Strategy (Truth Reconciliation)
-   You have 3 truth sources:
-   DB state (internal belief)
+Any → DISPUTED
+Guard: eligible dispute opened with reqId or reason code
 
-Chain state (actual money events)
+Invariant: Milestone VERIFICATION (VERIFIED) does not move money.
 
-Ramp state (fiat lifecycle)
+Money moves only via Releases/Refunds reaching CONFIRMED.
 
-Golden Rule
-DB never assumes money moved.
-DB finalizes balances only after:
-chain event confirmed OR
+5.3 Money Action Guards (Release / Refund)
 
-ramp webhook confirmed (plus chain proof where needed)
+Release creation allowed only if:
+milestone.status == VERIFIED
 
-Required mechanisms
-idempotency keys on all money operations
+vault.status == FUNDED
 
-event listener for contract events
+no open dispute for the milestone
 
-webhook handler for ramp events
+idempotencyKey unique for (milestoneId, actionType)
 
-scheduled reconciliation jobs:
+Refund creation allowed only if:
 
-chain balances vs internal balances
+vault.status in {FUNDED, CANCELLED} and not DISPUTED
 
-vault escrow states vs DB states
+refund eligibility satisfied (see Section 7.9)
+
+idempotencyKey unique for (vaultId, actionType)
+
+6. Truth & Reconciliation (DB vs Chain vs Ramp)
+   6.1 Three Truth Sources
+
+DB state (internal belief)
+
+Chain state (actual escrow events)
+
+Ramp/provider state (fiat lifecycle)
+
+6.2 Golden Rule
+
+DB never assumes money moved. DB finalizes balances only after:
+
+chain event confirmed (with confirmation threshold), or
+
+provider webhook confirms settlement AND, where applicable, chain proof exists
+
+6.3 Required Mechanisms
+
+Idempotency keys on all money operations
+
+Chain event listener:
+
+confirmation-gated
+
+dedupe by (txHash, logIndex)
+
+reorg-safe handling
+
+Ramp webhook handler:
+
+idempotent ingestion
+
+dedupe by providerRef + event id
+
+Scheduled reconciliation:
+
+chain escrow balances vs escrow accounts
+
+provider settlement vs ledger
+
+journal balance checks
 
 Mismatch rule:
-if reconciliation finds mismatch → auto-freeze affected vault/user
 
-4. Workflows (End-to-End)
-   Workflow A: Signup → Wallet Associated
-   User signs up via email/social through the Provider (Privy/Web3Auth).
+If mismatch detected → set Vault.status = PAUSED and block money actions.
 
-Backend receives:
+Evidence event VAULT_PAUSED appended with reason code.
 
-- providerUserId
-- publicAddress
+7. End-to-End Workflows
+   7.1 Signup → Smart Account Associated
 
-Backend creates user record and associates the Non-Custodial Wallet.
-status = ACTIVE
+User signs up via provider.
 
-Freelancer gating:
-status = PENDING_APPROVAL until reviewed
+Backend receives providerUserId + publicAddress.
 
-once approved → ACTIVE
+Backend creates user + smart account association.
 
-Workflow B: Client Deposit (Ramp)
-client clicks “Add funds”
+Freelancer gating: PENDING_APPROVAL until reviewed → ACTIVE.
 
-backend creates ramp checkout session:
+7.2 Client Deposit (Ramp)
 
-amount + destinationAddress = client wallet
+Client clicks “Add funds”.
 
-ramp processes fiat payment
+Backend creates ramp checkout/session (amount + destination parameters).
 
-webhook: deposit initiated
+Webhook updates deposit state.
 
-stablecoins arrive on-chain to client wallet
+If provider settles on-chain: chain listener confirms arrival.
 
-chain listener detects incoming transfer
+Ledger: deposit available only after settlement confirmation.
 
-backend ledger:
+UI: processing → available (USD).
 
-DEPOSIT PENDING → CONFIRMED
+7.3 Create Vault → Fund Escrow
 
-UI shows processing → available
+Client creates vault + milestones (DB).
 
-Workflow C: Create Vault → Fund Escrow
-client creates vault + milestones (DB)
+Vault.status = DRAFT → AWAITING_FUNDING.
 
-vault status = AWAITING_FUNDING / DRAFT depending on UX stage
+Client funds vault:
 
-client funds vault
+backend checks client available balance
 
-backend checks:
-
-client balance >= totalAmount
-
-freelancer is ACTIVE (if assigned)
-
-backend creates ledger LOCK PENDING
-
-backend initiates deposit session via ramp/provider
-
-client approves transaction via Provider UI (if required)
+creates funding transaction via wallet provider
 
 chain emits VaultFunded
 
-listener confirms:
+after confirmations: Vault.status = FUNDED
 
-LOCK CONFIRMED
+ledger/journal posts only on confirmation
 
-vault status = FUNDED_ASSIGNED or FUNDED_UNASSIGNED
+7.4 Freelancer Submit Deliverable
 
-Workflow D: Freelancer Submit Deliverable
-freelancer uploads file(s) or posts link(s)
+Freelancer uploads files/posts links.
 
-backend creates Submission + hashes
+Backend creates immutable Submission + contentHash.
 
-milestone status = SUBMITTED
+Milestone.status = SUBMITTED.
 
-verification job queued
+Audit job queued.
 
-Workflow E: AI Audit (Objective Only)
-AI audit runs deterministic checks based on requirementItemsJson.
-Outputs:
-PASS → milestone moves to AWAITING_APPROVAL
+7.5 AI Audit (Objective Only)
 
-FAIL → milestone moves to AWAITING_APPROVAL (AI is advisory, does not block)
+Deterministic checks based on requirementItemsJson (reqIds).
 
-FLAGGED/HUMAN_REVIEW → milestone moves to AWAITING_APPROVAL but marked “Needs extra review”
+Outputs PASS/FAIL/FLAGGED/HUMAN_REVIEW.
 
-Important:
-AI audit never releases funds.
+Milestone.status → AWAITING_APPROVAL (always).
 
-AI audit never decides milestone outcome (FAIL is advisory only).
+Audit never blocks approval; never releases funds.
 
-Workflow F: Client Review → Release Payment
+7.6 Client Review (Verify Work)
+
 Client sees:
-freelancer submission
 
-AI audit summary + reason codes
+Submission
+
+Audit summary + reason codes
 
 Client actions:
-APPROVE → milestone status VERIFIED (Marked as approved; eligible for explicit release action)
 
-REQUEST_CHANGES → milestone status REVISION_REQUESTED → freelancer resubmits
+Approve → milestone.status = VERIFIED
 
-REJECT → milestone status REJECTED (structured reason codes required)
+Review must reference submissionId + contentHash
 
-Important: Client can APPROVE even if auditStatus = FAIL
-System shows warning but does not block approval
-Client must acknowledge warning: acknowledgeAuditWarning = true
+If audit FAIL, client must set acknowledgeAuditWarning = true
 
-Release flow:
-backend creates ledger RELEASE PENDING
+Request changes → REVISION_REQUESTED (reason codes)
 
-backend initiates Release request via Provider SDK (using paymaster for gas)
+Reject → REJECTED (reason codes)
 
-Backend verifies request matches verified milestone status
+On review submission, backend must append evidence:
 
-chain emits MilestoneReleased
+REQUIREMENTS_SNAPSHOTTED (snapshot of requirements at that time)
 
-backend confirms:
+REVIEW_SUBMITTED
 
-RELEASE CONFIRMED
+7.7 Release Payment (Explicit Money Action)
 
-freelancer balance increases
+Client clicks Release.
 
-vault becomes COMPLETED if all milestones are VERIFIED
+Backend creates Release with idempotencyKey.
 
-Workflow G: Freelancer Withdraw (Ramp)
-freelancer clicks withdraw
+Release.status progresses:
 
-backend checks:
+PENDING_SIGNATURE (if user signature required)
 
-KYC status (if required)
+SUBMITTED (tx submitted)
 
-velocity limits
+CONFIRMED (after chain confirmations)
 
-available balance
+On CONFIRMED:
 
-backend initiates off-ramp session
+post journal entry for release
 
-ledger WITHDRAW PENDING → CONFIRMED after webhook
+append evidence RELEASE_CONFIRMED
 
-UI shows “Sent to bank”
+milestone considered “paid” in UI (via Release status)
 
-Workflow H: Dispute Opening (Eligibility-Gated)
-Dispute creation requires:
-vaultId + milestoneId
+7.8 Freelancer Withdraw (Ramp)
 
-disputeType
+Freelancer clicks Withdraw.
 
-reasonCode
+Backend checks: KYC, limits, available settled balance.
 
-requirementRef reqId if requirement-based
+Creates ramp withdrawal transaction.
 
-Eligibility rules:
-disputes are NOT “I don’t like it”
+After provider settlement confirmation:
 
-disputes exist only for:
+post journal entry
 
-VERIFICATION_ERROR
+UI shows “Sent to bank”.
 
-REQUIREMENT_MISMATCH
+7.9 Rejection Policy & Refund Eligibility
 
-SCOPE_CHANGE
+Rejection
 
-BAD_FAITH
+Client may reject for subjective reasons using structured codes.
 
-FRAUD
+Rejection does not move money and does not auto-create a dispute.
 
-PROCESS_BREACH
+Dispute window
 
-SECURITY
+Either party may open an eligible dispute within 7 days of rejection (policy default; configurable).
 
-Workflow I: Dispute Resolution
-dispute opens → milestone/vault becomes DISPUTED/PAUSED
+Cooling-off window
 
-system bundles evidence:
+Refund request cannot be initiated until 72 hours after rejection (policy default; configurable).
 
-requirements
+Refund eligibility
+
+If milestone is REJECTED and no eligible dispute is opened within the dispute window:
+
+client may initiate Refund for unreleased escrow as allowed by policy.
+
+Refund is a money action:
+
+must be idempotent
+
+must be chain-confirmed before ledger is final
+
+Refund Eligibility Gating:
+
+Refunds are disabled if a dispute is OPEN for the milestone/vault.
+
+Cooling-off window (default 72h) must elapse after rejection before refund becomes available.
+
+Bad-faith rejection pattern (clawback intent without objective failure) triggers an automated freeze (Vault.status = PAUSED) for manual review.
+
+7.10 Dispute Resolution
+
+Dispute opens → vault.status = DISPUTED (and/or milestone.status = DISPUTED).
+
+System bundles evidence:
+
+requirements snapshot
 
 submission hashes
 
@@ -937,134 +1105,154 @@ audit output
 
 evidence messages
 
-chain events
+chain/provider events
 
-AI re-audit snapshot attaches to case
+Human advisor resolves outcome:
 
-human advisor resolves outcome
+release / refund / split / allow resubmission / dismiss
 
-backend applies outcome:
+Backend applies outcome via money actions; ledger finalizes only after confirmation.
 
-release funds / hold / refund vault / allow resubmission
+Vault may return to FUNDED or proceed toward CLOSED based on settlement.
 
-ledger finalized only after chain confirmation
+8. AI Audit Implementation (Objective Only)
+   Layer 1: Deterministic Rules Engine (Mandatory)
 
-5. AI Implementation (Objective Verification Only)
-   Layer 1: Deterministic Rules Engine (mandatory)
-   file type checks
+File type checks
 
-required file presence
+Required file presence
 
-naming conventions
+Naming conventions
 
-size limits
+Size limits
 
-image resolution
+Image resolution
 
-pdf page count
+PDF page count
 
-zip content listing
+ZIP content listing
 
-link reachability (200 OK)
+Link reachability (HTTP 200)
 
-schema response validation for APIs
+Schema validation (for API outputs)
 
-Layer 2: Lightweight ML (optional)
-anomaly detection (“empty placeholder”)
+Layer 2: Lightweight ML (Optional)
 
-risk scoring for HUMAN_REVIEW routing
+Placeholder detection
 
-Layer 3: Human overrides become training data
-advisor overrides become labeled examples
+Risk scoring for HUMAN_REVIEW routing
 
-improves rule library + reason codes
+Layer 3: Human Overrides as Training Data
 
-Output must always reference requirement IDs:
-Example:
-FAIL because req_03 “Repo must contain README.md” is missing.
+Advisor overrides → labeled examples
 
-6. Build Order (One-by-One)
-   Phase 1: Backend spine (no chain yet)
-   auth + roles
+Improves rule library + reason codes
 
-vault + milestone CRUD
+Rule:
 
-state machine guards
+All outputs must reference reqIds:
 
-submissions
+Example: FAIL because req_03 “Repo must contain README.md” is missing.
 
-deterministic verification engine (mock PASS/FAIL)
+9. Build Order (Phased)
+   Phase 1: Backend Spine (No Chain)
 
-ledger entries (internal)
+Auth + roles
 
-disputes + eligibility gating
+Vault + milestone CRUD
 
-dispute UI timeline
+State machine guards
 
-Goal: simulate full flow with mock money.
-Phase 2: Custody + escrow (testnet)
-custody abstraction
+Submissions + hashing + evidence events
 
-minimal escrow contract
+Deterministic verification engine (mock)
 
-chain event listener
+Ledger/journal skeleton
 
-reconciliation jobs
+Disputes + eligibility gating
 
-pause/refund flows
+Dispute UI timeline
 
-Goal: real proof of funds + releases.
-Phase 3: Ramp integration
-deposit sessions + webhooks
+Goal: full flow simulation with mock money actions.
 
-withdraw flows
+Phase 2: Wallet + Escrow (Testnet)
 
-ramp/chain reconciliation
+Wallet abstraction integration
+
+Minimal escrow contract
+
+Chain event listener (confirmation-gated + dedupe)
+
+Reconciliation jobs
+
+Pause/refund flows
+
+Goal: proof of funds + releases.
+
+Phase 3: Ramp Integration
+
+Deposit sessions + webhooks
+
+Withdraw flows
+
+Ramp/chain reconciliation + manual review lane
 
 Goal: full Web2 deposit/withdraw UX.
-Phase 4: AI audit expansion
-more deterministic checks
 
-metadata extractors
+Phase 4: AI Audit Expansion
 
-human review dashboard
+More deterministic checks
 
-re-audit snapshots
+Metadata extractors
 
-Goal: lower disputes, higher confidence.
+Human review dashboard
 
-7. What Will Break First
-   Prepare for these failure modes:
-   idempotency bugs → double releases
+Re-audit snapshots attached to disputes
 
-webhook duplication → double crediting
+Goal: fewer disputes, higher confidence.
 
-chain confirmations → false success
+10. Failure Modes (What Breaks First)
 
-key management mistakes → catastrophic custody risk
+Expected failure points:
 
-vague requirements → disputes explode
+Idempotency bugs → double releases
 
-free-text disputes → becomes Upwork
+Webhook duplication → double crediting
 
-So you must enforce:
-idempotency keys
+Chain confirmation assumptions → false success
 
-event dedupe
+Reorg/duplicate logs → incorrect posting
 
-confirmation thresholds
+Vague requirements → disputes explode
 
-custody keyRef only
+Free-text disputes → becomes Upwork
 
-requirement builder with reqIds
+Missing snapshotting → “approved submission changed later”
 
-8. Minimal Diagram (Mental Model)
-   Frontend
-   → Backend API (state machine + ledger + disputes)
-   → Queue (audit + re-audit jobs)
-   → AI Audit Service (objective checks + reason codes)
-   → Custody Service (sign tx)
-   → Escrow Contract (moves funds)
-   → Chain Listener (updates DB)
-   → Ramp Provider (fiat in/out)
-   → Reconciler (truth alignment)
+Therefore enforce:
+
+Idempotency keys + dedupe everywhere
+
+Confirmation thresholds before posting money
+
+Non-custodial keys only (no keys in DB, logs, env vars)
+
+Requirement builder with reqIds + schema version
+
+Requirements + submission snapshot binding to reviews/releases
+
+Structured disputes only
+
+Freeze to PAUSED on mismatches
+
+11. Minimal Diagram (Mental Model)
+
+Frontend
+→ Backend API (state machine + evidence + money actions + ledger + disputes)
+→ Queue (audit + re-audit jobs)
+→ AI Audit Service (objective checks + reason codes)
+→ Wallet Provider (signing / sessions)
+→ Escrow Contract (moves funds)
+→ Chain Listener (updates DB)
+→ Ramp Provider (fiat in/out)
+→ Reconciler (truth alignment + auto-pause)

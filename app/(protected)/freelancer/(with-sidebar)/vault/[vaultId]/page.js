@@ -46,7 +46,29 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { EvidencePanel } from "@/components/shared/EvidencePanel";
 import { cn } from "@/lib/utils";
 import { getDisputeEligibility } from "@/lib/rules/disputes";
-import { VaultStatus, MilestoneStatus, VerificationResult } from "@/lib/domain/enums";
+import { VaultStatus, MilestoneStatus, ReleaseStatus, VerificationResult } from "@/lib/domain/enums";
+
+// Helper for derived UI labels (Invisible Blockchain)
+const getVaultDerivedLabel = (status) => {
+  switch (status) {
+    case VaultStatus.DRAFT:
+      return "DRAFT";
+    case VaultStatus.AWAITING_FUNDING:
+      return "PENDING DEPOSIT";
+    case VaultStatus.FUNDED:
+      return "IN PROGRESS";
+    case VaultStatus.PAUSED:
+      return "PAUSED";
+    case VaultStatus.DISPUTED:
+      return "IN DISPUTE";
+    case VaultStatus.CANCELLED:
+      return "CANCELLED";
+    case VaultStatus.CLOSED:
+      return "CLOSED";
+    default:
+      return status;
+  }
+};
 
 export default function FreelancerVaultDetailPage() {
   const params = useParams();
@@ -184,22 +206,32 @@ export default function FreelancerVaultDetailPage() {
     return displayMilestones.some((m) => getDisputeEligibility(m).eligible);
   }, [displayMilestones]);
 
-  // Helper for status colors
-  const getStatusColor = (status) => {
-    const normalized = status?.toUpperCase();
-    switch (normalized) {
-      case MilestoneStatus.VERIFIED:
-        return "text-emerald-500";
-      case MilestoneStatus.AWAITING_APPROVAL:
-      case "PENDING_REVIEW":
-      case MilestoneStatus.SUBMITTED:
-        return "text-amber-500";
-      case MilestoneStatus.REJECTED:
-      case MilestoneStatus.DISPUTED:
-        return "text-red-500";
-      default:
-        return "text-gray-400";
+  // Helper for status colors and labels
+  const getStatusDisplay = (milestone) => {
+    const status = milestone.status?.toUpperCase();
+    const releaseStatus = milestone.releaseStatus?.toUpperCase();
+
+    if (releaseStatus === ReleaseStatus.CONFIRMED) {
+      return { label: "PAID", color: "text-emerald-500", icon: CheckCircle };
     }
+    
+    if (status === MilestoneStatus.VERIFIED) {
+        return { label: "APPROVED", color: "text-emerald-400", icon: CheckCircle };
+    }
+
+    if (status === MilestoneStatus.AWAITING_APPROVAL || status === MilestoneStatus.SUBMITTED) {
+      return { label: "IN REVIEW", color: "text-amber-500", icon: Clock };
+    }
+    
+    if (status === MilestoneStatus.REJECTED || status === MilestoneStatus.REVISION_REQUESTED) {
+      return { label: "NEED CHANGES", color: "text-red-500", icon: AlertTriangle };
+    }
+    
+    if (status === MilestoneStatus.DISPUTED) {
+        return { label: "DISPUTED", color: "text-red-400", icon: Gavel };
+    }
+
+    return { label: "PENDING", color: "text-gray-400", icon: Clock };
   };
 
   // Helper for mock evidence
@@ -259,7 +291,7 @@ export default function FreelancerVaultDetailPage() {
                   variant="outline"
                   className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px] shrink-0"
                 >
-                  {vault.status}
+                  {getVaultDerivedLabel(vault.status)}
                 </Badge>
               </div>
               <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-wide truncate">
@@ -318,13 +350,13 @@ export default function FreelancerVaultDetailPage() {
                             </div>
                             <div className={cn(
                               "flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-bold uppercase tracking-widest",
-                              getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
-                              getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20"),
-                              getStatusColor(milestone.status)
+                              getStatusDisplay(milestone).color.replace("text-", "bg-").replace("500", "500/10").replace("400", "400/10"),
+                              getStatusDisplay(milestone).color.replace("text-", "border-").replace("500", "500/20").replace("400", "400/20"),
+                              getStatusDisplay(milestone).color
                             )}>
                               <Users className="w-3 h-3" />
                               <span>
-                                Approval: {milestone.status.replace("_", " ")}
+                                Approval: {getStatusDisplay(milestone).label}
                               </span>
                             </div>
                           </div>
@@ -371,17 +403,20 @@ export default function FreelancerVaultDetailPage() {
                             variant="outline"
                             className={cn(
                               "uppercase tracking-widest text-[10px] h-7 px-3 flex items-center gap-1.5",
-                              getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
-                              getStatusColor(milestone.status),
-                              getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20")
+                              getStatusDisplay(milestone).color.replace("text-", "bg-").replace("500", "500/10").replace("400", "400/10"),
+                              getStatusDisplay(milestone).color,
+                              getStatusDisplay(milestone).color.replace("text-", "border-").replace("500", "500/20").replace("400", "400/20")
                             )}
                           >
-                            {milestone.status === MilestoneStatus.VERIFIED ? (
-                              <CheckCircle className="w-3.5 h-3.5" />
-                            ) : (
-                              <Clock className="w-3.5 h-3.5" />
-                            )}
-                            {milestone.status.replace("_", " ")}
+                            {(() => {
+                                const { icon: StatusIcon, label } = getStatusDisplay(milestone);
+                                return (
+                                    <>
+                                        <StatusIcon className="w-3.5 h-3.5" />
+                                        {label}
+                                    </>
+                                );
+                            })()}
                           </Badge>
                         )}
                       </div>

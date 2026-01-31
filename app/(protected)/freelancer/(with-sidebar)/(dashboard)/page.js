@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useVault } from "@/lib/store/vault-context";
-import { useWallet } from "@/lib/store/wallet-context";
+import { useLedger } from "@/lib/store/ledger-context";
 import {
   Briefcase,
   ArrowUpRight,
@@ -17,6 +17,7 @@ import {
   CheckCircle,
   Zap,
 } from "lucide-react";
+import { VaultStatus, getVaultDerivedLabel } from "@/lib/domain/enums";
 import { AmountDisplay } from "@/components/ui/amount-display";
 import { StatusBadge } from "@/components/ui/status-badge";
 
@@ -41,15 +42,15 @@ const itemVariants = {
 
 export default function FreelancerDashboard() {
   const { vaults, loading } = useVault();
-  const { balance } = useWallet();
+  const { balance } = useLedger();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
   // Work categories
   const activeVaults = vaults.filter((v) =>
-    ["ACTIVE", "PENDING", "REVIEW"].includes(v.status)
+    [VaultStatus.FUNDED, VaultStatus.PAUSED, VaultStatus.DISPUTED].includes(v.status)
   );
-  const completedVaults = vaults.filter((v) => v.status === "COMPLETED");
+  const completedVaults = vaults.filter((v) => v.status === VaultStatus.CLOSED);
   const totalPending = activeVaults.reduce(
     (acc, v) => acc + (v.totalAmount || v.amount),
     0
@@ -213,7 +214,7 @@ export default function FreelancerDashboard() {
                         {vault.title}
                       </h4>
                       <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-xs font-black uppercase tracking-wide rounded-sm border border-emerald-500/20 whitespace-nowrap">
-                        {vault.status}
+                        {getVaultDerivedLabel(vault.status)}
                       </span>
                     </div>
                     {vault.description && (

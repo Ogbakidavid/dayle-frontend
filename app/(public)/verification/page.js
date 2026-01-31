@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Shield, Clock, CheckCircle2, AlertCircle, ArrowLeft, Lock, Globe } from 'lucide-react';
 import { api } from '@/lib/mock-api';
-import { VaultStatus, MilestoneStatus } from '@/lib/domain/enums';
+import { VaultStatus, MilestoneStatus, getVaultDerivedLabel } from '@/lib/domain/enums';
 import { Button } from '@/components/ui/button';
 
 function VerificationStatusContent() {
@@ -63,7 +63,7 @@ function VerificationStatusContent() {
         );
     }
 
-    const isVerified = vault.status === VaultStatus.COMPLETED;
+    const isVerified = vault.status === VaultStatus.CLOSED;
     const isReview = vault.milestones?.some(m => 
         m.status === MilestoneStatus.SUBMITTED || 
         m.status === MilestoneStatus.AWAITING_APPROVAL
@@ -122,7 +122,7 @@ function VerificationStatusContent() {
                                     isReview ? 'text-blue-500' :
                                         'text-white'
                                     }`}>
-                                    {vault.status.replace(/_/g, ' ')}
+                                    {getVaultDerivedLabel(vault.status)}
                                 </p>
                             </div>
                             <div>

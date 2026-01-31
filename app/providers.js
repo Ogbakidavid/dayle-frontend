@@ -1,18 +1,18 @@
 'use client';
 
 import { UserProvider } from '@/lib/store/user-context';
-import { WalletProvider } from '@/lib/store/wallet-context';
+import { LedgerProvider } from '@/lib/store/ledger-context';
 import { VaultProvider } from '@/lib/store/vault-context';
 import { KYCGate } from '@/components/shared/KYCGate';
 
 export function Providers({ children }) {
     return (
         <UserProvider>
-            <WalletProvider>
+            <LedgerProvider>
                 <VaultProvider>
                     {children}
                 </VaultProvider>
-            </WalletProvider>
+            </LedgerProvider>
         </UserProvider>
     );
 }

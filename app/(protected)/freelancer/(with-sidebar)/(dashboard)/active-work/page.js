@@ -82,7 +82,7 @@ export default function ActiveWorkPage() {
             ))}
           </div>
         ) : activeVaults.length === 0 ? (
-          <div className="mx-4 md:mx-0 py-20 text-center bg-[#111111] border border-gray-900 rounded-sm">
+          <div className="mx-4 md:mx-0 py-20 text-center bg-muted border border-gray-900 rounded-sm">
             <Activity className="w-12 h-12 text-white-700 mx-auto mb-4" />
             <p className="text-white-400 font-medium text-lg text-white">
               No active assignments
@@ -98,7 +98,7 @@ export default function ActiveWorkPage() {
                 <Link
                   key={vault.id}
                   href={`/freelancer/vault/${vault.id}`}
-                  className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 md:p-6 bg-[#111111] border border-gray-900 rounded-sm hover:border-gray-800 transition-colors gap-4"
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 md:p-6 bg-muted border border-gray-900 rounded-sm hover:border-gray-800 transition-colors gap-4"
                 >
                   <div className="space-y-2 min-w-0">
                     <div className="flex flex-wrap items-center gap-3">

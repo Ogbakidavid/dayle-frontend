@@ -60,7 +60,29 @@ import {
 } from "@/lib/rules/disputes";
 import { APPROVAL_REJECTION_CODES } from "@/lib/rules/milestones";
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
-import { VaultStatus, MilestoneStatus } from "@/lib/domain/enums";
+import { VaultStatus, MilestoneStatus, ReleaseStatus } from "@/lib/domain/enums";
+
+// Helper for derived UI labels (Invisible Blockchain)
+const getVaultDerivedLabel = (status) => {
+  switch (status) {
+    case VaultStatus.DRAFT:
+      return "DRAFT";
+    case VaultStatus.AWAITING_FUNDING:
+      return "PENDING DEPOSIT";
+    case VaultStatus.FUNDED:
+      return "IN PROGRESS";
+    case VaultStatus.PAUSED:
+      return "PAUSED";
+    case VaultStatus.DISPUTED:
+      return "IN DISPUTE";
+    case VaultStatus.CANCELLED:
+      return "CANCELLED";
+    case VaultStatus.CLOSED:
+      return "CLOSED";
+    default:
+      return status;
+  }
+};
 
 export default function ClientVaultDetailPage() {
   const params = useParams();
@@ -116,18 +138,21 @@ export default function ClientVaultDetailPage() {
             title: "GitHub Repository Setup",
             displayAmount: vault.totalAmount * 0.2,
             deliverableTypeId: "github_repo",
+            deliverable: "GitHub Repository",
             deliverableMode: "LINK",
           },
           {
             title: "Core API Implementation",
             displayAmount: vault.totalAmount * 0.4,
             deliverableTypeId: "api_endpoint",
+            deliverable: "Live API Endpoint",
             deliverableMode: "LINK",
           },
           {
             title: "Production Deployment",
             displayAmount: vault.totalAmount * 0.4,
             deliverableTypeId: "live_webapp",
+            deliverable: "Deployed Web App",
             deliverableMode: "LINK",
           }
         );
@@ -137,19 +162,25 @@ export default function ClientVaultDetailPage() {
             title: "Brand Guidelines",
             amount: vault.amount * 0.3,
             deliverableId: "figma_link",
-            deliverable: "Figma File",
+            deliverable: "Figma File", // Corrected to match freelancer (which had deliverable populated)
+            deliverableTypeId: "figma_link", // standardized
+            deliverableMode: "LINK",
           },
           {
             title: "Logo Assets",
             amount: vault.amount * 0.3,
             deliverableId: "asset_pack",
             deliverable: "Design Assets (ZIP)",
+            deliverableTypeId: "asset_pack",
+            deliverableMode: "FILE",
           },
           {
             title: "Social Media Kit",
             amount: vault.amount * 0.4,
             deliverableId: "figma_link",
             deliverable: "Figma Link",
+            deliverableTypeId: "figma_link",
+            deliverableMode: "LINK",
           }
         );
       } else if (vault.type === "content_ai") {
@@ -159,18 +190,24 @@ export default function ClientVaultDetailPage() {
             amount: vault.amount * 0.3,
             deliverableId: "ai_dataset",
             deliverable: "JSON Dataset",
+            deliverableTypeId: "ai_dataset",
+            deliverableMode: "FILE",
           },
           {
             title: "Data Sanitization",
             amount: vault.amount * 0.3,
             deliverableId: "doc_submission",
             deliverable: "Technical Document",
+            deliverableTypeId: "doc_submission",
+            deliverableMode: "FILE",
           },
           {
             title: "Model Fine-tuning",
             amount: vault.amount * 0.4,
             deliverableId: "audio_video",
             deliverable: "Model Weights (File)",
+            deliverableTypeId: "audio_video",
+            deliverableMode: "FILE",
           }
         );
       } else {
@@ -178,6 +215,7 @@ export default function ClientVaultDetailPage() {
           title: "Project Deliverable",
           displayAmount: vault.totalAmount || vault.amount,
           deliverableTypeId: "doc_submission",
+          deliverable: "General Document",
           deliverableMode: "FILE",
         });
       }
@@ -193,6 +231,7 @@ export default function ClientVaultDetailPage() {
         complianceStatus: m.verification?.result || "PENDING",
         status: m.status || MilestoneStatus.AWAITING_APPROVAL,
         displayAmount: m.totalAmount || m.amount || m.displayAmount,
+        deliverable: m.deliverable || (m.deliverableTypeId ? m.deliverableTypeId.replace(/_/g, ' ') : "Deliverable"), // Fallback
       };
     });
   }, [vault]);
@@ -337,16 +376,32 @@ export default function ClientVaultDetailPage() {
     );
   }
 
-  // Helper for status colors
-  const getStatusColor = (status) => {
-    const normalized = status?.toUpperCase();
-    if (normalized === MilestoneStatus.VERIFIED)
-      return "text-emerald-500";
-    if (normalized === MilestoneStatus.AWAITING_APPROVAL || normalized === MilestoneStatus.PENDING || normalized === MilestoneStatus.SUBMITTED)
-      return "text-amber-500";
-    if (normalized === MilestoneStatus.REJECTED || normalized === MilestoneStatus.REVISION_REQUESTED)
-      return "text-red-500";
-    return "text-gray-400";
+  // Helper for status colors and labels
+  const getStatusDisplay = (milestone) => {
+    const status = milestone.status?.toUpperCase();
+    const releaseStatus = milestone.releaseStatus?.toUpperCase();
+
+    if (releaseStatus === ReleaseStatus.CONFIRMED) {
+      return { label: "PAID", color: "text-emerald-500", icon: CheckCircle };
+    }
+    
+    if (status === MilestoneStatus.VERIFIED) {
+        return { label: "APPROVED", color: "text-emerald-400", icon: Check };
+    }
+
+    if (status === MilestoneStatus.AWAITING_APPROVAL || status === MilestoneStatus.SUBMITTED) {
+      return { label: "IN REVIEW", color: "text-amber-500", icon: Clock };
+    }
+    
+    if (status === MilestoneStatus.REJECTED || status === MilestoneStatus.REVISION_REQUESTED) {
+      return { label: "NEED CHANGES", color: "text-red-500", icon: X };
+    }
+    
+    if (status === MilestoneStatus.DISPUTED) {
+        return { label: "DISPUTED", color: "text-red-400", icon: Gavel };
+    }
+
+    return { label: "PENDING", color: "text-gray-400", icon: Clock };
   };
 
   return (
@@ -382,7 +437,7 @@ export default function ClientVaultDetailPage() {
                   variant="outline"
                   className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px]"
                 >
-                  {vault.status}
+                  {getVaultDerivedLabel(vault.status)}
                 </Badge>
                 {vault.status === VaultStatus.DRAFT && (
                   <Button
@@ -456,25 +511,25 @@ export default function ClientVaultDetailPage() {
                             </div>
                             <div className={cn(
                               "flex items-center gap-1.5 px-2 py-0.5 rounded border",
-                              getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
-                              getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20"),
-                              getStatusColor(milestone.status)
+                              getStatusDisplay(milestone).color.replace("text-", "bg-").replace("500", "500/10").replace("400", "400/10"),
+                              getStatusDisplay(milestone).color.replace("text-", "border-").replace("500", "500/20").replace("400", "400/20"),
+                              getStatusDisplay(milestone).color
                             )}>
                               <Users className="w-3 h-3" />
                               <span className="uppercase tracking-widest text-[9px] font-bold">
-                                Approval: {milestone.status.replace("_", " ")}
+                                Approval: {getStatusDisplay(milestone).label}
                               </span>
                             </div>
                           </div>
 
-                          {milestone.deliverableTypeId && (
+                          {(milestone.deliverable || milestone.deliverableTypeId) && (
                             <div className="mt-3 flex items-center gap-3">
                               <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gray-500 font-black">
                                 <FileText className="w-3 h-3" />
-                                Protocol:
+                                Deliverable:
                               </div>
                               <span className="text-[11px] text-gray-300 font-bold uppercase bg-white/5 px-2 py-0.5 rounded border border-white/5">
-                                {milestone.deliverableTypeId}
+                                {milestone.deliverable || milestone.deliverableTypeId}
                               </span>
                             </div>
                           )}
@@ -699,18 +754,20 @@ export default function ClientVaultDetailPage() {
                             variant="outline"
                             className={cn(
                               "uppercase tracking-widest text-[10px] h-7 px-3 flex items-center gap-1.5",
-                              getStatusColor(milestone.status).replace("text-", "bg-").replace("500", "500/10"),
-                              getStatusColor(milestone.status),
-                              getStatusColor(milestone.status).replace("text-", "border-").replace("500", "500/20")
+                              getStatusDisplay(milestone).color.replace("text-", "bg-").replace("500", "500/10").replace("400", "400/10"),
+                              getStatusDisplay(milestone).color,
+                              getStatusDisplay(milestone).color.replace("text-", "border-").replace("500", "500/20").replace("400", "400/20")
                             )}
                           >
-                            {milestone.status === "VERIFIED" ||
-                              milestone.status === MilestoneStatus.VERIFIED ? (
-                              <CheckCircle className="w-3.5 h-3.5" />
-                            ) : (
-                              <Clock className="w-3.5 h-3.5" />
-                            )}
-                            {milestone.status.replace("_", " ")}
+                            {(() => {
+                                const { icon: StatusIcon, label } = getStatusDisplay(milestone);
+                                return (
+                                    <>
+                                        <StatusIcon className="w-3.5 h-3.5" />
+                                        {label}
+                                    </>
+                                );
+                            })()}
                           </Badge>
                         )}
                       </div>

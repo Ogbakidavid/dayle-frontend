@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Landmark, Clock, ShieldCheck, Zap } from "lucide-react";
 
-export function WalletBalance({ balance, role = "client" }) {
+export function LedgerBalance({ balance, role = "client" }) {
     return (
         <div className="grid md:grid-cols-2 gap-6 p-4">
             {/* Available Funds - The High Value Side */}
@@ -15,7 +15,7 @@ export function WalletBalance({ balance, role = "client" }) {
                 <CardContent className="p-8 relative z-10">
                     <div className="flex items-center gap-2 text-white font-black uppercase tracking-wide text-sm mb-5">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
-                        Available Funds
+                        Available Balance
                     </div>
                     <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-light text-white">$</span>
@@ -40,7 +40,7 @@ export function WalletBalance({ balance, role = "client" }) {
                 <CardContent className="p-8 relative z-10">
                     <div className="flex items-center gap-2 text-white font-black uppercase tracking-wide text-sm mb-5">
                         <ShieldCheck size={14} className="text-emerald-500/50" />
-                        Pending in Vaults
+                        Pending Settlement
                     </div>
                     <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-light text-white">$</span>

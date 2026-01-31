@@ -55,7 +55,7 @@ const navigation = [
     icon: Briefcase,
     badge: "2",
   },
-  { name: "Financials", href: "/freelancer/wallet", icon: Landmark, badge: null },
+  { name: "My Balance", href: "/freelancer/balance", icon: Landmark, badge: null },
   { name: "Ledger", href: "/freelancer/ledger", icon: PieChart, badge: null },
   { name: "Disputes", href: "/freelancer/disputes", icon: Gavel, badge: null },
 ];

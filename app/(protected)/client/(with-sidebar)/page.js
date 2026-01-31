@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useVault } from "@/lib/store/vault-context";
-import { useWallet } from "@/lib/store/wallet-context";
+import { useLedger } from "@/lib/store/ledger-context";
 import {
   CreditCard,
   Landmark,
@@ -16,6 +16,7 @@ import {
   Zap,
   Plus,
 } from "lucide-react";
+import { getVaultDerivedLabel } from "@/lib/domain/enums";
 
 
 const containerVariants = {
@@ -36,7 +37,7 @@ const itemVariants = {
 
 export default function ClientDashboard() {
   const { vaults, loading } = useVault();
-  const { balance } = useWallet();
+  const { balance } = useLedger();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
@@ -177,7 +178,7 @@ export default function ClientDashboard() {
                       <div className="flex flex-wrap items-center gap-2 mb-2">
                         <h4 className="font-bold uppercase tracking-wide text-white truncate">{vault.title}</h4>
                         <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-xs font-black uppercase tracking-wide rounded-sm border border-emerald-500/20 whitespace-nowrap">
-                          {vault.status}
+                          {getVaultDerivedLabel(vault.status)}
                         </span>
                       </div>
                       {vault.description && (

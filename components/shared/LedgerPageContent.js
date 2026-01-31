@@ -2,24 +2,38 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AmountDisplay } from '@/components/ui/amount-display';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { WalletBalance } from '@/components/shared/WalletBalance';
-import { useWallet } from '@/lib/store/wallet-context';
+import { LedgerBalance } from './LedgerBalance';
+import { useLedger } from '@/lib/store/ledger-context';
 import { cn } from '@/lib/utils';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-    Download,
+    Building2,
     ArrowUpRight,
     ArrowDownLeft,
-    Search,
-    Filter,
-    CreditCard,
-    ShieldCheck,
     History,
-    Zap,
-    ArrowRight
+    AlertCircle,
+    PiggyBank,
+    CheckCircle2,
+    Lock,
+    ArrowRight,
+    Download,
+    Search,
+    Zap
 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+} from "@/components/ui/dialog";
 import { motion } from 'framer-motion';
 
 const containerVariants = {
@@ -38,8 +52,8 @@ const itemVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
-export default function WalletPageContent() {
-    const { balance, transactions, loading, withdraw } = useWallet();
+export default function LedgerPageContent() {
+    const { balance, transactions, loading, withdraw } = useLedger();
     const [isWithdrawing, setIsWithdrawing] = useState(false);
     const [withdrawAmount, setWithdrawAmount] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -50,7 +64,7 @@ export default function WalletPageContent() {
         if (!withdrawAmount || isWithdrawing) return;
 
         // Redirect to the new withdrawal flow with amount
-        const url = `   /withdraw?amount=${withdrawAmount}`;
+        const url = `/withdraw?amount=${withdrawAmount}`;
         window.location.href = url;
     };
 
@@ -83,7 +97,7 @@ export default function WalletPageContent() {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <motion.div variants={itemVariants} className="space-y-1">
                         <div className="flex items-center gap-2 text-[10px] md:text-sm font-black text-emerald-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2">
-                            <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                            <Lock className="w-3.5 h-3.5 shrink-0" />
                             Secured Settlement Account
                         </div>
                         <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight flex items-center gap-3">
@@ -103,7 +117,7 @@ export default function WalletPageContent() {
             <div className="space-y-10">
                 {/* Balance Visualization */}
                 <motion.div variants={itemVariants} className="bg-muted border border-gray-900 rounded-sm p-1">
-                    <WalletBalance balance={balance} role="freelancer" />
+                    <LedgerBalance balance={balance} role="freelancer" />
                 </motion.div>
 
                 <div className="grid lg:grid-cols-3 gap-10">
@@ -233,8 +247,8 @@ export default function WalletPageContent() {
                                                 <td className="hidden sm:table-cell px-6 py-6">
                                                     <span className={cn(
                                                         "px-2.5 py-1 text-[11px] font-black uppercase tracking-wide rounded-sm border",
-                                                        tx.status === 'completed' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
-                                                            tx.status === 'pending' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
+                                                        tx.status === 'CONFIRMED' || tx.status === 'completed' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                                                            tx.status === 'PENDING' || tx.status === 'pending' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
                                                                 "bg-white/5 text-white border-white/10"
                                                     )}>
                                                         {tx.status}

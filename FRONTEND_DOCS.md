@@ -29,7 +29,7 @@
 - **Styling**: Tailwind CSS 4
 - **Animations**: Framer Motion
 - **UI Components**: Radix UI + Lucide Icons
-- **State Management**: React Context API (`UserContext`, `WalletContext`, `VaultContext`)
+- **State Management**: React Context API (`UserContext`, `LedgerContext`, `VaultContext`)
 - **Data Fetching**: Mock API System (`lib/mock-api.js`)
 
 ---
@@ -66,36 +66,36 @@
 | `/client/disputes`                                              | Client | Dispute center       | Disputes list            | Create/view disputes      |
 | `/client/disputes/[disputeId]`                                  | Client | Dispute detail       | Dispute + evidence       | Add evidence              |
 | `/client/disputes/create`                                       | Client | Create dispute       | Vaults + milestones      | `api.disputes.create()`   |
-| `/client/wallet`                                                | Client | Wallet (unused)      | Wallet balance           | N/A                       |
+| `/client/ledger`                                                | Client | Ledger Settlement    | Ledger entries           | View transactions         |
 | `/client/settings`                                              | Client | User settings        | User profile             | Update profile            |
 
 ### Protected Routes - Freelancer
 
-| Route                                                               | Access     | Purpose              | Data Read                | Actions                   |
-| ------------------------------------------------------------------- | ---------- | -------------------- | ------------------------ | ------------------------- |
-| `/freelancer`                                                       | Freelancer | Dashboard            | Vaults + stats           | Navigate to work          |
-| `/freelancer/active-work`                                           | Freelancer | Active vaults        | Active vaults            | View work                 |
-| `/freelancer/wallet`                                                | Freelancer | Wallet & withdrawals | Balance + transactions   | `api.wallet.withdraw()`   |
-| `/freelancer/vaults`                                                | Freelancer | All vaults list      | Vaults list              | Filter vaults             |
-| `/freelancer/vault/[vaultId]`                                       | Freelancer | Vault detail         | Vault + milestones       | Submit work               |
-| `/freelancer/vault/[vaultId]/milestones/[milestoneId]`              | Freelancer | Milestone detail     | Milestone + evidence     | View requirements         |
-| `/freelancer/vault/[vaultId]/milestones/[milestoneId]/submit`       | Freelancer | Submit deliverable   | Milestone                | `api.milestones.submit()` |
-| `/freelancer/vault/[vaultId]/milestones/[milestoneId]/verification` | Freelancer | Verification results | Milestone + verification | View AI audit             |
-| `/freelancer/ledger`                                                | Freelancer | Earnings history     | Ledger entries           | View releases             |
-| `/freelancer/disputes`                                              | Freelancer | Dispute center       | Disputes list            | Create/view disputes      |
-| `/freelancer/disputes/[disputeId]`                                  | Freelancer | Dispute detail       | Dispute + evidence       | Add evidence              |
-| `/freelancer/disputes/create`                                       | Freelancer | Create dispute       | Vaults + milestones      | `api.disputes.create()`   |
-| `/freelancer/settings`                                              | Freelancer | User settings        | User profile             | Update profile            |
+| Route                                                               | Access     | Purpose               | Data Read                | Actions                   |
+| ------------------------------------------------------------------- | ---------- | --------------------- | ------------------------ | ------------------------- |
+| `/freelancer`                                                       | Freelancer | Dashboard             | Vaults + stats           | Navigate to work          |
+| `/freelancer/active-work`                                           | Freelancer | Active vaults         | Active vaults            | View work                 |
+| `/freelancer/balance`                                               | Freelancer | Balance & Withdrawals | Balance + transactions   | `api.ledger.withdraw()`   |
+| `/freelancer/vaults`                                                | Freelancer | All vaults list       | Vaults list              | Filter vaults             |
+| `/freelancer/vault/[vaultId]`                                       | Freelancer | Vault detail          | Vault + milestones       | Submit work               |
+| `/freelancer/vault/[vaultId]/milestones/[milestoneId]`              | Freelancer | Milestone detail      | Milestone + evidence     | View requirements         |
+| `/freelancer/vault/[vaultId]/milestones/[milestoneId]/submit`       | Freelancer | Submit deliverable    | Milestone                | `api.milestones.submit()` |
+| `/freelancer/vault/[vaultId]/milestones/[milestoneId]/verification` | Freelancer | Verification results  | Milestone + verification | View AI audit             |
+| `/freelancer/ledger`                                                | Freelancer | Earnings history      | Ledger entries           | View releases             |
+| `/freelancer/disputes`                                              | Freelancer | Dispute center        | Disputes list            | Create/view disputes      |
+| `/freelancer/disputes/[disputeId]`                                  | Freelancer | Dispute detail        | Dispute + evidence       | Add evidence              |
+| `/freelancer/disputes/create`                                       | Freelancer | Create dispute        | Vaults + milestones      | `api.disputes.create()`   |
+| `/freelancer/settings`                                              | Freelancer | User settings         | User profile             | Update profile            |
 
 ### Protected Routes - Shared
 
-| Route                      | Access        | Purpose          | Data Read      | Actions                      |
-| -------------------------- | ------------- | ---------------- | -------------- | ---------------------------- |
-| `/onboarding/kyc`          | Authenticated | KYC verification | User           | `api.onboarding.submitKyc()` |
-| `/withdraw`                | Freelancer    | Withdrawal flow  | Wallet balance | `api.wallet.withdraw()`      |
-| `/checkout/[vaultId]`      | Client        | Vault funding    | Vault          | Fund vault                   |
-| `/checkout/[vaultId]/card` | Client        | Card payment     | Vault          | Process payment              |
-| `/checkout/[vaultId]/bank` | Client        | Bank transfer    | Vault          | Process transfer             |
+| Route                      | Access        | Purpose          | Data Read       | Actions                      |
+| -------------------------- | ------------- | ---------------- | --------------- | ---------------------------- |
+| `/onboarding/kyc`          | Authenticated | KYC verification | User            | `api.onboarding.submitKyc()` |
+| `/withdraw`                | Freelancer    | Withdrawal flow  | Account balance | `api.ledger.withdraw()`      |
+| `/checkout/[vaultId]`      | Client        | Vault funding    | Vault           | Fund vault                   |
+| `/checkout/[vaultId]/card` | Client        | Card payment     | Vault           | Process payment              |
+| `/checkout/[vaultId]/bank` | Client        | Bank transfer    | Vault           | Process transfer             |
 
 ---
 
@@ -161,7 +161,7 @@
 
 ---
 
-### WalletContext (`lib/store/wallet-context.js`)
+### LedgerContext (`lib/store/ledger-context.js`)
 
 **State Shape**:
 
@@ -179,9 +179,9 @@
 
 **Actions**:
 
-- `withdraw(amount, bankDetails)` → Calls `api.wallet.withdraw()`, updates balance
-- `refreshBalance()` → Calls `api.wallet.getBalance()`, updates balance
-- `refreshTransactions()` → Calls `api.wallet.getTransactions()`, updates transactions
+- `withdraw(amount, bankDetails)` → Calls `api.ledger.withdraw()`, updates balance
+- `refreshBalance()` → Calls `api.ledger.getBalance()`, updates balance
+- `refreshTransactions()` → Calls `api.ledger.getTransactions()`, updates transactions
 
 **Side Effects**:
 
@@ -214,7 +214,7 @@
   FUNDED_ASSIGNED: "FUNDED_ASSIGNED",    // Funded with freelancer
   ACTIVE: "ACTIVE",                      // Work in progress
   IN_REVIEW: "IN_REVIEW",                // Under milestone review
-  COMPLETED: "COMPLETED",                // All milestones verified
+  CLOSED: "CLOSED",                      // All milestones verified
   CANCELLED: "CANCELLED",                // Vault cancelled
   PAUSED: "PAUSED"                       // Temporarily paused
 }
@@ -713,9 +713,9 @@
 
 ---
 
-### WalletBalance
+### LedgerBalance
 
-**Source**: `lib/mock-api.js` (wallet.getBalance)
+**Source**: `lib/mock-api.js` (ledger.getBalance)
 
 ```typescript
 {
@@ -1467,10 +1467,10 @@ Dispute;
 
 ### Financial & Ledger
 
-#### `GET /api/wallet/balance`
+#### `GET /api/ledger/balance`
 
 **Used by Frontend**: ✅ Yes  
-**Location**: `lib/mock-api.js:api.wallet.getBalance`
+**Location**: `lib/mock-api.js:api.ledger.getBalance`
 
 **Request**: None
 
@@ -1486,10 +1486,10 @@ Dispute;
 
 ---
 
-#### `GET /api/wallet/transactions`
+#### `GET /api/ledger/transactions`
 
 **Used by Frontend**: ✅ Yes  
-**Location**: `lib/mock-api.js:api.wallet.getTransactions`
+**Location**: `lib/mock-api.js:api.ledger.getTransactions`
 
 **Request**: None
 
@@ -1501,10 +1501,10 @@ Transaction[]
 
 ---
 
-#### `POST /api/wallet/withdraw`
+#### `POST /api/ledger/withdraw`
 
 **Used by Frontend**: ✅ Yes  
-**Location**: `lib/mock-api.js:api.wallet.withdraw`
+**Location**: `lib/mock-api.js:api.ledger.withdraw`
 
 **Request**:
 
@@ -1618,10 +1618,10 @@ stateDiagram-v2
     [*] --> DRAFT
     DRAFT --> FUNDED: Client Funds Vault
     FUNDED --> ACTIVE: Freelancer Assigned/Accepts
-    ACTIVE --> COMPLETED: All Milestones Verified
+    ACTIVE --> CLOSED: All Milestones Verified
     ACTIVE --> DISPUTED: Dispute Opened
     DISPUTED --> ACTIVE: Dispute Resolved (Resubmission)
-    DISPUTED --> COMPLETED: Dispute Resolved (Refund/Release)
+    DISPUTED --> CLOSED: Dispute Resolved (Refund/Release)
     * --> CANCELLED: Vault Cancelled
     * --> PAUSED: Vault Paused
 ```
@@ -1632,10 +1632,10 @@ stateDiagram-v2
 | -------- | --------- | ------------------------------------- | ------------ |
 | DRAFT    | FUNDED    | Lock funds in escrow                  | Client       |
 | FUNDED   | ACTIVE    | Freelancer accepts invitation         | Freelancer   |
-| ACTIVE   | COMPLETED | Final milestone reaches VERIFIED      | System       |
+| ACTIVE   | CLOSED    | Final milestone reaches VERIFIED      | System       |
 | ACTIVE   | DISPUTED  | Dispute record created                | Party        |
 | DISPUTED | ACTIVE    | Dispute resolved (allow resubmit)     | Admin        |
-| DISPUTED | COMPLETED | Dispute resolved (refund/release all) | Admin        |
+| DISPUTED | CLOSED    | Dispute resolved (refund/release all) | Admin        |
 | \*       | CANCELLED | Kill switch triggered                 | Client/Admin |
 | \*       | PAUSED    | Temporary hold                        | Admin        |
 

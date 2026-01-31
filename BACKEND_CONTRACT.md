@@ -16,14 +16,14 @@
 5. [Vault Module](#vault-module)
 6. [Milestone Module](#milestone-module)
 7. [Invite Module](#invite-module)
-8. [Wallet Module](#wallet-module)
+8. [Ledger Module](#ledger-module)
 9. [Ledger Module](#ledger-module)
 10. [Dispute Module](#dispute-module)
 11. [Evidence Module](#evidence-module)
 12. [Upload Module](#upload-module)
 13. [Error Codes](#error-codes)
 14. [Idempotency](#idempotency)
-15. [Wallet & Provider Integration](#wallet--provider-integration)
+15. [Smart Account & Provider Integration](#smart-account--provider-integration)
 
 ---
 
@@ -73,7 +73,7 @@ These enums are the single source of truth for state values across the system. A
 | `FUNDED_ASSIGNED`   | Vault is funded and has an assigned freelancer (pre-activation) |
 | `ACTIVE`            | Work is in progress                                             |
 | `IN_REVIEW`         | One or more milestones are under review                         |
-| `COMPLETED`         | All milestones have been verified and released                  |
+| `CLOSED`            | All milestones have been verified and released                  |
 | `CANCELLED`         | Vault has been cancelled                                        |
 | `DISPUTED`          | Vault is under dispute resolution                               |
 | `PAUSED`            | Vault is temporarily paused                                     |
@@ -309,15 +309,15 @@ User;
 
 ---
 
-### POST /api/auth/wallet
+### POST /api/auth/smart-account
 
 **Access**: Authenticated
-**Purpose**: Link non-custodial wallet from provider (Privy/Web3Auth)
+**Purpose**: Link non-custodial smart account from provider (Privy/Web3Auth)
 
 **Request DTO**:
 
 ```typescript
-class LinkWalletDto {
+class LinkSmartAccountDto {
   @IsEnum(["PRIVY", "WEB3AUTH"])
   provider: "PRIVY" | "WEB3AUTH";
 
@@ -346,8 +346,8 @@ class LinkWalletDto {
 
 **Errors**:
 
-- `WALLET_ALREADY_LINKED` (400): User already has a wallet
-- `ADDRESS_TAKEN` (409): Wallet address already associated with another user
+- `WALLET_ALREADY_LINKED` (400): User already has a smart account linked
+- `ADDRESS_TAKEN` (409): Smart Account address already associated with another user
 
 ---
 
@@ -1122,12 +1122,12 @@ class RespondInviteDto {
 
 ---
 
-## 8. Wallet Module
+## 8. Ledger Module
 
-### GET /api/wallet/balance
+### GET /api/ledger/balance
 
 **Access**: Authenticated  
-**Purpose**: Get wallet balance
+**Purpose**: Get ledger balance
 
 **Response**:
 
@@ -1146,7 +1146,7 @@ class RespondInviteDto {
 
 ---
 
-### GET /api/wallet/transactions
+### GET /api/ledger/transactions
 
 **Access**: Authenticated  
 **Purpose**: Get transaction history
@@ -1696,14 +1696,14 @@ If the key is missing, the server MUST return:
 
 ---
 
-## 15. Wallet & Provider Integration
+## 15. Smart Account & Provider Integration
 
 ### Non-Custodial Workflow
 
 1. **Frontend**: User authenticates with Privy/Web3Auth.
 2. **Frontend**: Retrieves `accessToken`, `providerUserId`, and `address`.
-3. **Frontend**: Calls `POST /api/auth/wallet` to link address to Dayle account.
-4. **Backend**: Verifies provider token (if applicable) and stores wallet metadata.
+3. **Frontend**: Calls `POST /api/auth/smart-account` to link address to Dayle account.
+4. **Backend**: Verifies provider token (if applicable) and stores smart account metadata.
 
 ### Money Actions (AA)
 
