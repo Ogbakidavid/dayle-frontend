@@ -816,11 +816,11 @@ export default function LandingPage() {
                                     Support
                                 </Link>
                             </li>
-                            <li>
+                            {/* <li>
                                 <Link href="/contact" className="hover:text-emerald-400 transition-colors">
                                     Sales
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                 </div>
