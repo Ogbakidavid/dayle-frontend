@@ -38,18 +38,18 @@
 
 ### Public Routes
 
-| Route                   | Access | Purpose                      | Data Read       | Actions                    |
-| ----------------------- | ------ | ---------------------------- | --------------- | -------------------------- |
-| `/`                     | Public | Landing page                 | None            | Navigate to login/signup   |
-| `/login`                | Public | User login                   | None            | `api.auth.login()`         |
-| `/signup`               | Public | User registration            | None            | `api.auth.signup()`        |
-| `/forgot-password`      | Public | Password reset request       | None            | Email reset link           |
-| `/reset-password`       | Public | Password reset form          | None            | Update password            |
-| `/verify-email`         | Public | Email verification           | None            | Verify email token         |
-| `/verification`         | Public | Public vault verification    | Vault by ID     | Display vault status       |
-| `/invite/[inviteToken]` | Public | Invitation acceptance        | Invite by token | `api.invites.respond()`    |
-| `/invitation-accepted`  | Public | Post-acceptance confirmation | None            | Display success            |
-| `/onboarding/role`      | Public | Role selection               | Current user    | `api.onboarding.setRole()` |
+| Route                   | Access | Purpose                      | Data Read       | Actions                                            |
+| ----------------------- | ------ | ---------------------------- | --------------- | -------------------------------------------------- |
+| `/`                     | Public | Landing page                 | None            | Navigate to login/signup                           |
+| `/login`                | Public | User login                   | None            | `api.auth.login()`                                 |
+| `/signup`               | Public | User registration            | None            | `api.auth.signup()` (Auto-generates Smart Account) |
+| `/forgot-password`      | Public | Password reset request       | None            | Email reset link                                   |
+| `/reset-password`       | Public | Password reset form          | None            | Update password                                    |
+| `/verify-email`         | Public | Email verification           | None            | Verify email token                                 |
+| `/verification`         | Public | Public vault verification    | Vault by ID     | Display vault status                               |
+| `/invite/[inviteToken]` | Public | Invitation acceptance        | Invite by token | `api.invites.respond()`                            |
+| `/invitation-accepted`  | Public | Post-acceptance confirmation | None            | Display success                                    |
+| `/onboarding/role`      | Public | Role selection               | Current user    | `api.onboarding.setRole()`                         |
 
 ### Protected Routes - Client
 
@@ -122,7 +122,7 @@
 **Actions**:
 
 - `login(email, password)` → Calls `api.auth.login()`, sets user
-- `signup(email, password, name, role)` → Calls `api.auth.signup()`, sets user
+- `signup(email, password, name, role)` → Calls `api.auth.signup()`, sets user, and triggers automatic smart account provisioning
 - `logout()` → Calls `api.auth.logout()`, clears user, redirects to `/login`
 - `refreshUser()` → Calls `api.auth.getCurrentUser()`, updates user
 
