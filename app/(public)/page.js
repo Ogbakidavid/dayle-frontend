@@ -93,24 +93,24 @@ export default function LandingPage() {
                                 Dayle
                             </span>
                         </div>
-
                         {/* Buttons */}
                         <div className="flex items-center gap-2 md:gap-3">
-                            <Link href="/login" className="hidden sm:inline-flex">
+                            <Link href="/login">
                                 <Button
                                     variant="ghost"
-                                    className="text-sm font-black uppercase tracking-wide px-4 md:px-5 text-white/80 hover:text-white hover:bg-white/[0.06] rounded-xl"
+                                    className="text-xs sm:text-sm font-black uppercase tracking-wide px-3 sm:px-4 text-white/80 hover:text-white hover:bg-white/[0.06] rounded-xl"
                                 >
                                     Sign In
                                 </Button>
                             </Link>
 
                             <Link href="/onboarding/role">
-                                <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-black rounded-xl px-5 md:px-6 h-10 md:h-11 text-sm uppercase tracking-wide transition-all">
+                                <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-black rounded-xl px-4 sm:px-6 h-9 sm:h-10 text-xs sm:text-sm uppercase tracking-wide transition-all">
                                     Create a Vault
                                 </Button>
                             </Link>
                         </div>
+
                     </div>
                 </div>
             </motion.nav>
