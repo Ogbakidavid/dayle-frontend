@@ -361,7 +361,7 @@ export default function LandingPage() {
                             </div>
 
                             <h2 className="mt-5 text-2xl md:text-4xl font-black tracking-tight text-white">
-                                AI supports milestone verification.
+                                AI supports <span className={"text-emerald-500"}>milestone verification.</span>
                             </h2>
 
                             <p className="mt-3 text-white/60 text-sm md:text-base leading-relaxed max-w-2xl">
