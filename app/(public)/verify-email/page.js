@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser } from '@/lib/store/user-context';
 import { Button } from '@/components/ui/button';
 import { Shield, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
-import { api, UserRole } from '@/lib/mock-api';
+import { api, UserRole } from '@/lib/api-client';
 
 export default function VerifyEmailPage() {
     const router = useRouter();

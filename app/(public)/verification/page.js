@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Shield, Clock, CheckCircle2, AlertCircle, ArrowLeft, Lock, Globe } from 'lucide-react';
-import { api } from '@/lib/mock-api';
+import { api } from '@/lib/api-client';
 import { VaultStatus, MilestoneStatus, getVaultDerivedLabel } from '@/lib/domain/enums';
 import { Button } from '@/components/ui/button';
 

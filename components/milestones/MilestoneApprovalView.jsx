@@ -9,7 +9,7 @@ import { DisputeInitiationPanel } from '@/components/disputes/DisputeInitiationP
 import { getEvidenceForMilestone, getMilestoneById, getVaultById } from '@/lib/mock';
 import { APPROVAL_REJECTION_CODES, MILESTONE_STATUS_LABELS } from '@/lib/rules/milestones';
 import { BadgeCheck, ChevronLeft, XCircle, Clock } from 'lucide-react';
-import { api } from '@/lib/mock-api';
+import { api } from '@/lib/api-client';
 
 export function MilestoneApprovalView({ vaultId, milestoneId, role }) {
     const vault = getVaultById(vaultId);

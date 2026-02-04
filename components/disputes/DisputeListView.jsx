@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 // import { Button } from "@/components/ui/button";
-import { api } from "@/lib/mock-api";
+import { api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import {
   Gavel,

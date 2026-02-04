@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { api, UserRole } from "@/lib/mock-api";
+import { api, UserRole } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import {
     Shield,

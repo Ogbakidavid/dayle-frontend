@@ -124,7 +124,7 @@ No release occurs without client approval.
 
 Responsibilities:
 
-Auth (email/password, social login as needed)
+Auth (email/password, social login as needed). NOTE: User Sign Up automatically provisions a non-custodial smart account.
 
 Client dashboard + freelancer dashboard
 
@@ -189,6 +189,8 @@ Audit-trail complete for evidence, disputes, and money actions
 C) Wallet Abstraction Layer (Non-Custodial AA)
 
 Use an embedded wallet provider (Privy/Web3Auth or equivalent).
+
+Wallet generation occurs immediately upon user creation (Sign Up). No separate "create wallet" step for the user.
 
 Provider manages key generation/storage; Dayle never sees private keys.
 

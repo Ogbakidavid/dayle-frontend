@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 
 import { getDisputeEligibility } from "@/lib/rules/disputes";
-import { api } from "@/lib/mock-api";
+import { api } from "@/lib/api-client";
 
 const MAX_FILE_MB = 10;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;

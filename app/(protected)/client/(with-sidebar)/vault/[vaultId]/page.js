@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link2, Mail, UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/lib/mock-api";
+import { api } from "@/lib/api-client";
 import {
   ArrowLeft,
   Shield,

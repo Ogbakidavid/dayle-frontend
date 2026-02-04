@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useUser } from '@/lib/store/user-context';
-import { UserRole } from '@/lib/mock-api';
+import { UserRole } from '@/lib/api-client';
 
 const ALLOWED_PATHS_WITHOUT_KYC = [
     '/login',

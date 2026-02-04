@@ -26,7 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
-import { api } from "@/lib/mock-api";
+import { api } from "@/lib/api-client";
 
 const variants = {
   enter: (direction) => ({

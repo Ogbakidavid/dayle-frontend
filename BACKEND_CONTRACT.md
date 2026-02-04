@@ -379,6 +379,7 @@ User;
 - Can only be called once
 - Cannot change role after KYC submission
 - Role must be CLIENT or FREELANCER
+- Upon successful account creation, a non-custodial smart account is automatically provisioned/linked for the user.
 
 **Errors**:
 

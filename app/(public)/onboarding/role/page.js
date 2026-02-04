@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Shield, Users, Briefcase, ArrowRight, Loader2 } from 'lucide-react';
-import { api, UserRole } from '@/lib/mock-api';
+import { api, UserRole } from '@/lib/api-client';
 import { useUser } from '@/lib/store/user-context';
 
 export default function RoleSelectionPage() {

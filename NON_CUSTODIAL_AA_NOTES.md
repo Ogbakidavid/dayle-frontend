@@ -10,7 +10,7 @@ To maintain security in a non-custodial AA environment, the backend must enforce
 
 ### 1. Idempotency & Replay Protection
 
-- **Idempotency Keys**: MUST be enforced for all wallet-linking and transaction-initiation requests (`POST /api/auth/wallet`, `POST /api/vaults/:id/fund`, etc.).
+- **Idempotency Keys**: MUST be enforced for all transaction-initiation requests (`POST /api/vaults/:id/fund`, etc.). Note: Wallet linking is automatic on sign-up, so explicit linking requests should be rare/recovery-only.
 - **Transaction Tracking**: All `LedgerEntry` records for money actions must include the `providerRef` (transaction hash or user operation hash) to prevent duplicate processing of the same on-chain event.
 
 ### 2. Webhook Verification
