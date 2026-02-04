@@ -9,9 +9,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Shield, ArrowRight, Loader2, CheckCircle2, User } from 'lucide-react';
 import { api, UserRole } from '@/lib/mock-api';
-
 import { useUser } from '@/lib/store/user-context';
-
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,6 +29,17 @@ export default function LoginPage() {
     const password = formData.get('password');
 
     try {
+      // First, check if user has 2FA enabled
+      const twoFAStatus = await api.security.check2FAOnLogin(email, password);
+
+      if (twoFAStatus.requires2FA) {
+        // Store pending credentials and redirect to 2FA page
+        api.auth.setPending2FA(email, password);
+        router.push(returnTo ? `/verify-2fa?returnTo=${encodeURIComponent(returnTo)}` : '/verify-2fa');
+        return;
+      }
+
+      // No 2FA required, proceed with login
       const user = await contextLogin(email, password);
 
       if (returnTo) {
@@ -44,7 +53,12 @@ export default function LoginPage() {
     } catch (err) {
       setError('Invalid email or password. Please check your credentials.');
     } finally {
-      setLoading(false);
+      // If we're redirecting, we want to keep the loading state to prevent flashing
+      if (loading) {
+        // check if we are NOT redirecting (error case) - wait, loading is set to true at start
+        // If error happened, we should set false. If success/redirect, keep true.
+        if (err) setLoading(false);
+      }
     }
   }
 
@@ -99,8 +113,12 @@ export default function LoginPage() {
 
         <div className="w-full max-w-[440px] relative z-10">
           <div className="mb-12">
-            <h2 className="text-4xl font-black text-white tracking-tight uppercase leading-none">Sign In</h2>
-            <p className="text-white mt-4 text-sm font-bold uppercase tracking-wide leading-relaxed">Access your secure financial workspace.</p>
+            <h2 className="text-4xl font-black text-white tracking-tight uppercase leading-none">
+              Sign In
+            </h2>
+            <p className="text-white mt-4 text-sm font-bold uppercase tracking-wide leading-relaxed">
+              Access your secure financial workspace.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -205,8 +223,6 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-
-
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -10,17 +10,42 @@ import { Switch } from '@/components/ui/switch';
 import {
     User, CreditCard, Lock, Bell,
     LogOut, Shield, Mail,
-    ChevronLeft, Smartphone, Plus, Trash2, Key, AlertTriangle, CheckCircle2
+    ChevronLeft, Smartphone, Plus, Trash2, Key, AlertTriangle, CheckCircle2, X, Copy, Check
 } from 'lucide-react';
 import { useUser } from '@/lib/store/user-context';
 import { cn } from "@/lib/utils";
 import UserAvatar from '@/components/shared/UserAvatar';
+import { api } from '@/lib/mock-api';
+import QRCode from 'qrcode';
 
 export default function SettingsPageContent({ role = 'client' }) {
     const router = useRouter();
     const { user, logout, refreshUser } = useUser();
     const [activeTab, setActiveTab] = useState('profile');
     const fileInputRef = useRef(null);
+
+    // Security state
+    const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+    const [show2FASetup, setShow2FASetup] = useState(false);
+    const [qrCodeUrl, setQrCodeUrl] = useState('');
+    const [twoFactorSecret, setTwoFactorSecret] = useState('');
+    const [recoveryCodes, setRecoveryCodes] = useState([]);
+    const [verificationCode, setVerificationCode] = useState('');
+    const [setupStep, setSetupStep] = useState(1); // 1: QR, 2: Verify, 3: Recovery codes
+    const [activeSessions, setActiveSessions] = useState([]);
+    const [loadingSessions, setLoadingSessions] = useState(false);
+
+    // Password change state
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+    // Loading states
+    const [loading2FA, setLoading2FA] = useState(false);
+    const [error2FA, setError2FA] = useState('');
+    const [copiedCode, setCopiedCode] = useState(false);
 
     const handleImageUpload = async (e) => {
         const file = e.target.files?.[0];
@@ -48,6 +73,162 @@ export default function SettingsPageContent({ role = 'client' }) {
     };
 
     const isClient = role === 'client';
+
+    // Load 2FA status and sessions on mount
+    useEffect(() => {
+        loadSecurityData();
+    }, []);
+
+    const loadSecurityData = async () => {
+        try {
+            const status = await api.security.get2FAStatus();
+            setTwoFactorEnabled(status.enabled);
+
+            const sessions = await api.security.getSessions();
+            setActiveSessions(sessions);
+        } catch (error) {
+            console.error('Failed to load security data:', error);
+        }
+    };
+
+    // 2FA Handlers
+    const handleEnable2FA = async () => {
+        setLoading2FA(true);
+        setError2FA('');
+        try {
+            const data = await api.security.enable2FA();
+            setTwoFactorSecret(data.tempSecret);
+            setRecoveryCodes(data.recoveryCodes);
+
+            // Generate QR code
+            const qrUrl = await QRCode.toDataURL(data.qrCodeUrl);
+            setQrCodeUrl(qrUrl);
+
+            setShow2FASetup(true);
+            setSetupStep(1);
+        } catch (error) {
+            setError2FA(error.message || 'Failed to enable 2FA');
+        } finally {
+            setLoading2FA(false);
+        }
+    };
+
+    const handleVerify2FA = async () => {
+        setLoading2FA(true);
+        setError2FA('');
+        try {
+            await api.security.verify2FA(verificationCode, twoFactorSecret);
+            setSetupStep(3); // Show recovery codes
+            setTwoFactorEnabled(true);
+            await refreshUser();
+        } catch (error) {
+            setError2FA(error.message || 'Invalid verification code');
+        } finally {
+            setLoading2FA(false);
+        }
+    };
+
+    const handleDisable2FA = async () => {
+        if (!verificationCode) {
+            setError2FA('Please enter verification code');
+            return;
+        }
+
+        setLoading2FA(true);
+        setError2FA('');
+        try {
+            await api.security.disable2FA(verificationCode);
+            setTwoFactorEnabled(false);
+            setShow2FASetup(false);
+            setVerificationCode('');
+            await refreshUser();
+        } catch (error) {
+            setError2FA(error.message || 'Failed to disable 2FA');
+        } finally {
+            setLoading2FA(false);
+        }
+    };
+
+    const close2FASetup = () => {
+        setShow2FASetup(false);
+        setSetupStep(1);
+        setVerificationCode('');
+        setError2FA('');
+        loadSecurityData(); // Refresh status
+    };
+
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
+        setCopiedCode(true);
+        setTimeout(() => setCopiedCode(false), 2000);
+    };
+
+    // Session Handlers
+    const handleRevokeSession = async (sessionId) => {
+        setLoadingSessions(true);
+        try {
+            await api.security.revokeSession(sessionId);
+            const sessions = await api.security.getSessions();
+            setActiveSessions(sessions);
+        } catch (error) {
+            console.error('Failed to revoke session:', error);
+            alert(error.message || 'Failed to revoke session');
+        } finally {
+            setLoadingSessions(false);
+        }
+    };
+
+    const handleRevokeAllSessions = async () => {
+        if (!confirm('Are you sure you want to revoke all other sessions? You will remain logged in on this device.')) {
+            return;
+        }
+
+        setLoadingSessions(true);
+        try {
+            await api.security.revokeAllSessions();
+            const sessions = await api.security.getSessions();
+            setActiveSessions(sessions);
+        } catch (error) {
+            console.error('Failed to revoke sessions:', error);
+            alert(error.message || 'Failed to revoke sessions');
+        } finally {
+            setLoadingSessions(false);
+        }
+    };
+
+    // Password Change Handler
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        setPasswordError('');
+        setPasswordSuccess(false);
+
+        // Validation
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            setPasswordError('All fields are required');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            setPasswordError('New passwords do not match');
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            setPasswordError('Password must be at least 8 characters');
+            return;
+        }
+
+        try {
+            await api.security.changePassword(currentPassword, newPassword);
+            setPasswordSuccess(true);
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+            setTimeout(() => setPasswordSuccess(false), 5000);
+        } catch (error) {
+            setPasswordError(error.message || 'Failed to change password');
+        }
+    };
 
     // Notification center state
     const [notificationList, setNotificationList] = useState(
@@ -148,14 +329,14 @@ export default function SettingsPageContent({ role = 'client' }) {
                         <span className="text-sm font-black text-white uppercase tracking-wide">Account Center</span>
                         <div className="h-4 w-px bg-white/5" />
                         <div className="flex items-center gap-2">
-                                <div className="relative group">
-                                    <UserAvatar 
-                                        identifier={user?.id || user?.email || "guest"} 
-                                        src={user?.profileImage}
-                                        size={24} 
-                                        className="h-6 w-6 rounded bg-emerald-500/10 border border-emerald-500/20"
-                                    />
-                                    {user?.kycStatus === 'VERIFIED' && (
+                            <div className="relative group">
+                                <UserAvatar
+                                    identifier={user?.id || user?.email || "guest"}
+                                    src={user?.profileImage}
+                                    size={24}
+                                    className="h-6 w-6 rounded bg-emerald-500/10 border border-emerald-500/20"
+                                />
+                                {user?.kycStatus === 'VERIFIED' && (
                                     <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-[#050505] flex items-center justify-center">
                                         <CheckCircle2 className="w-1.5 h-1.5 text-black" strokeWidth={4} />
                                     </div>
@@ -223,10 +404,10 @@ export default function SettingsPageContent({ role = 'client' }) {
                             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 <div className="flex items-end gap-6">
                                     <div className="relative group">
-                                        <UserAvatar 
-                                            identifier={user?.id || user?.email || "guest"} 
+                                        <UserAvatar
+                                            identifier={user?.id || user?.email || "guest"}
                                             src={user?.profileImage}
-                                            size={80} 
+                                            size={80}
                                             className="h-20 w-20 rounded-2xl bg-zinc-900 border border-zinc-800"
                                         />
                                         {user?.kycStatus === 'VERIFIED' && (
@@ -235,18 +416,18 @@ export default function SettingsPageContent({ role = 'client' }) {
                                                 <span className="text-[10px] font-black uppercase tracking-tighter text-emerald-500">Verified</span>
                                             </div>
                                         )}
-                                        <button 
+                                        <button
                                             onClick={() => fileInputRef.current?.click()}
                                             className="absolute -bottom-2 -right-2 p-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-400 hover:text-emerald-500 transition-colors shadow-xl"
                                         >
                                             <Plus className="w-3 h-3" />
                                         </button>
-                                        <input 
-                                            type="file" 
-                                            ref={fileInputRef} 
-                                            onChange={handleImageUpload} 
-                                            className="hidden" 
-                                            accept="image/*" 
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleImageUpload}
+                                            className="hidden"
+                                            accept="image/*"
                                         />
                                     </div>
                                     <div className="pb-1">
@@ -336,7 +517,7 @@ export default function SettingsPageContent({ role = 'client' }) {
                         {activeTab === 'security' && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 {/* Password Change */}
-                                <div className="space-y-6">
+                                <form onSubmit={handlePasswordChange} className="space-y-6">
                                     <div>
                                         <h3 className="text-sm font-black text-white uppercase tracking-wide mb-1">
                                             {isClient ? "Change Password" : "Passcode Security"}
@@ -351,23 +532,54 @@ export default function SettingsPageContent({ role = 'client' }) {
                                             <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
                                                 {isClient ? "Current Password" : "Current Passcode"}
                                             </Label>
-                                            <Input type="password" placeholder="••••••••" className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
+                                            <Input
+                                                type="password"
+                                                placeholder="••••••••"
+                                                value={currentPassword}
+                                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                                className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
+                                            />
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">New Password</Label>
-                                                <Input type="password" placeholder="••••••••" className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
+                                                <Input
+                                                    type="password"
+                                                    placeholder="••••••••"
+                                                    value={newPassword}
+                                                    onChange={(e) => setNewPassword(e.target.value)}
+                                                    className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
+                                                />
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">Confirm New</Label>
-                                                <Input type="password" placeholder="••••••••" className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11" />
+                                                <Input
+                                                    type="password"
+                                                    placeholder="••••••••"
+                                                    value={confirmPassword}
+                                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                                    className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
+                                                />
                                             </div>
                                         </div>
-                                        <Button className="bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 px-6 rounded-lg">
+
+                                        {passwordError && (
+                                            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                                <p className="text-sm text-red-400">{passwordError}</p>
+                                            </div>
+                                        )}
+
+                                        {passwordSuccess && (
+                                            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                                                <p className="text-sm text-emerald-400">Password updated successfully!</p>
+                                            </div>
+                                        )}
+
+                                        <Button type="submit" className="bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 px-6 rounded-lg">
                                             Update Password
                                         </Button>
                                     </div>
-                                </div>
+                                </form>
 
                                 {/* Two-Factor Authentication */}
                                 <div className="pt-8 border-t border-zinc-900">
@@ -384,30 +596,56 @@ export default function SettingsPageContent({ role = 'client' }) {
                                                     {isClient ? "Add an extra layer of security to your account with authenticator app verification" : "Secure your settlements with authenticator-based validation"}
                                                 </p>
                                                 <div className="pt-2">
-                                                    <span className="text-sm px-2 py-1 bg-white/5 text-white rounded-full font-black uppercase tracking-wide">Not Enabled</span>
+                                                    <span className={cn(
+                                                        "text-sm px-2 py-1 rounded-full font-black uppercase tracking-wide",
+                                                        twoFactorEnabled
+                                                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                                            : "bg-white/5 text-white"
+                                                    )}>
+                                                        {twoFactorEnabled ? "Enabled" : "Not Enabled"}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <Button className="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold px-4 text-sm rounded-lg">
-                                            Enable
+                                        <Button
+                                            onClick={twoFactorEnabled ? () => setShow2FASetup(true) : handleEnable2FA}
+                                            disabled={loading2FA}
+                                            className={cn(
+                                                "font-semibold px-4 text-sm rounded-lg",
+                                                twoFactorEnabled
+                                                    ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-200"
+                                                    : "bg-emerald-600 hover:bg-emerald-500 text-black"
+                                            )}
+                                        >
+                                            {loading2FA ? "Loading..." : twoFactorEnabled ? "Disable" : "Enable"}
                                         </Button>
                                     </div>
                                 </div>
 
-                                {/* Active Sessions (Client only UI slightly different but let's keep it similar for now, maybe only show for client if needed) */}
-                                {isClient && (
-                                    <div className="pt-8 border-t border-zinc-900 space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="text-sm font-black text-white uppercase tracking-wide">Active Sessions</h3>
-                                            <Button variant="link" className="text-red-400 text-sm font-black uppercase tracking-wide p-0 h-auto hover:text-red-300">Revoke All</Button>
-                                        </div>
+                                {/* Active Sessions */}
+                                <div className="pt-8 border-t border-zinc-900 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-sm font-black text-white uppercase tracking-wide">Active Sessions</h3>
+                                        {activeSessions.length > 1 && (
+                                            <Button
+                                                variant="link"
+                                                onClick={handleRevokeAllSessions}
+                                                disabled={loadingSessions}
+                                                className="text-red-400 text-sm font-black uppercase tracking-wide p-0 h-auto hover:text-red-300"
+                                            >
+                                                Revoke All
+                                            </Button>
+                                        )}
+                                    </div>
 
-                                        <div className="space-y-2">
-                                            {[
-                                                { device: 'Chrome on MacBook Pro', location: 'New York, US', current: true, time: 'Active now' },
-                                                { device: 'Safari on iPhone 15', location: 'New York, US', current: false, time: '2 hours ago' }
-                                            ].map((session, i) => (
-                                                <div key={i} className="flex items-center justify-between p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-xl">
+                                    <div className="space-y-2">
+                                        {activeSessions.length === 0 ? (
+                                            <div className="p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-xl text-center">
+                                                <p className="text-sm text-white/60">No active sessions</p>
+                                            </div>
+                                        ) : (
+                                            activeSessions.map((session) => (
+                                                <div key={session.id} className="flex items-center justify-between p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-xl">
                                                     <div className="flex items-center gap-3">
                                                         <div className="p-2 bg-zinc-800 rounded-lg">
                                                             <Key className="w-4 h-4 text-zinc-500" />
@@ -421,15 +659,21 @@ export default function SettingsPageContent({ role = 'client' }) {
                                                         </div>
                                                     </div>
                                                     {!session.current && (
-                                                        <Button variant="ghost" size="sm" className="text-zinc-500 hover:text-red-400 text-sm">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleRevokeSession(session.id)}
+                                                            disabled={loadingSessions}
+                                                            className="text-zinc-500 hover:text-red-400 text-sm"
+                                                        >
                                                             Revoke
                                                         </Button>
                                                     )}
                                                 </div>
-                                            ))}
-                                        </div>
+                                            ))
+                                        )}
                                     </div>
-                                )}
+                                </div>
 
                                 {/* Danger Zone */}
                                 <div className="pt-8 border-t border-zinc-900">
@@ -617,6 +861,191 @@ export default function SettingsPageContent({ role = 'client' }) {
                     </section>
                 </div>
             </main>
+
+            {/* 2FA Setup Modal */}
+            {show2FASetup && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-[#0a0a0a] border border-zinc-800 rounded-2xl max-w-lg w-full p-6 relative">
+                        <button
+                            onClick={close2FASetup}
+                            className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                            <X className="w-4 h-4 text-white" />
+                        </button>
+
+                        <h2 className="text-xl font-black text-white uppercase tracking-tight mb-6">
+                            {twoFactorEnabled ? "Disable Two-Factor Authentication" : "Enable Two-Factor Authentication"}
+                        </h2>
+
+                        {!twoFactorEnabled ? (
+                            <>
+                                {/* Step 1: QR Code */}
+                                {setupStep === 1 && (
+                                    <div className="space-y-6">
+                                        <div>
+                                            <h3 className="text-sm font-black text-white uppercase tracking-wide mb-2">Step 1: Scan QR Code</h3>
+                                            <p className="text-sm text-white/60 mb-4">
+                                                Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
+                                            </p>
+
+                                            <div className="bg-white p-4 rounded-xl mx-auto w-fit">
+                                                {qrCodeUrl && <img src={qrCodeUrl} alt="2FA QR Code" className="w-48 h-48" />}
+                                            </div>
+
+                                            <div className="mt-4 p-3 bg-zinc-900/50 border border-zinc-800 rounded-lg">
+                                                <p className="text-xs text-white/40 uppercase tracking-wide mb-1">Manual Entry Code</p>
+                                                <div className="flex items-center justify-between">
+                                                    <code className="text-sm text-white font-mono">{twoFactorSecret}</code>
+                                                    <button
+                                                        onClick={() => copyToClipboard(twoFactorSecret)}
+                                                        className="p-1.5 hover:bg-white/5 rounded transition-colors"
+                                                    >
+                                                        {copiedCode ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-white/60" />}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            onClick={() => setSetupStep(2)}
+                                            className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-semibold"
+                                        >
+                                            Next: Verify Code
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Step 2: Verify */}
+                                {setupStep === 2 && (
+                                    <div className="space-y-6">
+                                        <div>
+                                            <h3 className="text-sm font-black text-white uppercase tracking-wide mb-2">Step 2: Verify Code</h3>
+                                            <p className="text-sm text-white/60 mb-4">
+                                                Enter the 6-digit code from your authenticator app
+                                            </p>
+
+                                            <Input
+                                                type="text"
+                                                placeholder="000000"
+                                                value={verificationCode}
+                                                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                                className="bg-zinc-900/50 border-zinc-800 text-zinc-200 text-center text-2xl tracking-widest h-14"
+                                                maxLength={6}
+                                            />
+                                        </div>
+
+                                        {error2FA && (
+                                            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                                <p className="text-sm text-red-400">{error2FA}</p>
+                                            </div>
+                                        )}
+
+                                        <div className="flex gap-3">
+                                            <Button
+                                                onClick={() => setSetupStep(1)}
+                                                variant="outline"
+                                                className="flex-1"
+                                            >
+                                                Back
+                                            </Button>
+                                            <Button
+                                                onClick={handleVerify2FA}
+                                                disabled={loading2FA || verificationCode.length !== 6}
+                                                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-black font-semibold"
+                                            >
+                                                {loading2FA ? "Verifying..." : "Verify & Enable"}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Step 3: Recovery Codes */}
+                                {setupStep === 3 && (
+                                    <div className="space-y-6">
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                                                <h3 className="text-sm font-black text-emerald-500 uppercase tracking-wide">2FA Enabled Successfully!</h3>
+                                            </div>
+                                            <p className="text-sm text-white/60 mb-4">
+                                                Save these recovery codes in a safe place. You can use them to access your account if you lose your authenticator device.
+                                            </p>
+
+                                            <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg space-y-2">
+                                                {recoveryCodes.map((code, i) => (
+                                                    <div key={i} className="flex items-center justify-between p-2 bg-zinc-900 rounded">
+                                                        <code className="text-sm text-white font-mono">{code}</code>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <Button
+                                                onClick={() => {
+                                                    const text = recoveryCodes.join('\n');
+                                                    copyToClipboard(text);
+                                                }}
+                                                variant="outline"
+                                                className="w-full mt-3"
+                                            >
+                                                <Copy className="w-4 h-4 mr-2" />
+                                                Copy All Codes
+                                            </Button>
+                                        </div>
+
+                                        <Button
+                                            onClick={close2FASetup}
+                                            className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-semibold"
+                                        >
+                                            Done
+                                        </Button>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            /* Disable 2FA */
+                            <div className="space-y-6">
+                                <div>
+                                    <p className="text-sm text-white/60 mb-4">
+                                        Enter a verification code from your authenticator app to disable two-factor authentication.
+                                    </p>
+
+                                    <Input
+                                        type="text"
+                                        placeholder="000000"
+                                        value={verificationCode}
+                                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                        className="bg-zinc-900/50 border-zinc-800 text-zinc-200 text-center text-2xl tracking-widest h-14"
+                                        maxLength={6}
+                                    />
+                                </div>
+
+                                {error2FA && (
+                                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                        <p className="text-sm text-red-400">{error2FA}</p>
+                                    </div>
+                                )}
+
+                                <div className="flex gap-3">
+                                    <Button
+                                        onClick={close2FASetup}
+                                        variant="outline"
+                                        className="flex-1"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        onClick={handleDisable2FA}
+                                        disabled={loading2FA || verificationCode.length !== 6}
+                                        className="flex-1 bg-red-600 hover:bg-red-500 text-white font-semibold"
+                                    >
+                                        {loading2FA ? "Disabling..." : "Disable 2FA"}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
