@@ -9,7 +9,7 @@
     "start_url": "/login",
     "icons": [
         {
-            "src": "/icon.svg?v=4",
+            "src": "/icon.svg?v=5",
             "sizes": "any",
             "type": "image/svg+xml",
             "purpose": "any"

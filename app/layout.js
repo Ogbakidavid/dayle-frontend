@@ -14,9 +14,9 @@ export const metadata = {
   title: "Dayle - Work with Certainty",
   description: "Bank-grade infrastructure for milestone-based payments.",
   icons: {
-    icon: "/icon.svg?v=4",
-    shortcut: "/icon.svg?v=4",
-    apple: "/icon.svg?v=4",
+    icon: "/icon.svg?v=5",
+    shortcut: "/icon.svg?v=5",
+    apple: "/icon.svg?v=5",
   },
   appleWebApp: {
     capable: true,
