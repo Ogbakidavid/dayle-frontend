@@ -1,16 +1,14 @@
-"use client"
+"use client";
+
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
     Shield, Lock, Zap, ArrowRight,
     CheckCircle2, Box, ShieldCheck,
-    RefreshCcw, SearchCheck,
-    Cpu, Terminal,
-    ShieldAlert, Play,
-    Activity, ArrowUpRight, Check,
-    Sun, Moon, Plus, Minus, Menu, X,
+    RefreshCcw, Play,
+    ArrowUpRight,
     KeyRound,
     ListChecks,
     Layers,
@@ -18,10 +16,12 @@ import {
     FileText,
     Briefcase,
     Rocket,
-    Blocks
+    Blocks,
+    Plus,
+    Minus
 } from 'lucide-react';
 
-import Countries from "./components/Countries";
+import Countries from "../../(public)/components/Countries";
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -39,35 +39,11 @@ const staggerContainer = {
     }
 };
 
-export default function LandingPage() {
-    // State for FAQ toggles and mobile menu
+export default function LandingPageClient({ faqs }) {
     const [activeFaq, setActiveFaq] = useState(null);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-
-
-    const faqs = [
-        {
-            q: "How does the 'Autonomous Vault' actually work?",
-            a: "When a contract is initiated, funds are transferred into a secure escrow vault. These funds are locked and can only be released when pre-defined milestone conditions are met or if both parties agree to a refund."
-        },
-        {
-            q: "What happens if a client refuses to approve a milestone?",
-            a: "Dayle includes a built-in Dispute Hub. If a milestone is contested, an independent arbitrator reviews the submitted work against the project scope to ensure a fair resolution."
-        },
-        {
-            q: "Are there any hidden fees for international transfers?",
-            a: "No. We use integrated financial rails to provide real-time mid-market exchange rates. You see exactly what you’ll receive before the vault is even funded."
-        },
-        {
-            q: "Is my data and capital insured?",
-            a: "Yes. All project capital held in Dayle vaults is covered by our secondary insurance layer, and our infrastructure is SOC-2 Type II compliant with AES-256 encryption."
-        }
-    ];
 
     return (
         <div className="min-h-screen transition-colors duration-500 selection:bg-emerald-500/30 antialiased font-['Poppins',_sans-serif] bg-[#050505] text-white">
-
             {/* Background Sophistication */}
             <div className="fixed inset-0 z-0 opacity-[0.04] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
             <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
@@ -312,7 +288,7 @@ export default function LandingPage() {
                             {
                                 step: "03",
                                 title: "Controlled Release",
-                                desc: "Once approved, funds are released from the vault to the contractor’s payout method.",
+                                desc: "Once approved, funds are released from the vault to the contractor's payout method.",
                                 icon: Zap
                             }
                         ].map((item, i) => (
@@ -401,7 +377,7 @@ export default function LandingPage() {
                             </div>
 
                             <h2 className="mt-5 text-3xl md:text-5xl font-black tracking-tight text-white">
-                                Built for teams <span className='text-emerald-500'> that pay by outcome.</span>
+                                Built for teams <span className='text-emerald-500'>that pay by outcome.</span>
                             </h2>
 
                             <p className="mt-3 text-white/60 text-sm md:text-base leading-relaxed max-w-2xl">
@@ -515,7 +491,7 @@ export default function LandingPage() {
                     >
                         <div className="max-w-2xl">
                             <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight leading-none mb-5 text-white">
-                                Programmable <br /><span className='text-emerald-500'> Trust Infrastructure.</span>
+                                Programmable <br /><span className='text-emerald-500'>Trust Infrastructure.</span>
                             </h2>
                             <p className="text-white/70 text-sm md:text-base font-medium leading-relaxed">
                                 Dayle turns contractor payments into a deterministic workflow — lock funds, verify work, approve milestones, release.
@@ -699,7 +675,7 @@ export default function LandingPage() {
                                     Common <span className='text-emerald-500'>questions.</span>
                                 </h2>
                                 <p className="mt-3 text-white/60 text-sm md:text-base leading-relaxed max-w-2xl">
-                                    Everything you need to know about how Dayle’s vault workflow works — funding, approvals,
+                                    Everything you need to know about how Dayle's vault workflow works — funding, approvals,
                                     releases, and disputes.
                                 </p>
                             </div>
@@ -802,43 +778,47 @@ export default function LandingPage() {
                                     FAQ
                                 </Link>
                             </li>
+                            <li>
+                                <Link href="#safety" className="hover:text-emerald-400 transition-colors">
+                                    Security
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 
-                    {/* Contact */}
+                    {/* Company */}
                     <div>
                         <h4 className="text-xs md:text-sm font-black uppercase tracking-wide mb-6 md:mb-10 text-white">
-                            Contact
+                            Company
                         </h4>
                         <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-white/70 font-semibold">
                             <li>
-                                <Link href="/support" className="hover:text-emerald-400 transition-colors">
-                                    Support
+                                <Link href="https://orynexlabs.com/about" className="hover:text-emerald-400 transition-colors">
+                                    About
                                 </Link>
                             </li>
-                            {/* <li>
-                                <Link href="/contact" className="hover:text-emerald-400 transition-colors">
-                                    Sales
+                            <li>
+                                <Link href="https://orynexlabs.com/jobs" className="hover:text-emerald-400 transition-colors">
+                                    Careers
                                 </Link>
-                            </li> */}
+                            </li>
+                            <li>
+                                <Link href="mailto:contact@orynexlabs.com" className="hover:text-emerald-400 transition-colors">
+                                    Contact
+                                </Link>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto mt-16 md:mt-24 lg:mt-32 pt-8 md:pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs md:text-sm font-semibold text-white/50">
-                    <span>© 2026 Dayle.</span>
-
-                    <div className="flex items-center gap-6">
-                        <Link href="/privacy" className="hover:text-white transition-colors">
-                            Privacy
-                        </Link>
-                        <Link href="/terms" className="hover:text-white transition-colors">
-                            Terms
-                        </Link>
+                <div className="max-w-7xl mx-auto mt-16 md:mt-20 pt-8 md:pt-10 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs md:text-sm text-white/50 font-semibold">
+                    <p>© {new Date().getFullYear()} Dayle. All rights reserved.</p>
+                    <div className="flex gap-6 md:gap-8">
+                        <Link href="/privacy" className="hover:text-emerald-400 transition-colors">Privacy</Link>
+                        <Link href="/terms" className="hover:text-emerald-400 transition-colors">Terms</Link>
                     </div>
                 </div>
             </footer>
-
         </div>
     );
 }

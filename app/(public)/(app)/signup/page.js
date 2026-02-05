@@ -12,6 +12,8 @@ import { ArrowRight, CheckCircle2, Loader2, Shield, User, Mail } from 'lucide-re
 import { Label } from '@/components/ui/label';
 import { useUser } from '@/lib/store/user-context';
 
+
+
 export default function SignupPage() {
     const router = useRouter();
     const { signup: contextSignup, refreshUser } = useUser();

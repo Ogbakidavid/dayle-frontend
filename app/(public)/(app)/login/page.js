@@ -11,6 +11,8 @@ import { Shield, ArrowRight, Loader2, CheckCircle2, User } from 'lucide-react';
 import { api, UserRole } from '@/lib/mock-api';
 import { useUser } from '@/lib/store/user-context';
 
+
+
 export default function LoginPage() {
   const router = useRouter();
   const { login: contextLogin } = useUser();
