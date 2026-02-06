@@ -1,21 +1,25 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api } from '@/lib/mock-api';
 import { TransactionStatus } from "@/lib/domain/enums";
 import { useUser } from './user-context';
+import { WalletContextType, WalletBalance, Transaction, TransactionStatusType } from '@/lib/types';
 
-const WalletContext = createContext({});
+const WalletContext = createContext<WalletContextType | null>(null);
 
-export function WalletProvider({ children }) {
+export function WalletProvider({ children }: { children: ReactNode }) {
     const { user } = useUser();
-    const [balance, setBalance] = useState({ available: 0, pending: 0 });
-    const [transactions, setTransactions] = useState([]);
+    const [balance, setBalance] = useState<WalletBalance>({ available: 0, pending: 0 });
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (user) {
             fetchWalletData();
+        } else {
+            setBalance({ available: 0, pending: 0 });
+            setTransactions([]);
         }
     }, [user]);
 
@@ -35,7 +39,7 @@ export function WalletProvider({ children }) {
         }
     }
 
-    async function withdraw(amount) {
+    async function withdraw(amount: number): Promise<Transaction> {
         const idempotencyKey = `wd_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
         try {
             const tx = await api.wallet.withdraw(amount, { idempotencyKey });
@@ -48,12 +52,13 @@ export function WalletProvider({ children }) {
                 pending: prev.pending + Math.abs(tx.amount)
             }));
 
-            const normalized = {
+            const normalized: Transaction = {
                 id: tx.id,
-                date: tx.createdAt || new Date().toISOString(),
-                type: tx.type || 'withdraw',
+                createdAt: tx.createdAt || new Date().toISOString(),
+                type: (tx.type as any) || 'WITHDRAWAL', // Ensure type matches 'DEPOSIT' | 'WITHDRAWAL' | ...
                 amount: tx.amount,
-                status: tx.status || TransactionStatus.PENDING,
+                currency: tx.currency,
+                status: (tx.status as TransactionStatusType) || TransactionStatus.PENDING,
                 description: 'Withdrawal to Bank'
             };
 
@@ -64,10 +69,10 @@ export function WalletProvider({ children }) {
                 try {
                     const updatedTransactions = await api.wallet.getTransactions();
                     const updatedTx = updatedTransactions.find(t => t.id === tx.id);
-                    
+
                     if (updatedTx && updatedTx.status === TransactionStatus.CONFIRMED) {
                         // Transaction confirmed - update local state
-                        setTransactions(prev => 
+                        setTransactions(prev =>
                             prev.map(t => t.id === tx.id ? { ...t, status: TransactionStatus.CONFIRMED } : t)
                         );
                         // Decrement pending (funds already removed from available)
@@ -99,4 +104,10 @@ export function WalletProvider({ children }) {
     );
 }
 
-export const useWallet = () => useContext(WalletContext);
+export const useWallet = () => {
+    const context = useContext(WalletContext);
+    if (!context) {
+        throw new Error("useWallet must be used within a WalletProvider");
+    }
+    return context;
+};

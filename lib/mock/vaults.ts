@@ -163,7 +163,6 @@ export const vaults = [
     status: "IN_REVIEW",
     escrowRef: "v_2",
     totalAmount: 8500,
-    totalAmount: 8500,
     createdAt: "2025-01-12T14:30:00Z",
     description:
       "Comprehensive mobile security assessment and remediation plan.",

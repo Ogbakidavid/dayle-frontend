@@ -1,26 +1,34 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { EvidencePanel } from '@/components/shared/EvidencePanel';
 import { cn } from '@/lib/utils';
-import { getEvidenceForMilestone, getVaultById } from '@/lib/mock';
-import { MILESTONE_STATUS_LABELS } from '@/lib/rules/milestones';
+import { getEvidenceForMilestone } from '@/lib/mock';
 import {
     Calendar,
     FileText,
-    BadgeCheck,
     ShieldCheck,
     ClipboardList
 } from 'lucide-react';
+import { UserRoleType } from '@/lib/types';
+import { useVault } from '@/lib/store/vault-context';
 
-export function VaultDetailView({ vaultId, role }) {
-    const vault = useMemo(() => getVaultById(vaultId), [vaultId]);
+interface VaultDetailViewProps {
+    vaultId: string;
+    role: UserRoleType;
+}
+
+export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
+    const { getVault } = useVault();
+    const vault = getVault(vaultId);
+
+    // Fallback to empty if not found, but component handles !vault below
     const milestones = vault?.milestones || [];
-    const [activeMilestoneId, setActiveMilestoneId] = useState(null);
+    const [activeMilestoneId, setActiveMilestoneId] = useState<string | null>(null);
 
     useEffect(() => {
         if (milestones.length === 0) {
@@ -28,7 +36,9 @@ export function VaultDetailView({ vaultId, role }) {
             return;
         }
         if (!activeMilestoneId || !milestones.some((milestone) => milestone.id === activeMilestoneId)) {
-            setActiveMilestoneId(milestones[0].id);
+            if (milestones[0]) {
+                setActiveMilestoneId(milestones[0].id);
+            }
         }
     }, [activeMilestoneId, milestones]);
 
@@ -41,7 +51,7 @@ export function VaultDetailView({ vaultId, role }) {
         );
     }
 
-    const totalAmount = vault.totalAmount || vault.amount || 0;
+    const totalAmount = vault.totalAmount || 0;
 
     return (
         <div className="space-y-8">
@@ -56,7 +66,7 @@ export function VaultDetailView({ vaultId, role }) {
                         <p className="text-sm text-white/60 max-w-2xl">{vault.description}</p>
                         <div className="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-wide text-white">
                             <span>Client: {vault.clientName}</span>
-                            <span>Freelancer: {vault.freelancer?.name || vault.freelancer?.email || vault.freelancerEmail || 'Unassigned'}</span>
+                            <span>Freelancer: {vault.freelancerName || vault.freelancerEmail || 'Unassigned'}</span>
                             <span>Created: {new Date(vault.createdAt).toLocaleDateString()}</span>
                         </div>
                     </div>
@@ -94,7 +104,7 @@ export function VaultDetailView({ vaultId, role }) {
                                 const milestoneBase = `/${role}/vault/${vault.id}/milestones/${milestone.id}`;
                                 const active = milestone.id === activeMilestoneId;
                                 const hasVerification = milestone.verification?.result;
-                                
+
                                 return (
                                     <Card
                                         key={milestone.id}
@@ -116,7 +126,7 @@ export function VaultDetailView({ vaultId, role }) {
                                                     <Calendar className="w-3.5 h-3.5" />
                                                     Due {milestone.dueDate}
                                                 </span>
-                                                {hasVerification && (
+                                                {hasVerification && milestone.verification && (
                                                     <span className="flex items-center gap-2">
                                                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
                                                         AI: {milestone.verification.result}
@@ -131,7 +141,7 @@ export function VaultDetailView({ vaultId, role }) {
                                                     <p className="text-2xl font-bold text-white">${milestone.amount.toLocaleString()}</p>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {role === 'freelancer' && (
+                                                    {role === 'FREELANCER' && (
                                                         <Link href={`${milestoneBase}/submit`}>
                                                             <Button size="sm" variant="outline" className="border-white/10 text-white/70 hover:text-white">
                                                                 Submit
@@ -143,7 +153,7 @@ export function VaultDetailView({ vaultId, role }) {
                                                             Verification
                                                         </Button>
                                                     </Link>
-                                                    {role === 'client' && (
+                                                    {role === 'CLIENT' && (
                                                         <Link href={`${milestoneBase}/review`}>
                                                             <Button size="sm" variant="outline" className="border-white/10 text-white/70 hover:text-white">
                                                                 Review
@@ -156,7 +166,7 @@ export function VaultDetailView({ vaultId, role }) {
                                             <div className="rounded-lg border border-white/5 bg-black/40 p-4 space-y-2">
                                                 <p className="text-xs font-bold uppercase tracking-wide text-white">Requirements</p>
                                                 <div className="space-y-2">
-                                                    {(milestone.requirements || []).map((req) => (
+                                                    {((milestone as any).requirementItemsJson || []).map((req: any) => (
                                                         <div key={req.reqId} className="flex items-start gap-3 text-sm text-white/70">
                                                             <FileText className="w-4 h-4 text-emerald-500 mt-0.5" />
                                                             <div>

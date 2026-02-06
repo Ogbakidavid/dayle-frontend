@@ -6,6 +6,7 @@
 import { vaults as seedVaults } from "@/lib/mock/vaults";
 import { disputes as seedDisputes } from "@/lib/mock/disputes";
 import { seedInvites } from "@/lib/mock/invites";
+import { mockNotifications as seedNotifications } from "@/lib/mock/notifications";
 import {
   VaultStatus,
   MilestoneStatus,
@@ -14,11 +15,23 @@ import {
   LedgerEntryStatus,
   TransactionStatus,
   InviteStatus,
-  VerificationResult,
 } from "@/lib/domain/enums";
+import type {
+  User,
+  Vault,
+  Milestone,
+  Dispute,
+  Invite,
+  Wallet,
+  Transaction,
+  UserRoleType,
+  VaultStatusType,
+  MilestoneStatusType,
+} from "@/lib/types";
 
 const SESSION_KEY = "mock_user_session";
 const USERS_DB_KEY = "mock_users_db";
+const NOTIFICATIONS_DB_KEY = "mock_notifications_db";
 
 const DELAY_MS = 600;
 
@@ -28,8 +41,10 @@ export { VaultStatus, MilestoneStatus, UserRole, DisputeStatus };
 // Local enums not in canonical spec (implementation-specific)
 export const KycStatus = {
   PENDING: "PENDING",
+  VERIFIED: "VERIFIED",
+  REJECTED: "REJECTED",
   NONE: "NONE",
-};
+} as const;
 
 export const UserStatus = {
   ACTIVE: "ACTIVE",
@@ -73,12 +88,12 @@ export const EvidenceType = {
 };
 
 // Mock Database
-let mockUser = {
+let mockUser: User = {
   id: "u_guest",
   email: "",
   name: "Guest",
   role: UserRole.NONE,
-  kycStatus: KycStatus.NONE,
+  kycStatus: "NONE",
   profileImage: null,
   twoFactorEnabled: false,
   twoFactorSecret: null,
@@ -86,15 +101,15 @@ let mockUser = {
 };
 
 // Mock sessions storage
-let mockSessions = [];
+let mockSessions: any[] = [];
 
 // Helper to save user to persistent DB
-function saveUserToDB(user) {
+function saveUserToDB(user: User) {
   if (typeof window === "undefined" || !user.email) return;
 
   try {
     const dbStr = localStorage.getItem(USERS_DB_KEY);
-    const db = dbStr ? JSON.parse(dbStr) : {};
+    const db: Record<string, User> = dbStr ? JSON.parse(dbStr) : {};
     db[user.email] = user;
     localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
   } catch (e) {
@@ -103,13 +118,13 @@ function saveUserToDB(user) {
 }
 
 // Helper to get user from persistent DB
-function getUserFromDB(email) {
+function getUserFromDB(email: string): User | null {
   if (typeof window === "undefined" || !email) return null;
 
   try {
     const dbStr = localStorage.getItem(USERS_DB_KEY);
     if (!dbStr) return null;
-    const db = JSON.parse(dbStr);
+    const db: Record<string, User> = JSON.parse(dbStr);
     return db[email] || null;
   } catch (e) {
     console.error("Failed to get user from DB", e);
@@ -118,7 +133,7 @@ function getUserFromDB(email) {
 }
 
 // Initialize mockWallet with seed data
-let mockWallet = {
+let mockWallet: Wallet = {
   available: 1200,
   pending: 800,
   transactions: [
@@ -129,29 +144,67 @@ let mockWallet = {
       amount: 5000,
       currency: "USD",
       status: TransactionStatus.CONFIRMED,
+      description: "Initial Deposit",
     },
     {
       id: "TX_1002",
       createdAt: "2025-10-04",
-      type: "WITHDRAW",
+      type: "WITHDRAWAL" as any, // Using enum values
       amount: -2500,
       currency: "USD",
       status: TransactionStatus.CONFIRMED,
+      description: "Bank Withdrawal",
     },
   ],
 };
 
-const mockVaults = seedVaults.map((vault) => ({ ...vault }));
-const mockDisputes = seedDisputes.map((dispute) => ({ ...dispute }));
-const mockInvites = seedInvites.map((invite) => ({ ...invite }));
+const mockVaults: Vault[] = (seedVaults as any[]).map((v) => ({
+  ...v,
+  purpose: v.purpose || v.type || "development",
+  currency: v.currency || "USD",
+  updatedAt: v.updatedAt || v.createdAt,
+  clientEmail: v.clientEmail || "client@example.com",
+}));
+const mockDisputes: Dispute[] = (seedDisputes as any[]).map((dispute) => ({ ...dispute }));
+const mockInvites: Invite[] = (seedInvites as any[]).map((invite) => ({ ...invite }));
+
+// Notifications State
+// (using local storage via getNotificationsFromDB)
+
+// Helper to save notifications to persistent DB
+function saveNotificationsToDB(notifications: any[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(NOTIFICATIONS_DB_KEY, JSON.stringify(notifications));
+  } catch (e) {
+    console.error("Failed to save notifications", e);
+  }
+}
+
+// Helper to get notifications from persistent DB
+function getNotificationsFromDB(): any[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem(NOTIFICATIONS_DB_KEY);
+    if (stored) return JSON.parse(stored);
+
+    // Initialize with seeds if empty
+    const isClient = mockUser.role === UserRole.CLIENT;
+    const seeds = isClient ? seedNotifications.client : seedNotifications.freelancer;
+    saveNotificationsToDB(seeds);
+    return seeds;
+  } catch (e) {
+    return [];
+  }
+}
 
 // Simple idempotency map for money/create operations in the mock API
-const mockIdempotencyMap = {};
+const mockIdempotencyMap: Record<string, any> = {};
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Helper to generate a stable professional male avatar URL
-function getProfessionalAvatar(email, id) {
+function getProfessionalAvatar(email: string, id: string | null) {
   return null; // Using jdenticon on frontend instead
 }
 
@@ -174,15 +227,16 @@ function getDeviceInfo() {
   return device;
 }
 
-function getLocationInfo() {
+function getLocationInfo(): string {
   // Mock location - in real app would use IP geolocation
   const locations = ["New York, US", "San Francisco, US", "London, UK", "Toronto, CA"];
-  return locations[0]; // Default to New York
+  return locations[0] as string; // Default to New York
 }
 
 // Helper to get relative time string
-function getRelativeTime(timestamp) {
-  const seconds = Math.floor((new Date() - timestamp) / 1000);
+function getRelativeTime(timestamp: number | string | Date): string {
+  const ts = typeof timestamp === "number" ? timestamp : new Date(timestamp).getTime();
+  const seconds = Math.floor((new Date().getTime() - ts) / 1000);
   if (seconds < 60) return 'Active now';
   if (seconds < 3600) return `${Math.floor(seconds / 60)} ${Math.floor(seconds / 60) === 1 ? 'hour' : 'hours'} ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)} ${Math.floor(seconds / 3600) === 1 ? 'hour' : 'hours'} ago`;
@@ -235,49 +289,57 @@ function ensureSession() {
 
 export const api = {
   auth: {
-    login: async (email, password) => {
+    login: async (email: string, password?: string): Promise<User> => {
       await sleep(DELAY_MS);
 
       // Check if user exists in persistent DB
       const existingUser = getUserFromDB(email);
 
       if (existingUser) {
+        // If password provided and user has a password, verify it
+        if (existingUser.password && password && existingUser.password !== password) {
+          throw new Error("Invalid password");
+        }
         mockUser = { ...existingUser };
-        // If password provided and matches, return user
-        // If no password stored yet (legacy mock users), verify matching logic below
       } else {
         // Create new mock user based on email pattern
         if (email.includes("client")) {
           mockUser = {
-            ...mockUser,
             id: "u_client_1",
-            email, // Track login email
-            name: "Demo Client", // Set a better name
+            email,
+            name: "Demo Client",
             role: UserRole.CLIENT,
-            kycStatus: KycStatus.VERIFIED,
-            password, // Store password for mock auth
+            kycStatus: "VERIFIED",
+            password: password || "password123", // Default if not provided
+            profileImage: null,
+            twoFactorEnabled: false,
+            twoFactorSecret: null,
           };
         } else if (email.includes("freelancer")) {
           mockUser = {
-            ...mockUser,
             id: "u_freelancer_1",
-            email, // Track login email
-            name: "Demo Freelancer", // Set a better name
+            email,
+            name: "Demo Freelancer",
             role: UserRole.FREELANCER,
-            kycStatus: KycStatus.VERIFIED,
-            password, // Store password for mock auth
+            kycStatus: "VERIFIED",
+            password: password || "password123", // Default if not provided
+            profileImage: null,
+            twoFactorEnabled: false,
+            twoFactorSecret: null,
           };
         } else {
           // Default generic user
-          const nameFromEmail = email.split("@")[0];
+          const nameFromEmail = email.split("@")[0] || "User";
           mockUser = {
-            ...mockUser,
             id: `u_${Math.random().toString(36).substr(2, 9)}`,
             email,
             name: nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1),
             role: UserRole.FREELANCER,
-            kycStatus: KycStatus.VERIFIED,
-            password, // Store password for mock auth
+            kycStatus: "VERIFIED",
+            password: password || null,
+            profileImage: null,
+            twoFactorEnabled: false,
+            twoFactorSecret: null,
           };
         }
       }
@@ -300,34 +362,49 @@ export const api = {
 
       return { ...mockUser };
     },
-    signup: async (email, password, name, role) => {
-      await sleep(DELAY_MS);
-      // Use the provided role, or default to Freelancer
-      const finalRole = role || UserRole.FREELANCER;
-      const nameFromEmail = email.split("@")[0];
-      const displayName = name || (nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1));
+    signup: async (
+      email: string,
+      password: string,
+      name: string,
+      role: UserRoleType
+    ): Promise<User> => {
+      await sleep(DELAY_MS * 1.5);
+
+      const nameFromEmail = email.split("@")[0] || "User";
+      const finalName = name || nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
+
+      // Check if user exists (mock)
+      if (email === "demo@orynex.com") {
+        throw new Error("User already exists");
+      }
 
       mockUser = {
-        ...mockUser,
+        id: `u_${Date.now()}`,
         email,
-        name: displayName,
-        id: `u_${Math.random().toString(36).substr(2, 9)}`,
-        role: finalRole,
-        kycStatus: KycStatus.NONE,
-        emailVerified: false,
-        profileImage: getProfessionalAvatar(email, null)
+        name: finalName,
+        role: role || UserRole.NONE,
+        kycStatus: "NONE",
+        profileImage: null,
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        password: password || null,
       };
+
       if (typeof window !== "undefined") {
         localStorage.setItem(SESSION_KEY, JSON.stringify(mockUser));
       }
+
+      // Persist user to DB
+      saveUserToDB(mockUser);
+
       return { ...mockUser };
     },
-    sendVerificationEmail: async (email) => {
+    sendVerificationEmail: async (email: string): Promise<{ success: boolean }> => {
       await sleep(DELAY_MS);
       console.log(`[API] Verification code sent to ${email}`);
       return { success: true };
     },
-    verifyEmail: async (code) => {
+    verifyEmail: async (code: string): Promise<{ success: boolean; user: User }> => {
       await sleep(DELAY_MS);
       if (code === "123456") { // Mock success code
         mockUser = { ...mockUser, emailVerified: true };
@@ -338,7 +415,7 @@ export const api = {
       }
       throw new Error("Invalid verification code");
     },
-    updateProfile: async (updates) => {
+    updateProfile: async (updates: Partial<User>): Promise<User> => {
       await sleep(DELAY_MS);
       mockUser = { ...mockUser, ...updates };
 
@@ -367,7 +444,7 @@ export const api = {
 
       // Repair: If user has a role but name is still "Guest", give them a better name
       if (mockUser.role !== UserRole.NONE && mockUser.name === "Guest" && mockUser.email) {
-        const nameFromEmail = mockUser.email.split("@")[0];
+        const nameFromEmail = mockUser.email.split("@")[0] || "User";
         mockUser.name = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
       }
 
@@ -386,6 +463,10 @@ export const api = {
         name: "Guest",
         role: UserRole.NONE,
         kycStatus: KycStatus.NONE,
+        profileImage: null, // Ensure profileImage is set
+        twoFactorEnabled: false, // Ensure 2FA props are set
+        twoFactorSecret: null,
+        password: null,
       };
       if (typeof window !== "undefined") {
         localStorage.removeItem(SESSION_KEY);
@@ -394,13 +475,13 @@ export const api = {
     },
 
     // 2FA Pending State Management
-    setPending2FA: (email, password) => {
+    setPending2FA: (email: string, password?: string): void => {
       if (typeof window !== "undefined") {
         localStorage.setItem("pending_2fa_auth", JSON.stringify({ email, password, timestamp: Date.now() }));
       }
     },
 
-    getPending2FA: () => {
+    getPending2FA: (): any => {
       if (typeof window !== "undefined") {
         const stored = localStorage.getItem("pending_2fa_auth");
         if (stored) {
@@ -446,7 +527,7 @@ export const api = {
         tempSecret: secret, // Store temporarily until verified
       };
     },
-    verify2FA: async (code, tempSecret) => {
+    verify2FA: async (code: string, tempSecret: string): Promise<{ success: boolean; user: User }> => {
       await sleep(DELAY_MS);
       ensureSession();
 
@@ -468,7 +549,7 @@ export const api = {
 
       return { success: true, user: { ...mockUser } };
     },
-    disable2FA: async (code) => {
+    disable2FA: async (code: string): Promise<{ success: boolean; user: User }> => {
       await sleep(DELAY_MS);
       ensureSession();
 
@@ -514,7 +595,7 @@ export const api = {
         time: getRelativeTime(new Date(session.lastActive)),
       }));
     },
-    revokeSession: async (sessionId) => {
+    revokeSession: async (sessionId: string): Promise<{ success: boolean }> => {
       await sleep(DELAY_MS);
       ensureSession();
 
@@ -551,7 +632,7 @@ export const api = {
     },
 
     // Password Management
-    changePassword: async (currentPassword, newPassword) => {
+    changePassword: async (currentPassword?: string, newPassword?: string): Promise<{ success: boolean }> => {
       await sleep(DELAY_MS);
       ensureSession();
 
@@ -583,7 +664,7 @@ export const api = {
     },
 
     // Login-specific 2FA methods
-    check2FAOnLogin: async (email, password) => {
+    check2FAOnLogin: async (email: string, password?: string): Promise<{ requires2FA: boolean }> => {
       await sleep(DELAY_MS / 2);
 
       // In a real app, this would verify credentials first
@@ -598,7 +679,7 @@ export const api = {
       return { requires2FA: false };
     },
 
-    verify2FAOnLogin: async (email, code) => {
+    verify2FAOnLogin: async (email: string, code: string): Promise<{ success: boolean }> => {
       await sleep(DELAY_MS);
 
       // Mock verification - accept any 6-digit code
@@ -621,7 +702,7 @@ export const api = {
         total: available + pending
       };
     },
-    withdraw: async (amount, opts = {}) => {
+    withdraw: async (amount: number | string, opts: { idempotencyKey?: string } = {}): Promise<Transaction> => {
       await sleep(DELAY_MS);
       ensureSession();
 
@@ -647,13 +728,14 @@ export const api = {
         };
       }
 
-      const tx = {
+      const tx: Transaction = {
         id: `TX_${Date.now()}`,
         createdAt: new Date().toISOString(),
-        type: 'WITHDRAW',
+        type: 'WITHDRAWAL' as any,
         amount: -withdrawAmount,
         currency: 'USD',
         status: TransactionStatus.PENDING,
+        description: `Withdrawal of ${withdrawAmount} USD`,
       };
 
       // Move from available to pending
@@ -667,9 +749,11 @@ export const api = {
       setTimeout(() => {
         // Find the transaction and confirm it
         const txIndex = mockWallet.transactions.findIndex(t => t.id === tx.id);
-        if (txIndex !== -1 && mockWallet.transactions[txIndex].status === TransactionStatus.PENDING) {
-          mockWallet.transactions[txIndex].status = TransactionStatus.CONFIRMED;
-          mockWallet.transactions[txIndex].completedAt = new Date().toISOString();
+        const transaction = mockWallet.transactions[txIndex];
+        if (txIndex !== -1 && transaction && transaction.status === TransactionStatus.PENDING) {
+          transaction.status = TransactionStatus.CONFIRMED;
+          transaction.completedAt = new Date().toISOString();
+          mockWallet.transactions[txIndex] = transaction; // Re-assign if needed, though objects are ref
           // Decrement pending (funds already removed from available)
           mockWallet.pending = Math.max(0, mockWallet.pending - withdrawAmount);
         }
@@ -685,16 +769,22 @@ export const api = {
     },
   },
   vaults: {
-    list: async () => {
+    list: async (): Promise<Vault[]> => {
       await sleep(DELAY_MS);
       ensureSession();
 
       // HACK: Self-heal stale data if HMR didn't update mockVaults with new schema keys
-      if (mockVaults.length > 0 && !mockVaults[0].clientId) {
+      if (mockVaults[0] && !mockVaults[0].clientId) {
         console.warn(
           "[API] Detected stale mock data (missing clientId), re-syncing from seed..."
         );
-        const fresh = seedVaults.map((v) => ({ ...v }));
+        const fresh: Vault[] = (seedVaults as any[]).map((v) => ({
+          ...v,
+          purpose: v.purpose || v.type || "development",
+          currency: v.currency || "USD",
+          updatedAt: v.updatedAt || v.createdAt,
+          clientEmail: v.clientEmail || "client@example.com",
+        }));
         mockVaults.length = 0;
         mockVaults.push(...fresh);
       }
@@ -707,7 +797,7 @@ export const api = {
       );
       return participantVaults;
     },
-    create: async (data) => {
+    create: async (data: any): Promise<Vault> => {
       await sleep(DELAY_MS);
       ensureSession();
 
@@ -740,7 +830,7 @@ export const api = {
 
       return newVault;
     },
-    releaseMilestone: async (vaultId, milestoneId, opts = {}) => {
+    releaseMilestone: async (vaultId: string, milestoneId: string, opts: { idempotencyKey?: string } = {}): Promise<any> => {
       await sleep(DELAY_MS);
       ensureSession();
 
@@ -810,7 +900,7 @@ export const api = {
 
       return ledgerEntry;
     },
-    getById: async (id) => {
+    getById: async (id: string): Promise<Vault | null> => {
       await sleep(DELAY_MS);
       ensureSession();
       const vault = mockVaults.find((v) => v.id === id);
@@ -823,27 +913,27 @@ export const api = {
       }
       return null; // Or throw error
     },
-    updateStatus: async (id, status) => {
+    updateStatus: async (id: string, status: VaultStatusType): Promise<Vault> => {
       await sleep(DELAY_MS);
       const idx = mockVaults.findIndex((v) => v.id === id);
       if (idx !== -1) {
-        mockVaults[idx] = { ...mockVaults[idx], status };
-        return mockVaults[idx];
+        mockVaults[idx] = { ...mockVaults[idx]!, status };
+        return mockVaults[idx]!;
       }
       throw new Error("Vault not found");
     },
   },
   disputes: {
-    list: async () => {
+    list: async (): Promise<Dispute[]> => {
       await sleep(DELAY_MS);
       ensureSession();
 
       // HACK: Self-heal stale data if HMR didn't update mockVaults with new schema keys
-      if (mockVaults.length > 0 && !mockVaults[0].clientId) {
+      if (mockVaults.length > 0 && !mockVaults[0]?.clientId) {
         console.warn(
           "[API] Detected stale mock data (missing clientId), re-syncing from seed..."
         );
-        const fresh = seedVaults.map((v) => ({ ...v }));
+        const fresh = (seedVaults as any[]).map((v) => ({ ...v }));
         mockVaults.length = 0;
         mockVaults.push(...fresh);
       }
@@ -857,7 +947,7 @@ export const api = {
 
       return mockDisputes.filter((d) => visibleVaults.includes(d.vaultId));
     },
-    listForVault: async (vaultId) => {
+    listForVault: async (vaultId: string): Promise<Dispute[]> => {
       await sleep(DELAY_MS);
       const vault = mockVaults.find((v) => v.id === vaultId);
       if (
@@ -868,7 +958,7 @@ export const api = {
       }
       return mockDisputes.filter((d) => d.vaultId === vaultId);
     },
-    getById: async (id) => {
+    getById: async (id: string): Promise<Dispute | null> => {
       await sleep(DELAY_MS);
       const dispute = mockDisputes.find((d) => d.id === id);
       if (!dispute) return null;
@@ -882,7 +972,7 @@ export const api = {
       }
       return dispute;
     },
-    create: async (payload) => {
+    create: async (payload: any): Promise<Dispute> => {
       await sleep(DELAY_MS);
       // Validate access to vault
       const vault = mockVaults.find((v) => v.id === payload.vaultId);
@@ -893,7 +983,7 @@ export const api = {
         throw new Error("Unauthorized");
       }
 
-      const newDispute = {
+      const newDispute: any = {
         id: `d_${Date.now()}`,
         openedByUserId: mockUser.id,
         openedByRole: mockUser.role,
@@ -921,7 +1011,7 @@ export const api = {
     },
   },
   invites: {
-    getByToken: async (token) => {
+    getByToken: async (token: string): Promise<{ invite: Invite; vault: any } | null> => {
       await sleep(DELAY_MS);
       const invite = mockInvites.find((i) => i.token === token);
       if (!invite) throw new Error("Invite not found");
@@ -940,24 +1030,28 @@ export const api = {
           id: vault.id,
           title: vault.title,
           clientName: vault.clientName,
-          totalAmount: vault.totalAmount || vault.amount,
+          totalAmount: vault.totalAmount,
           milestoneCount: vault.milestones?.length || 0,
           status: vault.status,
           isFunded: vault.status.includes("FUNDED") || vault.status === "ACTIVE",
         },
       };
     },
-    getByVaultId: async (vaultId) => {
+    getByVaultId: async (vaultId: string): Promise<Invite | null> => {
       await sleep(DELAY_MS);
       // Get the most recent invite for this vault
       const invitesForVault = mockInvites.filter((i) => i.vaultId === vaultId);
       if (invitesForVault.length === 0) return null;
 
       // Sort by invitedAt descending
-      invitesForVault.sort((a, b) => new Date(b.invitedAt) - new Date(a.invitedAt));
-      return invitesForVault[0];
+      invitesForVault.sort((a, b) => {
+        const dateA = new Date(a.invitedAt || 0).getTime();
+        const dateB = new Date(b.invitedAt || 0).getTime();
+        return dateB - dateA;
+      });
+      return invitesForVault[0]!;
     },
-    respond: async (token, { decision, reasonCode }) => {
+    respond: async (token: string, { decision, reasonCode }: { decision: 'ACCEPT' | 'DECLINE'; reasonCode?: string }): Promise<{ success: boolean; vaultId?: string }> => {
       await sleep(DELAY_MS);
       ensureSession();
 
@@ -991,18 +1085,14 @@ export const api = {
       }
 
       if (decision === "ACCEPT") {
-        invite.status = "ACCEPTED";
+        invite.status = InviteStatus.ACCEPTED;
         invite.respondedAt = new Date().toISOString();
 
         // Update Vault
         vault.freelancerId = mockUser.id;
-        // simplistic update to freelancer object on vault
-        vault.freelancer = {
-          name: mockUser.name || "Freelancer",
-          email: mockUser.email,
-        };
+        vault.freelancerName = mockUser.name || "Freelancer";
+        vault.freelancerEmail = mockUser.email;
 
-        // State Transitions
         // State Transitions
         if (vault.status === VaultStatus.FUNDED_UNASSIGNED) {
           vault.status = VaultStatus.FUNDED_ASSIGNED;
@@ -1013,14 +1103,15 @@ export const api = {
 
         return { success: true, vaultId: vault.id };
       } else if (decision === "DECLINE") {
-        invite.status = "DECLINED";
+        invite.status = InviteStatus.DECLINED;
         invite.respondedAt = new Date().toISOString();
         invite.declineReason = reasonCode;
 
         // Vault logic: Clear placeholder if any, status logic
         if (vault.freelancerId === mockUser.id) {
           vault.freelancerId = null;
-          vault.freelancer = null;
+          vault.freelancerName = undefined;
+          vault.freelancerEmail = undefined;
         }
         // Status typically stays as is (FUNDED_UNASSIGNED or INVITED) if declined
 
@@ -1031,14 +1122,14 @@ export const api = {
     },
   },
   milestones: {
-    submit: async (milestoneId, submissionData) => {
+    submit: async (milestoneId: string, submissionData: any): Promise<Milestone> => {
       await sleep(DELAY_MS);
       const vault = mockVaults.find(v => v.milestones.some(m => m.id === milestoneId));
       if (!vault) throw new Error("Milestone not found");
-      const milestone = vault.milestones.find(m => m.id === milestoneId);
+      const milestone = vault.milestones.find(m => m.id === milestoneId)!;
 
       // STATE TRANSITION GUARD: Only allow submission from PENDING, REVISION_REQUESTED, or REJECTED
-      const allowedStatuses = [MilestoneStatus.PENDING, MilestoneStatus.REVISION_REQUESTED, MilestoneStatus.REJECTED];
+      const allowedStatuses: MilestoneStatusType[] = [MilestoneStatus.PENDING, MilestoneStatus.REVISION_REQUESTED, MilestoneStatus.REJECTED];
       if (!allowedStatuses.includes(milestone.status)) {
         throw {
           code: "INVALID_STATE_TRANSITION",
@@ -1053,20 +1144,19 @@ export const api = {
       milestone.submission = {
         ...submissionData,
         submittedAt: new Date().toISOString(),
-        milestoneId
       };
       // Normalize rename summary to notes if it exists in data
-      if (milestone.submission.summary) {
-        milestone.submission.notes = milestone.submission.summary;
-        delete milestone.submission.summary;
+      if (milestone.submission && (milestone.submission as any).summary) {
+        milestone.submission.notes = (milestone.submission as any).summary;
+        delete (milestone.submission as any).summary;
       }
       return milestone;
     },
-    verify: async (milestoneId) => {
+    verify: async (milestoneId: string): Promise<Milestone> => {
       await sleep(DELAY_MS);
       const vault = mockVaults.find(v => v.milestones.some(m => m.id === milestoneId));
       if (!vault) throw new Error("Milestone not found");
-      const milestone = vault.milestones.find(m => m.id === milestoneId);
+      const milestone = vault.milestones.find(m => m.id === milestoneId)!;
 
       // STATE TRANSITION GUARD: Only allow verification from SUBMITTED
       if (milestone.status !== MilestoneStatus.SUBMITTED) {
@@ -1081,22 +1171,21 @@ export const api = {
 
       milestone.status = MilestoneStatus.AWAITING_APPROVAL;
       milestone.verification = {
-        milestoneId,
         result: "PASS",
         ruleResultsJson: [
           { code: "FORMAT", passed: true, message: "Valid deliverable format" },
           { code: "METADATA", passed: true, message: "Metadata extracted successfully" }
         ],
         verifiedAt: new Date().toISOString(),
-        reviewedBy: "AI",
+        checks: ["AI", "Format", "Metadata"],
       };
       return milestone;
     },
-    review: async (milestoneId, reviewData) => {
+    review: async (milestoneId: string, reviewData: any): Promise<Milestone> => {
       await sleep(DELAY_MS);
       const vault = mockVaults.find(v => v.milestones.some(m => m.id === milestoneId));
       if (!vault) throw new Error("Milestone not found");
-      const milestone = vault.milestones.find(m => m.id === milestoneId);
+      const milestone = vault.milestones.find(m => m.id === milestoneId)!;
 
       // STATE TRANSITION GUARD: Only allow review from AWAITING_APPROVAL
       if (milestone.status !== MilestoneStatus.AWAITING_APPROVAL) {
@@ -1110,7 +1199,7 @@ export const api = {
       }
 
       // MAP OUTCOME TO STATUS (never assign outcome directly to status)
-      let newStatus;
+      let newStatus: MilestoneStatusType;
       switch (reviewData.outcome) {
         case "APPROVE":
           newStatus = MilestoneStatus.VERIFIED;
@@ -1133,8 +1222,8 @@ export const api = {
       milestone.status = newStatus;
       milestone.review = {
         ...reviewData,
-        reviewedAt: new Date().toISOString(),
-        milestoneId
+        submittedAt: new Date().toISOString(),
+        status: newStatus,
       };
 
       // Update Vault status if all milestones terminal
@@ -1144,14 +1233,14 @@ export const api = {
 
       return milestone;
     },
-    getEvidence: async (milestoneId) => {
+    getEvidence: async (milestoneId: string): Promise<any[]> => {
       await sleep(DELAY_MS / 2);
       const { evidence } = await import("@/lib/mock/evidence");
-      return evidence.filter(e => e.milestoneId === milestoneId);
+      return (evidence as any[]).filter(e => e.milestoneId === milestoneId);
     }
   },
   onboarding: {
-    setRole: async (role) => {
+    setRole: async (role: UserRoleType): Promise<User> => {
       await sleep(DELAY_MS);
       mockUser.role = role;
       if (typeof window !== "undefined") {
@@ -1159,7 +1248,7 @@ export const api = {
       }
       return mockUser;
     },
-    submitKyc: async (kycData) => {
+    submitKyc: async (_kycData: any): Promise<User> => {
       await sleep(DELAY_MS * 2);
       mockUser.kycStatus = "VERIFIED";
       if (typeof window !== "undefined") {
@@ -1176,4 +1265,28 @@ export const api = {
       };
     }
   },
+  notifications: {
+    list: async () => {
+      await sleep(DELAY_MS);
+      return getNotificationsFromDB();
+    },
+    markAsRead: async (id: number) => {
+      await sleep(DELAY_MS / 2);
+      const notifications = getNotificationsFromDB();
+      const updated = notifications.map(n => n.id === id ? { ...n, read: true } : n);
+      saveNotificationsToDB(updated);
+      return { success: true };
+    },
+    markAllAsRead: async () => {
+      await sleep(DELAY_MS / 2);
+      const notifications = getNotificationsFromDB();
+      const updated = notifications.map(n => ({ ...n, read: true }));
+      saveNotificationsToDB(updated);
+      return { success: true };
+    },
+    getUnreadCount: async () => {
+      const notifications = getNotificationsFromDB();
+      return notifications.filter(n => !n.read).length;
+    }
+  }
 };

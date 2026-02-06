@@ -1,4 +1,5 @@
 import { MilestoneStatus } from "@/lib/domain/enums";
+import { Milestone } from "@/lib/types";
 
 export const DISPUTE_REASON_CODES = [
   // AI Verification Disputes (when AI audit fails/flags incorrectly)
@@ -62,21 +63,21 @@ export const DISPUTE_REASON_CODES = [
   },
 ];
 
-export function getDisputeEligibility(milestone, requirementId) {
+export function getDisputeEligibility(milestone: Milestone | null, _requirementId?: string) {
   if (!milestone) {
     return {
       eligible: false,
       reason: "Select a milestone to open a case file.",
-      allowedCodes: [],
+      allowedCodes: [] as typeof DISPUTE_REASON_CODES,
     };
   }
 
   const status = milestone.status;
   const verificationResult = milestone.verification?.result;
 
-  let allowedCodes = [];
+  let allowedCodes: typeof DISPUTE_REASON_CODES = [];
 
-  // Logic based on verification result + status combination
+  // Logic based on assignment of verification result
   if (verificationResult === "FAIL" || verificationResult === "FLAGGED") {
     // AI audit failed/flagged - freelancer can dispute verification
     if (status === MilestoneStatus.REJECTED) {

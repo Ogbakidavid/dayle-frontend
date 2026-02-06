@@ -1,6 +1,21 @@
-import { Code, Palette, Sparkles } from "lucide-react";
+import { Code, Palette, Sparkles, type LucideIcon } from "lucide-react";
 
-export const VAULT_PURPOSE_MAPPING = {
+interface DeliverableRule {
+  id: string;
+  label: string;
+  type: 'link' | 'file';
+  rules: string[];
+}
+
+interface VaultPurposeConfig {
+  label: string;
+  icon: LucideIcon;
+  deliverables: DeliverableRule[];
+}
+
+type VaultPurposeType = 'development' | 'design' | 'content_ai';
+
+export const VAULT_PURPOSE_MAPPING: Record<VaultPurposeType, VaultPurposeConfig> = {
   development: {
     label: "Development",
     icon: Code,

@@ -25,7 +25,7 @@ export const VaultStatus = {
   COMPLETED: "COMPLETED",
   CANCELLED: "CANCELLED",
   PAUSED: "PAUSED",
-};
+} as const;
 
 // ============================================================================
 // MILESTONE STATUS
@@ -39,7 +39,7 @@ export const MilestoneStatus = {
   REVISION_REQUESTED: "REVISION_REQUESTED",
   REJECTED: "REJECTED",
   DISPUTED: "DISPUTED",
-};
+} as const;
 
 // ============================================================================
 // VERIFICATION RESULT (AI Compliance)
@@ -50,7 +50,7 @@ export const VerificationResult = {
   FAIL: "FAIL",
   FLAGGED: "FLAGGED",
   HUMAN_REVIEW: "HUMAN_REVIEW",
-};
+} as const;
 
 // ============================================================================
 // MILESTONE REVIEW OUTCOME (Client Decision)
@@ -60,7 +60,7 @@ export const MilestoneReviewOutcome = {
   APPROVE: "APPROVE",
   REQUEST_CHANGES: "REQUEST_CHANGES",
   REJECT: "REJECT",
-};
+} as const;
 
 // ============================================================================
 // DISPUTE STATUS
@@ -72,7 +72,7 @@ export const DisputeStatus = {
   NEEDS_INFO: "NEEDS_INFO",
   RESOLVED: "RESOLVED",
   REJECTED: "REJECTED",
-};
+} as const;
 
 // ============================================================================
 // TRANSACTION STATUS (Canonical: use CONFIRMED not COMPLETED)
@@ -82,7 +82,7 @@ export const TransactionStatus = {
   PENDING: "PENDING",
   CONFIRMED: "CONFIRMED",
   FAILED: "FAILED",
-};
+} as const;
 
 // ============================================================================
 // LEDGER ENTRY STATUS (Alias for TransactionStatus)
@@ -99,7 +99,7 @@ export const UserRole = {
   CLIENT: "CLIENT",
   FREELANCER: "FREELANCER",
   ADMIN: "ADMIN",
-};
+} as const;
 
 // ============================================================================
 // INVITE STATUS
@@ -110,4 +110,4 @@ export const InviteStatus = {
   ACCEPTED: "ACCEPTED",
   DECLINED: "DECLINED",
   EXPIRED: "EXPIRED",
-};
+} as const;

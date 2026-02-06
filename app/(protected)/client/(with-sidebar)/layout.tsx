@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Shield, LayoutDashboard, Plus, Landmark, LogOut, Settings, Bell, Search, ChevronDown, PieChart, FileText, Users, CreditCard, Lock, HelpCircle, Gavel, Menu, X } from 'lucide-react';
-import { useUser } from '@/lib/store/user-context';
-import { cn } from '@/lib/utils';
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import UserAvatar from '@/components/shared/UserAvatar';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Shield, LayoutDashboard, Plus, LogOut, Lock, Gavel, PieChart, Settings } from "lucide-react";
+import { useUser } from "@/lib/store/user-context";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import UserAvatar from "@/components/shared/UserAvatar";
+import MobileNav from "@/components/shared/MobileNav";
+import MobileHeader from "@/components/shared/MobileHeader";
 
 const sidebarVariants = {
     hidden: { x: -280, opacity: 0 },
@@ -16,12 +17,11 @@ const sidebarVariants = {
         x: 0,
         opacity: 1,
         transition: {
-            // Using a standard tween for smoother, less "bouncy" feel
-            type: "tween",
-            ease: "circOut",
+            type: "tween" as const,
+            ease: "circOut" as const,
             duration: 0.4,
             staggerChildren: 0.05,
-            delayChildren: 0.05 // Drastically reduced from 0.2 to prevent "hanging"
+            delayChildren: 0.05
         }
     }
 };
@@ -39,21 +39,12 @@ const navigation = [
     { name: 'Disputes', href: '/client/disputes', icon: Gavel, badge: null },
 ];
 
-export default function ClientLayout({ children }) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const { user, logout } = useUser();
-    const [userMenuOpen, setUserMenuOpen] = useState(false);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { user, logout, unreadCount } = useUser();
 
     return (
         <div className="min-h-screen bg-background text-white flex">
-            {/* Mobile Overlay */}
-            {sidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
 
             {/* Left Sidebar - Professional Dark Theme */}
             <motion.aside
@@ -61,9 +52,8 @@ export default function ClientLayout({ children }) {
                 animate="visible"
                 variants={sidebarVariants}
                 className={cn(
-                    "w-[280px] border-r border-gray-900 bg-muted flex flex-col h-screen transition-transform duration-300 ease-in-out",
-                    "fixed lg:sticky top-0 z-50 lg:z-auto",
-                    sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+                    "w-[280px] border-r border-gray-900 bg-[#111111] hidden lg:flex flex-col h-screen",
+                    "lg:sticky top-0 lg:z-auto"
                 )}>
                 {/* Logo & Brand */}
                 <div className="p-6 pb-4">
@@ -117,10 +107,10 @@ export default function ClientLayout({ children }) {
                 <div className="p-4 border-t border-gray-900 mt-auto">
                     <div className="flex items-center gap-3 p-3 rounded-lg">
                         <div className="relative group">
-                            <UserAvatar 
-                                identifier={user?.id || user?.email || "guest"} 
+                            <UserAvatar
+                                identifier={user?.id || user?.email || "guest"}
                                 src={user?.profileImage}
-                                size={36} 
+                                size={36}
                                 className="font-medium text-sm border border-gray-700"
                             />
                             {user?.kycStatus === 'VERIFIED' && (
@@ -145,7 +135,7 @@ export default function ClientLayout({ children }) {
                                 <Settings className="w-3.5 h-3.5 mr-2" />
                                 Settings
                             </Button>
-                            {user?.kycStatus !== 'approved' && (
+                            {(user?.kycStatus !== 'VERIFIED' || unreadCount > 0) && (
                                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-muted"></span>
@@ -165,30 +155,19 @@ export default function ClientLayout({ children }) {
                 </div>
             </motion.aside>
 
-            {/* Main Content */}
             < div className="flex-1 flex flex-col min-w-0" >
-                {/* Mobile Header */}
-                < div className="lg:hidden sticky top-0 z-30 bg-muted border-b border-gray-900 p-4 flex items-center justify-between" >
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSidebarOpen(true)}
-                        className="text-white hover:bg-white/10"
-                    >
-                        <Menu className="w-5 h-5" />
-                    </Button>
-                    <h1 className="text-lg font-bold uppercase">Dayle</h1>
-                    <div className="w-9" /> {/* Spacer for centering */}
-                </div >
+                <MobileHeader settingsHref="/client/settings" />
 
                 {/* Content Area */}
-                < main className="flex-1 overflow-y-auto bg-background" >
+                <main className="flex-1 overflow-y-auto bg-[#0A0A0A] pb-24 lg:pb-0">
                     <div className="p-4 lg:p-8">
                         <div className="max-w-7xl mx-auto">
                             {children}
                         </div>
                     </div>
                 </main >
+
+                <MobileNav navigation={navigation} />
             </div >
         </div >
     );

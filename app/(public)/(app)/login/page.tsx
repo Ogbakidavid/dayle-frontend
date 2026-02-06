@@ -54,13 +54,10 @@ export default function LoginPage() {
       else router.push('/onboarding/role');
     } catch (err) {
       setError('Invalid email or password. Please check your credentials.');
+      setLoading(false);
     } finally {
       // If we're redirecting, we want to keep the loading state to prevent flashing
-      if (loading) {
-        // check if we are NOT redirecting (error case) - wait, loading is set to true at start
-        // If error happened, we should set false. If success/redirect, keep true.
-        if (err) setLoading(false);
-      }
+      // If we're NOT redirecting (we stayed on page due to error), setLoading(false) was called in catch
     }
   }
 

@@ -231,29 +231,15 @@ export default function SettingsPageContent({ role = 'client' }) {
     };
 
     // Notification center state
-    const [notificationList, setNotificationList] = useState(
-        isClient ? [
-            { id: 1, type: 'kyc', title: 'Identity Verification Required', message: 'Complete your KYC verification to unlock full platform access and vault creation', timestamp: new Date(Date.now() - 1000 * 60 * 30), read: false, action: '/onboarding/kyc?role=client' },
-            { id: 2, type: 'milestone', title: 'Milestone Completed', message: 'Freelancer completed milestone "Phase 1 Development" - ready for review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), read: false },
-            { id: 3, type: 'payment', title: 'Payment Processed', message: '$2,500 has been transferred to escrow for "API Integration"', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), read: true },
-            { id: 4, type: 'security', title: 'New Login Detected', message: 'Login from Chrome on MacBook Pro in New York, US', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), read: true },
-            { id: 5, type: 'milestone', title: 'Milestone Approved', message: 'You approved milestone "Database Setup" - $1,200 released to freelancer', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), read: true },
-            { id: 6, type: 'payment', title: 'Vault Created', message: 'New vault "Mobile App Development" created with $10,000 budget', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), read: true },
-            { id: 7, type: 'security', title: 'Password Changed', message: 'Your account password was successfully updated', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), read: true },
-            { id: 8, type: 'milestone', title: 'Milestone Submitted', message: 'Freelancer submitted milestone "UI Design" for review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), read: true },
-            { id: 9, type: 'general', title: 'Welcome to Dayle', message: 'Start creating vaults and hiring freelancers securely', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14), read: true },
-        ] : [
-            { id: 1, type: 'kyc', title: 'Identity Verification Required', message: 'Complete your KYC verification to unlock full platform access and payments', timestamp: new Date(Date.now() - 1000 * 60 * 30), read: false, action: '/onboarding/kyc?role=freelancer' },
-            { id: 2, type: 'milestone', title: 'Milestone Approved', message: 'Client approved milestone "Phase 1 Development" - $2,500 released to escrow', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), read: false },
-            { id: 3, type: 'payment', title: 'Payment Received', message: '$2,500 has been settled in your account', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), read: true },
-            { id: 4, type: 'security', title: 'New Login Detected', message: 'Login from Chrome on MacBook Pro in New York, US', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), read: true },
-            { id: 5, type: 'milestone', title: 'Milestone Submitted', message: 'Your submission for "API Integration" is under review', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), read: true },
-            { id: 6, type: 'payment', title: 'Payment Received', message: '$1,800 has been settled in your account', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), read: true },
-            { id: 7, type: 'security', title: 'Password Changed', message: 'Your account password was successfully updated', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), read: true },
-            { id: 8, type: 'milestone', title: 'Milestone Approved', message: 'Client approved milestone "Database Setup" - $1,200 released', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), read: true },
-            { id: 9, type: 'general', title: 'Welcome to Dayle', message: 'Complete your profile to start receiving work opportunities', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14), read: true },
-        ]
-    );
+    const [notificationList, setNotificationList] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            const data = await api.notifications.list();
+            setNotificationList(data);
+        };
+        fetchNotifications();
+    }, []);
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
@@ -289,12 +275,16 @@ export default function SettingsPageContent({ role = 'client' }) {
         }
     };
 
-    const markAllAsRead = () => {
+    const markAllAsRead = async () => {
+        await api.notifications.markAllAsRead();
         setNotificationList(prev => prev.map(n => ({ ...n, read: true })));
+        await refreshUser();
     };
 
-    const markAsRead = (id) => {
+    const markAsRead = async (id) => {
+        await api.notifications.markAsRead(id);
         setNotificationList(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+        await refreshUser();
     };
 
     const unreadCount = notificationList.filter(n => !n.read).length;

@@ -1,11 +1,17 @@
 import { cn } from "@/lib/utils";
 import { Shield, CheckCircle2, Clock, AlertCircle, XCircle, Pause, FileText, Eye, Activity } from "lucide-react";
 
-export function StatusBadge({ status, className }) {
+interface StatusBadgeProps {
+    status: string;
+    className?: string;
+}
+
+export function StatusBadge({ status, className }: StatusBadgeProps) {
     // Normalize to uppercase for matching
     const normalizedStatus = status?.toUpperCase();
-    
-    const config = {
+
+    // ... (rest of the config)
+    const config: Record<string, { label: string; icon: any; className: string }> = {
         // Vault Statuses
         DRAFT: {
             label: "Draft",
@@ -52,7 +58,7 @@ export function StatusBadge({ status, className }) {
             icon: Pause,
             className: "badge-pending",
         },
-        
+
         // Milestone Statuses
         PENDING: {
             label: "Pending",
@@ -89,7 +95,7 @@ export function StatusBadge({ status, className }) {
             icon: AlertCircle,
             className: "badge-failed",
         },
-        
+
         // Legacy fallbacks (lowercase)
         SECURED: {
             label: "Secured",
@@ -108,7 +114,15 @@ export function StatusBadge({ status, className }) {
         },
     };
 
-    const { label, icon: Icon, className: badgeClass } = config[normalizedStatus] || config.PENDING;
+    const defaultStatus = {
+        label: "Pending",
+        icon: Clock,
+        className: "badge-pending",
+    };
+
+    const statusConfig = config[normalizedStatus] || config.PENDING || defaultStatus;
+    // We cast this because we know defaultStatus matches the shape and ensures existence
+    const { label, icon: Icon, className: badgeClass } = statusConfig as typeof defaultStatus;
 
     return (
         <span className={cn("badge", badgeClass, className)}>

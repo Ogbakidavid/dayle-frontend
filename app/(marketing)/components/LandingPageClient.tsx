@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
@@ -25,7 +25,7 @@ import Countries from "../../(public)/components/Countries";
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
 };
 
 const staggerContainer = {
@@ -39,7 +39,12 @@ const staggerContainer = {
     }
 };
 
-export default function LandingPageClient({ faqs }) {
+interface FAQ {
+    q: string;
+    a: string;
+}
+
+export default function LandingPageClient({ faqs }: { faqs: FAQ[] }) {
     const [activeFaq, setActiveFaq] = useState(null);
 
     return (
@@ -690,7 +695,7 @@ export default function LandingPageClient({ faqs }) {
                     </motion.div>
 
                     <div className="divide-y divide-white/10 rounded-3xl border border-white/10 overflow-hidden bg-white/[0.02]">
-                        {faqs.map((faq, index) => {
+                        {faqs.map((faq: FAQ, index: number) => {
                             const open = activeFaq === index;
                             return (
                                 <motion.div
@@ -793,8 +798,8 @@ export default function LandingPageClient({ faqs }) {
                         </h4>
                         <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-white/70 font-semibold">
                             <li>
-                                <Link href="https://orynexlabs.com/about" className="hover:text-emerald-400 transition-colors">
-                                    About
+                                <Link href="/support" className="hover:text-emerald-400 transition-colors">
+                                    Support
                                 </Link>
                             </li>
                             <li>
