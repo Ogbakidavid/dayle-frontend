@@ -4,7 +4,6 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
-import { usePrivy } from "@privy-io/react-auth";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -18,18 +17,13 @@ export const metadata: Metadata = {
 };
 
 export interface RootLayoutProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  const { login, user } = usePrivy();
-  
-
   return (
     <html lang="en">
-      <body
-        className={`${poppins.variable} font-sans antialiased`}
-      >
+      <body className={`${poppins.variable} font-sans antialiased`}>
         <Providers>
           {children}
           <Toaster richColors position="top-right" theme="dark" />

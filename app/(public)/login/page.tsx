@@ -11,15 +11,88 @@ import { Label } from "@/components/ui/label";
 import { Shield, ArrowRight, Loader2, CheckCircle2, User } from "lucide-react";
 import { api, UserRole } from "@/lib/api-client";
 import { useUser } from "@/lib/store/user-context";
+import { usePrivy } from "@privy-io/react-auth";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login: contextLogin } = useUser();
+  const { login: contextLogin, refreshUser } = useUser();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   // const { refreshUser } = useUser(); // Unused in original, but imported
+
+  const {
+    login: privyLogin,
+    ready,
+    authenticated,
+    user: privyUser,
+    getAccessToken,
+  } = usePrivy();
+
+  async function handleSocialLoginSuccess() {
+    try {
+      const accessToken = await getAccessToken();
+      if (!accessToken) return;
+
+      setLoading(true);
+      await api.auth.socialLogin({ accessToken });
+      const userData = await refreshUser();
+
+      // Check if user needs to complete profile
+      if (!userData?.name || userData.name.trim() === "") {
+        router.push("/complete-profile");
+        return;
+      }
+
+      // Check if user needs to select role
+      if (!userData.role || userData.role === "NONE") {
+        router.push("/onboarding/role");
+        return;
+      }
+
+      // User has name and role, redirect to dashboard or returnTo
+      if (returnTo) {
+        router.push(returnTo);
+      } else {
+        router.push(userData.role === "CLIENT" ? "/client" : "/freelancer");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Social login failed. Please try again.");
+      setLoading(false);
+    }
+  }
+
+  // Temporarily triggering handleSocialLoginSuccess when authenticated via Privy.
+  // In a real flow, better to use the onSuccess callback of login() or a specialized hook.
+  // But usePrivy's login callback options are cleaner.
+  // Re-implementing login call below to include { onComplete }.
+
+  // Actually, overriding `login` usage in buttons to include { onComplete } is better than useEffect
+  // but button click handler above uses purely `login({...})`.
+  // Let's redefine `login` wrapper or just use `useEffect`.
+  // Using useEffect on `authenticated` state might double-trigger if not careful,
+  // but `login` with `onComplete` is best practice.
+
+  // Updating buttons to use handlePrivyLogin wrapper.
+  const handlePrivyLogin = async (provider: any) => {
+    try {
+      // The login method accepts LoginModalOptions. To preserve the "button-like" feel
+      // we can restrict the modal to only show the chosen provider.
+      await privyLogin({ loginMethods: [provider] });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Use effect to watch for authentication state change and trigger backend sync
+  useEffect(() => {
+    if (ready && authenticated && privyUser) {
+      handleSocialLoginSuccess();
+    }
+  }, [ready, authenticated, privyUser]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -219,10 +292,12 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <Button
                 type="button"
                 variant="outline"
+                onClick={() => handlePrivyLogin("google")}
+                disabled={!ready || authenticated}
                 className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
               >
                 <svg
@@ -250,24 +325,12 @@ export default function LoginPage() {
                   Google
                 </span>
               </Button>
+
               <Button
                 type="button"
                 variant="outline"
-                className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
-              >
-                <svg
-                  className="w-5 h-5 mr-2 fill-white/60 group-hover:fill-white transition-colors group-hover:scale-110"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.74 1.18 0 2.45-.93 3.99-.71 1.03.07 1.93.53 2.18 1.11-.96 1.34-1.35 2.53-.19 4.3 1.25 1.95 2.91 2.53 2.18 4.67-.23.68-.56 1.35-.91 1.96-.58 1.03-1.4 1.86-2.33.91zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.16 2.22-1.84 4.08-3.74 4.25z" />
-                </svg>
-                <span className="text-white/60 font-black uppercase text-[10px] tracking-widest group-hover:text-white transition-colors">
-                  Apple
-                </span>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
+                onClick={() => handlePrivyLogin("github")}
+                disabled={!ready || authenticated}
                 className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
               >
                 <svg

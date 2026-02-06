@@ -1,13 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { api } from "@/lib/api-client";
+import { api, UserRole } from "@/lib/api-client";
 import {
   ArrowRight,
   CheckCircle2,
@@ -15,17 +15,72 @@ import {
   Shield,
   User,
   Mail,
+  Briefcase,
+  Building2,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/lib/store/user-context";
+import { usePrivy } from "@privy-io/react-auth";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { signup: contextSignup, refreshUser, user: backendUser } = useUser();
   const searchParams = useSearchParams();
+  const {
+    login: contextLogin,
+    signup: contextSignup,
+    refreshUser,
+    user: backendUser,
+  } = useUser();
   const returnTo = searchParams.get("returnTo");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const initialRole =
+    (searchParams.get("role") as UserRole) || UserRole.FREELANCER;
+  const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
+
+  const {
+    login: privyLogin,
+    ready,
+    authenticated,
+    user: privyUser,
+    getAccessToken,
+  } = usePrivy();
+
+  // Social Auth Handlers
+  async function handleSocialLoginSuccess() {
+    try {
+      const accessToken = await getAccessToken();
+      if (!accessToken) return;
+
+      setLoading(true);
+      await api.auth.socialLogin({ accessToken });
+      await refreshUser();
+
+      // Redirect to complete profile page to enter full name
+      const roleParam = searchParams.get("role");
+      router.push(
+        roleParam ? `/complete-profile?role=${roleParam}` : "/complete-profile",
+      );
+    } catch (err) {
+      console.error(err);
+      setError("Social signup failed. Please try again.");
+      setLoading(false);
+    }
+  }
+
+  const handlePrivyLogin = async (provider: any) => {
+    try {
+      await privyLogin({ loginMethods: [provider] });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (ready && authenticated && privyUser) {
+      handleSocialLoginSuccess();
+    }
+  }, [ready, authenticated, privyUser, handleSocialLoginSuccess]);
 
   // Get role from search params
   const role = searchParams.get("role") as "CLIENT" | "FREELANCER" | null;
@@ -33,13 +88,21 @@ export default function SignupPage() {
   // If somehow we are here and already have a backend user, auto-redirect
   React.useEffect(() => {
     if (backendUser) {
+      // Check if user needs to complete profile first
+      if (!backendUser.name || backendUser.name.trim() === "") {
+        router.push(
+          role ? `/complete-profile?role=${role}` : "/complete-profile",
+        );
+        return;
+      }
+
       if (role) {
         router.push(
           returnTo || (role === "CLIENT" ? "/client" : "/freelancer"),
         );
       } else {
         // If no role in URL and valid user, maybe send to role selection or dashboard based on user.role
-        if (backendUser.role) {
+        if (backendUser.role && backendUser.role !== "NONE") {
           router.push(
             backendUser.role === "CLIENT" ? "/client" : "/freelancer",
           );
@@ -288,10 +351,12 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <Button
                   type="button"
                   variant="outline"
+                  onClick={() => handlePrivyLogin("google")}
+                  disabled={!ready || authenticated}
                   className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
                 >
                   <svg
@@ -319,24 +384,12 @@ export default function SignupPage() {
                     Google
                   </span>
                 </Button>
+
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
-                >
-                  <svg
-                    className="w-5 h-5 mr-2 fill-white/60 group-hover:fill-white transition-colors group-hover:scale-110"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.74 1.18 0 2.45-.93 3.99-.71 1.03.07 1.93.53 2.18 1.11-.96 1.34-1.35 2.53-.19 4.3 1.25 1.95 2.91 2.53 2.18 4.67-.23.68-.56 1.35-.91 1.96-.58 1.03-1.4 1.86-2.33.91zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.16 2.22-1.84 4.08-3.74 4.25z" />
-                  </svg>
-                  <span className="text-white/60 font-black uppercase text-[10px] tracking-widest group-hover:text-white transition-colors">
-                    Apple
-                  </span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
+                  onClick={() => handlePrivyLogin("github")}
+                  disabled={!ready || authenticated}
                   className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
                 >
                   <svg
