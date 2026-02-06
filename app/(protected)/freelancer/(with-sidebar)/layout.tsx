@@ -54,7 +54,7 @@ const navigation = [
   { name: "Disputes", href: "/freelancer/disputes", icon: Gavel, badge: null },
 ];
 
-export default function FreelancerLayout({ children }) {
+export default function FreelancerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout, unreadCount } = useUser();
 
