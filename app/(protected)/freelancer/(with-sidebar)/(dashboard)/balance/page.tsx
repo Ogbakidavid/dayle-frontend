@@ -1,0 +1,8 @@
+"use client";
+
+import * as React from "react";
+import LedgerPageContent from "@/components/shared/LedgerPageContent";
+
+export default function FreelancerWalletPage() {
+  return <LedgerPageContent />;
+}
