@@ -220,8 +220,8 @@ export const api = {
     },
 
     revokeAllSessions: async (): Promise<any> => {
-      return await request("/auth/sessions/revoke-all", {
-        method: "POST",
+      return await request("/auth/sessions", {
+        method: "DELETE",
       });
     },
 
@@ -288,16 +288,16 @@ export const api = {
     },
 
     releaseMilestone: async (vaultId: string, milestoneId: string, opts: any = {}): Promise<any> => {
-      return await request(`/vaults/${vaultId}/milestones/${milestoneId}/release`, {
+      return await request(`/vaults/${vaultId}/release-milestone`, {
         method: "POST",
-        body: opts,
+        body: { milestoneId, ...opts },
       });
     },
 
     refund: async (vaultId: string, milestoneId: string, opts: any = {}): Promise<any> => {
-      return await request(`/vaults/${vaultId}/milestones/${milestoneId}/refund`, {
+      return await request(`/vaults/${vaultId}/refund`, {
         method: "POST",
-        body: opts,
+        body: { milestoneId, ...opts },
       });
     },
 
@@ -338,7 +338,7 @@ export const api = {
 
   invites: {
     getByToken: async (token: string): Promise<any> => {
-      return await request(`/invites/${token}`);
+      return await request(`/invites/token/${token}`);
     },
 
     getByVaultId: async (vaultId: string): Promise<any> => {
@@ -355,7 +355,10 @@ export const api = {
     respond: async (token: string, { decision, reasonCode }: { decision: string; reasonCode?: string }): Promise<any> => {
       return await request(`/invites/${token}/respond`, {
         method: "POST",
-        body: { decision, reasonCode },
+        body: { 
+          action: decision === "ACCEPTED" || decision === "ACCEPT" ? "accept" : "decline", 
+          declineReason: reasonCode 
+        },
       });
     },
   },
@@ -389,7 +392,7 @@ export const api = {
   onboarding: {
     setRole: async (role: string): Promise<any> => {
       return await request("/onboarding/role", {
-        method: "POST",
+        method: "PATCH",
         body: { role },
       });
     },

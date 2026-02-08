@@ -40,23 +40,29 @@ export default function LoginPage() {
       await api.auth.socialLogin({ accessToken });
       const userData = await refreshUser();
 
-      // Check if user needs to complete profile
+      // Skip complete-profile and use social name if backend name is missing
       if (!userData?.name || userData.name.trim() === "") {
-        router.push("/complete-profile");
-        return;
+        const socialName =
+          privyUser?.google?.name || privyUser?.github?.username || "";
+        if (socialName) {
+          await api.auth.updateProfile({ name: socialName });
+          await refreshUser();
+        }
       }
 
+      const updatedUser = await refreshUser();
+
       // Check if user needs to select role
-      if (!userData.role || userData.role === "NONE") {
+      if (!updatedUser.role || updatedUser.role === "NONE") {
         router.push("/onboarding/role");
         return;
       }
 
-      // User has name and role, redirect to dashboard or returnTo
+      // User has name (or social default) and role, redirect to dashboard or returnTo
       if (returnTo) {
         router.push(returnTo);
       } else {
-        router.push(userData.role === "CLIENT" ? "/client" : "/freelancer");
+        router.push(updatedUser.role === "CLIENT" ? "/client" : "/freelancer");
       }
     } catch (err) {
       console.error(err);

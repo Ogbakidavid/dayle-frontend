@@ -54,13 +54,25 @@ export default function SignupPage() {
 
       setLoading(true);
       await api.auth.socialLogin({ accessToken });
-      await refreshUser();
 
-      // Redirect to complete profile page to enter full name
-      const roleParam = searchParams.get("role");
-      router.push(
-        roleParam ? `/complete-profile?role=${roleParam}` : "/complete-profile",
-      );
+      // Update profile with social name if missing
+      const socialName =
+        privyUser?.google?.name || privyUser?.github?.username || "";
+      if (socialName) {
+        await api.auth.updateProfile({ name: socialName });
+      }
+
+      const userData = await refreshUser();
+
+      // Redirect to dashboard or role selection
+      const roleParam = searchParams.get("role") as UserRole;
+      const targetRole = roleParam || userData?.role;
+
+      if (targetRole && targetRole !== UserRole.NONE) {
+        router.push(targetRole === UserRole.CLIENT ? "/client" : "/freelancer");
+      } else {
+        router.push("/onboarding/role");
+      }
     } catch (err) {
       console.error(err);
       setError("Social signup failed. Please try again.");
@@ -88,14 +100,6 @@ export default function SignupPage() {
   // If somehow we are here and already have a backend user, auto-redirect
   React.useEffect(() => {
     if (backendUser) {
-      // Check if user needs to complete profile first
-      if (!backendUser.name || backendUser.name.trim() === "") {
-        router.push(
-          role ? `/complete-profile?role=${role}` : "/complete-profile",
-        );
-        return;
-      }
-
       if (role) {
         router.push(
           returnTo || (role === "CLIENT" ? "/client" : "/freelancer"),
