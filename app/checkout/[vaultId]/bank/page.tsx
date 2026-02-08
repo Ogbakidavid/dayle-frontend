@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { useVault } from "@/lib/store/vault-context";
+import { api } from "@/lib/api-client";
 
 export default function BankTransferPage() {
   const router = useRouter();
@@ -63,31 +64,30 @@ export default function BankTransferPage() {
   // Simulate status updates during processing
   useEffect(() => {
     if (step === "processing") {
-      const statusFlow = [
-        { status: "pending", delay: 2000 },
-        { status: "processing", delay: 3000 },
-        { status: "completed", delay: 2000 },
-      ];
+      const processTransaction = async () => {
+        try {
+          setProcessingStatus("processing");
 
-      let currentIndex = 0;
-      const updateStatus = () => {
-        if (currentIndex < statusFlow.length) {
-          setTimeout(() => {
-            setProcessingStatus(statusFlow[currentIndex].status);
-            currentIndex++;
-            if (currentIndex < statusFlow.length) {
-              updateStatus();
-            } else {
-              // Randomly succeed or fail for demo
-              setTimeout(() => {
-                const success = Math.random() > 0.2; // 80% success rate
-                setStep(success ? "success" : "failure");
-              }, 1000);
-            }
-          }, statusFlow[currentIndex].delay);
+          // Call Backend to fund vault
+          const idempotencyKey = crypto.randomUUID();
+          await api.vaults.fund(vaultId, {
+            paymentMethod: "bank",
+            paymentDetails: {
+              refCode: transactionId,
+              sender: "Client Bank Account", // In real app, this comes from user profile
+            },
+            idempotencyKey,
+          });
+
+          setProcessingStatus("completed");
+          setTimeout(() => setStep("success"), 1000);
+        } catch (error) {
+          console.error("Fund error:", error);
+          setStep("failure");
         }
       };
-      updateStatus();
+
+      processTransaction();
     }
   }, [step]);
 

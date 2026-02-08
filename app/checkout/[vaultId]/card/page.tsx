@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { useVault } from "@/lib/store/vault-context";
+import { api } from "@/lib/api-client";
 
 export default function CardPaymentPage() {
   const router = useRouter();
@@ -87,7 +88,7 @@ export default function CardPaymentPage() {
     setCardDetails((prev) => ({ ...prev, [field]: formattedValue }));
   };
 
-  const handleCardSubmit = () => {
+  const handleCardSubmit = async () => {
     const cleanNum = cardDetails.number.replace(/\D/g, "");
     const newErrors: Record<string, string> = {};
 
@@ -111,17 +112,27 @@ export default function CardPaymentPage() {
 
     setErrors({});
     setIsProcessing(true);
-    setTimeout(() => {
-      if (cleanNum.endsWith("0000")) {
-        setIsProcessing(false);
-        setPaymentError(
-          "Your financial hub has declined this transaction. Critical mismatch detected.",
-        );
-      } else {
-        setIsProcessing(false);
-        setStep("success");
-      }
-    }, 2000);
+
+    try {
+      // Generate unique idempotency key
+      const idempotencyKey = crypto.randomUUID();
+
+      await api.vaults.fund(vaultId, {
+        paymentMethod: "card",
+        paymentDetails: {
+          number: cleanNum.slice(-4), // Only send last 4 digits for reference
+          brand: cardDetails.type || "unknown",
+          expiry: cardDetails.expiry,
+        },
+        idempotencyKey,
+      });
+
+      setIsProcessing(false);
+      setStep("success");
+    } catch (err: any) {
+      setIsProcessing(false);
+      setPaymentError(err.message || "Transaction failed. Protocol rejected.");
+    }
   };
 
   return (

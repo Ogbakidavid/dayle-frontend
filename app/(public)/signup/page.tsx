@@ -40,6 +40,7 @@ export default function SignupPage() {
 
   const {
     login: privyLogin,
+    logout: privyLogout,
     ready,
     authenticated,
     user: privyUser,
@@ -73,9 +74,21 @@ export default function SignupPage() {
       } else {
         router.push("/onboarding/role");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Social signup failed. Please try again.");
+
+      // If unauthorized (401), it means the user exists in Privy but not in our DB (or was deleted).
+      // We must logout from Privy to clear this stale state and allow a fresh signup.
+      if (
+        err.statusCode === 401 ||
+        err.status === 401 ||
+        err.message?.includes("401")
+      ) {
+        await privyLogout();
+        setError("Account not found. Please sign up again.");
+      } else {
+        setError("Social login failed. Please try again.");
+      }
       setLoading(false);
     }
   }
@@ -145,7 +158,7 @@ export default function SignupPage() {
 
       // If role was selected in previous step, update it now
       if (roleParam) {
-        await api.auth.updateProfile({ role: roleParam as any });
+        // Role is already handled by signup
         // Refresh user context immediately so everything else knows the correct role
         await refreshUser();
       }
