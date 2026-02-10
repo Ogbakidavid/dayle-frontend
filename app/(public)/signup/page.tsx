@@ -54,6 +54,10 @@ export default function SignupPage() {
       if (!accessToken) return;
 
       setLoading(true);
+
+      // Wallet is now created automatically by Privy (createOnLogin: 'all-users')
+      // We just proceed to authenticate with backend
+
       await api.auth.socialLogin({ accessToken });
 
       // Update profile with social name if missing

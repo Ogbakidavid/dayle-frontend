@@ -18,6 +18,7 @@ export default function VerifyEmailPage() {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResending, setIsResending] = useState(false);
+  const [isChecking, setIsChecking] = useState(false); // New state for manual check
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -34,13 +35,35 @@ export default function VerifyEmailPage() {
     if (resendCooldown > 0 || isResending) return;
 
     setIsResending(true);
+    setError(""); // Clear previous errors
     try {
       await api.auth.sendVerificationEmail(user?.email || "");
       setResendCooldown(60); // 60 seconds cooldown
     } catch (err: any) {
+      console.error(err);
       setError("Failed to resend verification email.");
     } finally {
       setIsResending(false);
+    }
+  };
+
+  const handleManualCheck = async () => {
+    setIsChecking(true);
+    try {
+      const updatedUser = await refreshUser();
+      if (updatedUser?.emailVerified) {
+        const role = searchParams.get("role") || user?.role;
+        if (role === UserRole.CLIENT) router.push("/client");
+        else if (role === UserRole.FREELANCER) router.push("/freelancer");
+        else router.push("/onboarding/role");
+      } else {
+        // Maybe show a toast or small message
+        // For now, just ensuring it acts as a "refresh"
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsChecking(false);
     }
   };
 
@@ -228,6 +251,21 @@ export default function VerifyEmailPage() {
                 </span>
               )}
             </Button>
+
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleManualCheck}
+                disabled={isChecking}
+                className="text-white/40 hover:text-white text-xs uppercase tracking-widest"
+              >
+                {isChecking ? (
+                  <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                ) : null}
+                I've already verified
+              </Button>
+            </div>
 
             <div className="text-center text-white/50 text-sm font-bold uppercase tracking-wide mt-6">
               {resendCooldown > 0 ? (

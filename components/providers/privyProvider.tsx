@@ -12,18 +12,19 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       config={{
         defaultChain: celo,
         supportedChains: [celo],
-        // Create embedded wallets for all users to ensure they show up in the dashboard
+        // Disable auto-creation of embedded wallets to hide the modal.
+        // We will manually trigger creation in the background (silent).
         embeddedWallets: {
           ethereum: {
             createOnLogin: "all-users",
           },
-          showWalletUIs: false,
         },
 
         appearance: {
           theme: "dark",
           showWalletLoginFirst: false,
           walletList: ["detected_wallets", "metamask", "coinbase_wallet"],
+          // Attempt to fix some potential CSS/Style issues if possible, although 'fill-rule' is likely deep in SVG
         },
       }}
     >

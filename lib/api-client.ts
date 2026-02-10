@@ -21,7 +21,7 @@ export {
   DisputeType,
 } from "@/lib/domain/enums";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 const API_PREFIX = "/api";
 
 interface RequestOptions extends RequestInit {
@@ -75,7 +75,12 @@ async function request(endpoint: string, options: RequestOptions = {}) {
     // Silently handle 401 errors (user not authenticated)
     // These are expected and not actual errors
     if (error.statusCode !== 401) {
-      console.error(`API Error [${method} ${endpoint}]:`, error);
+      console.error(`API Error [${method} ${endpoint}]:`, {
+        message: error.message,
+        code: error.code,
+        data: error.data,
+        status: error.statusCode
+      });
     }
     throw error;
   }
