@@ -138,14 +138,14 @@ export default function CreateVaultPage() {
   };
 
   return (
-    <div className="min-h-screen text-white selection:bg-emerald-500/30 selection:text-emerald-400">
+    <div className="text-white selection:bg-emerald-500/30 selection:text-emerald-400">
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative max-w-4xl mx-auto px-6 py-12 lg:py-20">
+      <div className="relative max-w-6xl mx-auto px-6 py-8 lg:py-12">
 
         {/* Header Section */}
         <header className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end md:justify-between gap-6">
@@ -341,7 +341,7 @@ export default function CreateVaultPage() {
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl rotate-12 flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
                           <Users className="w-10 h-10 text-emerald-500 -rotate-12" />
                         </div>
-                        <h2 className="text-2xl font-black uppercase italic tracking-tighter">Assign Operator</h2>
+                        <h2 className="text-2xl font-black uppercase tracking-tighter">Assign Operator</h2>
                         <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Identify the vault beneficiary</p>
                       </div>
 
@@ -350,13 +350,13 @@ export default function CreateVaultPage() {
                           value={freelancerEmail}
                           onChange={(e) => setFreelancerEmail(e.target.value)}
                           placeholder="OPERATOR EMAIL"
-                          className="bg-white/3 border-white/5 h-14 rounded-xl text-center font-bold tracking-widest"
+                          className="bg-white/3 border-white/5 h-14 rounded-xl font-bold tracking-widest"
                         />
                         <Input
                           value={freelancerName}
                           onChange={(e) => setFreelancerName(e.target.value)}
                           placeholder="FULL NAME (OPTIONAL)"
-                          className="bg-white/3 border-white/5 h-14 rounded-xl text-center font-bold tracking-widest"
+                          className="bg-white/3 border-white/5 h-14 rounded-xl font-bold tracking-widest"
                         />
                         <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 flex gap-3 items-center">
                           <ShieldCheck className="w-5 h-5 text-blue-500 shrink-0" />
@@ -372,7 +372,7 @@ export default function CreateVaultPage() {
                   {step === 4 && (
                     <div className="space-y-8">
                       <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-black uppercase tracking-tighter italic">Confirm Deployment</h2>
+                        <h2 className="text-xl font-black uppercase tracking-tighter">Confirm Deployment</h2>
                         <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                           <span className="text-emerald-500 text-[10px] font-black uppercase tracking-widest">Protocol Verified</span>
                         </div>
@@ -509,13 +509,6 @@ export default function CreateVaultPage() {
           </aside>
         </div>
 
-        {/* Footer */}
-        <div className="mt-12 flex items-center justify-center gap-3 text-white/20">
-          <Lock className="w-3 h-3" />
-          <span className="text-[10px] uppercase tracking-[0.3em] font-black">
-            Secured by Dayle Escrow Protocol
-          </span>
-        </div>
       </div>
     </div>
   );

@@ -356,7 +356,7 @@ export default function SettingsPageContent({ role = 'client' }) {
         try {
             const { linkToken } = await api.telegram.getLinkToken();
             setTelegramLinkToken(linkToken);
-            window.open(`https://t.me/DAYLE_BOT?start=${linkToken}`, '_blank');
+            window.open(`https://t.me/DayleAIBot?start=${linkToken}`, '_blank');
 
             setTimeout(async () => {
                 try {
@@ -411,11 +411,7 @@ export default function SettingsPageContent({ role = 'client' }) {
         try {
             const result = await api.whatsapp.confirmVerification(whatsappCode, whatsappConsent);
             setNotificationPrefs(result.preferences);
-            setShowWhatsAppFlow(false);
-            setWhatsappPhone('');
-            setWhatsappCode('');
-            setWhatsappConsent(false);
-            setWhatsappStep(1);
+            closeWhatsAppFlow();
             setPrefsSuccess('WhatsApp verified and enabled!');
             setTimeout(() => setPrefsSuccess(''), 3000);
         } catch (error: any) {
@@ -438,6 +434,15 @@ export default function SettingsPageContent({ role = 'client' }) {
         } finally {
             setLoadingWhatsApp(false);
         }
+    };
+
+    const closeWhatsAppFlow = () => {
+        setShowWhatsAppFlow(false);
+        setWhatsappStep(1);
+        setWhatsappPhone('');
+        setWhatsappCode('');
+        setWhatsappConsent(false);
+        setWhatsappError('');
     };
 
 
@@ -892,12 +897,15 @@ export default function SettingsPageContent({ role = 'client' }) {
                                                     </p>
                                                 </div>
                                             </div>
-                                            <Switch
-                                                checked={notificationPrefs.emailEnabled}
-                                                onCheckedChange={handleEmailToggle}
-                                                disabled={savingPrefs}
-                                                className="data-[state=checked]:bg-emerald-600"
-                                            />
+                                            <div className="flex items-center space-x-2">
+                                                <Switch
+                                                    id="email-notifications"
+                                                    checked={!!notificationPrefs.emailEnabled}
+                                                    onCheckedChange={handleEmailToggle}
+                                                    disabled={savingPrefs}
+                                                    className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-700"
+                                                />
+                                            </div>
                                         </div>
 
                                         {/* Telegram */}
@@ -985,114 +993,6 @@ export default function SettingsPageContent({ role = 'client' }) {
                                                     )}
                                                 </div>
                                             </div>
-
-                                            {/* WhatsApp Verification Flow */}
-                                            {showWhatsAppFlow && !notificationPrefs.whatsapp.phoneVerified && (
-                                                <div className="mt-4 pt-4 border-t border-zinc-800 space-y-4">
-                                                    {whatsappStep === 1 ? (
-                                                        <>
-                                                            <div className="space-y-2">
-                                                                <Label className="text-sm font-bold text-white uppercase tracking-wide ml-1">
-                                                                    Phone Number (E.164 format)
-                                                                </Label>
-                                                                <Input
-                                                                    type="tel"
-                                                                    placeholder="+1234567890"
-                                                                    value={whatsappPhone}
-                                                                    onChange={(e) => setWhatsappPhone(e.target.value)}
-                                                                    className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-green-500/50 h-11"
-                                                                />
-                                                                <p className="text-xs text-white/40">Include country code (e.g., +1 for US)</p>
-                                                            </div>
-
-                                                            {whatsappError && (
-                                                                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                                                                    <p className="text-sm text-red-400">{whatsappError}</p>
-                                                                </div>
-                                                            )}
-
-                                                            <div className="flex gap-3">
-                                                                <Button
-                                                                    onClick={() => {
-                                                                        setShowWhatsAppFlow(false);
-                                                                        setWhatsappPhone('');
-                                                                        setWhatsappError('');
-                                                                    }}
-                                                                    variant="outline"
-                                                                    className="flex-1"
-                                                                >
-                                                                    Cancel
-                                                                </Button>
-                                                                <Button
-                                                                    onClick={handleWhatsAppStartVerification}
-                                                                    disabled={loadingWhatsApp || !whatsappPhone}
-                                                                    className="flex-1 bg-green-600 hover:bg-green-500 text-white font-semibold"
-                                                                >
-                                                                    {loadingWhatsApp ? "Sending..." : "Send Code"}
-                                                                </Button>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <div className="space-y-2">
-                                                                <Label className="text-sm font-bold text-white uppercase tracking-wide ml-1">
-                                                                    Verification Code
-                                                                </Label>
-                                                                <Input
-                                                                    type="text"
-                                                                    placeholder="123456"
-                                                                    value={whatsappCode}
-                                                                    onChange={(e) => setWhatsappCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                                                    className="bg-zinc-900/50 border-zinc-800 text-zinc-200 text-center text-2xl tracking-widest h-14"
-                                                                    maxLength={6}
-                                                                />
-                                                            </div>
-
-                                                            {/* Consent Checkbox */}
-                                                            <div className="flex items-start gap-3 p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    id="whatsapp-consent"
-                                                                    checked={whatsappConsent}
-                                                                    onChange={(e) => setWhatsappConsent(e.target.checked)}
-                                                                    className="mt-1 w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-emerald-600 focus:ring-emerald-500"
-                                                                />
-                                                                <label htmlFor="whatsapp-consent" className="text-sm text-white/80 leading-relaxed">
-                                                                    I agree to receive WhatsApp alerts for vault activity. Reply STOP to opt out.
-                                                                </label>
-                                                            </div>
-
-                                                            {whatsappError && (
-                                                                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                                                                    <p className="text-sm text-red-400">{whatsappError}</p>
-                                                                </div>
-                                                            )}
-
-                                                            <div className="flex gap-3">
-                                                                <Button
-                                                                    onClick={() => {
-                                                                        setWhatsappStep(1);
-                                                                        setWhatsappCode('');
-                                                                        setWhatsappConsent(false);
-                                                                        setWhatsappError('');
-                                                                    }}
-                                                                    variant="outline"
-                                                                    className="flex-1"
-                                                                >
-                                                                    Back
-                                                                </Button>
-                                                                <Button
-                                                                    onClick={handleWhatsAppConfirmVerification}
-                                                                    disabled={loadingWhatsApp || whatsappCode.length !== 6 || !whatsappConsent}
-                                                                    className="flex-1 bg-green-600 hover:bg-green-500 text-white font-semibold"
-                                                                >
-                                                                    {loadingWhatsApp ? "Verifying..." : "Verify & Enable"}
-                                                                </Button>
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            )}
                                         </div>
 
                                         {/* Quiet Hours Info */}
@@ -1458,6 +1358,130 @@ export default function SettingsPageContent({ role = 'client' }) {
                                 </div>
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* WhatsApp Setup Modal */}
+            {showWhatsAppFlow && !notificationPrefs?.whatsapp?.phoneVerified && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-[#0a0a0a] border border-zinc-800 rounded-2xl max-w-lg w-full p-6 relative">
+                        <button
+                            onClick={closeWhatsAppFlow}
+                            className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                            <X className="w-4 h-4 text-white" />
+                        </button>
+
+                        <h2 className="text-xl font-black text-white uppercase tracking-tight mb-6">
+                            Add WhatsApp Number
+                        </h2>
+
+                        <div className="space-y-6">
+                            {whatsappStep === 1 ? (
+                                <>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
+                                            Phone Number (E.164 format)
+                                        </Label>
+                                        <Input
+                                            type="tel"
+                                            placeholder="+1234567890"
+                                            value={whatsappPhone}
+                                            onChange={(e) => setWhatsappPhone(e.target.value)}
+                                            className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-green-500/50 h-11"
+                                        />
+                                        <p className="text-xs text-white/40 uppercase tracking-wide font-bold">Include country code (e.g., +1 for US)</p>
+                                    </div>
+
+                                    {whatsappError && (
+                                        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                            <p className="text-sm text-red-400">{whatsappError}</p>
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-3">
+                                        <Button
+                                            onClick={closeWhatsAppFlow}
+                                            variant="outline"
+                                            className="flex-1 border-white/5 hover:bg-white/5 text-white font-bold uppercase tracking-wide"
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            onClick={handleWhatsAppStartVerification}
+                                            disabled={loadingWhatsApp || !whatsappPhone}
+                                            className="flex-1 bg-green-600 hover:bg-green-500 text-black font-black uppercase tracking-wide"
+                                        >
+                                            {loadingWhatsApp ? "Sending..." : "Send Code"}
+                                        </Button>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
+                                                Verification Code
+                                            </Label>
+                                            <Input
+                                                type="text"
+                                                placeholder="123456"
+                                                value={whatsappCode}
+                                                onChange={(e) => setWhatsappCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                                className="bg-zinc-900/50 border-zinc-800 text-zinc-200 text-center text-2xl font-mono tracking-[0.5em] h-14"
+                                                maxLength={6}
+                                            />
+                                            <p className="text-xs text-white/40 text-center uppercase tracking-wide font-bold">Enter the 6-digit code sent to your phone</p>
+                                        </div>
+
+                                        {/* Consent Checkbox */}
+                                        <div className="flex items-start gap-3 p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                                            <div className="pt-0.5">
+                                                <input
+                                                    type="checkbox"
+                                                    id="whatsapp-consent-modal"
+                                                    checked={whatsappConsent}
+                                                    onChange={(e) => setWhatsappConsent(e.target.checked)}
+                                                    className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-green-600 focus:ring-green-500 focus:ring-offset-0 transition-colors"
+                                                />
+                                            </div>
+                                            <label htmlFor="whatsapp-consent-modal" className="text-xs text-white/70 leading-relaxed uppercase font-bold tracking-tight">
+                                                I agree to receive WhatsApp alerts for vault activity. Reply STOP to opt out.
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    {whatsappError && (
+                                        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                            <p className="text-sm text-red-400">{whatsappError}</p>
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-3">
+                                        <Button
+                                            onClick={() => {
+                                                setWhatsappStep(1);
+                                                setWhatsappCode('');
+                                                setWhatsappConsent(false);
+                                                setWhatsappError('');
+                                            }}
+                                            variant="outline"
+                                            className="flex-1 border-white/5 hover:bg-white/5 text-white font-bold uppercase tracking-wide"
+                                        >
+                                            Back
+                                        </Button>
+                                        <Button
+                                            onClick={handleWhatsAppConfirmVerification}
+                                            disabled={loadingWhatsApp || whatsappCode.length !== 6 || !whatsappConsent}
+                                            className="flex-1 bg-green-600 hover:bg-green-500 text-black font-black uppercase tracking-wide"
+                                        >
+                                            {loadingWhatsApp ? "Verifying..." : "Verify & Enable"}
+                                        </Button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
