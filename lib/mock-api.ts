@@ -31,7 +31,8 @@ import type {
 
 const SESSION_KEY = "mock_user_session";
 const USERS_DB_KEY = "mock_users_db";
-const NOTIFICATIONS_DB_KEY = "mock_notifications_db";
+const NOTIFICATIONS_DB_KEY = "mock_notifications_db_v4";
+const NOTIFICATION_PREFS_KEY = "mock_notification_preferences";
 
 const DELAY_MS = 600;
 
@@ -1287,6 +1288,206 @@ export const api = {
     getUnreadCount: async () => {
       const notifications = getNotificationsFromDB();
       return notifications.filter(n => !n.read).length;
+    },
+
+    // Notification Preferences
+    getPreferences: async () => {
+      await sleep(DELAY_MS / 2);
+      ensureSession();
+
+      if (typeof window === "undefined") {
+        return getDefaultNotificationPreferences();
+      }
+
+      try {
+        const stored = localStorage.getItem(`${NOTIFICATION_PREFS_KEY}_${mockUser.id}`);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (e) {
+        console.error("Failed to load notification preferences", e);
+      }
+
+      return getDefaultNotificationPreferences();
+    },
+
+    updatePreferences: async (updates: any) => {
+      await sleep(DELAY_MS);
+      ensureSession();
+
+      const current = await api.notifications.getPreferences();
+      const updated = {
+        ...current,
+        ...updates,
+        // Deep merge for nested objects
+        telegram: updates.telegram ? { ...current.telegram, ...updates.telegram } : current.telegram,
+        whatsapp: updates.whatsapp ? { ...current.whatsapp, ...updates.whatsapp } : current.whatsapp,
+      };
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`${NOTIFICATION_PREFS_KEY}_${mockUser.id}`, JSON.stringify(updated));
+      }
+
+      return updated;
+    }
+  },
+
+  telegram: {
+    getLinkToken: async () => {
+      await sleep(DELAY_MS);
+      ensureSession();
+
+      // Generate a unique link token
+      const token = `tg_${mockUser.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      // Store the token temporarily (in real app, this would be in backend)
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`telegram_link_token_${mockUser.id}`, token);
+      }
+
+      return { linkToken: token };
+    },
+
+    // Simulate Telegram bot callback (in real app, this would be a webhook)
+    simulateConnect: async (username: string) => {
+      await sleep(DELAY_MS);
+      ensureSession();
+
+      const prefs = await api.notifications.getPreferences();
+      const updated = await api.notifications.updatePreferences({
+        telegram: {
+          connected: true,
+          enabled: true,
+          username: username,
+        }
+      });
+
+      return { success: true, preferences: updated };
+    },
+
+    disconnect: async () => {
+      await sleep(DELAY_MS);
+      ensureSession();
+
+      const updated = await api.notifications.updatePreferences({
+        telegram: {
+          connected: false,
+          enabled: false,
+          username: undefined,
+        }
+      });
+
+      // Clear link token
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(`telegram_link_token_${mockUser.id}`);
+      }
+
+      return { success: true, preferences: updated };
+    }
+  },
+
+  whatsapp: {
+    startVerification: async (phoneE164: string) => {
+      await sleep(DELAY_MS);
+      ensureSession();
+
+      // Validate phone format (basic)
+      if (!phoneE164.startsWith('+') || phoneE164.length < 10) {
+        throw new Error("Invalid phone number format. Use E.164 format (e.g., +1234567890)");
+      }
+
+      // Store pending verification
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`whatsapp_pending_${mockUser.id}`, JSON.stringify({
+          phoneE164,
+          code: "123456", // Mock verification code
+          timestamp: Date.now()
+        }));
+      }
+
+      return { success: true, message: "Verification code sent via WhatsApp" };
+    },
+
+    confirmVerification: async (code: string, consented: boolean) => {
+      await sleep(DELAY_MS);
+      ensureSession();
+
+      if (!consented) {
+        throw new Error("You must consent to receive WhatsApp alerts");
+      }
+
+      // Check pending verification
+      if (typeof window === "undefined") {
+        throw new Error("No pending verification found");
+      }
+
+      const pendingStr = localStorage.getItem(`whatsapp_pending_${mockUser.id}`);
+      if (!pendingStr) {
+        throw new Error("No pending verification found. Please request a new code.");
+      }
+
+      const pending = JSON.parse(pendingStr);
+
+      // Check if code expired (5 minutes)
+      if (Date.now() - pending.timestamp > 5 * 60 * 1000) {
+        localStorage.removeItem(`whatsapp_pending_${mockUser.id}`);
+        throw new Error("Verification code expired. Please request a new code.");
+      }
+
+      // Verify code (mock - accept "123456")
+      if (code !== pending.code) {
+        throw new Error("Invalid verification code");
+      }
+
+      // Update preferences
+      const updated = await api.notifications.updatePreferences({
+        whatsapp: {
+          enabled: true,
+          phoneVerified: true,
+          phoneE164: pending.phoneE164,
+          consentedAt: new Date().toISOString(),
+        }
+      });
+
+      // Clear pending verification
+      localStorage.removeItem(`whatsapp_pending_${mockUser.id}`);
+
+      return { success: true, preferences: updated };
+    },
+
+    disable: async () => {
+      await sleep(DELAY_MS);
+      ensureSession();
+
+      const updated = await api.notifications.updatePreferences({
+        whatsapp: {
+          enabled: false,
+          phoneVerified: false,
+          phoneE164: undefined,
+          consentedAt: undefined,
+        }
+      });
+
+      return { success: true, preferences: updated };
     }
   }
 };
+
+// Helper function for default notification preferences
+function getDefaultNotificationPreferences() {
+  return {
+    inApp: true,
+    emailEnabled: true,
+    telegram: {
+      enabled: false,
+      connected: false,
+      username: undefined,
+    },
+    whatsapp: {
+      enabled: false,
+      phoneVerified: false,
+      phoneE164: undefined,
+      consentedAt: undefined,
+    }
+  };
+}

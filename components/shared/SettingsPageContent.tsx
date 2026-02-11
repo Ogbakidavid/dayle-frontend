@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import {
     User, CreditCard, Lock, Bell,
     LogOut, Shield, Mail,
-    ChevronLeft, Smartphone, Plus, Trash2, Key, AlertTriangle, CheckCircle2, X, Copy, Check
+    ChevronLeft, Smartphone, Plus, Trash2, Key, AlertTriangle, CheckCircle2, X, Copy, Check, MessageSquare, Phone
 } from 'lucide-react';
 import { useUser } from '@/lib/store/user-context';
 import { cn } from "@/lib/utils";
@@ -241,11 +241,51 @@ export default function SettingsPageContent({ role = 'client' }) {
         fetchNotifications();
     }, []);
 
+    // Notification Preferences State
+    const [notificationPrefs, setNotificationPrefs] = useState<any>(null);
+    const [loadingPrefs, setLoadingPrefs] = useState(false);
+    const [savingPrefs, setSavingPrefs] = useState(false);
+    const [prefsError, setPrefsError] = useState('');
+    const [prefsSuccess, setPrefsSuccess] = useState('');
+
+    // Telegram state
+    const [telegramLinkToken, setTelegramLinkToken] = useState('');
+    const [loadingTelegram, setLoadingTelegram] = useState(false);
+
+    // WhatsApp state
+    const [showWhatsAppFlow, setShowWhatsAppFlow] = useState(false);
+    const [whatsappPhone, setWhatsappPhone] = useState('');
+    const [whatsappCode, setWhatsappCode] = useState('');
+    const [whatsappConsent, setWhatsappConsent] = useState(false);
+    const [whatsappStep, setWhatsappStep] = useState(1); // 1: phone, 2: verify
+    const [loadingWhatsApp, setLoadingWhatsApp] = useState(false);
+    const [whatsappError, setWhatsappError] = useState('');
+
+    // Load notification preferences
+    useEffect(() => {
+        const loadPreferences = async () => {
+            setLoadingPrefs(true);
+            try {
+                const prefs = await api.notifications.getPreferences();
+                setNotificationPrefs(prefs);
+            } catch (error: any) {
+                console.error('Failed to load notification preferences:', error);
+                setPrefsError(error.message || 'Failed to load preferences');
+            } finally {
+                setLoadingPrefs(false);
+            }
+        };
+        if (activeTab === 'channels') {
+            loadPreferences();
+        }
+    }, [activeTab]);
+
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
 
     const getRelativeTime = (timestamp) => {
-        const seconds = Math.floor((new Date() - timestamp) / 1000);
+        const date = new Date(timestamp);
+        const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
         if (seconds < 60) return 'Just now';
         if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
         if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
@@ -294,11 +334,118 @@ export default function SettingsPageContent({ role = 'client' }) {
         currentPage * itemsPerPage
     );
 
+    // Notification Preferences Handlers
+    const handleEmailToggle = async (enabled: boolean) => {
+        setSavingPrefs(true);
+        setPrefsError('');
+        try {
+            const updated = await api.notifications.updatePreferences({ emailEnabled: enabled });
+            setNotificationPrefs(updated);
+            setPrefsSuccess('Email notifications ' + (enabled ? 'enabled' : 'disabled'));
+            setTimeout(() => setPrefsSuccess(''), 3000);
+        } catch (error: any) {
+            setPrefsError(error.message || 'Failed to update email preference');
+        } finally {
+            setSavingPrefs(false);
+        }
+    };
+
+    const handleTelegramConnect = async () => {
+        setLoadingTelegram(true);
+        setPrefsError('');
+        try {
+            const { linkToken } = await api.telegram.getLinkToken();
+            setTelegramLinkToken(linkToken);
+            window.open(`https://t.me/DAYLE_BOT?start=${linkToken}`, '_blank');
+
+            setTimeout(async () => {
+                try {
+                    const result = await api.telegram.simulateConnect(`@user_${Math.random().toString(36).substr(2, 6)}`);
+                    setNotificationPrefs(result.preferences);
+                    setPrefsSuccess('Telegram connected successfully!');
+                    setTimeout(() => setPrefsSuccess(''), 3000);
+                } catch (error: any) {
+                    setPrefsError(error.message || 'Failed to connect Telegram');
+                }
+                setLoadingTelegram(false);
+            }, 3000);
+        } catch (error: any) {
+            setPrefsError(error.message || 'Failed to generate Telegram link');
+            setLoadingTelegram(false);
+        }
+    };
+
+    const handleTelegramDisconnect = async () => {
+        setLoadingTelegram(true);
+        setPrefsError('');
+        try {
+            const result = await api.telegram.disconnect();
+            setNotificationPrefs(result.preferences);
+            setPrefsSuccess('Telegram disconnected');
+            setTimeout(() => setPrefsSuccess(''), 3000);
+        } catch (error: any) {
+            setPrefsError(error.message || 'Failed to disconnect Telegram');
+        } finally {
+            setLoadingTelegram(false);
+        }
+    };
+
+    const handleWhatsAppStartVerification = async () => {
+        setLoadingWhatsApp(true);
+        setWhatsappError('');
+        try {
+            await api.whatsapp.startVerification(whatsappPhone);
+            setWhatsappStep(2);
+            setPrefsSuccess('Verification code sent! (Use 123456 for demo)');
+            setTimeout(() => setPrefsSuccess(''), 5000);
+        } catch (error: any) {
+            setWhatsappError(error.message || 'Failed to send verification code');
+        } finally {
+            setLoadingWhatsApp(false);
+        }
+    };
+
+    const handleWhatsAppConfirmVerification = async () => {
+        setLoadingWhatsApp(true);
+        setWhatsappError('');
+        try {
+            const result = await api.whatsapp.confirmVerification(whatsappCode, whatsappConsent);
+            setNotificationPrefs(result.preferences);
+            setShowWhatsAppFlow(false);
+            setWhatsappPhone('');
+            setWhatsappCode('');
+            setWhatsappConsent(false);
+            setWhatsappStep(1);
+            setPrefsSuccess('WhatsApp verified and enabled!');
+            setTimeout(() => setPrefsSuccess(''), 3000);
+        } catch (error: any) {
+            setWhatsappError(error.message || 'Failed to verify WhatsApp');
+        } finally {
+            setLoadingWhatsApp(false);
+        }
+    };
+
+    const handleWhatsAppDisable = async () => {
+        setLoadingWhatsApp(true);
+        setPrefsError('');
+        try {
+            const result = await api.whatsapp.disable();
+            setNotificationPrefs(result.preferences);
+            setPrefsSuccess('WhatsApp disabled');
+            setTimeout(() => setPrefsSuccess(''), 3000);
+        } catch (error: any) {
+            setPrefsError(error.message || 'Failed to disable WhatsApp');
+        } finally {
+            setLoadingWhatsApp(false);
+        }
+    };
+
 
     const tabs = [
         { id: 'profile', label: 'Profile', icon: User },
         { id: 'payment', label: isClient ? 'Billing' : 'Payouts', icon: CreditCard },
         { id: 'security', label: 'Security', icon: Lock },
+        { id: 'channels', label: 'Channels', icon: MessageSquare },
         { id: 'notifications', label: 'Notifications', icon: Bell },
     ];
 
@@ -684,6 +831,284 @@ export default function SettingsPageContent({ role = 'client' }) {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Channels Section */}
+                        {activeTab === 'channels' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                {/* Header */}
+                                <div>
+                                    <h3 className="text-sm font-black text-white uppercase tracking-wide mb-1">Notification Channels</h3>
+                                    <p className="text-sm text-white/60 leading-relaxed">Choose how you want to receive alerts</p>
+                                </div>
+
+                                {/* Success/Error Messages */}
+                                {prefsSuccess && (
+                                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                                        <p className="text-sm text-emerald-400">{prefsSuccess}</p>
+                                    </div>
+                                )}
+                                {prefsError && (
+                                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                        <p className="text-sm text-red-400">{prefsError}</p>
+                                    </div>
+                                )}
+
+                                {loadingPrefs ? (
+                                    <div className="p-8 text-center">
+                                        <p className="text-sm text-white/40">Loading preferences...</p>
+                                    </div>
+                                ) : notificationPrefs && (
+                                    <div className="space-y-4">
+                                        {/* In-App (Always On) */}
+                                        <div className="flex items-start justify-between p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl">
+                                            <div className="flex gap-4">
+                                                <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                                                    <Bell className="w-5 h-5 text-emerald-500" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <h4 className="text-sm font-black text-white uppercase tracking-tight">In-App Notifications</h4>
+                                                    <p className="text-sm text-white/60 leading-relaxed max-w-md">
+                                                        Receive notifications within the platform
+                                                    </p>
+                                                    <span className="inline-block text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                        Always Enabled
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Email */}
+                                        <div className="flex items-start justify-between p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
+                                            <div className="flex gap-4">
+                                                <div className="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                                    <Mail className="w-5 h-5 text-blue-500" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <h4 className="text-sm font-black text-white uppercase tracking-tight">Email Notifications</h4>
+                                                    <p className="text-sm text-white/60 leading-relaxed max-w-md">
+                                                        Get important updates via email
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Switch
+                                                checked={notificationPrefs.emailEnabled}
+                                                onCheckedChange={handleEmailToggle}
+                                                disabled={savingPrefs}
+                                                className="data-[state=checked]:bg-emerald-600"
+                                            />
+                                        </div>
+
+                                        {/* Telegram */}
+                                        <div className="flex items-start justify-between p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
+                                            <div className="flex gap-4 flex-1">
+                                                <div className="p-2.5 bg-sky-500/10 border border-sky-500/20 rounded-lg">
+                                                    <MessageSquare className="w-5 h-5 text-sky-500" />
+                                                </div>
+                                                <div className="space-y-2 flex-1">
+                                                    <h4 className="text-sm font-black text-white uppercase tracking-tight">Telegram</h4>
+                                                    <p className="text-sm text-white/60 leading-relaxed max-w-md">
+                                                        Instant alerts via Telegram bot
+                                                    </p>
+                                                    {notificationPrefs.telegram.connected && (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                                Connected
+                                                            </span>
+                                                            <span className="text-xs text-white/60">{notificationPrefs.telegram.username}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                {!notificationPrefs.telegram.connected ? (
+                                                    <Button
+                                                        onClick={handleTelegramConnect}
+                                                        disabled={loadingTelegram}
+                                                        className="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-4 text-sm rounded-lg"
+                                                    >
+                                                        {loadingTelegram ? "Connecting..." : "Connect"}
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        onClick={handleTelegramDisconnect}
+                                                        disabled={loadingTelegram}
+                                                        variant="outline"
+                                                        className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 font-semibold px-4 text-sm"
+                                                    >
+                                                        {loadingTelegram ? "Disconnecting..." : "Disconnect"}
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* WhatsApp */}
+                                        <div className="p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="flex gap-4 flex-1">
+                                                    <div className="p-2.5 bg-green-500/10 border border-green-500/20 rounded-lg">
+                                                        <Phone className="w-5 h-5 text-green-500" />
+                                                    </div>
+                                                    <div className="space-y-2 flex-1">
+                                                        <h4 className="text-sm font-black text-white uppercase tracking-tight">WhatsApp</h4>
+                                                        <p className="text-sm text-white/60 leading-relaxed max-w-md">
+                                                            Receive alerts via WhatsApp messages
+                                                        </p>
+                                                        {notificationPrefs.whatsapp.phoneVerified && (
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                                    Verified
+                                                                </span>
+                                                                <span className="text-xs text-white/60">{notificationPrefs.whatsapp.phoneE164}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    {!notificationPrefs.whatsapp.phoneVerified ? (
+                                                        <Button
+                                                            onClick={() => setShowWhatsAppFlow(true)}
+                                                            className="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 text-sm rounded-lg"
+                                                        >
+                                                            Add Phone
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            onClick={handleWhatsAppDisable}
+                                                            disabled={loadingWhatsApp}
+                                                            variant="outline"
+                                                            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 font-semibold px-4 text-sm"
+                                                        >
+                                                            {loadingWhatsApp ? "Disabling..." : "Disable"}
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* WhatsApp Verification Flow */}
+                                            {showWhatsAppFlow && !notificationPrefs.whatsapp.phoneVerified && (
+                                                <div className="mt-4 pt-4 border-t border-zinc-800 space-y-4">
+                                                    {whatsappStep === 1 ? (
+                                                        <>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-bold text-white uppercase tracking-wide ml-1">
+                                                                    Phone Number (E.164 format)
+                                                                </Label>
+                                                                <Input
+                                                                    type="tel"
+                                                                    placeholder="+1234567890"
+                                                                    value={whatsappPhone}
+                                                                    onChange={(e) => setWhatsappPhone(e.target.value)}
+                                                                    className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-green-500/50 h-11"
+                                                                />
+                                                                <p className="text-xs text-white/40">Include country code (e.g., +1 for US)</p>
+                                                            </div>
+
+                                                            {whatsappError && (
+                                                                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                                                    <p className="text-sm text-red-400">{whatsappError}</p>
+                                                                </div>
+                                                            )}
+
+                                                            <div className="flex gap-3">
+                                                                <Button
+                                                                    onClick={() => {
+                                                                        setShowWhatsAppFlow(false);
+                                                                        setWhatsappPhone('');
+                                                                        setWhatsappError('');
+                                                                    }}
+                                                                    variant="outline"
+                                                                    className="flex-1"
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={handleWhatsAppStartVerification}
+                                                                    disabled={loadingWhatsApp || !whatsappPhone}
+                                                                    className="flex-1 bg-green-600 hover:bg-green-500 text-white font-semibold"
+                                                                >
+                                                                    {loadingWhatsApp ? "Sending..." : "Send Code"}
+                                                                </Button>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-sm font-bold text-white uppercase tracking-wide ml-1">
+                                                                    Verification Code
+                                                                </Label>
+                                                                <Input
+                                                                    type="text"
+                                                                    placeholder="123456"
+                                                                    value={whatsappCode}
+                                                                    onChange={(e) => setWhatsappCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                                                    className="bg-zinc-900/50 border-zinc-800 text-zinc-200 text-center text-2xl tracking-widest h-14"
+                                                                    maxLength={6}
+                                                                />
+                                                            </div>
+
+                                                            {/* Consent Checkbox */}
+                                                            <div className="flex items-start gap-3 p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    id="whatsapp-consent"
+                                                                    checked={whatsappConsent}
+                                                                    onChange={(e) => setWhatsappConsent(e.target.checked)}
+                                                                    className="mt-1 w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-emerald-600 focus:ring-emerald-500"
+                                                                />
+                                                                <label htmlFor="whatsapp-consent" className="text-sm text-white/80 leading-relaxed">
+                                                                    I agree to receive WhatsApp alerts for vault activity. Reply STOP to opt out.
+                                                                </label>
+                                                            </div>
+
+                                                            {whatsappError && (
+                                                                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                                                    <p className="text-sm text-red-400">{whatsappError}</p>
+                                                                </div>
+                                                            )}
+
+                                                            <div className="flex gap-3">
+                                                                <Button
+                                                                    onClick={() => {
+                                                                        setWhatsappStep(1);
+                                                                        setWhatsappCode('');
+                                                                        setWhatsappConsent(false);
+                                                                        setWhatsappError('');
+                                                                    }}
+                                                                    variant="outline"
+                                                                    className="flex-1"
+                                                                >
+                                                                    Back
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={handleWhatsAppConfirmVerification}
+                                                                    disabled={loadingWhatsApp || whatsappCode.length !== 6 || !whatsappConsent}
+                                                                    className="flex-1 bg-green-600 hover:bg-green-500 text-white font-semibold"
+                                                                >
+                                                                    {loadingWhatsApp ? "Verifying..." : "Verify & Enable"}
+                                                                </Button>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Quiet Hours Info */}
+                                        <div className="p-4 bg-zinc-900/20 border border-zinc-800/30 rounded-xl">
+                                            <div className="flex items-start gap-3">
+                                                <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                                                <div>
+                                                    <h5 className="text-sm font-bold text-white mb-1">Quiet Hours</h5>
+                                                    <p className="text-xs text-white/60 leading-relaxed">
+                                                        Customize notification schedules and quiet hours. <span className="text-amber-500 font-semibold">Coming in v2</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 

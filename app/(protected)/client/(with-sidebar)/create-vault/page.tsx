@@ -78,6 +78,7 @@ export default function CreateVaultPage() {
     },
   ]);
 
+
   const steps = [
     { id: 1, name: "Basics", icon: Info },
     { id: 2, name: "Milestones", icon: ListChecks },
@@ -95,6 +96,7 @@ export default function CreateVaultPage() {
   // Validation
   const isStep1Complete = vaultTitle.trim() !== "" && vaultPurpose !== "" && budget > 0;
   const isStep2Complete = milestones.length > 0 && milestones.every(m => m.title.trim() !== "" && m.amount !== "" && m.deliverableType !== "") && totalAmount <= budget;
+
   const isStep3Complete = freelancerEmail.trim() !== "" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(freelancerEmail);
 
   const canContinue = step === 1 ? isStep1Complete : step === 2 ? isStep2Complete : step === 3 ? isStep3Complete : true;
@@ -105,6 +107,7 @@ export default function CreateVaultPage() {
     setMilestones(updated);
     setTotalAmount(updated.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0));
   };
+
 
   const handleDeploy = () => {
     // Create vault via API with idempotency to simulate safe money action
@@ -401,7 +404,6 @@ export default function CreateVaultPage() {
                                   <p className="text-sm font-black uppercase tracking-widest text-white">{m.title}</p>
                                   <div className="flex items-center gap-3 mt-1">
                                     <span className="text-[12px] text-emerald-500/70 font-bold uppercase tracking-widest">{getDeliverableLabel(m.deliverableType)}</span>
-                                    <span className="text-[12px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-black uppercase">AI AUDIT ON</span>
                                   </div>
                                 </div>
                               </div>
