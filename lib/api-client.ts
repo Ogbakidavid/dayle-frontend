@@ -130,8 +130,12 @@ export const api = {
       });
     },
 
-    getCurrentUser: async (): Promise<any> => {
-      return await request("/auth/me");
+    getCurrentUser: async (token?: string): Promise<any> => {
+      const headers: any = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      return await request("/auth/me", { headers });
     },
 
     logout: async (): Promise<any> => {
@@ -178,7 +182,7 @@ export const api = {
       });
     },
 
-    socialLogin: async (dto: any): Promise<any> => {
+    socialLogin: async (dto: { accessToken: string; role?: string }): Promise<any> => {
       const data = await request("/auth/social-login", {
         method: "POST",
         body: dto,

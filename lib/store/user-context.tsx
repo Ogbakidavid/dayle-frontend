@@ -9,6 +9,7 @@ import {
 } from "react";
 import { api, UserRole } from "@/lib/api-client";
 import { useRouter } from "next/navigation";
+import { usePrivy } from "@privy-io/react-auth";
 
 interface User {
   id: string;
@@ -30,7 +31,7 @@ interface UserContextType {
     role: string,
   ) => Promise<User>;
   logout: () => Promise<void>;
-  refreshUser: () => Promise<User | null>;
+  refreshUser: (token?: string) => Promise<User | null>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -39,15 +40,16 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { logout: privyLogout } = usePrivy();
 
   useEffect(() => {
     // Check session on mount
     checkSession();
   }, []);
 
-  async function checkSession(): Promise<User | null> {
+  async function checkSession(token?: string): Promise<User | null> {
     try {
-      const userData = await api.auth.getCurrentUser();
+      const userData = await api.auth.getCurrentUser(token);
       setUser(userData);
       return userData;
     } catch (err: any) {
@@ -82,6 +84,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   async function logout() {
+    await privyLogout();
     await api.auth.logout();
     setUser(null);
     router.push("/login");

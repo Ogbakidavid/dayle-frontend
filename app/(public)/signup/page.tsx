@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
 import { api, UserRole } from "@/lib/api-client";
 import {
   ArrowRight,
@@ -15,39 +14,127 @@ import {
   Shield,
   User,
   Mail,
-  Briefcase,
-  Building2,
+  Lock,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/lib/store/user-context";
-import { usePrivy } from "@privy-io/react-auth";
+import { usePrivy, useLoginWithEmail } from "@privy-io/react-auth";
+
+// OTP Input Component
+const OTPInput = ({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  disabled: boolean;
+}) => {
+  const inputs = React.useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, i: number) => {
+    const val = e.target.value;
+    if (isNaN(Number(val))) return;
+
+    const newCode = value.split("");
+    newCode[i] = val.substring(val.length - 1);
+    const combined = newCode.join("");
+    onChange(combined);
+
+    // Auto focus next
+    if (val && i < 5) {
+      inputs.current[i + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    i: number,
+  ) => {
+    if (e.key === "Backspace" && !value[i] && i > 0) {
+      inputs.current[i - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text").slice(0, 6);
+    if (!/^\d+$/.test(pastedData)) return;
+    onChange(pastedData);
+  };
+
+  return (
+    <div className="flex gap-2 justify-center">
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <input
+          key={i}
+          ref={(el) => {
+            inputs.current[i] = el;
+          }}
+          type="text"
+          maxLength={1}
+          value={value[i] || ""}
+          disabled={disabled}
+          onChange={(e) => handleChange(e, i)}
+          onKeyDown={(e) => handleKeyDown(e, i)}
+          onPaste={handlePaste}
+          className="w-12 h-14 text-center text-2xl font-bold bg-muted! border-white/10 rounded-xl focus:border-emerald-500/50 focus:bg-white/8! focus:ring-0 transition-all text-white placeholder:text-gray-400"
+        />
+      ))}
+    </div>
+  );
+};
 
 export default function SignupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const {
-    login: contextLogin,
-    signup: contextSignup,
-    refreshUser,
-    user: backendUser,
-  } = useUser();
+  const { refreshUser, user: backendUser } = useUser();
   const returnTo = searchParams.get("returnTo");
-  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const initialRole =
-    (searchParams.get("role") as UserRole) || UserRole.FREELANCER;
-  const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
+  const [loading, setLoading] = useState(false); // General loading state for UI
+  const [step, setStep] = useState<"initial" | "otp">("initial");
 
   const {
     login: privyLogin,
-    logout: privyLogout,
     ready,
     authenticated,
     user: privyUser,
     getAccessToken,
   } = usePrivy();
 
-  // Social Auth Handlers
+  const { sendCode, loginWithCode, state } = useLoginWithEmail({
+    onComplete: async (params) => {
+      // Logic handled in useEffect or separate function, but here for safety
+      console.log("Privy email login success", params.user);
+    },
+    onError: (error) => {
+      console.error("Privy email error", error);
+      setError("Failed to verify email. Please try again.");
+      setLoading(false);
+    },
+  });
+
+  // Extract relevant state from useLoginWithEmail
+  const isSendingCode = state.status === "sending-code";
+  const isSubmittingCode = state.status === "submitting-code";
+  const emailStateLoading = isSendingCode || isSubmittingCode;
+
+  // Sync loading state
+  useEffect(() => {
+    if (emailStateLoading) {
+      setLoading(true);
+    } else if (state.status === "awaiting-code-input") {
+      setLoading(false);
+      setStep("otp");
+    } else {
+      // Other states, manage manually
+    }
+  }, [state.status, emailStateLoading]);
+
+  // Social Auth Handlers (Reused from previous implementation)
   async function handleSocialLoginSuccess() {
     try {
       const accessToken = await getAccessToken();
@@ -58,46 +145,51 @@ export default function SignupPage() {
       // Wallet is now created automatically by Privy (createOnLogin: 'all-users')
       // We just proceed to authenticate with backend
 
-      await api.auth.socialLogin({ accessToken });
+      // Get role from params or state
+      const roleParam =
+        (searchParams.get("role") as UserRole) || backendUser?.role;
+      const roleToPass =
+        roleParam && roleParam !== UserRole.NONE ? roleParam : undefined;
 
-      // Update profile with social name if missing
+      await api.auth.socialLogin({ accessToken, role: roleToPass });
+
+      // Update profile with name if available (from form or social)
       const socialName =
-        privyUser?.google?.name || privyUser?.github?.username || "";
+        privyUser?.google?.name ||
+        privyUser?.github?.username ||
+        formData.name ||
+        "";
+
       if (socialName) {
+        // Only update if we have a name to update
         await api.auth.updateProfile({ name: socialName });
       }
 
-      const userData = await refreshUser();
+      await refreshUser();
 
-      // Redirect to dashboard or role selection
-      const roleParam = searchParams.get("role") as UserRole;
-      const targetRole = roleParam || userData?.role;
+      // Redirect
 
-      if (targetRole && targetRole !== UserRole.NONE) {
-        router.push(targetRole === UserRole.CLIENT ? "/client" : "/freelancer");
+      // We need to fetch fresh user data after refreshUser if we want to be sure,
+      // but refreshUser returns userData in valid implementation.
+      // api-client refreshUser returns void in context but checking implementation...
+      // verified context: refreshUser returns Promise<User | null>
+
+      const freshUser = await refreshUser();
+      const freshRole = freshUser?.role;
+
+      if (freshRole && freshRole !== UserRole.NONE) {
+        router.push(freshRole === "CLIENT" ? "/client" : "/freelancer");
       } else {
         router.push("/onboarding/role");
       }
     } catch (err: any) {
       console.error(err);
-
-      // If unauthorized (401), it means the user exists in Privy but not in our DB (or was deleted).
-      // We must logout from Privy to clear this stale state and allow a fresh signup.
-      if (
-        err.statusCode === 401 ||
-        err.status === 401 ||
-        err.message?.includes("401")
-      ) {
-        await privyLogout();
-        setError("Account not found. Please sign up again.");
-      } else {
-        setError("Social login failed. Please try again.");
-      }
+      setError("Authentication failed. Please try again.");
       setLoading(false);
     }
   }
 
-  const handlePrivyLogin = async (provider: any) => {
+  const handlePrivySocialLogin = async (provider: any) => {
     try {
       await privyLogin({ loginMethods: [provider] });
     } catch (e) {
@@ -105,85 +197,65 @@ export default function SignupPage() {
     }
   };
 
+  // Watch for successful authentication to trigger backend sync
   useEffect(() => {
     if (ready && authenticated && privyUser) {
       handleSocialLoginSuccess();
     }
-  }, [ready, authenticated, privyUser, handleSocialLoginSuccess]);
+  }, [ready, authenticated, privyUser]);
 
-  // Get role from search params
-  const role = searchParams.get("role") as "CLIENT" | "FREELANCER" | null;
-
-  // If somehow we are here and already have a backend user, auto-redirect
-  React.useEffect(() => {
-    if (backendUser) {
-      if (role) {
-        router.push(
-          returnTo || (role === "CLIENT" ? "/client" : "/freelancer"),
-        );
-      } else {
-        // If no role in URL and valid user, maybe send to role selection or dashboard based on user.role
-        if (backendUser.role && backendUser.role !== "NONE") {
-          router.push(
-            backendUser.role === "CLIENT" ? "/client" : "/freelancer",
-          );
-        } else {
-          router.push("/onboarding/role");
-        }
-      }
-    }
-  }, [backendUser, role, returnTo, router]);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  // Form Handlers
+  const handleInitialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirmPassword") as string;
-    // Get role from search params
-    const roleParam = searchParams.get("role");
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (!formData.email || !formData.name) {
+      setError("Please fill in all fields.");
       return;
     }
 
     setLoading(true);
     try {
-      await contextSignup(email, password, name, roleParam);
-
-      // If role was selected in previous step, update it now
-      if (roleParam) {
-        // Role is already handled by signup
-        // Refresh user context immediately so everything else knows the correct role
-        await refreshUser();
-      }
-
-      if (returnTo) {
-        router.push(returnTo);
-        return;
-      }
-
-      // Always redirect to email verification with role parameter
-      const verifyUrl = roleParam
-        ? `/verify-email?role=${roleParam}`
-        : "/verify-email";
-      router.push(verifyUrl);
-    } catch (err: any) {
+      await sendCode({ email: formData.email });
+      // State change to "awaiting-code-input" handled in effect
+    } catch (err) {
       console.error(err);
-      setError("Something went wrong. Please try again.");
-    } finally {
+      setError("Failed to send verification code.");
       setLoading(false);
     }
-  }
+  };
+
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (otp.length !== 6) {
+      setError("Please enter a valid 6-digit code.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await loginWithCode({ code: otp });
+      // Success handled by onLoginSuccess -> authenticated -> useEffect hook
+    } catch (err) {
+      console.error(err);
+      setError("Invalid code. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      await sendCode({ email: formData.email });
+      setLoading(false);
+    } catch (err) {
+      setError("Failed to resend code.");
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] flex flex-col md:flex-row selection:bg-emerald-500/30 font-[Poppins,sans-serif]">
@@ -251,180 +323,212 @@ export default function SignupPage() {
         <div className="w-full max-w-[440px] relative z-10">
           <div className="mb-10">
             <h2 className="text-4xl font-black text-white tracking-tight uppercase leading-none">
-              Create Account
+              {step === "otp" ? "Verify Email" : "Create Account"}
             </h2>
             <p className="text-white mt-4 text-sm font-bold uppercase tracking-wide leading-relaxed">
-              Start securing your professional engagements today.
+              {step === "otp"
+                ? `Enter the code sent to ${formData.email}`
+                : "Start securing your professional engagements today."}
             </p>
           </div>
 
           <div className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="name"
-                  className="text-sm font-black uppercase tracking-wide text-white ml-1"
-                >
-                  Full Name
-                </Label>
-                <div className="relative group">
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="John Doe"
-                    required
-                    className="bg-muted! border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white/8! focus:ring-0 transition-all text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
-                  />
-                  <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  className="text-sm font-black uppercase tracking-wide text-white ml-1"
-                >
-                  Email Address
-                </Label>
-                <div className="relative group">
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="name@company.com"
-                    required
-                    className="bg-muted! border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white/8! focus:ring-0 transition-all text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
-                  />
-                  <Mail className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="password"
-                  className="text-sm font-black uppercase tracking-wide text-white ml-1"
-                >
-                  Password
-                </Label>
-                <div className="relative group">
-                  <PasswordInput
-                    id="password"
-                    name="password"
-                    placeholder="••••••••"
-                    required
-                    className="bg-muted! border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white/8! focus:ring-0 transition-all text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="confirmPassword"
-                  className="text-sm font-black uppercase tracking-wide text-white ml-1"
-                >
-                  Confirm Password
-                </Label>
-                <div className="relative group">
-                  <PasswordInput
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    placeholder="••••••••"
-                    required
-                    className="bg-muted! border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white/8! focus:ring-0 transition-all text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <div className="flex items-center gap-3 text-red-400 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <p className="text-sm font-bold uppercase tracking-wide leading-relaxed">
-                    {error}
-                  </p>
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full h-14 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-black text-base uppercase tracking-wide transition-all shadow-xl active:scale-[0.98]"
-              >
-                {loading ? (
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Creating Account...</span>
+            {step === "initial" ? (
+              <form onSubmit={handleInitialSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="name"
+                    className="text-sm font-black uppercase tracking-wide text-white ml-1"
+                  >
+                    Full Name
+                  </Label>
+                  <div className="relative group">
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      required
+                      className="bg-muted! border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white/8! focus:ring-0 transition-all text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+                    />
+                    <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                   </div>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    Create Account <ArrowRight className="w-5 h-5" />
-                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="email"
+                    className="text-sm font-black uppercase tracking-wide text-white ml-1"
+                  >
+                    Email Address
+                  </Label>
+                  <div className="relative group">
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="name@company.com"
+                      value={formData.email}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
+                      required
+                      className="bg-muted! border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white/8! focus:ring-0 transition-all text-white text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+                    />
+                    <Mail className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="flex items-center gap-3 text-red-400 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <p className="text-sm font-bold uppercase tracking-wide leading-relaxed">
+                      {error}
+                    </p>
+                  </div>
                 )}
-              </Button>
-
-              <div className="relative pt-2">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-white/10" />
-                </div>
-                <div className="relative flex justify-center text-[10px] uppercase">
-                  <span className="bg-[#050505] px-2 text-white/30 font-black tracking-[0.2em]">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handlePrivyLogin("google")}
-                  disabled={!ready || authenticated}
-                  className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
-                >
-                  <svg
-                    className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      fill="#4285F4"
-                    />
-                    <path
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      fill="#34A853"
-                    />
-                    <path
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      fill="#FBBC05"
-                    />
-                    <path
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      fill="#EA4335"
-                    />
-                  </svg>
-                  <span className="text-white/60 font-black uppercase text-[10px] tracking-widest group-hover:text-white transition-colors">
-                    Google
-                  </span>
-                </Button>
 
                 <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handlePrivyLogin("github")}
-                  disabled={!ready || authenticated}
-                  className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-14 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-black text-base uppercase tracking-wide transition-all shadow-xl active:scale-[0.98]"
                 >
-                  <svg
-                    className="w-5 h-5 mr-2 fill-white/60 group-hover:fill-white transition-colors group-hover:scale-110"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                  </svg>
-                  <span className="text-white/60 font-black uppercase text-[10px] tracking-widest group-hover:text-white transition-colors">
-                    GitHub
-                  </span>
+                  {loading ? (
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Sending Code...</span>
+                    </div>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      Continue <ArrowRight className="w-5 h-5" />
+                    </span>
+                  )}
                 </Button>
-              </div>
-            </form>
+
+                <div className="relative pt-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-white/10" />
+                  </div>
+                  <div className="relative flex justify-center text-[10px] uppercase">
+                    <span className="bg-[#050505] px-2 text-white/30 font-black tracking-[0.2em]">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handlePrivySocialLogin("google")}
+                    disabled={loading}
+                    className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
+                  >
+                    <svg
+                      className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                    </svg>
+                    <span className="text-white/60 font-black uppercase text-[10px] tracking-widest group-hover:text-white transition-colors">
+                      Google
+                    </span>
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handlePrivySocialLogin("github")}
+                    disabled={loading}
+                    className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
+                  >
+                    <svg
+                      className="w-5 h-5 mr-2 fill-white/60 group-hover:fill-white transition-colors group-hover:scale-110"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                    <span className="text-white/60 font-black uppercase text-[10px] tracking-widest group-hover:text-white transition-colors">
+                      GitHub
+                    </span>
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleOtpSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <Label className="text-sm font-black uppercase tracking-wide text-white ml-1 text-center block">
+                    Verification Code
+                  </Label>
+                  <OTPInput value={otp} onChange={setOtp} disabled={loading} />
+                  <div className="flex justify-center">
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={handleResendCode}
+                      disabled={loading}
+                      className="text-emerald-500 hover:text-emerald-400 no-underline font-bold text-xs uppercase tracking-widest"
+                    >
+                      Resend Code
+                    </Button>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="flex items-center gap-3 text-red-400 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <p className="text-sm font-bold uppercase tracking-wide leading-relaxed">
+                      {error}
+                    </p>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-14 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-black text-base uppercase tracking-wide transition-all shadow-xl active:scale-[0.98]"
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Verifying...</span>
+                    </div>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      Verify & Create Account <ArrowRight className="w-5 h-5" />
+                    </span>
+                  )}
+                </Button>
+
+                <div className="text-center pt-4">
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={() => setStep("initial")}
+                    className="text-white/40 hover:text-white font-bold text-xs uppercase tracking-widest"
+                  >
+                    Back to Email
+                  </Button>
+                </div>
+              </form>
+            )}
           </div>
 
           <p className="mt-12 text-center text-white text-sm font-bold uppercase tracking-wide">

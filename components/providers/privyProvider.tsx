@@ -7,8 +7,8 @@ import { celo } from "viem/chains";
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <PrivyProvider
-      appId="cmkrdte7f017ml50bgzxjrhx6"
-      clientId="client-WY6VA9LkGLeABxXt3HKt5cQc3jwU8NTp1mq7umpdKhahE"
+      appId="cmlgbfk7k029al50bfwfrgti3"
+      clientId="client-WY6W1EYmvypDsARfuDn8w1ELcVD4wNDMn3m8RQha7uDh5"
       config={{
         defaultChain: celo,
         supportedChains: [celo],
@@ -18,6 +18,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           ethereum: {
             createOnLogin: "all-users",
           },
+          showWalletUIs: false,
         },
 
         appearance: {
