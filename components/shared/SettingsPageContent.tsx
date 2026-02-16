@@ -16,52 +16,56 @@ import {
   Shield,
   Mail,
   ChevronLeft,
-  Smartphone,
   Plus,
   Trash2,
-  Key,
   AlertTriangle,
   CheckCircle2,
   X,
-  Copy,
-  Check,
+  MessageSquare,
+  Phone,
 } from "lucide-react";
 import { useUser } from "@/lib/store/user-context";
 import { cn } from "@/lib/utils";
 import UserAvatar from "@/components/shared/UserAvatar";
 import { api } from "@/lib/api-client";
-import QRCode from "qrcode";
 
 export default function SettingsPageContent({ role = "client" }) {
   const router = useRouter();
   const { user, logout, refreshUser } = useUser();
   const [activeTab, setActiveTab] = useState("profile");
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Security state
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [show2FASetup, setShow2FASetup] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState("");
-  const [twoFactorSecret, setTwoFactorSecret] = useState("");
-  const [recoveryCodes, setRecoveryCodes] = useState([]);
-  const [verificationCode, setVerificationCode] = useState("");
-  const [setupStep, setSetupStep] = useState(1); // 1: QR, 2: Verify, 3: Recovery codes
-  const [activeSessions, setActiveSessions] = useState([]);
-  const [loadingSessions, setLoadingSessions] = useState(false);
+  // Notification center state
+  const [notificationList, setNotificationList] = useState<any[]>([]);
 
-  // Password change state
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const data = await api.notifications.list();
+      setNotificationList(data);
+    };
+    fetchNotifications();
+  }, []);
 
-  // Loading states
-  const [loading2FA, setLoading2FA] = useState(false);
-  const [error2FA, setError2FA] = useState("");
-  const [copiedCode, setCopiedCode] = useState(false);
+  // Notification Preferences State
+  const [notificationPrefs, setNotificationPrefs] = useState<any>(null);
+  const [loadingPrefs, setLoadingPrefs] = useState(false);
+  const [savingPrefs, setSavingPrefs] = useState(false);
+  const [prefsError, setPrefsError] = useState("");
+  const [prefsSuccess, setPrefsSuccess] = useState("");
 
-  const handleImageUpload = async (e) => {
+  // Telegram state
+  const [loadingTelegram, setLoadingTelegram] = useState(false);
+
+  // WhatsApp state
+  const [showWhatsAppFlow, setShowWhatsAppFlow] = useState(false);
+  const [whatsappPhone, setWhatsappPhone] = useState("");
+  const [whatsappCode, setWhatsappCode] = useState("");
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
+  const [whatsappStep, setWhatsappStep] = useState(1); // 1: phone, 2: verify
+  const [loadingWhatsApp, setLoadingWhatsApp] = useState(false);
+  const [whatsappError, setWhatsappError] = useState("");
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -73,11 +77,12 @@ export default function SettingsPageContent({ role = "client" }) {
 
     const reader = new FileReader();
     reader.onloadend = async () => {
-      const base64String = reader.result;
+      const base64String = reader.result as string | null;
       try {
         // In a real app, you'd upload to S3/Cloudinary.
-        // Real API call to update preferences
-        await api.auth.updateProfile({ profileImage: base64String });
+        // Here we use the mock API which perists to localStorage.
+        if (base64String)
+          await api.auth.updateProfile({ profileImage: base64String });
         await refreshUser();
       } catch (error) {
         console.error("Failed to upload image:", error);
@@ -88,176 +93,31 @@ export default function SettingsPageContent({ role = "client" }) {
 
   const isClient = role === "client";
 
-  // Load 2FA status and sessions on mount
+  // Load notification preferences
   useEffect(() => {
-    loadSecurityData();
-  }, []);
-
-  const loadSecurityData = async () => {
-    try {
-      const status = await api.security.get2FAStatus();
-      setTwoFactorEnabled(status.enabled);
-
-      const sessions = await api.security.getSessions();
-      setActiveSessions(sessions);
-    } catch (error) {
-      console.error("Failed to load security data:", error);
+    const loadPreferences = async () => {
+      setLoadingPrefs(true);
+      try {
+        const prefs = await api.notifications.getPreferences();
+        setNotificationPrefs(prefs);
+      } catch (error: any) {
+        console.error("Failed to load notification preferences:", error);
+        setPrefsError(error.message || "Failed to load preferences");
+      } finally {
+        setLoadingPrefs(false);
+      }
+    };
+    if (activeTab === "channels") {
+      loadPreferences();
     }
-  };
-
-  // 2FA Handlers
-  const handleEnable2FA = async () => {
-    setLoading2FA(true);
-    setError2FA("");
-    try {
-      const data = await api.security.enable2FA();
-      setTwoFactorSecret(data.tempSecret);
-      setRecoveryCodes(data.recoveryCodes);
-
-      // Generate QR code
-      const qrUrl = await QRCode.toDataURL(data.qrCodeUrl);
-      setQrCodeUrl(qrUrl);
-
-      setShow2FASetup(true);
-      setSetupStep(1);
-    } catch (error) {
-      setError2FA(error.message || "Failed to enable 2FA");
-    } finally {
-      setLoading2FA(false);
-    }
-  };
-
-  const handleVerify2FA = async () => {
-    setLoading2FA(true);
-    setError2FA("");
-    try {
-      await api.security.verify2FA(verificationCode, twoFactorSecret);
-      setSetupStep(3); // Show recovery codes
-      setTwoFactorEnabled(true);
-      await refreshUser();
-    } catch (error) {
-      setError2FA(error.message || "Invalid verification code");
-    } finally {
-      setLoading2FA(false);
-    }
-  };
-
-  const handleDisable2FA = async () => {
-    if (!verificationCode) {
-      setError2FA("Please enter verification code");
-      return;
-    }
-
-    setLoading2FA(true);
-    setError2FA("");
-    try {
-      await api.security.disable2FA(verificationCode);
-      setTwoFactorEnabled(false);
-      setShow2FASetup(false);
-      setVerificationCode("");
-      await refreshUser();
-    } catch (error) {
-      setError2FA(error.message || "Failed to disable 2FA");
-    } finally {
-      setLoading2FA(false);
-    }
-  };
-
-  const close2FASetup = () => {
-    setShow2FASetup(false);
-    setSetupStep(1);
-    setVerificationCode("");
-    setError2FA("");
-    loadSecurityData(); // Refresh status
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
-
-  // Session Handlers
-  const handleRevokeSession = async (sessionId) => {
-    setLoadingSessions(true);
-    try {
-      await api.security.revokeSession(sessionId);
-      const sessions = await api.security.getSessions();
-      setActiveSessions(sessions);
-    } catch (error) {
-      console.error("Failed to revoke session:", error);
-      alert(error.message || "Failed to revoke session");
-    } finally {
-      setLoadingSessions(false);
-    }
-  };
-
-  const handleRevokeAllSessions = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to revoke all other sessions? You will remain logged in on this device.",
-      )
-    ) {
-      return;
-    }
-
-    setLoadingSessions(true);
-    try {
-      await api.security.revokeAllSessions();
-      const sessions = await api.security.getSessions();
-      setActiveSessions(sessions);
-    } catch (error) {
-      console.error("Failed to revoke sessions:", error);
-      alert(error.message || "Failed to revoke sessions");
-    } finally {
-      setLoadingSessions(false);
-    }
-  };
-
-  // Password Change Handler
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-    setPasswordError("");
-    setPasswordSuccess(false);
-
-    // Validation
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setPasswordError("All fields are required");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPasswordError("New passwords do not match");
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      setPasswordError("Password must be at least 8 characters");
-      return;
-    }
-
-    try {
-      await api.security.changePassword(currentPassword, newPassword);
-      setPasswordSuccess(true);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setTimeout(() => setPasswordSuccess(false), 5000);
-    } catch (error) {
-      setPasswordError(error.message || "Failed to change password");
-    }
-  };
-
-  // Notification center state
-  const [notificationList, setNotificationList] = useState([]);
+  }, [activeTab]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
-  const getRelativeTime = (timestamp: any) => {
-    const seconds = Math.floor(
-      (Number(new Date()) - Number(new Date(timestamp))) / 1000,
-    );
+  const getRelativeTime = (timestamp: string | number) => {
+    const date = new Date(timestamp);
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
     if (seconds < 60) return "Just now";
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
@@ -265,7 +125,7 @@ export default function SettingsPageContent({ role = "client" }) {
     return `${Math.floor(seconds / 604800)}w ago`;
   };
 
-  const getNotificationIcon = (type) => {
+  const getNotificationIcon = (type: string) => {
     switch (type) {
       case "kyc":
         return Shield;
@@ -282,7 +142,7 @@ export default function SettingsPageContent({ role = "client" }) {
     }
   };
 
-  const getNotificationColor = (type) => {
+  const getNotificationColor = (type: string) => {
     switch (type) {
       case "kyc":
         return "amber";
@@ -299,22 +159,138 @@ export default function SettingsPageContent({ role = "client" }) {
     }
   };
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
+    await api.notifications.markAllAsRead();
     setNotificationList((prev) => prev.map((n) => ({ ...n, read: true })));
+    await refreshUser();
   };
 
-  const markAsRead = (id) => {
+  const markAsRead = async (id: number) => {
+    await api.notifications.markAsRead(id);
     setNotificationList((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
+    await refreshUser();
   };
 
-  const unreadCount = notificationList.filter((n) => !n.read).length;
-  const totalPages = Math.ceil(notificationList.length / itemsPerPage);
-  const paginatedNotifications = notificationList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  // Notification Preferences Handlers
+  const handleEmailToggle = async (enabled: boolean) => {
+    setSavingPrefs(true);
+    setPrefsError("");
+    try {
+      const updated = await api.notifications.updatePreferences({
+        emailEnabled: enabled,
+      });
+      setNotificationPrefs(updated);
+      setPrefsSuccess(
+        "Email notifications " + (enabled ? "enabled" : "disabled"),
+      );
+      setTimeout(() => setPrefsSuccess(""), 3000);
+    } catch (error: any) {
+      setPrefsError(error.message || "Failed to update email preference");
+    } finally {
+      setSavingPrefs(false);
+    }
+  };
+
+  const handleTelegramConnect = async () => {
+    setLoadingTelegram(true);
+    setPrefsError("");
+    try {
+      const { linkToken } = await api.telegram.getLinkToken();
+      window.open(`https://t.me/DayleAIBot?start=${linkToken}`, "_blank");
+
+      setTimeout(async () => {
+        try {
+          const result = await api.telegram.simulateConnect(
+            `@user_${Math.random().toString(36).substr(2, 6)}`,
+          );
+          setNotificationPrefs(result.preferences);
+          setPrefsSuccess("Telegram connected successfully!");
+          setTimeout(() => setPrefsSuccess(""), 3000);
+        } catch (error: any) {
+          setPrefsError(error.message || "Failed to connect Telegram");
+        }
+        setLoadingTelegram(false);
+      }, 3000);
+    } catch (error: any) {
+      setPrefsError(error.message || "Failed to generate Telegram link");
+      setLoadingTelegram(false);
+    }
+  };
+
+  const handleTelegramDisconnect = async () => {
+    setLoadingTelegram(true);
+    setPrefsError("");
+    try {
+      const result = await api.telegram.disconnect();
+      setNotificationPrefs(result.preferences);
+      setPrefsSuccess("Telegram disconnected");
+      setTimeout(() => setPrefsSuccess(""), 3000);
+    } catch (error: any) {
+      setPrefsError(error.message || "Failed to disconnect Telegram");
+    } finally {
+      setLoadingTelegram(false);
+    }
+  };
+
+  const handleWhatsAppStartVerification = async () => {
+    setLoadingWhatsApp(true);
+    setWhatsappError("");
+    try {
+      await api.whatsapp.startVerification(whatsappPhone);
+      setWhatsappStep(2);
+      setPrefsSuccess("Verification code sent! (Use 123456 for demo)");
+      setTimeout(() => setPrefsSuccess(""), 5000);
+    } catch (error: any) {
+      setWhatsappError(error.message || "Failed to send verification code");
+    } finally {
+      setLoadingWhatsApp(false);
+    }
+  };
+
+  const handleWhatsAppConfirmVerification = async () => {
+    setLoadingWhatsApp(true);
+    setWhatsappError("");
+    try {
+      const result = await api.whatsapp.confirmVerification(
+        whatsappCode,
+        whatsappConsent,
+      );
+      setNotificationPrefs(result.preferences);
+      closeWhatsAppFlow();
+      setPrefsSuccess("WhatsApp verified and enabled!");
+      setTimeout(() => setPrefsSuccess(""), 3000);
+    } catch (error: any) {
+      setWhatsappError(error.message || "Failed to verify WhatsApp");
+    } finally {
+      setLoadingWhatsApp(false);
+    }
+  };
+
+  const handleWhatsAppDisable = async () => {
+    setLoadingWhatsApp(true);
+    setPrefsError("");
+    try {
+      const result = await api.whatsapp.disable();
+      setNotificationPrefs(result.preferences);
+      setPrefsSuccess("WhatsApp disabled");
+      setTimeout(() => setPrefsSuccess(""), 3000);
+    } catch (error: any) {
+      setPrefsError(error.message || "Failed to disable WhatsApp");
+    } finally {
+      setLoadingWhatsApp(false);
+    }
+  };
+
+  const closeWhatsAppFlow = () => {
+    setShowWhatsAppFlow(false);
+    setWhatsappStep(1);
+    setWhatsappPhone("");
+    setWhatsappCode("");
+    setWhatsappConsent(false);
+    setWhatsappError("");
+  };
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
@@ -323,17 +299,16 @@ export default function SettingsPageContent({ role = "client" }) {
       label: isClient ? "Billing" : "Payouts",
       icon: CreditCard,
     },
-    { id: "security", label: "Security", icon: Lock },
+    { id: "channels", label: "Channels", icon: MessageSquare },
     { id: "notifications", label: "Notifications", icon: Bell },
   ];
 
-  const userInitials = user?.name
-    ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-    : "JD";
+  const unreadCount = notificationList.filter((n) => !n.read).length;
+  const totalPages = Math.ceil(notificationList.length / itemsPerPage);
+  const paginatedNotifications = notificationList.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
 
   return (
     <div className="min-h-screen bg-[#050505] text-white/80 font-sans selection:bg-emerald-500/30">
@@ -585,7 +560,11 @@ export default function SettingsPageContent({ role = "client" }) {
                         <div>
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-bold text-white uppercase tracking-tight">
-                              {isClient ? `•••• ${item.last4}` : item.label}
+                              {isClient && "last4" in item
+                                ? `•••• ${item.last4}`
+                                : "label" in item
+                                  ? item.label
+                                  : ""}
                             </p>
                             {item.primary && (
                               <span className="text-sm px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 rounded font-black uppercase tracking-tighter">
@@ -593,7 +572,7 @@ export default function SettingsPageContent({ role = "client" }) {
                               </span>
                             )}
                           </div>
-                          {isClient && (
+                          {isClient && "exp" in item && (
                             <p className="text-[11px] font-bold text-white uppercase tracking-wide">
                               Expires {item.exp}
                             </p>
@@ -618,232 +597,203 @@ export default function SettingsPageContent({ role = "client" }) {
               </div>
             )}
 
-            {/* Security Section */}
-            {activeTab === "security" && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                {/* Password Change */}
-                <form onSubmit={handlePasswordChange} className="space-y-6">
-                  <div>
-                    <h3 className="text-sm font-black text-white uppercase tracking-wide mb-1">
-                      {isClient ? "Change Password" : "Passcode Security"}
-                    </h3>
-                    <p className="text-sm font-bold text-white uppercase tracking-wide">
-                      {isClient
-                        ? "Update your password to keep your account secure"
-                        : "Maintain bank-grade protection for your freelancer account"}
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
-                        {isClient ? "Current Password" : "Current Passcode"}
-                      </Label>
-                      <Input
-                        type="password"
-                        placeholder="••••••••"
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
-                          New Password
-                        </Label>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
-                          Confirm New
-                        </Label>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
-                        />
-                      </div>
-                    </div>
-
-                    {passwordError && (
-                      <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                        <p className="text-sm text-red-400">{passwordError}</p>
-                      </div>
-                    )}
-
-                    {passwordSuccess && (
-                      <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                        <p className="text-sm text-emerald-400">
-                          Password updated successfully!
-                        </p>
-                      </div>
-                    )}
-
-                    <Button
-                      type="submit"
-                      className="bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 px-6 rounded-lg"
-                    >
-                      Update Password
-                    </Button>
-                  </div>
-                </form>
-
-                {/* Two-Factor Authentication */}
-                <div className="pt-8 border-t border-zinc-900">
-                  <div className="flex items-start justify-between p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
-                    <div className="flex gap-4">
-                      <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                        <Smartphone className="w-5 h-5 text-emerald-500" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-black text-white uppercase tracking-tight">
-                          {isClient
-                            ? "Two-Factor Authentication"
-                            : "2FA Protection"}
-                        </h4>
-                        <p className="text-sm font-bold text-white leading-relaxed max-w-md uppercase tracking-wide">
-                          {isClient
-                            ? "Add an extra layer of security to your account with authenticator app verification"
-                            : "Secure your settlements with authenticator-based validation"}
-                        </p>
-                        <div className="pt-2">
-                          <span
-                            className={cn(
-                              "text-sm px-2 py-1 rounded-full font-black uppercase tracking-wide",
-                              twoFactorEnabled
-                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                : "bg-white/5 text-white",
-                            )}
-                          >
-                            {twoFactorEnabled ? "Enabled" : "Not Enabled"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={
-                        twoFactorEnabled
-                          ? () => setShow2FASetup(true)
-                          : handleEnable2FA
-                      }
-                      disabled={loading2FA}
-                      className={cn(
-                        "font-semibold px-4 text-sm rounded-lg",
-                        twoFactorEnabled
-                          ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-200"
-                          : "bg-emerald-600 hover:bg-emerald-500 text-black",
-                      )}
-                    >
-                      {loading2FA
-                        ? "Loading..."
-                        : twoFactorEnabled
-                          ? "Disable"
-                          : "Enable"}
-                    </Button>
-                  </div>
+            {/* Channels Section */}
+            {activeTab === "channels" && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                {/* Header */}
+                <div>
+                  <h3 className="text-sm font-black text-white uppercase tracking-wide mb-1">
+                    Notification Channels
+                  </h3>
+                  <p className="text-sm text-white/60 leading-relaxed">
+                    Choose how you want to receive alerts
+                  </p>
                 </div>
 
-                {/* Active Sessions */}
-                <div className="pt-8 border-t border-zinc-900 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black text-white uppercase tracking-wide">
-                      Active Sessions
-                    </h3>
-                    {activeSessions.length > 1 && (
-                      <Button
-                        variant="link"
-                        onClick={handleRevokeAllSessions}
-                        disabled={loadingSessions}
-                        className="text-red-400 text-sm font-black uppercase tracking-wide p-0 h-auto hover:text-red-300"
-                      >
-                        Revoke All
-                      </Button>
-                    )}
+                {/* Success/Error Messages */}
+                {prefsSuccess && (
+                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                    <p className="text-sm text-emerald-400">{prefsSuccess}</p>
                   </div>
+                )}
+                {prefsError && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <p className="text-sm text-red-400">{prefsError}</p>
+                  </div>
+                )}
 
-                  <div className="space-y-2">
-                    {activeSessions.length === 0 ? (
-                      <div className="p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-xl text-center">
-                        <p className="text-sm text-white/60">
-                          No active sessions
-                        </p>
-                      </div>
-                    ) : (
-                      activeSessions.map((session) => (
-                        <div
-                          key={session.id}
-                          className="flex items-center justify-between p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-xl"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-zinc-800 rounded-lg">
-                              <Key className="w-4 h-4 text-zinc-500" />
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <p className="text-sm font-bold text-white uppercase tracking-tight">
-                                  {session.device}
-                                </p>
-                                {session.current && (
-                                  <span className="text-sm px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 rounded font-black uppercase tracking-tighter">
-                                    Current
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-[11px] font-bold text-white uppercase tracking-wide">
-                                {session.location} • {session.time}
-                              </p>
-                            </div>
+                {loadingPrefs ? (
+                  <div className="p-8 text-center">
+                    <p className="text-sm text-white/40">
+                      Loading preferences...
+                    </p>
+                  </div>
+                ) : (
+                  notificationPrefs && (
+                    <div className="space-y-4">
+                      {/* In-App (Always On) */}
+                      <div className="flex items-start justify-between p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl">
+                        <div className="flex gap-4">
+                          <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                            <Bell className="w-5 h-5 text-emerald-500" />
                           </div>
-                          {!session.current && (
+                          <div className="space-y-1">
+                            <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                              In-App Notifications
+                            </h4>
+                            <p className="text-sm text-white/60 leading-relaxed max-w-md">
+                              Receive notifications within the platform
+                            </p>
+                            <span className="inline-block text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                              Always Enabled
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Email */}
+                      <div className="flex items-start justify-between p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
+                        <div className="flex gap-4">
+                          <div className="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                            <Mail className="w-5 h-5 text-blue-500" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                              Email Notifications
+                            </h4>
+                            <p className="text-sm text-white/60 leading-relaxed max-w-md">
+                              Get important updates via email
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            id="email-notifications"
+                            checked={!!notificationPrefs.emailEnabled}
+                            onCheckedChange={handleEmailToggle}
+                            disabled={savingPrefs}
+                            className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-700"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Telegram */}
+                      <div className="flex items-start justify-between p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
+                        <div className="flex gap-4 flex-1">
+                          <div className="p-2.5 bg-sky-500/10 border border-sky-500/20 rounded-lg">
+                            <MessageSquare className="w-5 h-5 text-sky-500" />
+                          </div>
+                          <div className="space-y-2 flex-1">
+                            <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                              Telegram
+                            </h4>
+                            <p className="text-sm text-white/60 leading-relaxed max-w-md">
+                              Instant alerts via Telegram bot
+                            </p>
+                            {notificationPrefs.telegram.connected && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                  Connected
+                                </span>
+                                <span className="text-xs text-white/60">
+                                  {notificationPrefs.telegram.username}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          {!notificationPrefs.telegram.connected ? (
                             <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRevokeSession(session.id)}
-                              disabled={loadingSessions}
-                              className="text-zinc-500 hover:text-red-400 text-sm"
+                              onClick={handleTelegramConnect}
+                              disabled={loadingTelegram}
+                              className="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-4 text-sm rounded-lg"
                             >
-                              Revoke
+                              {loadingTelegram ? "Connecting..." : "Connect"}
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={handleTelegramDisconnect}
+                              disabled={loadingTelegram}
+                              variant="outline"
+                              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 font-semibold px-4 text-sm"
+                            >
+                              {loadingTelegram
+                                ? "Disconnecting..."
+                                : "Disconnect"}
                             </Button>
                           )}
                         </div>
-                      ))
-                    )}
-                  </div>
-                </div>
+                      </div>
 
-                {/* Danger Zone */}
-                <div className="pt-8 border-t border-zinc-900">
-                  <div className="p-5 bg-red-500/5 border border-red-500/20 rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                      <div className="flex-1">
-                        <h4 className="text-sm font-semibold text-red-400 mb-1">
-                          {isClient ? "Danger Zone" : "Deactivate Account"}
-                        </h4>
-                        <p className="text-sm text-zinc-400 mb-4">
-                          {isClient
-                            ? "Once you delete your account, there is no going back. Please be certain."
-                            : "Closing your freelancer account will clear any pending applications."}
-                        </p>
-                        <Button
-                          variant="outline"
-                          className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 text-sm"
-                        >
-                          Delete Account
-                        </Button>
+                      {/* WhatsApp */}
+                      <div className="p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex gap-4 flex-1">
+                            <div className="p-2.5 bg-green-500/10 border border-green-500/20 rounded-lg">
+                              <Phone className="w-5 h-5 text-green-500" />
+                            </div>
+                            <div className="space-y-2 flex-1">
+                              <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                                WhatsApp
+                              </h4>
+                              <p className="text-sm text-white/60 leading-relaxed max-w-md">
+                                Receive alerts via WhatsApp messages
+                              </p>
+                              {notificationPrefs.whatsapp.phoneVerified && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                    Verified
+                                  </span>
+                                  <span className="text-xs text-white/60">
+                                    {notificationPrefs.whatsapp.phoneE164}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            {!notificationPrefs.whatsapp.phoneVerified ? (
+                              <Button
+                                onClick={() => setShowWhatsAppFlow(true)}
+                                className="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 text-sm rounded-lg"
+                              >
+                                Add Phone
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={handleWhatsAppDisable}
+                                disabled={loadingWhatsApp}
+                                variant="outline"
+                                className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 font-semibold px-4 text-sm"
+                              >
+                                {loadingWhatsApp ? "Disabling..." : "Disable"}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Quiet Hours Info */}
+                      <div className="p-4 bg-zinc-900/20 border border-zinc-800/30 rounded-xl">
+                        <div className="flex items-start gap-3">
+                          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                          <div>
+                            <h5 className="text-sm font-bold text-white mb-1">
+                              Quiet Hours
+                            </h5>
+                            <p className="text-xs text-white/60 leading-relaxed">
+                              Customize notification schedules and quiet hours.{" "}
+                              <span className="text-amber-500 font-semibold">
+                                Coming in v2
+                              </span>
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  )
+                )}
               </div>
             )}
 
@@ -879,6 +829,23 @@ export default function SettingsPageContent({ role = "client" }) {
                       Mark all read
                     </Button>
                   )}
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await api.notifications.createTest();
+                        const data = await api.notifications.list();
+                        setNotificationList(data);
+                      } catch (e) {
+                        console.error(e);
+                        alert("Failed to send test notification");
+                      }
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="ml-2 text-zinc-400 hover:text-white border-zinc-700 font-bold uppercase tracking-wide text-xs"
+                  >
+                    Send Test
+                  </Button>
                 </div>
 
                 {/* Notification List */}
@@ -1047,226 +1014,142 @@ export default function SettingsPageContent({ role = "client" }) {
         </div>
       </main>
 
-      {/* 2FA Setup Modal */}
-      {show2FASetup && (
+      {/* WhatsApp Setup Modal */}
+      {showWhatsAppFlow && !notificationPrefs?.whatsapp?.phoneVerified && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#0a0a0a] border border-zinc-800 rounded-2xl max-w-lg w-full p-6 relative">
             <button
-              onClick={close2FASetup}
+              onClick={closeWhatsAppFlow}
               className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-lg transition-colors"
             >
               <X className="w-4 h-4 text-white" />
             </button>
 
             <h2 className="text-xl font-black text-white uppercase tracking-tight mb-6">
-              {twoFactorEnabled
-                ? "Disable Two-Factor Authentication"
-                : "Enable Two-Factor Authentication"}
+              Add WhatsApp Number
             </h2>
 
-            {!twoFactorEnabled ? (
-              <>
-                {/* Step 1: QR Code */}
-                {setupStep === 1 && (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-sm font-black text-white uppercase tracking-wide mb-2">
-                        Step 1: Scan QR Code
-                      </h3>
-                      <p className="text-sm text-white/60 mb-4">
-                        Scan this QR code with your authenticator app (Google
-                        Authenticator, Authy, etc.)
-                      </p>
+            <div className="space-y-6">
+              {whatsappStep === 1 ? (
+                <>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
+                      Phone Number (E.164 format)
+                    </Label>
+                    <Input
+                      type="tel"
+                      placeholder="+1234567890"
+                      value={whatsappPhone}
+                      onChange={(e) => setWhatsappPhone(e.target.value)}
+                      className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-green-500/50 h-11"
+                    />
+                    <p className="text-xs text-white/40 uppercase tracking-wide font-bold">
+                      Include country code (e.g., +1 for US)
+                    </p>
+                  </div>
 
-                      <div className="bg-white p-4 rounded-xl mx-auto w-fit">
-                        {qrCodeUrl && (
-                          <img
-                            src={qrCodeUrl}
-                            alt="2FA QR Code"
-                            className="w-48 h-48"
-                          />
-                        )}
-                      </div>
-
-                      <div className="mt-4 p-3 bg-zinc-900/50 border border-zinc-800 rounded-lg">
-                        <p className="text-xs text-white/40 uppercase tracking-wide mb-1">
-                          Manual Entry Code
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <code className="text-sm text-white font-mono">
-                            {twoFactorSecret}
-                          </code>
-                          <button
-                            onClick={() => copyToClipboard(twoFactorSecret)}
-                            className="p-1.5 hover:bg-white/5 rounded transition-colors"
-                          >
-                            {copiedCode ? (
-                              <Check className="w-4 h-4 text-emerald-500" />
-                            ) : (
-                              <Copy className="w-4 h-4 text-white/60" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
+                  {whatsappError && (
+                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                      <p className="text-sm text-red-400">{whatsappError}</p>
                     </div>
+                  )}
 
+                  <div className="flex gap-3">
                     <Button
-                      onClick={() => setSetupStep(2)}
-                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-semibold"
+                      onClick={closeWhatsAppFlow}
+                      variant="outline"
+                      className="flex-1 border-white/5 hover:bg-white/5 text-white font-bold uppercase tracking-wide"
                     >
-                      Next: Verify Code
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleWhatsAppStartVerification}
+                      disabled={loadingWhatsApp || !whatsappPhone}
+                      className="flex-1 bg-green-600 hover:bg-green-500 text-black font-black uppercase tracking-wide"
+                    >
+                      {loadingWhatsApp ? "Sending..." : "Send Code"}
                     </Button>
                   </div>
-                )}
-
-                {/* Step 2: Verify */}
-                {setupStep === 2 && (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-sm font-black text-white uppercase tracking-wide mb-2">
-                        Step 2: Verify Code
-                      </h3>
-                      <p className="text-sm text-white/60 mb-4">
-                        Enter the 6-digit code from your authenticator app
-                      </p>
-
+                </>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
+                        Verification Code
+                      </Label>
                       <Input
                         type="text"
-                        placeholder="000000"
-                        value={verificationCode}
+                        placeholder="123456"
+                        value={whatsappCode}
                         onChange={(e) =>
-                          setVerificationCode(
+                          setWhatsappCode(
                             e.target.value.replace(/\D/g, "").slice(0, 6),
                           )
                         }
-                        className="bg-zinc-900/50 border-zinc-800 text-zinc-200 text-center text-2xl tracking-widest h-14"
+                        className="bg-zinc-900/50 border-zinc-800 text-zinc-200 text-center text-2xl font-mono tracking-[0.5em] h-14"
                         maxLength={6}
                       />
+                      <p className="text-xs text-white/40 text-center uppercase tracking-wide font-bold">
+                        Enter the 6-digit code sent to your phone
+                      </p>
                     </div>
 
-                    {error2FA && (
-                      <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                        <p className="text-sm text-red-400">{error2FA}</p>
+                    {/* Consent Checkbox */}
+                    <div className="flex items-start gap-3 p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                      <div className="pt-0.5">
+                        <input
+                          type="checkbox"
+                          id="whatsapp-consent-modal"
+                          checked={whatsappConsent}
+                          onChange={(e) => setWhatsappConsent(e.target.checked)}
+                          className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-green-600 focus:ring-green-500 focus:ring-offset-0 transition-colors"
+                        />
                       </div>
-                    )}
-
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={() => setSetupStep(1)}
-                        variant="outline"
-                        className="flex-1"
+                      <label
+                        htmlFor="whatsapp-consent-modal"
+                        className="text-xs text-white/70 leading-relaxed uppercase font-bold tracking-tight"
                       >
-                        Back
-                      </Button>
-                      <Button
-                        onClick={handleVerify2FA}
-                        disabled={loading2FA || verificationCode.length !== 6}
-                        className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-black font-semibold"
-                      >
-                        {loading2FA ? "Verifying..." : "Verify & Enable"}
-                      </Button>
+                        I agree to receive WhatsApp alerts for vault activity.
+                        Reply STOP to opt out.
+                      </label>
                     </div>
                   </div>
-                )}
 
-                {/* Step 3: Recovery Codes */}
-                {setupStep === 3 && (
-                  <div className="space-y-6">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                        <h3 className="text-sm font-black text-emerald-500 uppercase tracking-wide">
-                          2FA Enabled Successfully!
-                        </h3>
-                      </div>
-                      <p className="text-sm text-white/60 mb-4">
-                        Save these recovery codes in a safe place. You can use
-                        them to access your account if you lose your
-                        authenticator device.
-                      </p>
-
-                      <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg space-y-2">
-                        {recoveryCodes.map((code, i) => (
-                          <div
-                            key={i}
-                            className="flex items-center justify-between p-2 bg-zinc-900 rounded"
-                          >
-                            <code className="text-sm text-white font-mono">
-                              {code}
-                            </code>
-                          </div>
-                        ))}
-                      </div>
-
-                      <Button
-                        onClick={() => {
-                          const text = recoveryCodes.join("\n");
-                          copyToClipboard(text);
-                        }}
-                        variant="outline"
-                        className="w-full mt-3"
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copy All Codes
-                      </Button>
+                  {whatsappError && (
+                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                      <p className="text-sm text-red-400">{whatsappError}</p>
                     </div>
+                  )}
 
+                  <div className="flex gap-3">
                     <Button
-                      onClick={close2FASetup}
-                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-semibold"
+                      onClick={() => {
+                        setWhatsappStep(1);
+                        setWhatsappCode("");
+                        setWhatsappConsent(false);
+                        setWhatsappError("");
+                      }}
+                      variant="outline"
+                      className="flex-1 border-white/5 hover:bg-white/5 text-white font-bold uppercase tracking-wide"
                     >
-                      Done
+                      Back
+                    </Button>
+                    <Button
+                      onClick={handleWhatsAppConfirmVerification}
+                      disabled={
+                        loadingWhatsApp ||
+                        whatsappCode.length !== 6 ||
+                        !whatsappConsent
+                      }
+                      className="flex-1 bg-green-600 hover:bg-green-500 text-black font-black uppercase tracking-wide"
+                    >
+                      {loadingWhatsApp ? "Verifying..." : "Verify & Enable"}
                     </Button>
                   </div>
-                )}
-              </>
-            ) : (
-              /* Disable 2FA */
-              <div className="space-y-6">
-                <div>
-                  <p className="text-sm text-white/60 mb-4">
-                    Enter a verification code from your authenticator app to
-                    disable two-factor authentication.
-                  </p>
-
-                  <Input
-                    type="text"
-                    placeholder="000000"
-                    value={verificationCode}
-                    onChange={(e) =>
-                      setVerificationCode(
-                        e.target.value.replace(/\D/g, "").slice(0, 6),
-                      )
-                    }
-                    className="bg-zinc-900/50 border-zinc-800 text-zinc-200 text-center text-2xl tracking-widest h-14"
-                    maxLength={6}
-                  />
-                </div>
-
-                {error2FA && (
-                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                    <p className="text-sm text-red-400">{error2FA}</p>
-                  </div>
-                )}
-
-                <div className="flex gap-3">
-                  <Button
-                    onClick={close2FASetup}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleDisable2FA}
-                    disabled={loading2FA || verificationCode.length !== 6}
-                    className="flex-1 bg-red-600 hover:bg-red-500 text-white font-semibold"
-                  >
-                    {loading2FA ? "Disabling..." : "Disable 2FA"}
-                  </Button>
-                </div>
-              </div>
-            )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

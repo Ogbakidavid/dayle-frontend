@@ -182,7 +182,7 @@ export const api = {
       });
     },
 
-    socialLogin: async (dto: { accessToken: string; role?: string }): Promise<any> => {
+    socialLogin: async (dto: any): Promise<any> => {
       const data = await request("/auth/social-login", {
         method: "POST",
         body: dto,
@@ -434,6 +434,63 @@ export const api = {
         method: "POST",
         body: payload,
       });
+    },
+  },
+
+  notifications: {
+    list: async (): Promise<any[]> => {
+      return await request("/notifications");
+    },
+    markAllAsRead: async (): Promise<any> => {
+      return await request("/notifications/read-all", { method: "POST" });
+    },
+    markAsRead: async (id: number | string): Promise<any> => {
+      return await request(`/notifications/${id}/read`, { method: "POST" });
+    },
+    getPreferences: async (): Promise<any> => {
+      return await request("/notifications/preferences");
+    },
+    updatePreferences: async (prefs: any): Promise<any> => {
+      return await request("/notifications/preferences", {
+        method: "PATCH",
+        body: prefs,
+      });
+    },
+    createTest: async (): Promise<any> => {
+      return await request("/notifications/test-seed", { method: "POST" });
+    },
+  },
+
+  telegram: {
+    getLinkToken: async (): Promise<any> => {
+      return await request("/notifications/telegram/link-token");
+    },
+    simulateConnect: async (username: string): Promise<any> => {
+       return await request("/notifications/telegram/connect", {
+         method: "POST",
+         body: { username },
+       });
+    },
+    disconnect: async (): Promise<any> => {
+       return await request("/notifications/telegram/disconnect", { method: "POST" });
+    },
+  },
+
+  whatsapp: {
+    startVerification: async (phone: string): Promise<any> => {
+      return await request("/notifications/whatsapp/start-verification", {
+         method: "POST",
+         body: { phone },
+       });
+    },
+    confirmVerification: async (code: string, consent: boolean): Promise<any> => {
+      return await request("/notifications/whatsapp/confirm-verification", {
+         method: "POST",
+         body: { code, consent },
+       });
+    },
+    disable: async (): Promise<any> => {
+       return await request("/notifications/whatsapp/disable", { method: "POST" });
     },
   },
 };
