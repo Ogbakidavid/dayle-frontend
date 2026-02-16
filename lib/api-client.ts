@@ -183,7 +183,7 @@ export const api = {
     },
 
     socialLogin: async (dto: any): Promise<any> => {
-      const data = await request("/auth/social-login", {
+      const data = await request("/auth/privy-login", {
         method: "POST",
         body: dto,
       });

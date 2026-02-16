@@ -464,9 +464,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       {isClient ? "Full Name" : "Public Name"}
                     </Label>
                     <Input
-                      defaultValue={
-                        user?.name || (isClient ? "John Doe" : "Jane Smith")
-                      }
+                      defaultValue={user?.name || ""}
                       className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
                     />
                   </div>
@@ -475,10 +473,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       Email Address
                     </Label>
                     <Input
-                      defaultValue={
-                        user?.email ||
-                        (isClient ? "john@example.com" : "jane@example.com")
-                      }
+                      defaultValue={user?.email || ""}
                       className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
                     />
                   </div>
@@ -487,11 +482,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       {isClient ? "Company" : "Professional Bio"}
                     </Label>
                     <Input
-                      defaultValue={
-                        isClient
-                          ? "Acme Global Holdings"
-                          : "Senior Fullstack Engineer specializing in fintech and secure settlement systems."
-                      }
+                      defaultValue={""}
                       className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
                     />
                   </div>
@@ -521,34 +512,7 @@ export default function SettingsPageContent({ role = "client" }) {
                 </div>
 
                 <div className="space-y-3">
-                  {(isClient
-                    ? [
-                        {
-                          type: "VISA",
-                          last4: "4242",
-                          exp: "12/28",
-                          primary: true,
-                        },
-                        {
-                          type: "MAST",
-                          last4: "8833",
-                          exp: "09/26",
-                          primary: false,
-                        },
-                      ]
-                    : [
-                        {
-                          type: "BANK",
-                          label: "US BANKING •••• 1122",
-                          primary: true,
-                        },
-                        {
-                          type: "CRYP",
-                          label: "ACCOUNT •••• 7x92",
-                          primary: false,
-                        },
-                      ]
-                  ).map((item, i) => (
+                  {([] as any[]).map((item, i) => (
                     <div
                       key={i}
                       className="group flex items-center justify-between p-4 bg-zinc-900/40 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all"

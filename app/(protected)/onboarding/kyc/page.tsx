@@ -7,6 +7,7 @@ import { useUser } from "@/lib/store/user-context";
 import { api, UserRole } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Shield,
   CheckCircle2,
@@ -255,16 +256,23 @@ function KYCPageContent() {
                     </div>
 
                     <div className="space-y-8">
-                      <Input
-                        label="Full Legal Name"
-                        placeholder="Enter your legal name as on ID"
-                        value={formData.fullName}
-                        onChange={(e) =>
-                          setFormData({ ...formData, fullName: e.target.value })
-                        }
-                        className="bg-muted! border-white/10! text-white! focus:border-emerald-500/50! h-16 placeholder:text-gray-400"
-                        required
-                      />
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
+                          Full Legal Name
+                        </Label>
+                        <Input
+                          placeholder="Enter your legal name as on ID"
+                          value={formData.fullName}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              fullName: e.target.value,
+                            })
+                          }
+                          className="bg-muted! border-white/10! text-white! focus:border-emerald-500/50! h-16 placeholder:text-gray-400"
+                          required
+                        />
+                      </div>
 
                       <div className="grid md:grid-cols-2 gap-8">
                         <div className="flex flex-col space-y-2">
@@ -286,16 +294,20 @@ function KYCPageContent() {
                             />
                           </div>
                         </div>
-                        <Input
-                          label="SSN / National ID"
-                          placeholder="XXX-XX-XXXX"
-                          value={formData.ssn}
-                          onChange={(e) =>
-                            setFormData({ ...formData, ssn: e.target.value })
-                          }
-                          className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                          required
-                        />
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
+                            SSN / National ID
+                          </Label>
+                          <Input
+                            placeholder="XXX-XX-XXXX"
+                            value={formData.ssn}
+                            onChange={(e) =>
+                              setFormData({ ...formData, ssn: e.target.value })
+                            }
+                            className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
+                            required
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -510,48 +522,70 @@ function KYCPageContent() {
                     </div>
 
                     <div className="space-y-8">
-                      <Input
-                        label="Street Address"
-                        placeholder="123 Financial District"
-                        value={formData.address}
-                        onChange={(e) =>
-                          setFormData({ ...formData, address: e.target.value })
-                        }
-                        className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                        required
-                      />
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
+                          Street Address
+                        </Label>
+                        <Input
+                          placeholder="123 Financial District"
+                          value={formData.address}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              address: e.target.value,
+                            })
+                          }
+                          className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
+                          required
+                        />
+                      </div>
 
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-                        <Input
-                          label="City"
-                          placeholder="San Francisco"
-                          value={formData.city}
-                          onChange={(e) =>
-                            setFormData({ ...formData, city: e.target.value })
-                          }
-                          className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                          required
-                        />
-                        <Input
-                          label="State"
-                          placeholder="CA"
-                          value={formData.state}
-                          onChange={(e) =>
-                            setFormData({ ...formData, state: e.target.value })
-                          }
-                          className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                          required
-                        />
-                        <Input
-                          label="ZIP"
-                          placeholder="94103"
-                          value={formData.zip}
-                          onChange={(e) =>
-                            setFormData({ ...formData, zip: e.target.value })
-                          }
-                          className="bg-muted! border-white/10! text-white! h-16 md:col-span-1 col-span-2 placeholder:text-gray-400"
-                          required
-                        />
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
+                            City
+                          </Label>
+                          <Input
+                            placeholder="San Francisco"
+                            value={formData.city}
+                            onChange={(e) =>
+                              setFormData({ ...formData, city: e.target.value })
+                            }
+                            className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
+                            State
+                          </Label>
+                          <Input
+                            placeholder="CA"
+                            value={formData.state}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                state: e.target.value,
+                              })
+                            }
+                            className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
+                            ZIP
+                          </Label>
+                          <Input
+                            placeholder="94103"
+                            value={formData.zip}
+                            onChange={(e) =>
+                              setFormData({ ...formData, zip: e.target.value })
+                            }
+                            className="bg-muted! border-white/10! text-white! h-16 md:col-span-1 col-span-2 placeholder:text-gray-400"
+                            required
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -574,27 +608,35 @@ function KYCPageContent() {
                     </div>
 
                     <div className="space-y-8">
-                      <Input
-                        label="Legal Business Name (Optional)"
-                        placeholder="Acme Holdings Inc."
-                        value={formData.businessName}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            businessName: e.target.value,
-                          })
-                        }
-                        className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                      />
-                      <Input
-                        label="EIN / Business ID (Optional)"
-                        placeholder="XX-XXXXXXX"
-                        value={formData.ein}
-                        onChange={(e) =>
-                          setFormData({ ...formData, ein: e.target.value })
-                        }
-                        className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                      />
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
+                          Legal Business Name (Optional)
+                        </Label>
+                        <Input
+                          placeholder="Acme Holdings Inc."
+                          value={formData.businessName}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              businessName: e.target.value,
+                            })
+                          }
+                          className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
+                          EIN / Business ID (Optional)
+                        </Label>
+                        <Input
+                          placeholder="XX-XXXXXXX"
+                          value={formData.ein}
+                          onChange={(e) =>
+                            setFormData({ ...formData, ein: e.target.value })
+                          }
+                          className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
