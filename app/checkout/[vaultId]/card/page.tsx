@@ -14,13 +14,17 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-import { useVault } from "@/lib/store/vault-context";
+import { useVault, Vault } from "@/lib/store/vault-context";
+import { useUser } from "@/lib/store/user-context";
+import { KycStatus } from "@/lib/domain/enums";
 import { api } from "@/lib/api-client";
 
 export default function CardPaymentPage() {
   const router = useRouter();
   const params = useParams();
+  const { user } = useUser();
   const { vaults, loading } = useVault();
+  const isKycVerified = user?.kycStatus === KycStatus.VERIFIED;
   const vaultId = params.vaultId as string;
 
   const vault = (vaults || []).find((v) => v.id === vaultId);
@@ -107,6 +111,13 @@ export default function CardPaymentPage() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      return;
+    }
+
+    if (!isKycVerified) {
+      setPaymentError(
+        "Identity verification (KYC) required to initialize deposit stream.",
+      );
       return;
     }
 
@@ -282,9 +293,12 @@ export default function CardPaymentPage() {
                     </div>
                     <button
                       onClick={handleCardSubmit}
-                      className="w-full h-20 bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase tracking-[0.2em] text-xs rounded-4xl shadow-[0_0_40px_rgba(16,185,129,0.2)] transition-all active:scale-[0.98]"
+                      disabled={!isKycVerified}
+                      className={`w-full h-20 ${isKycVerified ? "bg-emerald-500 hover:bg-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.2)]" : "bg-white/5 text-white/20 cursor-not-allowed"} text-black font-black uppercase tracking-[0.2em] text-xs rounded-4xl transition-all active:scale-[0.98]`}
                     >
-                      Initialize Deposit stream
+                      {isKycVerified
+                        ? "Initialize Deposit stream"
+                        : "KYC Required"}
                     </button>
                   </div>
                 </motion.div>
@@ -313,7 +327,10 @@ function Sidebar({ amount }: SidebarProps) {
       <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
       <div className="space-y-16 relative z-10">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform cursor-pointer">
+          <div
+            className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform cursor-pointer"
+            onClick={() => (window.location.href = "/client")}
+          >
             <Lock className="w-5 h-5 text-black" />
           </div>
           <span className="text-white font-black tracking-tighter text-2xl uppercase italic">

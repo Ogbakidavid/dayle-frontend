@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 import { api } from "@/lib/api-client";
+import { useVault } from "@/lib/store/vault-context";
 
 const variants: Variants = {
   enter: (direction: number) => ({
@@ -58,6 +59,7 @@ interface Milestone {
 
 export default function CreateVaultPage() {
   const router = useRouter();
+  const { createVault } = useVault();
   const [isDeploying, setIsDeploying] = useState(false);
   const [[page, direction], setPage] = useState([1, 0]);
   const step = page;
@@ -141,23 +143,41 @@ export default function CreateVaultPage() {
 
   const handleDeploy = async () => {
     // Create vault via API with idempotency to simulate safe money action
-    const makeIdempotencyKey = () =>
-      `idem_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+    const makeIdempotencyKey = () => crypto.randomUUID();
 
     setIsDeploying(true);
     const idempotencyKey = makeIdempotencyKey();
     try {
       const payload = {
         title: vaultTitle,
-        purpose: vaultPurpose,
+        type: vaultPurpose, // Renamed from purpose
         description: vaultDescription,
         totalAmount: totalAmount,
-        milestones,
-        freelancerEmail,
-        freelancerName,
+        milestones: milestones.map((m) => ({
+          title: m.title,
+          amount: Number(m.amount),
+          dueDate: m.dueDate || undefined,
+          deliverableTypeId: m.deliverableType,
+          auditEnabled: m.aiVerificationEnabled,
+          requirementItemsJson: m.requirementItemsJson,
+        })),
         idempotencyKey,
       };
-      const newVault = await api.vaults.create(payload);
+      const newVault = await createVault(payload);
+
+      // Send invitation to freelancer if email provided
+      if (freelancerEmail) {
+        try {
+          await api.invites.create({
+            vaultId: newVault.id,
+            email: freelancerEmail.trim(),
+          });
+        } catch (inviteErr) {
+          console.error("Failed to send freelancer invite:", inviteErr);
+          // We still proceed to checkout as the vault is created
+        }
+      }
+
       router.push(`/checkout/${newVault.id}?idem=${idempotencyKey}`);
     } catch (err) {
       console.error(err);

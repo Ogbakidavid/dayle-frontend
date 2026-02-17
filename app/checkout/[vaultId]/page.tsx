@@ -11,18 +11,46 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import { useVault } from "@/lib/store/vault-context";
+import { useVault, Vault } from "@/lib/store/vault-context";
+import { useUser } from "@/lib/store/user-context";
+import { KycStatus } from "@/lib/domain/enums";
+import { api } from "@/lib/api-client";
 
 export default function CheckoutSelectionPage() {
   const router = useRouter();
   const params = useParams();
-  const { vaults, loading } = useVault();
+  const { user } = useUser();
+  const { vaults, loading: contextLoading } = useVault();
   const vaultId = params.vaultId as string;
 
-  const vault = (vaults || []).find((v) => v.id === vaultId);
+  const [localVault, setLocalVault] = React.useState<Vault | null>(null);
+  const [fetching, setFetching] = React.useState(false);
+
+  React.useEffect(() => {
+    const cachedVault = (vaults || []).find((v) => v.id === vaultId);
+    if (cachedVault) {
+      setLocalVault(cachedVault);
+    } else if (vaultId && !contextLoading) {
+      fetchVault();
+    }
+  }, [vaults, vaultId, contextLoading]);
+
+  const fetchVault = async () => {
+    setFetching(true);
+    try {
+      const v = await api.vaults.getById(vaultId);
+      setLocalVault(v);
+    } catch (err) {
+      console.error("Failed to fetch vault:", err);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const vault = localVault;
   const amount = vault?.totalAmount || 0;
 
-  if (loading)
+  if (contextLoading || fetching)
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-['Poppins',sans-serif]">
         Loading...
@@ -30,10 +58,20 @@ export default function CheckoutSelectionPage() {
     );
   if (!vault)
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-['Poppins',sans-serif]">
-        Vault Not Found
+      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-white font-['Poppins',sans-serif] gap-6">
+        <p className="text-xl font-black uppercase tracking-widest text-white/40">
+          Vault Not Found
+        </p>
+        <button
+          onClick={() => router.push("/client")}
+          className="px-8 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+        >
+          Return to Dashboard
+        </button>
       </div>
     );
+
+  const isKycVerified = user?.kycStatus === KycStatus.VERIFIED;
 
   return (
     <div className="min-h-screen bg-[#050505] text-white/80 font-['Poppins',sans-serif] antialiased">
@@ -46,7 +84,7 @@ export default function CheckoutSelectionPage() {
             <div className="flex items-center gap-4">
               <div
                 className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform cursor-pointer"
-                onClick={() => router.push("/")}
+                onClick={() => router.push("/client")}
               >
                 <Lock className="w-5 h-5 text-black" />
               </div>
@@ -112,6 +150,26 @@ export default function CheckoutSelectionPage() {
                 <p className="text-xs font-black text-white/30 uppercase tracking-[0.3em]">
                   Select your primary project liquidation method
                 </p>
+                {!isKycVerified && (
+                  <div className="mt-8 p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex items-center gap-4 text-left">
+                    <ShieldCheck className="w-6 h-6 text-amber-500 shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-amber-500 font-black uppercase tracking-widest leading-relaxed">
+                        KYC VERIFICATION REQUIRED
+                      </p>
+                      <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-1">
+                        Please complete identity verification in your{" "}
+                        <span
+                          className="text-white cursor-pointer underline underline-offset-4"
+                          onClick={() => router.push("/client/settings")}
+                        >
+                          settings
+                        </span>{" "}
+                        before funding.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid gap-6">
@@ -123,8 +181,8 @@ export default function CheckoutSelectionPage() {
                 />
                 <MethodBtn
                   icon={<Building2 className="w-8 h-8" />}
-                  title="Bank Settlement"
-                  desc="Wire, ACH, SWIFT"
+                  title="Bank Transfer"
+                  desc="Direct bank-to-terminal settlement."
                   onClick={() => router.push(`/checkout/${vaultId}/bank`)}
                 />
               </div>

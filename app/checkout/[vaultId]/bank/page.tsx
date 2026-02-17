@@ -21,12 +21,15 @@ import {
   Check,
 } from "lucide-react";
 
-import { useVault } from "@/lib/store/vault-context";
+import { useVault, Vault } from "@/lib/store/vault-context";
+import { useUser } from "@/lib/store/user-context";
+import { KycStatus } from "@/lib/domain/enums";
 import { api } from "@/lib/api-client";
 
 export default function BankTransferPage() {
   const router = useRouter();
   const params = useParams();
+  const { user } = useUser();
   const { vaults, loading: vaultsLoading } = useVault();
   const vaultId = params.vaultId as string;
 
@@ -145,7 +148,15 @@ export default function BankTransferPage() {
     }
   };
 
+  const isKycVerified = user?.kycStatus === KycStatus.VERIFIED;
+
   const handleVerifyOtp = () => {
+    if (!isKycVerified) {
+      setOtpError(
+        "Identity verification (KYC) required to authorize bank transfers.",
+      );
+      return;
+    }
     const otpValue = otp.join("");
     if (otpValue.length !== 6) {
       setOtpError("Please enter complete 6-digit code");
@@ -212,6 +223,7 @@ export default function BankTransferPage() {
                   onOtpPaste={handleOtpPaste}
                   onVerify={handleVerifyOtp}
                   onResend={() => setOtpError("")}
+                  isKycVerified={isKycVerified}
                 />
               )}
 
@@ -225,6 +237,7 @@ export default function BankTransferPage() {
                   onCopy={handleCopy}
                   copied={copied}
                   onConfirm={handlePaymentConfirmed}
+                  isKycVerified={isKycVerified}
                 />
               )}
 
@@ -275,7 +288,10 @@ function Sidebar({ amount, transactionId, step }: SidebarProps) {
       <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
       <div className="space-y-16 relative z-10">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform cursor-pointer">
+          <div
+            className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform cursor-pointer"
+            onClick={() => (window.location.href = "/client")}
+          >
             <Lock className="w-5 h-5 text-black" />
           </div>
           <span className="text-white font-black tracking-tighter text-2xl uppercase italic">
@@ -285,7 +301,7 @@ function Sidebar({ amount, transactionId, step }: SidebarProps) {
         <div className="space-y-10">
           <div className="space-y-3">
             <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.4em] italic leading-none">
-              TOTAL SETTLEMENT
+              TOTAL TRANSFER
             </p>
             <h1 className="text-6xl font-black text-white tracking-tighter font-mono flex items-baseline gap-2">
               <span className="text-emerald-500 font-black text-3xl">$</span>
@@ -328,6 +344,7 @@ interface VerificationScreenProps {
   onOtpPaste: (e: React.ClipboardEvent) => void;
   onVerify: () => void;
   onResend: () => void;
+  isKycVerified: boolean;
 }
 
 function VerificationScreen({
@@ -338,6 +355,7 @@ function VerificationScreen({
   onOtpPaste,
   onVerify,
   onResend,
+  isKycVerified,
 }: VerificationScreenProps) {
   return (
     <motion.div
@@ -388,9 +406,10 @@ function VerificationScreen({
 
         <button
           onClick={onVerify}
-          className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase tracking-[0.2em] text-xs rounded-3xl shadow-[0_0_30px_rgba(16,185,129,0.2)] transition-all active:scale-[0.98]"
+          disabled={!isKycVerified}
+          className={`w-full h-16 ${isKycVerified ? "bg-emerald-500 hover:bg-emerald-400" : "bg-white/5 text-white/20 cursor-not-allowed"} text-black font-black uppercase tracking-[0.2em] text-xs rounded-3xl shadow-[0_0_30px_rgba(16,185,129,0.2)] transition-all active:scale-[0.98]`}
         >
-          Authorize & Proceduralize
+          {isKycVerified ? "Authorize & Proceduralize" : "KYC Required"}
         </button>
 
         <button
@@ -422,6 +441,7 @@ interface PaymentInstructionsScreenProps {
   onCopy: (t: string, f: string) => void;
   copied: string;
   onConfirm: () => void;
+  isKycVerified: boolean;
 }
 
 function PaymentInstructionsScreen({
@@ -432,6 +452,7 @@ function PaymentInstructionsScreen({
   onCopy,
   copied,
   onConfirm,
+  isKycVerified,
 }: PaymentInstructionsScreenProps) {
   return (
     <motion.div
@@ -448,7 +469,7 @@ function PaymentInstructionsScreen({
         </div>
         <div className="space-y-4">
           <h4 className="text-3xl font-black text-white uppercase tracking-tighter italic">
-            Liquid Instructions
+            Transfer Instructions
           </h4>
           <p className="text-xs text-white/40 leading-relaxed font-black uppercase tracking-[0.2em] italic">
             Initialize the asset transfer to the designated vault terminal.
@@ -487,7 +508,7 @@ function PaymentInstructionsScreen({
             copied={copied === "routing"}
           />
           <BankInfo
-            label="Settlement Sum"
+            label="Transfer Sum"
             value={`$${amount.toLocaleString()}`}
             highlight
           />
@@ -514,9 +535,10 @@ function PaymentInstructionsScreen({
 
         <button
           onClick={onConfirm}
-          className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase tracking-[0.2em] text-xs rounded-3xl shadow-[0_0_40px_rgba(16,185,129,0.2)] transition-all active:scale-[0.98] mt-auto"
+          disabled={!isKycVerified}
+          className={`w-full h-16 ${isKycVerified ? "bg-emerald-500 hover:bg-emerald-400" : "bg-white/5 text-white/20 cursor-not-allowed"} text-black font-black uppercase tracking-[0.2em] text-xs rounded-3xl shadow-[0_0_40px_rgba(16,185,129,0.2)] transition-all active:scale-[0.98] mt-auto`}
         >
-          Transfer Verified & Initialized
+          {isKycVerified ? "Transfer Verified & Initialized" : "KYC Required"}
         </button>
       </div>
     </motion.div>

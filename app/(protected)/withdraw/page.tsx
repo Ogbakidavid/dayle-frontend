@@ -299,7 +299,7 @@ export default function FreelancerWithdrawPage() {
             <div className="space-y-10">
               <div className="space-y-3">
                 <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.4em] italic leading-none">
-                  SETTLEMENT VALUE
+                  WITHDRAWAL VALUE
                 </p>
                 <h1 className="text-6xl font-black text-white tracking-tighter sm:text-7xl font-mono flex items-baseline gap-2">
                   <span className="text-emerald-500 font-black text-3xl">
@@ -339,8 +339,8 @@ export default function FreelancerWithdrawPage() {
                 <Shield className="w-4 h-4" /> SECURE SETTLEMENT V2
               </div>
               <p className="text-xs text-white/40 leading-relaxed font-black uppercase tracking-widest">
-                Assets are migrated through high-speed bank-settlement rails
-                with encryption at every node.
+                Assets are migrated through high-speed bank-transfer rails with
+                encryption at every node.
               </p>
             </div>
           </div>
@@ -387,7 +387,7 @@ export default function FreelancerWithdrawPage() {
                 >
                   <div className="text-center space-y-4">
                     <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
-                      Settlement Layer
+                      Withdrawal Layer
                     </h2>
                     <p className="text-xs font-black text-white/30 uppercase tracking-[0.3em]">
                       Select your primary liquidation protocol
@@ -405,8 +405,8 @@ export default function FreelancerWithdrawPage() {
                     />
                     <MethodBtn
                       icon={<Building2 />}
-                      title="Bank ACH Transfer"
-                      desc="High-speed local bank settlement"
+                      title="Bank Transfer"
+                      desc="High-speed local bank transfer"
                       onClick={() => {
                         setSelectedMethod("bank");
                         setStep("initiation");
