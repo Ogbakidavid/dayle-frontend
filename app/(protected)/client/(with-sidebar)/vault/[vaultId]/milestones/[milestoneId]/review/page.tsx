@@ -241,7 +241,7 @@ export default function ClientReviewPage() {
                       )}
 
                       <p className="text-[9px] text-white/40 pt-1 font-bold uppercase tracking-widest">
-                        Sends milestone back to "Revision Requested".
+                        Sends milestone back to &quot;Revision Requested&quot;.
                       </p>
                     </div>
 
@@ -290,7 +290,7 @@ export default function ClientReviewPage() {
                         Confirm Rejection
                       </Button>
                       <p className="text-[9px] text-white/40 mt-2 font-bold uppercase tracking-widest">
-                        Marks as "Rejected". Does NOT start a dispute.
+                        Marks as &quot;Rejected&quot;. Does NOT start a dispute.
                       </p>
                     </div>
                   </CardContent>

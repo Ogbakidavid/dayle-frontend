@@ -24,7 +24,7 @@ import {
   Gavel,
   Upload,
   X,
-  Info
+  Info,
 } from "lucide-react";
 
 import { getDisputeEligibility } from "@/lib/rules/disputes";
@@ -58,7 +58,7 @@ function StepHeader({ step, title, subtitle, right }: StepHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
+        <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/3">
           <span className="text-sm font-semibold text-white/80">{step}</span>
         </div>
         <div className="space-y-0.5">
@@ -86,7 +86,7 @@ function StatusBanner({ eligible, title, description }: StatusBannerProps) {
         "flex items-start gap-4 rounded-xl border p-4",
         eligible
           ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-200"
-          : "border-red-500/20 bg-red-500/10 text-red-200"
+          : "border-red-500/20 bg-red-500/10 text-red-200",
       )}
     >
       {eligible ? (
@@ -107,7 +107,10 @@ export interface CreateDisputeFormProps {
   initialVaultId?: string;
 }
 
-export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormProps) {
+export function CreateDisputeForm({
+  role,
+  initialVaultId,
+}: CreateDisputeFormProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -155,26 +158,29 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
   const selectedRequirement = useMemo(() => {
     return (
       ((selectedMilestone as any)?.requirements || []).find(
-        (r: any) => r.reqId === selectedRequirementId
+        (r: any) => r.reqId === selectedRequirementId,
       ) || null
     );
   }, [selectedMilestone, selectedRequirementId]);
 
   const eligibility = useMemo(() => {
-    return getDisputeEligibility(selectedMilestone as any, selectedRequirementId);
+    return getDisputeEligibility(
+      selectedMilestone as any,
+      selectedRequirementId,
+    );
   }, [selectedMilestone, selectedRequirementId]);
 
   // Determine if the *current* selection requires a requirement reference
   const requiresRequirementRef = useMemo(() => {
     if (!selectedReasonCode || !eligibility?.allowedCodes) return false;
     const codeDef = eligibility.allowedCodes.find(
-      (c) => c.code === selectedReasonCode
+      (c) => c.code === selectedReasonCode,
     );
     return Boolean(codeDef?.requiresRequirementRef);
   }, [selectedReasonCode, eligibility]);
 
   const step1Complete = Boolean(
-    selectedVaultId && selectedMilestoneId && selectedMilestone
+    selectedVaultId && selectedMilestoneId && selectedMilestone,
   );
   const step2Ready = step1Complete && eligibility?.eligible;
 
@@ -215,7 +221,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
       }
       if (f.size > MAX_FILE_BYTES) {
         setFileError(
-          `File too large. Max allowed is ${MAX_FILE_MB}MB per file.`
+          `File too large. Max allowed is ${MAX_FILE_MB}MB per file.`,
         );
         continue;
       }
@@ -225,7 +231,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
     if (next.length) {
       setFiles((prev) => {
         const seen = new Set(
-          prev.map((x) => `${x.name}_${x.size}_${x.lastModified}`)
+          prev.map((x) => `${x.name}_${x.size}_${x.lastModified}`),
         );
         const deduped = next.filter((x) => {
           const key = `${x.name}_${x.size}_${x.lastModified}`;
@@ -315,7 +321,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
           <span
             className={cn(
               "h-2 w-2 rounded-full",
-              step1Complete ? "bg-emerald-400" : "bg-white/20"
+              step1Complete ? "bg-emerald-400" : "bg-white/20",
             )}
           />
           <span>Step 1</span>
@@ -323,7 +329,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
           <span
             className={cn(
               "h-2 w-2 rounded-full",
-              step2Ready ? "bg-emerald-400" : "bg-white/20"
+              step2Ready ? "bg-emerald-400" : "bg-white/20",
             )}
           />
           <span>Step 2</span>
@@ -360,7 +366,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
               subtitle="Pick the vault and milestone this dispute applies to."
               right={
                 selectedVault ? (
-                  <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/60">
+                  <div className="rounded-lg border border-white/10 bg-white/3 px-3 py-1 text-xs text-white/60">
                     {selectedVault.id}
                   </div>
                 ) : null
@@ -392,7 +398,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
 
                   <SelectContent
                     className="
-                      w-[var(--radix-select-trigger-width)]
+                      w-(--radix-select-trigger-width)
                       border-white/10 bg-[#141416] text-white
                     "
                   >
@@ -448,7 +454,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
 
                   <SelectContent
                     className="
-                      w-[var(--radix-select-trigger-width)]
+                      w-(--radix-select-trigger-width)
                       border-white/10 bg-[#141416] text-white
                     "
                   >
@@ -484,7 +490,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
 
             {/* Quick milestone context */}
             {selectedMilestone ? (
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/3 p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 space-y-2">
                     <div className="text-sm font-semibold text-white">
@@ -509,12 +515,13 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
                           <span
                             className={cn(
                               "uppercase font-bold",
-                              (selectedMilestone as any).verification?.status === "PASS"
+                              (selectedMilestone as any).verification
+                                ?.status === "PASS"
                                 ? "text-emerald-400"
-                                : (selectedMilestone as any).verification?.status ===
-                                  "FAIL"
-                                ? "text-red-400"
-                                : "text-amber-400"
+                                : (selectedMilestone as any).verification
+                                      ?.status === "FAIL"
+                                  ? "text-red-400"
+                                  : "text-amber-400",
                             )}
                           >
                             {(selectedMilestone as any).verification?.status ||
@@ -583,26 +590,28 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
 
                     <SelectContent
                       className="
-                        w-[var(--radix-select-trigger-width)]
+                        w-(--radix-select-trigger-width)
                         border-white/10 bg-[#141416] text-white
                       "
                     >
-                      {((selectedMilestone as any)?.requirements || []).map((req: any) => (
-                        <SelectItem
-                          key={req.reqId}
-                          value={req.reqId}
-                          className="focus:bg-white/10 focus:text-white"
-                        >
-                          <div className="flex flex-col items-start py-1">
-                            <span className="text-sm font-medium">
-                              {req.reqId}
-                            </span>
-                            <span className="text-xs text-white/40">
-                              {req.label}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                      {((selectedMilestone as any)?.requirements || []).map(
+                        (req: any) => (
+                          <SelectItem
+                            key={req.reqId}
+                            value={req.reqId}
+                            className="focus:bg-white/10 focus:text-white"
+                          >
+                            <div className="flex flex-col items-start py-1">
+                              <span className="text-sm font-medium">
+                                {req.reqId}
+                              </span>
+                              <span className="text-xs text-white/40">
+                                {req.label}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ),
+                      )}
                     </SelectContent>
                   </Select>
 
@@ -636,7 +645,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
                             "group relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all",
                             active
                               ? "border-amber-500/50 bg-amber-500/10"
-                              : "border-white/10 bg-black/30 hover:border-white/20 hover:bg-white/[0.04]"
+                              : "border-white/10 bg-black/30 hover:border-white/20 hover:bg-white/4",
                           )}
                         >
                           <input
@@ -670,7 +679,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
                                   "rounded-md border px-2 py-0.5 text-[11px]",
                                   active
                                     ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
-                                    : "border-white/10 bg-white/[0.03] text-white/50"
+                                    : "border-white/10 bg-white/3 text-white/50",
                                 )}
                               >
                                 {code.code}
@@ -710,7 +719,9 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
 
                     <Textarea
                       value={description}
-                      onChange={(e) => setDescription(e.target.value.slice(0, 600))}
+                      onChange={(e) =>
+                        setDescription(e.target.value.slice(0, 600))
+                      }
                       placeholder="State facts. Timeline. What you delivered vs what was agreed. Avoid emotions."
                       className="min-h-[140px] resize-none border-white/10 bg-black/40 text-white hover:border-white/20 focus:ring-2 focus:ring-amber-500/30"
                     />
@@ -764,7 +775,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
                         "cursor-pointer rounded-xl border border-dashed p-6 transition-all",
                         isDragging
                           ? "border-amber-500/50 bg-amber-500/10"
-                          : "border-white/15 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/25"
+                          : "border-white/15 bg-white/2 hover:bg-white/4 hover:border-white/25",
                       )}
                     >
                       <div className="flex items-start gap-4">
@@ -796,7 +807,7 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
                             className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/30 p-3 hover:border-white/20"
                           >
                             <div className="flex min-w-0 items-center gap-3">
-                              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03]">
+                              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/3">
                                 <FileText className="h-4 w-4 text-emerald-400" />
                               </div>
                               <div className="min-w-0">
@@ -829,12 +840,12 @@ export function CreateDisputeForm({ role, initialVaultId }: CreateDisputeFormPro
         ) : null}
 
         {/* Footer actions */}
-        <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/2 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-2 text-xs text-white/45">
             <Info className="mt-0.5 h-4 w-4 shrink-0" />
             <p>
-              Submitting a dispute means you're asserting the information is
-              accurate. Poor evidence and vague claims will get denied.
+              Submitting a dispute means you&apos;re asserting the information
+              is accurate. Poor evidence and vague claims will get denied.
             </p>
           </div>
 

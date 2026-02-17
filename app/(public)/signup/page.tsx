@@ -124,70 +124,89 @@ export default function SignupPage() {
 
   // Sync loading state
   useEffect(() => {
-    if (emailStateLoading) {
-      setLoading(true);
-    } else if (state.status === "awaiting-code-input") {
-      setLoading(false);
-      setStep("otp");
-    } else {
-      // Other states, manage manually
-    }
+    const timer = setTimeout(() => {
+      if (emailStateLoading) {
+        setLoading(true);
+      } else if (state.status === "awaiting-code-input") {
+        setLoading(false);
+        setStep("otp");
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, [state.status, emailStateLoading]);
 
   // Social Auth Handlers (Reused from previous implementation)
-  async function handleSocialLoginSuccess() {
-    try {
-      const accessToken = await getAccessToken();
-      if (!accessToken) return;
+  // Watch for successful authentication to trigger backend sync
+  useEffect(() => {
+    const handleSocialLoginSuccess = async () => {
+      try {
+        const accessToken = await getAccessToken();
+        if (!accessToken) return;
 
-      setLoading(true);
+        setLoading(true);
 
-      // Wallet is now created automatically by Privy (createOnLogin: 'all-users')
-      // We just proceed to authenticate with backend
+        // Wallet is now created automatically by Privy (createOnLogin: 'all-users')
+        // We just proceed to authenticate with backend
 
-      // Get role from params or state
-      const roleParam =
-        (searchParams.get("role") as UserRole) || backendUser?.role;
-      const roleToPass =
-        roleParam && roleParam !== UserRole.NONE ? roleParam : undefined;
+        // Get role from params or state
+        const roleParam =
+          (searchParams.get("role") as UserRole) || backendUser?.role;
+        const roleToPass =
+          roleParam && roleParam !== UserRole.NONE ? roleParam : undefined;
 
-      await api.auth.socialLogin({ accessToken, role: roleToPass });
+        await api.auth.socialLogin({ accessToken, role: roleToPass });
 
-      // Update profile with name if available (from form or social)
-      const socialName =
-        privyUser?.google?.name ||
-        privyUser?.github?.username ||
-        formData.name ||
-        "";
+        // Update profile with name if available (from form or social)
+        const socialName =
+          privyUser?.google?.name ||
+          privyUser?.github?.username ||
+          formData.name ||
+          "";
 
-      if (socialName) {
-        // Only update if we have a name to update
-        await api.auth.updateProfile({ name: socialName });
+        if (socialName) {
+          // Only update if we have a name to update
+          await api.auth.updateProfile({ name: socialName });
+        }
+
+        await refreshUser();
+
+        // Redirect
+
+        // We need to fetch fresh user data after refreshUser if we want to be sure,
+        // but refreshUser returns userData in valid implementation.
+        // api-client refreshUser returns void in context but checking implementation...
+        // verified context: refreshUser returns Promise<User | null>
+
+        const freshUser = await refreshUser();
+        const freshRole = freshUser?.role;
+
+        if (freshRole && freshRole !== UserRole.NONE) {
+          router.push(freshRole === "CLIENT" ? "/client" : "/freelancer");
+        } else {
+          router.push("/onboarding/role");
+        }
+      } catch (err: any) {
+        console.error(err);
+        setError("Authentication failed. Please try again.");
+        setLoading(false);
       }
+    };
 
-      await refreshUser();
-
-      // Redirect
-
-      // We need to fetch fresh user data after refreshUser if we want to be sure,
-      // but refreshUser returns userData in valid implementation.
-      // api-client refreshUser returns void in context but checking implementation...
-      // verified context: refreshUser returns Promise<User | null>
-
-      const freshUser = await refreshUser();
-      const freshRole = freshUser?.role;
-
-      if (freshRole && freshRole !== UserRole.NONE) {
-        router.push(freshRole === "CLIENT" ? "/client" : "/freelancer");
-      } else {
-        router.push("/onboarding/role");
-      }
-    } catch (err: any) {
-      console.error(err);
-      setError("Authentication failed. Please try again.");
-      setLoading(false);
+    if (ready && authenticated && privyUser) {
+      const timer = setTimeout(() => handleSocialLoginSuccess(), 0);
+      return () => clearTimeout(timer);
     }
-  }
+  }, [
+    ready,
+    authenticated,
+    privyUser,
+    getAccessToken,
+    searchParams,
+    backendUser?.role,
+    formData.name,
+    refreshUser,
+    router,
+  ]);
 
   const handlePrivySocialLogin = async (provider: any) => {
     try {
@@ -196,13 +215,6 @@ export default function SignupPage() {
       console.error(e);
     }
   };
-
-  // Watch for successful authentication to trigger backend sync
-  useEffect(() => {
-    if (ready && authenticated && privyUser) {
-      handleSocialLoginSuccess();
-    }
-  }, [ready, authenticated, privyUser]);
 
   // Form Handlers
   const handleInitialSubmit = async (e: React.FormEvent) => {

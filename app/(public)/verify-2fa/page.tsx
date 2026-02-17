@@ -34,8 +34,11 @@ export default function Verify2FAPage() {
       router.replace("/login");
       return;
     }
-    setPendingCredentials(creds);
-    setInitializing(false);
+    const timer = setTimeout(() => {
+      setPendingCredentials(creds);
+      setInitializing(false);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [router]);
 
   const handleChange = (element: HTMLInputElement, index: number) => {

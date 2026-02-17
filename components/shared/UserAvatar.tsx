@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import Image from "next/image";
+import { useRef, useEffect } from "react";
 import * as jdenticon from "jdenticon";
 
 export interface UserAvatarProps {
@@ -10,7 +11,12 @@ export interface UserAvatarProps {
   className?: string;
 }
 
-export default function UserAvatar({ identifier, src, size = 36, className = "" }: UserAvatarProps) {
+export default function UserAvatar({
+  identifier,
+  src,
+  size = 36,
+  className = "",
+}: UserAvatarProps) {
   const iconRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -20,15 +26,18 @@ export default function UserAvatar({ identifier, src, size = 36, className = "" 
   }, [identifier, size, src]);
 
   return (
-    <div 
+    <div
       className={`relative inline-block overflow-hidden rounded-lg border border-gray-700 bg-zinc-900 ${className}`}
       style={{ width: size, height: size }}
     >
       {src ? (
-        <img 
-          src={src} 
-          alt="User Profile" 
+        <Image
+          src={src}
+          alt="User Profile"
+          width={size}
+          height={size}
           className="w-full h-full object-cover"
+          unoptimized
         />
       ) : (
         <svg

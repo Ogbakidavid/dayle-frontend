@@ -14,7 +14,7 @@ export interface VaultCardProps {
 
 export function VaultCard({ vault, isClient }: VaultCardProps) {
     return (
-        <Card className="bg-[#111111] border-white/5 card-interactive group">
+        <Card className="bg-muted border-white/5 card-interactive group">
             <CardHeader>
                 <div className="flex items-start justify-between gap-3">
                     <CardTitle className="text-base font-bold text-white line-clamp-1 flex-1">
@@ -38,7 +38,7 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-white/60 line-clamp-2 min-h-[2.5rem]">
+                <p className="text-sm text-white/60 line-clamp-2 min-h-10">
                     {vault.description}
                 </p>
 

@@ -35,6 +35,7 @@ const itemVariants = {
 
 export default function FreelancerVaultsPage() {
   const { vaults, loading } = useVault();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -197,14 +198,18 @@ export default function FreelancerVaultsPage() {
                           </p>
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2">
                             <p className="text-[9px] text-white/30 font-black uppercase tracking-widest whitespace-nowrap">
-                              {new Date(
-                                vault.createdAt || Date.now(),
-                              ).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })}
+                              {vault.createdAt
+                                ? new Date(vault.createdAt).toLocaleDateString(
+                                    "en-US",
+                                    {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    },
+                                  )
+                                : "Pending..."}
                             </p>
+
                             <span className="sm:hidden text-[8px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full border border-emerald-500/20 font-black uppercase tracking-widest whitespace-nowrap">
                               {(vault.status || "Pending").toUpperCase()}
                             </span>

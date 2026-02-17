@@ -1,0 +1,26 @@
+
+> dayle-frontend@0.1.0 build /home/creativeogbaki/Desktop/dayle-frontend
+> next build
+
+▲ Next.js 16.1.1 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 52s
+  Running TypeScript ...
+Failed to compile.
+
+./node_modules/.pnpm/ox@0.10.0_typescript@5.9.3_zod@3.25.76/node_modules/ox/core/Signature.ts:288:40
+Type error: Argument of type '{ r: bigint; s: bigint; yParity: number; v?: undefined; } | { r: bigint; s: bigint; yParity?: number; v?: undefined; } | { r: bigint; s: bigint; v: number; yParity?: undefined; }' is not assignable to parameter of type 'Legacy<bigint, number>'.
+  Type '{ r: bigint; s: bigint; yParity: number; v?: undefined; }' is not assignable to type 'Legacy<bigint, number>'.
+    Property 'v' is optional in type '{ r: bigint; s: bigint; yParity: number; v?: undefined; }' but required in type 'Legacy<bigint, number>'.
+
+[0m [90m 286 |[39m     [36mif[39m (signature [36minstanceof[39m [33mUint8Array[39m) [36mreturn[39m fromBytes(signature)
+ [90m 287 |[39m     [36mif[39m ([36mtypeof[39m signature[33m.[39mr [33m===[39m [32m'string'[39m) [36mreturn[39m fromRpc(signature)
+[31m[1m>[22m[39m[90m 288 |[39m     [36mif[39m (signature[33m.[39mv) [36mreturn[39m fromLegacy(signature)
+ [90m     |[39m                                        [31m[1m^[22m[39m
+ [90m 289 |[39m     [36mreturn[39m {
+ [90m 290 |[39m       r[33m:[39m signature[33m.[39mr[33m,[39m
+ [90m 291 |[39m       s[33m:[39m signature[33m.[39ms[33m,[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+ ELIFECYCLE  Command failed with exit code 1.

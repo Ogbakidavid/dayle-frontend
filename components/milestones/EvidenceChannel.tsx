@@ -9,7 +9,7 @@ import {
   Clock,
   User,
   Loader2,
-  LucideIcon
+  LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -54,24 +54,18 @@ export function EvidenceChannel({
   const [newMessage, setNewMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
 
-  useEffect(() => {
-    if (milestoneId) {
-      fetchEvidence();
-    }
-  }, [milestoneId]);
-
-  async function fetchEvidence() {
+  const fetchEvidence = React.useCallback(async () => {
     if (!milestoneId) return;
     setLoading(true);
     try {
       const data = await api.evidence.list({ milestoneId });
-      const mapped: EvidenceEvent[] = data.map(ev => ({
+      const mapped: EvidenceEvent[] = data.map((ev) => ({
         id: ev.id,
         type: ev.type,
         content: ev.notes,
         timestamp: ev.createdAt,
         authorName: (ev as any).creator?.name || "User",
-        authorRole: (ev as any).creator?.role?.toLowerCase() || "system"
+        authorRole: (ev as any).creator?.role?.toLowerCase() || "system",
       }));
       setEvents(mapped);
     } catch (err) {
@@ -79,7 +73,13 @@ export function EvidenceChannel({
     } finally {
       setLoading(false);
     }
-  }
+  }, [milestoneId]);
+
+  useEffect(() => {
+    if (milestoneId) {
+      fetchEvidence();
+    }
+  }, [milestoneId, fetchEvidence]);
 
   const handleSend = async () => {
     if (!newMessage.trim() || !milestoneId) return;
@@ -119,57 +119,61 @@ export function EvidenceChannel({
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 text-white/20 gap-3">
               <Loader2 className="w-6 h-6 animate-spin" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Syncing evidence ledger...</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                Syncing evidence ledger...
+              </p>
             </div>
           ) : events.length === 0 ? (
             <div className="text-center py-10 text-white/20 italic text-xs">
               No evidence logged for this milestone yet.
             </div>
-          ) : events.map((event) => (
-            <div key={event.id} className="flex flex-col gap-1">
-              {/* Event Header */}
-              <div className="flex items-center gap-2 mb-1">
-                {event.type === EVIDENCE_TYPES.SYSTEM ? (
-                  <span className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/5">
-                    System Event
+          ) : (
+            events.map((event) => (
+              <div key={event.id} className="flex flex-col gap-1">
+                {/* Event Header */}
+                <div className="flex items-center gap-2 mb-1">
+                  {event.type === EVIDENCE_TYPES.SYSTEM ? (
+                    <span className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/5">
+                      System Event
+                    </span>
+                  ) : (
+                    <span
+                      className={cn(
+                        "text-[10px] font-bold uppercase tracking-wider flex items-center gap-1",
+                        event.authorRole === role
+                          ? "text-emerald-500"
+                          : "text-amber-500",
+                      )}
+                    >
+                      <User className="w-3 h-3" />
+                      {event.authorName}
+                    </span>
+                  )}
+                  <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {new Date(event.timestamp).toLocaleString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </span>
-                ) : (
-                  <span
-                    className={cn(
-                      "text-[10px] font-bold uppercase tracking-wider flex items-center gap-1",
-                      event.authorRole === role
-                        ? "text-emerald-500"
-                        : "text-amber-500"
-                    )}
-                  >
-                    <User className="w-3 h-3" />
-                    {event.authorName}
-                  </span>
-                )}
-                <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {new Date(event.timestamp).toLocaleString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </div>
+                </div>
 
-              {/* Event Content */}
-              <div
-                className={cn(
-                  "p-3 rounded-lg text-sm leading-relaxed border",
-                  event.type === EVIDENCE_TYPES.SYSTEM
-                    ? "bg-white/2 border-white/5 text-gray-400 italic"
-                    : "bg-[#141416] border-white/10 text-gray-400"
-                )}
-              >
-                {event.content}
+                {/* Event Content */}
+                <div
+                  className={cn(
+                    "p-3 rounded-lg text-sm leading-relaxed border",
+                    event.type === EVIDENCE_TYPES.SYSTEM
+                      ? "bg-white/2 border-white/5 text-gray-400 italic"
+                      : "bg-[#141416] border-white/10 text-gray-400",
+                  )}
+                >
+                  {event.content}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
 
           {/* Immutable Disclaimer */}
           <div className="flex items-center justify-center gap-2 py-4">
@@ -208,7 +212,11 @@ export function EvidenceChannel({
               className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase text-xs tracking-wide"
             >
               {isSending ? "Loging..." : "Log to Detail"}
-              {isSending ? <Loader2 className="w-3 h-3 ml-2 animate-spin" /> : <Send className="w-3 h-3 ml-2" />}
+              {isSending ? (
+                <Loader2 className="w-3 h-3 ml-2 animate-spin" />
+              ) : (
+                <Send className="w-3 h-3 ml-2" />
+              )}
             </Button>
           </div>
           <p className="text-[10px] text-gray-400 text-center">

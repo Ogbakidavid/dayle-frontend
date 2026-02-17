@@ -5,6 +5,8 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/lib/store/user-context";
 import { api, UserRole } from "@/lib/api-client";
+import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -382,11 +384,14 @@ function KYCPageContent() {
 
                       {idImage ? (
                         <>
-                          <img
+                          <Image
                             src={idImage}
                             alt="ID Preview"
-                            className="absolute inset-0 w-full h-full object-cover opacity-40"
+                            fill
+                            className="object-cover opacity-40"
+                            unoptimized
                           />
+
                           <div className="relative z-10 flex flex-col items-center gap-4 bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-white/10">
                             {isIdScanning ? (
                               <>
@@ -484,11 +489,14 @@ function KYCPageContent() {
                           </div>
                         ) : capturedFace ? (
                           <div className="w-full h-full rounded-full bg-black flex flex-col items-center justify-center overflow-hidden relative border border-emerald-500/30">
-                            <img
+                            <Image
                               src={capturedFace}
                               alt="Captured Face"
-                              className="absolute inset-0 w-full h-full object-cover"
+                              fill
+                              className="object-cover"
+                              unoptimized
                             />
+
                             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 animate-in fade-in duration-300">
                               <div className="flex gap-3">
                                 <Button

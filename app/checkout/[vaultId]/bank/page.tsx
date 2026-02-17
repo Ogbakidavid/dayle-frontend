@@ -39,7 +39,7 @@ export default function BankTransferPage() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [otpError, setOtpError] = useState("");
   const [requiresVerification, setRequiresVerification] = useState(true); // Toggle for testing
-  const [transactionId] = useState(`TXN-${Date.now()}`);
+  const [transactionId] = useState(() => `TXN-${Date.now()}`);
   const [processingStatus, setProcessingStatus] = useState<any>("pending"); // pending, processing, completed
   const [copied, setCopied] = useState("");
   const [timeRemaining, setTimeRemaining] = useState(24 * 60 * 60); // 24 hours in seconds
@@ -47,7 +47,8 @@ export default function BankTransferPage() {
   // Skip verification if not required
   useEffect(() => {
     if (!requiresVerification) {
-      setStep("instructions");
+      const timer = setTimeout(() => setStep("instructions"), 0);
+      return () => clearTimeout(timer);
     }
   }, [requiresVerification]);
 
@@ -89,7 +90,7 @@ export default function BankTransferPage() {
 
       processTransaction();
     }
-  }, [step]);
+  }, [step, vaultId, transactionId]);
 
   const handleOtpChange = (index: number, value: string) => {
     if (value.length > 1) value = value[0];

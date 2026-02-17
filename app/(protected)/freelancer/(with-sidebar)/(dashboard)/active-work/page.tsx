@@ -33,6 +33,7 @@ import { VaultStatus } from "@/lib/domain/enums";
 
 export default function ActiveWorkPage() {
   const { vaults, loading } = useVault();
+
   // Filter for active work context
   const activeVaults = vaults.filter((v: any) =>
     [VaultStatus.FUNDED, VaultStatus.PAUSED, VaultStatus.DISPUTED].includes(
@@ -140,13 +141,16 @@ export default function ActiveWorkPage() {
                         <p className="whitespace-nowrap">
                           Initialized{" "}
                           <span className="text-white/40">
-                            {new Date(
-                              vault.createdAt || Date.now(),
-                            ).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
+                            {vault.createdAt
+                              ? new Date(vault.createdAt).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  },
+                                )
+                              : "Recently"}
                           </span>
                         </p>
                       </div>

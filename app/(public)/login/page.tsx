@@ -50,61 +50,72 @@ export default function LoginPage() {
 
   const isAwaitingCode = state.status === "awaiting-code-input";
 
-  async function handleSocialLoginSuccess() {
-    console.log("handleSocialLoginSuccess called");
-    try {
-      const accessToken = await getAccessToken();
-      if (!accessToken) {
-        console.warn("Access token missing in handleSocialLoginSuccess");
-        setLoading(false); // Stop loading if token is missing
-        return;
-      }
-
-      setLoading(true);
-      console.log("Exchanging access token with backend...");
-      const { accessToken: backendToken } = await api.auth.socialLogin({
-        accessToken,
-      });
-      console.log("Backend token received, refreshing user...");
-      const userData = await refreshUser(backendToken);
-
-      // Skip complete-profile and use social name if backend name is missing
-      if (!userData?.name || userData.name.trim() === "") {
-        const socialName =
-          privyUser?.google?.name || privyUser?.github?.username || "";
-        if (socialName) {
-          await api.auth.updateProfile({ name: socialName });
-          await refreshUser(backendToken);
-        }
-      }
-
-      const updatedUser = await refreshUser(backendToken);
-
-      // Check if user needs to select role
-      if (!updatedUser.role || updatedUser.role === "NONE") {
-        router.push("/onboarding/role");
-        return;
-      }
-
-      // User has name (or social default) and role, redirect to dashboard or returnTo
-      if (returnTo) {
-        router.push(returnTo);
-      } else {
-        router.push(updatedUser.role === "CLIENT" ? "/client" : "/freelancer");
-      }
-    } catch (err) {
-      console.error("handleSocialLoginSuccess error:", err);
-      setError("Login failed. Please try again.");
-      setLoading(false);
-    }
-  }
-
   // Watch for successful authentication to trigger backend sync
   useEffect(() => {
+    const handleSocialLoginSuccess = async () => {
+      console.log("handleSocialLoginSuccess called");
+      try {
+        const accessToken = await getAccessToken();
+        if (!accessToken) {
+          console.warn("Access token missing in handleSocialLoginSuccess");
+          setLoading(false); // Stop loading if token is missing
+          return;
+        }
+
+        setLoading(true);
+        console.log("Exchanging access token with backend...");
+        const { accessToken: backendToken } = await api.auth.socialLogin({
+          accessToken,
+        });
+        console.log("Backend token received, refreshing user...");
+        const userData = await refreshUser(backendToken);
+
+        // Skip complete-profile and use social name if backend name is missing
+        if (!userData?.name || userData.name.trim() === "") {
+          const socialName =
+            privyUser?.google?.name || privyUser?.github?.username || "";
+          if (socialName) {
+            await api.auth.updateProfile({ name: socialName });
+            await refreshUser(backendToken);
+          }
+        }
+
+        const updatedUser = await refreshUser(backendToken);
+
+        // Check if user needs to select role
+        if (!updatedUser.role || updatedUser.role === "NONE") {
+          router.push("/onboarding/role");
+          return;
+        }
+
+        // User has name (or social default) and role, redirect to dashboard or returnTo
+        if (returnTo) {
+          router.push(returnTo);
+        } else {
+          router.push(
+            updatedUser.role === "CLIENT" ? "/client" : "/freelancer",
+          );
+        }
+      } catch (err) {
+        console.error("handleSocialLoginSuccess error:", err);
+        setError("Login failed. Please try again.");
+        setLoading(false);
+      }
+    };
+
     if (ready && authenticated && privyUser) {
-      handleSocialLoginSuccess();
+      const timer = setTimeout(() => handleSocialLoginSuccess(), 0);
+      return () => clearTimeout(timer);
     }
-  }, [ready, authenticated, privyUser]);
+  }, [
+    ready,
+    authenticated,
+    privyUser,
+    getAccessToken,
+    refreshUser,
+    router,
+    returnTo,
+  ]);
 
   const handlePrivyLogin = async (provider: any) => {
     try {
@@ -408,7 +419,7 @@ export default function LoginPage() {
           )}
 
           <p className="mt-12 text-center text-white text-sm font-bold uppercase tracking-wide">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href={
                 returnTo
