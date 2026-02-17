@@ -26,6 +26,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/lib/store/user-context";
+import { KycStatus } from "@/lib/domain/enums";
+import { toast } from "sonner";
 
 type Step =
   | "method_selection"
@@ -55,6 +58,7 @@ interface BankDetails {
 
 export default function FreelancerWithdrawPage() {
   const router = useRouter();
+  const { user } = useUser();
   const searchParams = useSearchParams();
 
   // Get parameters from URL
@@ -225,6 +229,13 @@ export default function FreelancerWithdrawPage() {
 
   // --- Review Logic ---
   const handleConfirmWithdrawal = () => {
+    if (user?.kycStatus !== KycStatus.VERIFIED) {
+      toast.error("KYC Verification Required", {
+        description:
+          "You must complete KYC verification before you can withdraw funds.",
+      });
+      return;
+    }
     setStep("processing");
   };
 

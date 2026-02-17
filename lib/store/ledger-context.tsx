@@ -8,8 +8,9 @@ import {
   ReactNode,
 } from "react";
 import { api } from "@/lib/api-client";
-import { TransactionStatus } from "@/lib/domain/enums";
+import { TransactionStatus, KycStatus } from "@/lib/domain/enums";
 import { useUser } from "./user-context";
+import { toast } from "sonner";
 
 export interface LedgerBalance {
   available: number;
@@ -70,7 +71,16 @@ export function LedgerProvider({ children }: { children: ReactNode }) {
   }
 
   async function withdraw(amount: number): Promise<Transaction> {
+    if (user?.kycStatus !== KycStatus.VERIFIED) {
+      toast.error("KYC Verification Required", {
+        description:
+          "You must complete KYC verification before you can withdraw funds.",
+      });
+      throw new Error("KYC_REQUIRED");
+    }
+
     const idempotencyKey = crypto.randomUUID();
+
     try {
       const tx = await api.ledger.withdraw(amount, { idempotencyKey });
 

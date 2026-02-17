@@ -61,7 +61,9 @@ import {
   VaultStatus,
   MilestoneStatus,
   ReleaseStatus,
+  KycStatus,
 } from "@/lib/domain/enums";
+import { useUser } from "@/lib/store/user-context";
 
 const getVaultDerivedLabel = (status: string) => {
   switch (status) {
@@ -88,6 +90,7 @@ export default function ClientVaultDetailPage() {
   const params = useParams();
   const router = useRouter();
   const vaultId = params.vaultId as string;
+  const { user } = useUser();
   const { vaults, loading: vaultsLoading, refreshVaults } = useVault();
 
   // Review Modal State
@@ -161,6 +164,14 @@ export default function ClientVaultDetailPage() {
   };
 
   const handleFund = async () => {
+    if (user?.kycStatus !== KycStatus.VERIFIED) {
+      toast.error("KYC Verification Required", {
+        description:
+          "You must complete KYC verification before you can fund vaults.",
+      });
+      return;
+    }
+
     try {
       await api.vaults.fund(vault.id, {
         paymentMethod: "bank",

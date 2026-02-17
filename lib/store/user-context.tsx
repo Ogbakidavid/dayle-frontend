@@ -8,6 +8,7 @@ import {
   ReactNode,
 } from "react";
 import { api, UserRole } from "@/lib/api-client";
+import { KycStatus } from "@/lib/domain/enums";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 
@@ -17,6 +18,7 @@ interface User {
   name?: string;
   role: UserRole;
   emailVerified: boolean;
+  kycStatus?: KycStatus;
   [key: string]: any;
 }
 
@@ -33,7 +35,6 @@ interface UserContextType {
   logout: () => Promise<void>;
   refreshUser: (token?: string) => Promise<User | null>;
 }
-
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -41,7 +42,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { logout: privyLogout } = usePrivy();
-
   useEffect(() => {
     // Check session on mount
     checkSession();

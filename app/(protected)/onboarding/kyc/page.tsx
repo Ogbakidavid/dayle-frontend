@@ -55,6 +55,9 @@ function KYCPageContent() {
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [documentType, setDocumentType] = useState<
+    "passport" | "drivers_license" | "national_id"
+  >("passport");
   const [formData, setFormData] = useState<KYCFormData>({
     fullName: "",
     dateOfBirth: "",
@@ -179,9 +182,25 @@ function KYCPageContent() {
 
     setLoading(true);
     try {
-      await api.auth.updateProfile({ kycStatus: "approved", ...formData });
-      const freshUser = await refreshUser();
+      // Assemble full address for backend
+      const fullAddress = `${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}`;
 
+      // Submit KYC data to the correct onboarding endpoint
+      await api.onboarding.submitKyc({
+        fullName: formData.fullName,
+        dateOfBirth: formData.dateOfBirth,
+        address: fullAddress,
+        idDocumentUrl: idImage, // Sending the base64 image
+        idNumber: formData.ssn,
+        idType: documentType,
+      });
+
+      // Update basic profile info if needed (optional, typically KYC handles status)
+      await api.auth.updateProfile({
+        name: formData.fullName,
+      });
+
+      const freshUser = await refreshUser();
       const currentUserRole = roleParam || freshUser?.role || user?.role;
 
       if (
@@ -321,9 +340,32 @@ function KYCPageContent() {
                         Document
                       </h3>
                       <p className="text-sm font-medium font-['Poppins',sans-serif]">
-                        Upload a clear photo of your Passport or Driver's
-                        License.
+                        Select your document type and upload a clear photo.
                       </p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setDocumentType("passport")}
+                        className={`p-4 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest ${documentType === "passport" ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "bg-white/2 border-white/5 text-zinc-500 hover:border-white/10"}`}
+                      >
+                        Passport
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDocumentType("drivers_license")}
+                        className={`p-4 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest ${documentType === "drivers_license" ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "bg-white/2 border-white/5 text-zinc-500 hover:border-white/10"}`}
+                      >
+                        Driver License
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDocumentType("national_id")}
+                        className={`p-4 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest ${documentType === "national_id" ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "bg-white/2 border-white/5 text-zinc-500 hover:border-white/10"}`}
+                      >
+                        National ID
+                      </button>
                     </div>
 
                     <div
