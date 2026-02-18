@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/lib/store/user-context";
 import { KycStatus } from "@/lib/domain/enums";
+import { api } from "@/lib/api-client";
 import { toast } from "sonner";
 
 type Step =
@@ -251,21 +252,32 @@ export default function FreelancerWithdrawPage() {
       let currentIndex = 0;
       const updateStatus = () => {
         if (currentIndex < statusFlow.length) {
-          setTimeout(() => {
+          setTimeout(async () => {
             setProcessingStatus(statusFlow[currentIndex].status);
             currentIndex++;
             if (currentIndex < statusFlow.length) {
               updateStatus();
             } else {
-              setTimeout(() => {
-                const isSuccess = Math.random() > 0.1;
-                if (isSuccess) {
-                  setProcessingStatus("completed");
-                  setTimeout(() => setStep("success"), 1000);
-                } else {
-                  setStep("failure");
-                }
-              }, 2000);
+              try {
+                // Call Backend to withdraw
+                const idempotencyKey = crypto.randomUUID();
+                await api.ledger.withdraw(
+                  amount,
+                  {
+                    bankName: bankDetails.bankName,
+                    accountNumber: bankDetails.accountNumber,
+                    accountName: bankDetails.accountName,
+                    routingNumber: "121000358", // Mock routing for now or capture from UI
+                  },
+                  { idempotencyKey },
+                );
+
+                setProcessingStatus("completed");
+                setTimeout(() => setStep("success"), 1000);
+              } catch (error) {
+                console.error("Withdrawal error:", error);
+                setStep("failure");
+              }
             }
           }, statusFlow[currentIndex].delay);
         }

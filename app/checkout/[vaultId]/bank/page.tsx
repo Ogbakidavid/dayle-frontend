@@ -25,6 +25,7 @@ import { useVault, Vault } from "@/lib/store/vault-context";
 import { useUser } from "@/lib/store/user-context";
 import { KycStatus } from "@/lib/domain/enums";
 import { api } from "@/lib/api-client";
+import { toast } from "sonner";
 
 export default function BankTransferPage() {
   const router = useRouter();
@@ -74,14 +75,23 @@ export default function BankTransferPage() {
 
           // Call Backend to fund vault
           const idempotencyKey = crypto.randomUUID();
-          await api.vaults.fund(vaultId, {
+          const result = await api.vaults.fund(vaultId, {
             paymentMethod: "bank",
             paymentDetails: {
               refCode: transactionId,
-              sender: "Client Bank Account", // In real app, this comes from user profile
+              sender: "Client Bank Account",
             },
             idempotencyKey,
           });
+
+          if (result.paymentUrl) {
+            setProcessingStatus("completed");
+            toast.success("Redirecting to secure payment terminal...");
+            setTimeout(() => {
+              window.location.href = result.paymentUrl;
+            }, 1000);
+            return;
+          }
 
           setProcessingStatus("completed");
           setTimeout(() => setStep("success"), 1000);

@@ -24,6 +24,8 @@ import {
   ExternalLink,
   CreditCard,
   RefreshCcw,
+  ShieldAlert,
+  AlertCircle,
 } from "lucide-react";
 import {
   Card,
@@ -358,8 +360,9 @@ export default function ClientVaultDetailPage() {
                 {vault.status === VaultStatus.DRAFT && (
                   <Button
                     size="sm"
-                    className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3 transition-all"
+                    className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3 transition-all disabled:opacity-50 disabled:grayscale"
                     onClick={handleFund}
+                    disabled={vault.isFrozen}
                   >
                     <CreditCard className="w-3.5 h-3.5 mr-1.5" />
                     Fund Vault
@@ -384,6 +387,40 @@ export default function ClientVaultDetailPage() {
             </div>
           </div>
         </header>
+
+        {/* FROZEN VAULT BANNER */}
+        {vault.isFrozen && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center gap-6 animate-in fade-in slide-in-from-top-4">
+            <div className="p-3 bg-red-500/10 rounded-full shrink-0">
+              <ShieldAlert className="w-8 h-8 text-red-500" />
+            </div>
+            <div className="space-y-1 grow">
+              <h3 className="text-lg font-black text-red-500 uppercase tracking-wide">
+                Security Freeze Active
+              </h3>
+              <p className="text-sm font-medium text-white/80 leading-relaxed">
+                This vault has been automatically frozen due to a detected
+                discrepancy. All actions (funding, submissions, reviews) are
+                temporarily paused.
+              </p>
+              {vault.frozenReason && (
+                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-red-500/20 text-xs font-mono text-red-400">
+                  <AlertCircle className="w-3 h-3" />
+                  REASON: {vault.frozenReason}
+                </div>
+              )}
+            </div>
+            <Button
+              variant="outline"
+              className="border-red-500/30 text-red-500 hover:bg-red-500 hover:text-white font-bold uppercase tracking-widest text-[10px]"
+              asChild
+            >
+              <a href="mailto:support@dayle.com?subject=Frozen Vault Appeal">
+                Contact Support
+              </a>
+            </Button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-black!">
           {/* LEFT COLUMN: MILESTONES */}
@@ -481,7 +518,8 @@ export default function ClientVaultDetailPage() {
                               <Button
                                 size="sm"
                                 onClick={() => setActiveReview(milestone)}
-                                className="bg-amber-500 text-black hover:bg-amber-400 font-bold uppercase tracking-wide text-[11px] h-8 transition-all"
+                                disabled={vault.isFrozen}
+                                className="bg-amber-500 text-black hover:bg-amber-400 font-bold uppercase tracking-wide text-[11px] h-8 transition-all disabled:opacity-50 disabled:grayscale"
                               >
                                 Review Work
                                 <ChevronRight className="w-4 h-4 ml-1" />

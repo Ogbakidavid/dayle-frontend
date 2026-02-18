@@ -28,10 +28,12 @@ import { useUser } from "@/lib/store/user-context";
 import { cn } from "@/lib/utils";
 import UserAvatar from "@/components/shared/UserAvatar";
 import { api } from "@/lib/api-client";
+import { useMfaEnrollment } from "@privy-io/react-auth";
 
 export default function SettingsPageContent({ role = "client" }) {
   const router = useRouter();
   const { user, logout, refreshUser } = useUser();
+  const { showMfaEnrollmentModal } = useMfaEnrollment();
   const [activeTab, setActiveTab] = useState("profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -639,6 +641,29 @@ export default function SettingsPageContent({ role = "client" }) {
                             className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-700"
                           />
                         </div>
+                      </div>
+
+                      {/* MFA Section */}
+                      <div className="flex items-start justify-between p-5 bg-zinc-900/30 border border-zinc-800/50 rounded-xl hover:border-zinc-700 transition-all">
+                        <div className="flex gap-4">
+                          <div className="p-2.5 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                            <Shield className="w-5 h-5 text-purple-500" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                              Transaction Security (MFA)
+                            </h4>
+                            <p className="text-sm text-white/60 leading-relaxed max-w-md">
+                              Require verification for high-value transactions
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => showMfaEnrollmentModal()}
+                          className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-4 text-sm rounded-lg"
+                        >
+                          Manage MFA
+                        </Button>
                       </div>
 
                       {/* Telegram */}

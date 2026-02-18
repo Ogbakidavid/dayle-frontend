@@ -192,26 +192,7 @@ export const api = {
   },
 
   security: {
-    // Two-Factor Authentication
-    enable2FA: async (): Promise<any> => {
-      return await request("/auth/2fa/enable", {
-        method: "POST",
-      });
-    },
 
-    verify2FA: async (code: string, tempSecret: string): Promise<any> => {
-      return await request("/auth/2fa/verify", {
-        method: "POST",
-        body: { code, tempSecret },
-      });
-    },
-
-    disable2FA: async (code: string): Promise<any> => {
-      return await request("/auth/2fa/disable", {
-        method: "POST",
-        body: { code },
-      });
-    },
 
     get2FAStatus: async (): Promise<any> => {
       return await request("/auth/2fa/status");
@@ -242,19 +223,7 @@ export const api = {
       });
     },
 
-    // Login-specific 2FA methods
-    check2FAOnLogin: async (email: string, password: string): Promise<any> => {
-      // This would be part of the login flow
-      // For now, return false as backend handles this
-      return { requires2FA: false };
-    },
 
-    verify2FAOnLogin: async (email: string, code: string): Promise<any> => {
-      return await request("/auth/2fa/verify-login", {
-        method: "POST",
-        body: { email, code },
-      });
-    },
   },
 
   ledger: {
@@ -262,11 +231,11 @@ export const api = {
       return await request("/ledger/balance");
     },
 
-    withdraw: async (amount: number, opts: any = {}): Promise<any> => {
+    withdraw: async (amount: number, bankDetails: any, opts: any = {}): Promise<any> => {
       const { idempotencyKey } = opts;
       return await request("/ledger/withdraw", {
         method: "POST",
-        body: { amount, idempotencyKey },
+        body: { amount, bankDetails, idempotencyKey },
       });
     },
 
