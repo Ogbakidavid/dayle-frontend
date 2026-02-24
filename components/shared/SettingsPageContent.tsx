@@ -37,6 +37,19 @@ export default function SettingsPageContent({ role = "client" }) {
   const [activeTab, setActiveTab] = useState("profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Profile Edit State
+  const [profileName, setProfileName] = useState(user?.name || "");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [profileSuccess, setProfileSuccess] = useState("");
+
+  // Sync profile name when user context loads
+  useEffect(() => {
+    if (user?.name) {
+      setProfileName(user.name);
+    }
+  }, [user]);
+
   // Notification center state
   const [notificationList, setNotificationList] = useState<any[]>([]);
 
@@ -91,6 +104,23 @@ export default function SettingsPageContent({ role = "client" }) {
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleSaveProfile = async () => {
+    setSavingProfile(true);
+    setProfileError("");
+    setProfileSuccess("");
+    try {
+      await api.auth.updateProfile({ name: profileName });
+      await refreshUser();
+      setProfileSuccess("Profile updated successfully");
+      setTimeout(() => setProfileSuccess(""), 3000);
+    } catch (error: any) {
+      console.error("Failed to update profile:", error);
+      setProfileError(error.message || "Failed to update profile");
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   const isClient = role === "client";
@@ -460,13 +490,26 @@ export default function SettingsPageContent({ role = "client" }) {
                   </div>
                 </div>
 
+                {/* Success/Error Messages */}
+                {profileSuccess && (
+                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                    <p className="text-sm text-emerald-400">{profileSuccess}</p>
+                  </div>
+                )}
+                {profileError && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <p className="text-sm text-red-400">{profileError}</p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
                   <div className="space-y-2">
                     <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
                       {isClient ? "Full Name" : "Public Name"}
                     </Label>
                     <Input
-                      defaultValue={user?.name || ""}
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
                       className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
                     />
                   </div>
@@ -475,8 +518,10 @@ export default function SettingsPageContent({ role = "client" }) {
                       Email Address
                     </Label>
                     <Input
-                      defaultValue={user?.email || ""}
-                      className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
+                      value={user?.email || ""}
+                      disabled
+                      readOnly
+                      className="bg-zinc-900/50 border-zinc-800 text-zinc-500 focus:ring-1 focus:ring-emerald-500/50 h-11 cursor-not-allowed opacity-70"
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
@@ -486,13 +531,20 @@ export default function SettingsPageContent({ role = "client" }) {
                     <Input
                       defaultValue={""}
                       className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-emerald-500/50 h-11"
+                      placeholder={
+                        isClient ? "Add your company name" : "Add a short bio"
+                      }
                     />
                   </div>
                 </div>
 
                 <div className="pt-6 border-t border-zinc-900 flex justify-end">
-                  <Button className="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold px-6 rounded-lg transition-all shadow-lg shadow-emerald-600/10">
-                    Save Changes
+                  <Button
+                    onClick={handleSaveProfile}
+                    disabled={savingProfile}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold px-6 rounded-lg transition-all shadow-lg shadow-emerald-600/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {savingProfile ? "Saving..." : "Save Changes"}
                   </Button>
                 </div>
               </div>

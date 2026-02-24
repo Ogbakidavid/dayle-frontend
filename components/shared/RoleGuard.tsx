@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/lib/store/user-context";
 import { UserRole } from "@/lib/api-client";
-import { Loader2 } from "lucide-react";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -59,7 +59,7 @@ export default function RoleGuard({
   if (loading || (user && !allowedRoles.includes(user.role))) {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+        <DotLoader size="lg" />
         <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em]">
           Verifying Permissions
         </p>

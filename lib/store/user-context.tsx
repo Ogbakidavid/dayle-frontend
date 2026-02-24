@@ -25,13 +25,6 @@ interface User {
 interface UserContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<User>;
-  signup: (
-    email: string,
-    password: string,
-    name: string,
-    role: string,
-  ) => Promise<User>;
   logout: () => Promise<void>;
   refreshUser: (token?: string) => Promise<User | null>;
 }
@@ -66,23 +59,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function login(email: string, password: string): Promise<User> {
-    const userData = await api.auth.login(email, password);
-    setUser(userData);
-    return userData;
-  }
-
-  async function signup(
-    email: string,
-    password: string,
-    name: string,
-    role: string,
-  ): Promise<User> {
-    const userData = await api.auth.signup(email, password, name, role);
-    setUser(userData);
-    return userData;
-  }
-
   async function logout() {
     await privyLogout();
     await api.auth.logout();
@@ -95,8 +71,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
-        login,
-        signup,
         logout,
         refreshUser: checkSession,
       }}

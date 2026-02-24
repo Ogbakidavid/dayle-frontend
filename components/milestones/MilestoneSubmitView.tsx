@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
+import { DotLoader } from "@/components/ui/dot-loader";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,13 +12,7 @@ import {
   type EvidenceItemData,
 } from "@/components/shared/EvidencePanel";
 import { MILESTONE_STATUS_LABELS } from "@/lib/rules/milestones";
-import {
-  Calendar,
-  FileText,
-  UploadCloud,
-  ChevronLeft,
-  Loader2,
-} from "lucide-react";
+import { Calendar, FileText, UploadCloud, ChevronLeft } from "lucide-react";
 import type { Vault, Milestone } from "@/lib/store/vault-context";
 
 export interface MilestoneSubmitViewProps {
@@ -81,7 +76,7 @@ export function MilestoneSubmitView({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-white/50 gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+        <DotLoader size="lg" />
         <p className="font-bold uppercase tracking-widest text-xs">
           Securing data link...
         </p>

@@ -15,7 +15,7 @@ import {
   Activity,
   CheckCircle,
   Zap,
-  Badge
+  Badge,
 } from "lucide-react";
 import { VaultStatus } from "@/lib/domain/enums";
 import { getVaultDerivedLabel } from "@/lib/domain/enums";
@@ -189,6 +189,8 @@ export default function FreelancerDashboard() {
         ) : activeVaults.length === 0 ? (
           <motion.div
             variants={itemVariants}
+            initial="hidden"
+            animate="visible"
             className="py-20 text-center bg-[#0D0D0E] border border-white/5 rounded-2xl shadow-2xl"
           >
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6 border border-white/10 group">

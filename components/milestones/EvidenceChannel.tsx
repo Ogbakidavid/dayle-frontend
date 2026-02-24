@@ -8,7 +8,6 @@ import {
   ShieldAlert,
   Clock,
   User,
-  Loader2,
   LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api-client";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 // Production Evidence/Event Types
 // CLARIFICATION_REQUEST, REQUIREMENT_CONFIRMATION, FILE_COMMENT, DISPUTE_NOTE, DISPUTE_OPENED, DISPUTE_EVIDENCE
@@ -118,7 +118,7 @@ export function EvidenceChannel({
         <div className="flex-1 space-y-6 overflow-y-auto mb-6 pr-2 max-h-[500px]">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 text-white/20 gap-3">
-              <Loader2 className="w-6 h-6 animate-spin" />
+              <DotLoader size="md" />
               <p className="text-[10px] font-black uppercase tracking-widest text-white/30">
                 Syncing evidence ledger...
               </p>
@@ -213,7 +213,7 @@ export function EvidenceChannel({
             >
               {isSending ? "Loging..." : "Log to Detail"}
               {isSending ? (
-                <Loader2 className="w-3 h-3 ml-2 animate-spin" />
+                <DotLoader size="sm" className="ml-2" />
               ) : (
                 <Send className="w-3 h-3 ml-2" />
               )}

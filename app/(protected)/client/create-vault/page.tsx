@@ -28,6 +28,7 @@ import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 import { api } from "@/lib/api-client";
 import { useVault } from "@/lib/store/vault-context";
 
+
 const variants: Variants = {
   enter: (direction: number) => ({
     x: direction > 0 ? 20 : -20,
@@ -142,17 +143,20 @@ export default function CreateVaultPage() {
   };
 
   const handleDeploy = async () => {
-    // Create vault via API with idempotency to simulate safe money action
+    // Create vault via API with idempotency to prevent duplicate creations
     const makeIdempotencyKey = () => crypto.randomUUID();
 
     setIsDeploying(true);
     const idempotencyKey = makeIdempotencyKey();
     try {
+      // 1. Call backend DB creation. The backend will now automatically
+      // deploy the Web3 Vault using the Treasury wallet behind the scenes.
       const payload = {
         title: vaultTitle,
-        type: vaultPurpose, // Renamed from purpose
+        type: vaultPurpose,
         description: vaultDescription,
         totalAmount: totalAmount,
+        // vaultAddress is intentionally omitted so the backend provisions it
         milestones: milestones.map((m) => ({
           title: m.title,
           amount: Number(m.amount),
@@ -163,9 +167,10 @@ export default function CreateVaultPage() {
         })),
         idempotencyKey,
       };
+      
       const newVault = await createVault(payload);
 
-      // Send invitation to freelancer if email provided
+      // 2. Send invitation to freelancer if email provided
       if (freelancerEmail) {
         try {
           await api.invites.create({
@@ -174,10 +179,10 @@ export default function CreateVaultPage() {
           });
         } catch (inviteErr) {
           console.error("Failed to send freelancer invite:", inviteErr);
-          // We still proceed to checkout as the vault is created
         }
       }
 
+      // 3. Redirect to checkout for the Fiat Onramp flow
       router.push(`/checkout/${newVault.id}?idem=${idempotencyKey}`);
     } catch (err) {
       console.error(err);

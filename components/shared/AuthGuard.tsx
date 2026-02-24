@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import { useUser } from "@/lib/store/user-context";
-import { Loader2 } from "lucide-react";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -20,28 +20,50 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Track if we're already attempting to refresh or redirect to prevent loops
+  const isRefreshingRef = useRef(false);
+  const hasRedirectedRef = useRef(false);
+
   useEffect(() => {
     if (!privyReady || userLoading) return;
 
     if (!authenticated) {
       // Not logged in with Privy, redirect to login
-      const returnUrl = encodeURIComponent(pathname);
-      router.push(`/login?redirect=${returnUrl}`);
+      if (!hasRedirectedRef.current) {
+        hasRedirectedRef.current = true;
+        const returnUrl = encodeURIComponent(pathname);
+        router.push(`/login?redirect=${returnUrl}`);
+      }
       return;
     }
 
     // Authenticated with Privy, but check if we have internal user session
-    if (!user) {
-      refreshUser().then((internalUser) => {
-        if (!internalUser) {
-          // Internal session check failed despite Privy auth
-          // This might happen if backend sync is pending or failed
-          console.warn(
-            "Privy authenticated but internal session missing. Redirecting to login.",
-          );
-          router.push("/login");
-        }
-      });
+    if (!user && !isRefreshingRef.current && !hasRedirectedRef.current) {
+      isRefreshingRef.current = true;
+      refreshUser()
+        .then((internalUser) => {
+          isRefreshingRef.current = false;
+          if (!internalUser) {
+            // Internal session check failed despite Privy auth
+            // This might happen if backend sync is pending or failed
+            console.warn(
+              "Privy authenticated but internal session missing. Redirecting to login.",
+            );
+            if (!hasRedirectedRef.current) {
+              hasRedirectedRef.current = true;
+              router.push("/login");
+            }
+          }
+        })
+        .catch((error) => {
+          isRefreshingRef.current = false;
+          console.error("Error refreshing user:", error);
+          // If we get a 401 or any auth error, redirect to login
+          if (!hasRedirectedRef.current) {
+            hasRedirectedRef.current = true;
+            router.push("/login");
+          }
+        });
     }
   }, [
     authenticated,
@@ -63,7 +85,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center space-y-4">
         <div className="relative">
           <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full animate-pulse" />
-          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin relative z-10" />
+          <DotLoader size="lg" className="relative z-10" />
         </div>
         <div className="text-center space-y-1">
           <p className="text-xs font-black text-emerald-500 uppercase tracking-[0.4em] animate-pulse">

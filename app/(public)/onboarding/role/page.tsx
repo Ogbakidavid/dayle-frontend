@@ -4,17 +4,39 @@ import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Shield, Users, Briefcase, ArrowRight, Loader2 } from "lucide-react";
-import { UserRole } from "@/lib/api-client";
+import { DotLoader } from "@/components/ui/dot-loader";
+import { Shield, Users, Briefcase, ArrowRight } from "lucide-react";
+import { api, UserRole } from "@/lib/api-client";
+import { usePrivy } from "@privy-io/react-auth";
+import { useUser } from "@/lib/store/user-context";
 
 export default function RoleSelectionPage() {
   const router = useRouter();
+  const { authenticated, getAccessToken } = usePrivy();
+  const { refreshUser } = useUser();
   const [loading, setLoading] = useState<UserRole | null>(null);
 
-  function handleSelect(role: UserRole) {
+  async function handleSelect(role: UserRole) {
     setLoading(role);
-    // Redirect to signup with selected role
-    router.push(`/signup?role=${role}`);
+
+    try {
+      if (authenticated) {
+        // User is already authenticated (e.g. from Social Login), set role directly
+        const token = await getAccessToken();
+        if (token) {
+          await api.onboarding.setRole(role);
+          await refreshUser(token);
+          router.push(role === UserRole.CLIENT ? "/client" : "/freelancer");
+          return;
+        }
+      }
+
+      // Default: Redirect to signup with selected role
+      router.push(`/signup?role=${role}`);
+    } catch (error) {
+      console.error("Error setting role:", error);
+      setLoading(null);
+    }
   }
 
   return (
@@ -74,7 +96,7 @@ export default function RoleSelectionPage() {
                 className="p-0 text-emerald-500 font-black uppercase tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
               >
                 {loading === UserRole.CLIENT ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <DotLoader size="sm" />
                 ) : (
                   <span className="flex items-center gap-2">
                     Setup Client Account <ArrowRight className="w-5 h-5" />
@@ -117,7 +139,7 @@ export default function RoleSelectionPage() {
                 className="p-0 text-emerald-500 font-black uppercase tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
               >
                 {loading === UserRole.FREELANCER ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <DotLoader size="sm" />
                 ) : (
                   <span className="flex items-center gap-2">
                     Setup Contractor Account <ArrowRight className="w-5 h-5" />

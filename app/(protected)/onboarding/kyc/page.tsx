@@ -1,27 +1,22 @@
 "use client";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/lib/store/user-context";
 import { api, UserRole } from "@/lib/api-client";
-import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Shield,
   CheckCircle2,
   AlertCircle,
-  Lock,
   ArrowRight,
   Globe,
-  Building2,
   CreditCard,
-  Loader2,
   UserCircle2,
-  MapPin,
   Camera,
   Scan,
   Fingerprint,
@@ -31,12 +26,6 @@ interface KYCFormData {
   fullName: string;
   dateOfBirth: string;
   ssn: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  businessName: string;
-  ein: string;
 }
 
 function KYCPageContent() {
@@ -64,18 +53,12 @@ function KYCPageContent() {
     fullName: "",
     dateOfBirth: "",
     ssn: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    businessName: "",
-    ein: "",
   });
 
   const isClient = roleParam
     ? roleParam.toLowerCase() === "client"
     : user?.role === UserRole.CLIENT;
-  const totalSteps = isClient ? 5 : 4;
+  const totalSteps = 3;
 
   const stopCamera = () => {
     if (streamRef.current) {
@@ -184,14 +167,11 @@ function KYCPageContent() {
 
     setLoading(true);
     try {
-      // Assemble full address for backend
-      const fullAddress = `${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}`;
-
       // Submit KYC data to the correct onboarding endpoint
       await api.onboarding.submitKyc({
         fullName: formData.fullName,
         dateOfBirth: formData.dateOfBirth,
-        address: fullAddress,
+        address: "NOT_REQUIRED_ONBOARDING",
         idDocumentUrl: idImage, // Sending the base64 image
         idNumber: formData.ssn,
         idType: documentType,
@@ -223,526 +203,386 @@ function KYCPageContent() {
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col font-['Poppins',sans-serif] selection:bg-emerald-500/30">
-      <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-      <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+    <div className="min-h-dvh bg-black text-white flex flex-col font-['Inter',sans-serif] selection:bg-emerald-500/30 overflow-hidden">
+      {/* Top Navigation Bar - Mobile App Style */}
+      <header className="fixed top-0 inset-x-0 h-16 bg-black z-50 flex items-center justify-between px-6">
+        <div className="flex items-center gap-4 w-full">
+          {currentStep > 1 ? (
+            <button
+              type="button"
+              onClick={prevStep}
+              className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition"
+            >
+              <ArrowRight className="w-5 h-5 rotate-180" />
+            </button>
+          ) : (
+            <div className="w-10 h-10"></div>
+          )}
+          <div className="flex-1 text-center font-semibold text-[17px] tracking-tight text-white">
+            Verification Phase {currentStep}
+          </div>
+          <div className="w-10 h-10 flex items-center justify-center font-mono text-xs text-white/40">
+            {currentStep}/{totalSteps}
+          </div>
+        </div>
+      </header>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-12 lg:py-12">
-        <div className="w-full max-w-2xl">
-          <div className="text-center mb-12 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-sm font-black uppercase tracking-wide text-emerald-400">
-              Verification Protocol
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
-              Verify <span className="text-emerald-500 italic">Account.</span>
+      {/* Sleek Native Top Progress Bar */}
+      <div className="fixed top-16 inset-x-0 h-1 bg-white/5 z-50">
+        <div
+          className="h-full bg-emerald-500 transition-all duration-500 ease-out"
+          style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+        ></div>
+      </div>
+
+      {/* Main Content Area - Full Bleed */}
+      <main className="flex-1 overflow-y-auto w-full pt-20 pb-32">
+        <div className="max-w-md mx-auto w-full px-6 py-6 h-full flex flex-col">
+          {/* Header Copy */}
+          <div className="space-y-2 mb-10">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Complete ID Verify
             </h1>
+            <p className="text-sm text-zinc-400">
+              Unlock full access to funding and withdrawals in under 60 seconds.
+            </p>
           </div>
 
-          <div className="bg-muted border border-white/10 rounded-[40px] shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-white/5 overflow-hidden">
-              <div
-                className="h-full bg-emerald-500 transition-all duration-700 ease-in-out shadow-[0_0_15px_rgba(16,185,129,0.5)]"
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              ></div>
-            </div>
+          <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
+            {currentStep === 1 && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
+                    <UserCircle2 className="w-8 h-8 text-emerald-500" /> Legal
+                    Identity
+                  </h3>
+                  <p className="text-sm font-medium text-zinc-400">
+                    As shown on your official government documents.
+                  </p>
+                </div>
 
-            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 blur-[150px] rounded-full pointer-events-none transition-all group-hover:bg-emerald-500/10"></div>
+                <div className="space-y-8">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider ml-1">
+                      Full Legal Name
+                    </Label>
+                    <Input
+                      placeholder="Enter your legal name as on ID"
+                      value={formData.fullName}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          fullName: e.target.value,
+                        })
+                      }
+                      className="bg-transparent border-0 border-b-2 border-white/10 rounded-none px-1 text-white text-xl placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:border-emerald-500 transition-colors h-14"
+                      required
+                    />
+                  </div>
 
-            <div className="p-8 md:p-16 relative z-10">
-              <div className="flex justify-between items-center mb-12 text-zinc-400">
-                <span className="text-sm font-black uppercase tracking-[0.3em]">
-                  Phase {currentStep} of {totalSteps}
-                </span>
-                <div className="flex gap-1.5">
-                  {[...Array(totalSteps)].map((_, i) => (
-                    <div
-                      key={i}
-                      className={`w-2 h-2 rounded-full transition-all duration-500 ${currentStep > i ? "bg-emerald-500" : "bg-white/10"}`}
-                    ></div>
-                  ))}
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="flex flex-col space-y-1">
+                      <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider ml-1">
+                        Date of Birth
+                      </label>
+                      <div className="relative group">
+                        <input
+                          type="date"
+                          value={formData.dateOfBirth}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              dateOfBirth: e.target.value,
+                            })
+                          }
+                          className="w-full bg-transparent border-0 border-b-2 border-white/10 rounded-none px-1 text-white text-xl focus:ring-0 focus:outline-none focus-visible:border-emerald-500 transition-colors h-14 scheme:dark"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider ml-1">
+                        National ID Number
+                      </Label>
+                      <Input
+                        placeholder="e.g. BVN, NIN, CPF"
+                        value={formData.ssn}
+                        onChange={(e) =>
+                          setFormData({ ...formData, ssn: e.target.value })
+                        }
+                        className="bg-transparent border-0 border-b-2 border-white/10 rounded-none px-1 text-white text-xl placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:border-emerald-500 transition-colors h-14"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
+            )}
 
-              <form onSubmit={handleSubmit} className="space-y-12">
-                {currentStep === 1 && (
-                  <div className="space-y-10 animate-in fade-in slide-in-from-right-8 duration-500 text-zinc-400">
-                    <div className="space-y-2">
-                      <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-                        <UserCircle2 className="w-8 h-8 text-emerald-500" />{" "}
-                        Legal Identity
-                      </h3>
-                      <p className="text-sm font-medium font-['Poppins',sans-serif]">
-                        As shown on your official government documents.
-                      </p>
-                    </div>
+            {currentStep === 2 && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
+                    <CreditCard className="w-8 h-8 text-emerald-500" /> ID
+                    Document
+                  </h3>
+                  <p className="text-sm font-medium text-zinc-400">
+                    Select your document type and upload a clear photo.
+                  </p>
+                </div>
 
-                    <div className="space-y-8">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                          Full Legal Name
-                        </Label>
-                        <Input
-                          placeholder="Enter your legal name as on ID"
-                          value={formData.fullName}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              fullName: e.target.value,
-                            })
-                          }
-                          className="bg-muted! border-white/10! text-white! focus:border-emerald-500/50! h-16 placeholder:text-gray-400"
-                          required
-                        />
-                      </div>
+                <div className="flex bg-white/5 p-1 rounded-2xl items-center">
+                  <button
+                    type="button"
+                    onClick={() => setDocumentType("passport")}
+                    className={`flex-1 py-3 px-2 rounded-xl transition-all text-[11px] font-bold uppercase tracking-wide ${documentType === "passport" ? "bg-emerald-500 text-black shadow-md" : "text-zinc-400 hover:text-white"}`}
+                  >
+                    Passport
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDocumentType("drivers_license")}
+                    className={`flex-1 py-3 px-2 rounded-xl transition-all text-[11px] font-bold uppercase tracking-wide ${documentType === "drivers_license" ? "bg-emerald-500 text-black shadow-md" : "text-zinc-400 hover:text-white"}`}
+                  >
+                    Driver License
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDocumentType("national_id")}
+                    className={`flex-1 py-3 px-2 rounded-xl transition-all text-[11px] font-bold uppercase tracking-wide ${documentType === "national_id" ? "bg-emerald-500 text-black shadow-md" : "text-zinc-400 hover:text-white"}`}
+                  >
+                    National ID
+                  </button>
+                </div>
 
-                      <div className="grid md:grid-cols-2 gap-8">
-                        <div className="flex flex-col space-y-2">
-                          <label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                            Date of Birth
-                          </label>
-                          <div className="relative group">
-                            <input
-                              type="date"
-                              value={formData.dateOfBirth}
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  dateOfBirth: e.target.value,
-                                })
-                              }
-                              className="w-full h-16 bg-[#050505] border border-white/10 rounded-xl px-4 text-white font-bold uppercase tracking-tight focus:border-emerald-500/50 focus:bg-white/5 focus:outline-none transition-all scheme:dark"
-                              required
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                            SSN / National ID
-                          </Label>
-                          <Input
-                            placeholder="XXX-XX-XXXX"
-                            value={formData.ssn}
-                            onChange={(e) =>
-                              setFormData({ ...formData, ssn: e.target.value })
-                            }
-                            className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`relative aspect-4/3 w-full max-w-sm mx-auto rounded-3xl flex flex-col items-center justify-center gap-4 transition-all cursor-pointer overflow-hidden ${idImage ? "bg-black" : "bg-white/5 hover:bg-white/10"}`}
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleIdUpload}
+                  />
 
-                {currentStep === 2 && (
-                  <div className="space-y-10 animate-in fade-in slide-in-from-right-8 duration-500 text-zinc-400">
-                    <div className="space-y-2">
-                      <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-                        <CreditCard className="w-8 h-8 text-emerald-500" /> ID
-                        Document
-                      </h3>
-                      <p className="text-sm font-medium font-['Poppins',sans-serif]">
-                        Select your document type and upload a clear photo.
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                      <button
-                        type="button"
-                        onClick={() => setDocumentType("passport")}
-                        className={`p-4 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest ${documentType === "passport" ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "bg-white/2 border-white/5 text-zinc-500 hover:border-white/10"}`}
-                      >
-                        Passport
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDocumentType("drivers_license")}
-                        className={`p-4 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest ${documentType === "drivers_license" ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "bg-white/2 border-white/5 text-zinc-500 hover:border-white/10"}`}
-                      >
-                        Driver License
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDocumentType("national_id")}
-                        className={`p-4 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest ${documentType === "national_id" ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "bg-white/2 border-white/5 text-zinc-500 hover:border-white/10"}`}
-                      >
-                        National ID
-                      </button>
-                    </div>
-
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`relative h-64 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center gap-4 transition-all cursor-pointer overflow-hidden ${idImage ? "border-emerald-500/50 bg-emerald-500/2" : "border-white/10 hover:border-emerald-500/30 hover:bg-white/2"}`}
-                    >
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleIdUpload}
+                  {idImage ? (
+                    <>
+                      <Image
+                        src={idImage}
+                        alt="ID Preview"
+                        fill
+                        className="object-cover opacity-40"
+                        unoptimized
                       />
 
-                      {idImage ? (
-                        <>
-                          <Image
-                            src={idImage}
-                            alt="ID Preview"
-                            fill
-                            className="object-cover opacity-40"
-                            unoptimized
-                          />
-
-                          <div className="relative z-10 flex flex-col items-center gap-4 bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                            {isIdScanning ? (
-                              <>
-                                <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-                                <div className="space-y-2 text-center">
-                                  <p className="text-sm font-black text-emerald-500 uppercase tracking-wide">
-                                    OCR Extraction Active
-                                  </p>
-                                  <div className="w-32 h-1 bg-emerald-500/20 rounded-full overflow-hidden">
-                                    <div
-                                      className="h-full bg-emerald-500 transition-all duration-300"
-                                      style={{ width: `${idScanProgress}%` }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center">
-                                  <CheckCircle2 className="w-6 h-6 text-black" />
-                                </div>
-                                <p className="text-sm font-black text-white uppercase tracking-wide">
-                                  Document Verified
-                                </p>
-                                <button className="text-[9px] text-gray-400 hover:text-white underline uppercase tracking-tighter">
-                                  Replace Document
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                            <Globe className="w-8 h-8 text-gray-400 group-hover:text-emerald-500 transition-colors" />
-                          </div>
-                          <div className="text-center">
-                            <p className="text-sm font-black text-white uppercase tracking-wide">
-                              Click to upload document
-                            </p>
-                            <p className="text-sm font-medium text-gray-400 mt-1 uppercase tracking-tighter">
-                              PNG, JPG or PDF up to 10MB
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {currentStep === 3 && (
-                  <div className="space-y-10 animate-in fade-in slide-in-from-right-8 duration-500 text-zinc-400">
-                    <div className="space-y-2 text-center">
-                      <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center justify-center gap-3">
-                        <Scan className="w-8 h-8 text-emerald-500" /> Live
-                        Identity
-                      </h3>
-                      <p className="text-sm font-medium font-['Poppins',sans-serif]">
-                        Please position your face within the frame and look
-                        directly at the camera.
-                      </p>
-                    </div>
-
-                    <div className="relative group/camera mx-auto w-full max-w-sm aspect-square">
-                      <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-full flex items-center justify-center p-4">
-                        <div className="absolute inset-0 border-4 border-emerald-500 rounded-full animate-pulse-slow clip-path-face z-30 pointer-events-none"></div>
-
-                        {!isCameraActive && !capturedFace ? (
-                          <div className="w-full h-full rounded-full bg-white/2 flex flex-col items-center justify-center gap-6 border border-white/5 group-hover/camera:bg-white/4 transition-all relative z-10">
-                            <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                              <Camera className="w-10 h-10 text-emerald-500" />
-                            </div>
-                            {cameraError ? (
-                              <div className="text-center px-8 space-y-4">
-                                <p className="text-sm font-medium text-red-500 uppercase tracking-wide font-['Poppins',sans-serif]">
-                                  {cameraError}
-                                </p>
-                                <Button
-                                  onClick={startScan}
-                                  type="button"
-                                  className="bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-wide text-[9px] px-6 py-3 rounded-full border border-white/10"
-                                >
-                                  Retry Access
-                                </Button>
-                              </div>
-                            ) : (
-                              <Button
-                                onClick={startScan}
-                                type="button"
-                                className="bg-emerald-500 text-black font-black uppercase tracking-wide text-sm px-8 py-4 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-105 transition-transform"
-                              >
-                                Enable Camera
-                              </Button>
-                            )}
-                          </div>
-                        ) : capturedFace ? (
-                          <div className="w-full h-full rounded-full bg-black flex flex-col items-center justify-center overflow-hidden relative border border-emerald-500/30">
-                            <Image
-                              src={capturedFace}
-                              alt="Captured Face"
-                              fill
-                              className="object-cover"
-                              unoptimized
-                            />
-
-                            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 animate-in fade-in duration-300">
-                              <div className="flex gap-3">
-                                <Button
-                                  onClick={retakePhoto}
-                                  type="button"
-                                  className="bg-transparent border border-white/20 hover:bg-white/10 text-white text-sm uppercase tracking-wide px-4 h-10 rounded-full"
-                                >
-                                  Retake
-                                </Button>
-                                <Button
-                                  onClick={confirmFace}
-                                  type="button"
-                                  className="bg-emerald-500 hover:bg-emerald-400 text-black text-sm uppercase tracking-wide px-4 h-10 rounded-full"
-                                >
-                                  Confirm
-                                </Button>
+                      <div className="relative z-10 flex flex-col items-center gap-4 bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-white/10">
+                        {isIdScanning ? (
+                          <>
+                            <DotLoader size="lg" />
+                            <div className="space-y-2 text-center">
+                              <p className="text-sm font-black text-emerald-500 uppercase tracking-wide">
+                                OCR Extraction Active
+                              </p>
+                              <div className="w-32 h-1 bg-emerald-500/20 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-emerald-500 transition-all duration-300"
+                                  style={{ width: `${idScanProgress}%` }}
+                                ></div>
                               </div>
                             </div>
-                          </div>
+                          </>
                         ) : (
-                          <div className="w-full h-full rounded-full bg-black flex flex-col items-center justify-center overflow-hidden relative border border-emerald-500/30">
-                            <video
-                              ref={videoRef}
-                              autoPlay
-                              playsInline
-                              muted
-                              className="absolute inset-0 w-full h-full object-cover scale-x-[-1]"
-                            />
-
-                            <div className="absolute inset-x-0 bottom-12 z-40 text-center space-y-3">
-                              <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-emerald-500/30">
-                                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                                  Live Feed
-                                </span>
-                              </div>
-                              <Button
-                                onClick={capturePhoto}
-                                type="button"
-                                className="mx-auto flex bg-white text-black font-black uppercase tracking-wide text-sm px-6 py-2 rounded-full hover:scale-105 transition-transform"
-                              >
-                                Capture Photo
-                              </Button>
+                          <>
+                            <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center">
+                              <CheckCircle2 className="w-6 h-6 text-black" />
                             </div>
-
-                            <div className="absolute inset-0 opacity-20 pointer-events-none z-20 bg-[linear-gradient(rgba(16,185,129,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.1)_1px,transparent_1px)] bg-size-[20px_20px]"></div>
-                          </div>
+                            <p className="text-sm font-black text-white uppercase tracking-wide">
+                              Document Verified
+                            </p>
+                            <button className="text-[9px] text-gray-400 hover:text-white underline uppercase tracking-tighter">
+                              Replace Document
+                            </button>
+                          </>
                         )}
                       </div>
-
-                      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-4 w-max">
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#050505] border border-white/10 shadow-xl">
-                          <Fingerprint className="w-3 h-3 text-emerald-500" />
-                          <span className="text-[8px] font-black text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                            Biometric Encrypted
-                          </span>
-                        </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center gap-4 py-8">
+                      <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center shadow-xl">
+                        <Camera className="w-7 h-7 text-emerald-500" />
+                      </div>
+                      <div className="text-center mt-2">
+                        <p className="text-sm font-semibold text-white">
+                          Tap to Front ID
+                        </p>
+                        <p className="text-xs text-zinc-500 mt-1">
+                          Ensure all corners are visible.
+                        </p>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              </div>
+            )}
+            {currentStep === 3 && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className="space-y-2 text-center">
+                  <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center justify-center gap-3">
+                    <Scan className="w-8 h-8 text-emerald-500" /> Live Identity
+                  </h3>
+                  <p className="text-sm font-medium text-zinc-400">
+                    Please position your face within the frame and look directly
+                    at the camera.
+                  </p>
+                </div>
 
-                {currentStep === 4 && (
-                  <div className="space-y-10 animate-in fade-in slide-in-from-right-8 duration-500 text-zinc-400">
-                    <div className="space-y-2">
-                      <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-                        <MapPin className="w-8 h-8 text-emerald-500" />{" "}
-                        Residency
-                      </h3>
-                      <p className="text-sm font-medium font-['Poppins',sans-serif]">
-                        Your current primary residence address.
-                      </p>
-                    </div>
+                <div className="relative group/camera mx-auto w-full max-w-sm aspect-square">
+                  <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-full flex items-center justify-center p-4">
+                    <div className="absolute inset-0 border-4 border-emerald-500 rounded-full animate-pulse-slow clip-path-face z-30 pointer-events-none"></div>
 
-                    <div className="space-y-8">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                          Street Address
-                        </Label>
-                        <Input
-                          placeholder="123 Financial District"
-                          value={formData.address}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              address: e.target.value,
-                            })
-                          }
-                          className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                          required
+                    {!isCameraActive && !capturedFace ? (
+                      <div className="w-full h-full rounded-full bg-white/2 flex flex-col items-center justify-center gap-6 border border-white/5 group-hover/camera:bg-white/4 transition-all relative z-10">
+                        <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <Camera className="w-10 h-10 text-emerald-500" />
+                        </div>
+                        {cameraError ? (
+                          <div className="text-center px-8 space-y-4">
+                            <p className="text-sm font-medium text-red-500 uppercase tracking-wide font-['Poppins',sans-serif]">
+                              {cameraError}
+                            </p>
+                            <Button
+                              onClick={startScan}
+                              type="button"
+                              className="bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-wide text-[9px] px-6 py-3 rounded-full border border-white/10"
+                            >
+                              Retry Access
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            onClick={startScan}
+                            type="button"
+                            className="bg-emerald-500 text-black font-black uppercase tracking-wide text-sm px-8 py-4 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-105 transition-transform"
+                          >
+                            Enable Camera
+                          </Button>
+                        )}
+                      </div>
+                    ) : capturedFace ? (
+                      <div className="w-full h-full rounded-full bg-black flex flex-col items-center justify-center overflow-hidden relative border border-emerald-500/30">
+                        <Image
+                          src={capturedFace}
+                          alt="Captured Face"
+                          fill
+                          className="object-cover"
+                          unoptimized
                         />
-                      </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                            City
-                          </Label>
-                          <Input
-                            placeholder="San Francisco"
-                            value={formData.city}
-                            onChange={(e) =>
-                              setFormData({ ...formData, city: e.target.value })
-                            }
-                            className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                            State
-                          </Label>
-                          <Input
-                            placeholder="CA"
-                            value={formData.state}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                state: e.target.value,
-                              })
-                            }
-                            className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                            ZIP
-                          </Label>
-                          <Input
-                            placeholder="94103"
-                            value={formData.zip}
-                            onChange={(e) =>
-                              setFormData({ ...formData, zip: e.target.value })
-                            }
-                            className="bg-muted! border-white/10! text-white! h-16 md:col-span-1 col-span-2 placeholder:text-gray-400"
-                            required
-                          />
+                        <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 animate-in fade-in duration-300">
+                          <div className="flex gap-3">
+                            <Button
+                              onClick={retakePhoto}
+                              type="button"
+                              className="bg-transparent border border-white/20 hover:bg-white/10 text-white text-sm uppercase tracking-wide px-4 h-10 rounded-full"
+                            >
+                              Retake
+                            </Button>
+                            <Button
+                              onClick={confirmFace}
+                              type="button"
+                              className="bg-emerald-500 hover:bg-emerald-400 text-black text-sm uppercase tracking-wide px-4 h-10 rounded-full"
+                            >
+                              Confirm
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                )}
-
-                {currentStep === 5 && isClient && (
-                  <div className="space-y-10 animate-in fade-in slide-in-from-right-8 duration-500 text-zinc-400">
-                    <div className="space-y-2">
-                      <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-                        <Building2 className="w-8 h-8 text-emerald-500" />{" "}
-                        Business Entity
-                        <span className="text-sm bg-white/10 px-2 py-0.5 rounded text-white/50 ml-auto font-['Poppins',sans-serif]">
-                          Optional
-                        </span>
-                      </h3>
-                      <p className="text-sm font-medium font-['Poppins',sans-serif]">
-                        Details for the legal entity funding the account
-                        (Optional).
-                      </p>
-                    </div>
-
-                    <div className="space-y-8">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                          Legal Business Name (Optional)
-                        </Label>
-                        <Input
-                          placeholder="Acme Holdings Inc."
-                          value={formData.businessName}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              businessName: e.target.value,
-                            })
-                          }
-                          className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
+                    ) : (
+                      <div className="w-full h-full rounded-full bg-black flex flex-col items-center justify-center overflow-hidden relative border border-emerald-500/30">
+                        <video
+                          ref={videoRef}
+                          autoPlay
+                          playsInline
+                          muted
+                          className="absolute inset-0 w-full h-full object-cover scale-x-[-1]"
                         />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
-                          EIN / Business ID (Optional)
-                        </Label>
-                        <Input
-                          placeholder="XX-XXXXXXX"
-                          value={formData.ein}
-                          onChange={(e) =>
-                            setFormData({ ...formData, ein: e.target.value })
-                          }
-                          className="bg-muted! border-white/10! text-white! h-16 placeholder:text-gray-400"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
 
-                <div className="pt-12 border-t border-white/5 space-y-8">
-                  <div className="flex gap-4">
-                    {currentStep > 1 && (
-                      <Button
-                        type="button"
-                        onClick={prevStep}
-                        className="h-18 flex-1 bg-transparent border border-white/10 hover:bg-white/5 text-gray-400 hover:text-white font-black uppercase tracking-wide text-sm rounded-2xl py-6 transition-all"
-                      >
-                        Back
-                      </Button>
+                        <div className="absolute inset-x-0 bottom-6 z-40 flex flex-col items-center gap-4">
+                          <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-emerald-500/30">
+                            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                              Live Feed
+                            </span>
+                          </div>
+                          <button
+                            onClick={capturePhoto}
+                            type="button"
+                            className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-transform"
+                          >
+                            <div className="w-14 h-14 rounded-full border-2 border-black flex items-center justify-center"></div>
+                          </button>
+                        </div>
+
+                        <div className="absolute inset-0 opacity-20 pointer-events-none z-20 bg-[linear-gradient(rgba(16,185,129,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.1)_1px,transparent_1px)] bg-size-[20px_20px]"></div>
+                      </div>
                     )}
-                    <Button
-                      type="submit"
-                      isLoading={loading}
-                      disabled={currentStep === 2 && !idImage}
-                      className={`${currentStep > 1 ? "flex-2" : "w-full"} h-18 bg-emerald-500 hover:bg-emerald-600 text-black font-black uppercase tracking-wide text-sm rounded-2xl transition-all shadow-2xl shadow-emerald-500/20 group py-6 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed`}
-                    >
-                      {loading ? (
-                        <span className="flex items-center gap-3">
-                          Finalizing
-                        </span>
-                      ) : (
-                        <span className="flex items-center justify-center gap-3">
-                          {currentStep === totalSteps
-                            ? "Complete Verification"
-                            : currentStep === 3
-                              ? "Scanning..."
-                              : "Continue"}
-                          {currentStep === totalSteps ? (
-                            <CheckCircle2 className="w-6 h-6" />
-                          ) : (
-                            currentStep !== 3 && (
-                              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                            )
-                          )}
-                        </span>
-                      )}
-                    </Button>
                   </div>
 
-                  <div className="p-6 rounded-2xl bg-white/2 border border-white/5 flex gap-4 items-center">
-                    <AlertCircle className="w-5 h-5 text-gray-400 shrink-0" />
-                    <p className="text-sm font-medium text-gray-400 leading-tight uppercase tracking-wide font-['Poppins',sans-serif]">
-                      Information is secured by military-grade AES-256
-                      encryption. Our verification partners are SOC2 Type II
-                      compliant.
-                    </p>
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-4 w-max">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#050505] border border-white/10 shadow-xl">
+                      <Fingerprint className="w-3 h-3 text-emerald-500" />
+                      <span className="text-[8px] font-black text-gray-400 uppercase tracking-wide font-['Poppins',sans-serif]">
+                        Biometric Encrypted
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </form>
+              </div>
+            )}
+
+            <div className="mt-auto sticky bottom-0 inset-x-0 bg-linear-to-t from-black via-black to-transparent pt-12 pb-6 space-y-6">
+              <div className="flex gap-4">
+                {currentStep > 1 && (
+                  <Button
+                    type="button"
+                    onClick={prevStep}
+                    className="h-14 flex-1 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold text-[15px] rounded-3xl transition-all"
+                  >
+                    Back
+                  </Button>
+                )}
+                <Button
+                  type="submit"
+                  isLoading={loading}
+                  disabled={currentStep === 2 && !idImage}
+                  className={`${currentStep > 1 ? "flex-2" : "w-full"} h-14 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-[15px] rounded-3xl transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed`}
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-3">
+                      Finalizing...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      {currentStep === totalSteps
+                        ? "Complete Verification"
+                        : currentStep === 3
+                          ? "Scanning..."
+                          : "Continue"}
+                    </span>
+                  )}
+                </Button>
+              </div>
+
+              <div className="flex justify-center items-center gap-2 text-zinc-500">
+                <AlertCircle className="w-4 h-4" />
+                <p className="text-[11px] font-medium tracking-tight">
+                  Secured by AES-256. Bank-grade SOC2 Type II.
+                </p>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </main>
 
@@ -777,7 +617,7 @@ export default function KYCPage() {
     <React.Suspense
       fallback={
         <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+          <DotLoader size="lg" />
         </div>
       }
     >

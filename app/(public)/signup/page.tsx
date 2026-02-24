@@ -1,4 +1,5 @@
 "use client";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 import * as React from "react";
 import { useState, useEffect } from "react";
@@ -10,7 +11,6 @@ import { api, UserRole } from "@/lib/api-client";
 import {
   ArrowRight,
   CheckCircle2,
-  Loader2,
   Shield,
   User,
   Mail,
@@ -410,7 +410,7 @@ export default function SignupPage() {
                 >
                   {loading ? (
                     <div className="flex items-center gap-3">
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <DotLoader size="sm" />
                       <span>Sending Code...</span>
                     </div>
                   ) : (
@@ -519,7 +519,7 @@ export default function SignupPage() {
                 >
                   {loading ? (
                     <div className="flex items-center gap-3">
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <DotLoader size="sm" />
                       <span>Verifying...</span>
                     </div>
                   ) : (

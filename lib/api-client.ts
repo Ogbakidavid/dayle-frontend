@@ -88,41 +88,6 @@ async function request(endpoint: string, options: RequestOptions = {}) {
 
 export const api = {
   auth: {
-    login: async (email: string, password: string): Promise<any> => {
-      const data = await request("/auth/login", {
-        method: "POST",
-        body: { email, password },
-      });
-      
-      // Tokens are now in httpOnly cookies, no need to store manually
-      return data.user;
-    },
-
-    signup: async (email: string, password: string, name: string, role: string): Promise<any> => {
-      const data = await request("/auth/signup", {
-        method: "POST",
-        body: { email, password, name, role },
-      });
-      
-      // Tokens are now in httpOnly cookies, no need to store manually
-      return data.user;
-    },
-
-    sendVerificationEmail: async (email: string): Promise<any> => {
-      return await request("/auth/send-verification-email", {
-        method: "POST",
-        body: { email },
-      });
-    },
-
-    verifyEmail: async (token: string): Promise<any> => {
-      const data = await request("/auth/verify-email", {
-        method: "POST",
-        body: { token },
-      });
-      return data;
-    },
-
     updateProfile: async (updates: any): Promise<any> => {
       return await request("/auth/profile", {
         method: "PATCH",
@@ -146,42 +111,6 @@ export const api = {
       return result;
     },
 
-    // 2FA Pending State Management (client-side only)
-    setPending2FA: (email: string, password: string): void => {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("pending_2fa_auth", JSON.stringify({ email, password, timestamp: Date.now() }));
-      }
-    },
-
-    getPending2FA: (): any => {
-      if (typeof window !== "undefined") {
-        const stored = localStorage.getItem("pending_2fa_auth");
-        if (stored) {
-          const data = JSON.parse(stored);
-          // Expire after 5 minutes
-          if (Date.now() - data.timestamp > 5 * 60 * 1000) {
-            localStorage.removeItem("pending_2fa_auth");
-            return null;
-          }
-          return data;
-        }
-      }
-      return null;
-    },
-
-    clearPending2FA: (): void => {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("pending_2fa_auth");
-      }
-    },
-
-    linkSmartAccount: async (payload: any): Promise<any> => {
-      return await request("/auth/smart-account", {
-        method: "POST",
-        body: payload,
-      });
-    },
-
     socialLogin: async (dto: any): Promise<any> => {
       const data = await request("/auth/privy-login", {
         method: "POST",
@@ -192,12 +121,6 @@ export const api = {
   },
 
   security: {
-
-
-    get2FAStatus: async (): Promise<any> => {
-      return await request("/auth/2fa/status");
-    },
-
     // Session Management
     getSessions: async (): Promise<any> => {
       return await request("/auth/sessions");
@@ -214,16 +137,6 @@ export const api = {
         method: "DELETE",
       });
     },
-
-    // Password Management
-    changePassword: async (currentPassword: string, newPassword: string): Promise<any> => {
-      return await request("/auth/change-password", {
-        method: "POST",
-        body: { currentPassword, newPassword },
-      });
-    },
-
-
   },
 
   ledger: {

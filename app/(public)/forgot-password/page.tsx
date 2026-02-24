@@ -1,4 +1,5 @@
 "use client";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 import * as React from "react";
 import { useState } from "react";
@@ -10,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import {
   Shield,
   ArrowRight,
-  Loader2,
   CheckCircle2,
   User,
   ArrowLeft,
@@ -152,7 +152,7 @@ export default function ForgotPasswordPage() {
               >
                 {loading ? (
                   <div className="flex items-center gap-3">
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <DotLoader size="sm" />
                     <span>Sending Link...</span>
                   </div>
                 ) : (

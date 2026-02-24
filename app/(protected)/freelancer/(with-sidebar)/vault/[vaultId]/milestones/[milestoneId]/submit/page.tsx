@@ -7,7 +7,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Upload, File as FileIcon, X, Loader2 } from "lucide-react";
+import { ArrowLeft, Upload, File as FileIcon, X } from "lucide-react";
+import { DotLoader } from "@/components/ui/dot-loader";
 import { toast } from "sonner";
 import { api } from "@/lib/api-client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -162,7 +163,7 @@ export default function SubmissionPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <DotLoader size="sm" className="mr-2" />
                       Encrypting & Submitting...
                     </>
                   ) : (

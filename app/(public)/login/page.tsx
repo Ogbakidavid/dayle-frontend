@@ -1,20 +1,14 @@
 "use client";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Shield,
-  ArrowRight,
-  Loader2,
-  CheckCircle2,
-  User,
-  KeyRound,
-} from "lucide-react";
+import { Shield, ArrowRight, CheckCircle2, User, KeyRound } from "lucide-react";
 import { api, UserRole } from "@/lib/api-client";
 import { useUser } from "@/lib/store/user-context";
 import { usePrivy, useLoginWithEmail } from "@privy-io/react-auth";
@@ -27,7 +21,10 @@ export default function LoginPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [loginFailed, setLoginFailed] = useState(false);
   const [otp, setOtp] = useState("");
+  // Guard: prevent multiple simultaneous backend login calls
+  const loginInProgressRef = useRef(false);
 
   const {
     login: privyLogin,
@@ -35,6 +32,7 @@ export default function LoginPage() {
     authenticated,
     user: privyUser,
     getAccessToken,
+    logout,
   } = usePrivy();
 
   const { sendCode, loginWithCode, state } = useLoginWithEmail({
@@ -52,13 +50,21 @@ export default function LoginPage() {
 
   // Watch for successful authentication to trigger backend sync
   useEffect(() => {
+    if (!ready || !authenticated || !privyUser) return;
+    // Prevent firing multiple times (privyUser updates as wallet is added etc.)
+    if (loginInProgressRef.current) return;
+
     const handleSocialLoginSuccess = async () => {
       console.log("handleSocialLoginSuccess called");
+      loginInProgressRef.current = true;
       try {
         const accessToken = await getAccessToken();
         if (!accessToken) {
           console.warn("Access token missing in handleSocialLoginSuccess");
-          setLoading(false); // Stop loading if token is missing
+          setLoading(false);
+          setLoginFailed(true);
+          loginInProgressRef.current = false;
+          await logout();
           return;
         }
 
@@ -88,7 +94,6 @@ export default function LoginPage() {
           return;
         }
 
-        // User has name (or social default) and role, redirect to dashboard or returnTo
         if (returnTo) {
           router.push(returnTo);
         } else {
@@ -100,22 +105,14 @@ export default function LoginPage() {
         console.error("handleSocialLoginSuccess error:", err);
         setError("Login failed. Please try again.");
         setLoading(false);
+        setLoginFailed(true);
+        loginInProgressRef.current = false;
       }
     };
 
-    if (ready && authenticated && privyUser) {
-      const timer = setTimeout(() => handleSocialLoginSuccess(), 0);
-      return () => clearTimeout(timer);
-    }
-  }, [
-    ready,
-    authenticated,
-    privyUser,
-    getAccessToken,
-    refreshUser,
-    router,
-    returnTo,
-  ]);
+    handleSocialLoginSuccess();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, authenticated]);
 
   const handlePrivyLogin = async (provider: any) => {
     try {
@@ -275,12 +272,12 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                disabled={loading || authenticated}
+                disabled={loading || (authenticated && !loginFailed)}
                 className="w-full h-16 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-black text-base uppercase tracking-wide transition-all shadow-xl active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {loading || authenticated ? (
+                {loading || (authenticated && !loginFailed) ? (
                   <div className="flex items-center gap-3">
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <DotLoader size="sm" />
                     <span>
                       {authenticated ? "Signing In..." : "Sending Code..."}
                     </span>
@@ -308,7 +305,7 @@ export default function LoginPage() {
                   type="button"
                   variant="outline"
                   onClick={() => handlePrivyLogin("google")}
-                  disabled={!ready || authenticated}
+                  disabled={!ready || (authenticated && !loginFailed)}
                   className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
                 >
                   <svg
@@ -341,7 +338,7 @@ export default function LoginPage() {
                   type="button"
                   variant="outline"
                   onClick={() => handlePrivyLogin("github")}
-                  disabled={!ready || authenticated}
+                  disabled={!ready || (authenticated && !loginFailed)}
                   className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
                 >
                   <svg
@@ -406,7 +403,7 @@ export default function LoginPage() {
               >
                 {loading ? (
                   <div className="flex items-center gap-3">
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <DotLoader size="sm" />
                     <span>Verifying...</span>
                   </div>
                 ) : (

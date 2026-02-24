@@ -14,6 +14,7 @@ import {
 import { useVault, Vault } from "@/lib/store/vault-context";
 import { useUser } from "@/lib/store/user-context";
 import { KycStatus } from "@/lib/domain/enums";
+
 import { api } from "@/lib/api-client";
 
 export default function CheckoutSelectionPage() {
@@ -50,10 +51,49 @@ export default function CheckoutSelectionPage() {
   const vault = localVault;
   const amount = vault?.totalAmount || 0;
 
+  const [isDepositing, setIsDepositing] = React.useState(false);
+
+  const simulateFiatPayment = async () => {
+    setIsDepositing(true);
+    try {
+      // In production, this button would redirect to Partna/Paycrest UI.
+      // For local testing, we send a mock webhook to our backend to simulate 
+      // the payment provider telling us the card charge was successful.
+      
+      const providerRef = `mock_fiat_${Date.now()}`;
+      
+      // Step 1: Create the pending ledger entry (normally done by the Fund API before redirecting)
+      await api.vaults.fund(vaultId, { paymentMethod: "card" });
+      
+      // Step 2: Simulate the Partna Webhook hitting our backend
+      await fetch("http://localhost:3000/api/webhooks/partna", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reference: `vault_fund_${vaultId}`, // The vaults.service.ts uses this prefix 
+          // Note: To make this robust, we should really hit a dedicated debug API 
+          // but for simplicity, we mock the exact payload format:
+          status: "success",
+          amount: amount,
+          type: "collection"
+        })
+      });
+
+      // Redirect back to vault summary to see the FUNDED status
+      router.push(`/client/vault/${vaultId}?success=true`);
+    } catch (err) {
+      console.error("Fiat simulation failed", err);
+    } finally {
+      setIsDepositing(false);
+    }
+  };
+
   if (contextLoading || fetching)
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-['Poppins',sans-serif]">
-        Loading...
+        <div className="animate-spin text-emerald-500">
+          <Lock />
+        </div>
       </div>
     );
   if (!vault)
@@ -108,14 +148,14 @@ export default function CheckoutSelectionPage() {
 
               <div className="pt-10 border-t border-white/5 space-y-6">
                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                  <span className="text-white/30 italic">Vault Reference</span>
-                  <span className="text-white/70 italic font-mono tracking-normal">
-                    {vaultId.slice(0, 12)}...
+                  <span className="text-white/30 italic">Vault Contract</span>
+                  <span className="text-emerald-500 italic font-mono tracking-normal text-[9px]">
+                    {vault?.vaultAddress || "Deployment Pending"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-white">
                   <span className="text-white/30 italic">Network Fee</span>
-                  <span className="text-emerald-500 italic">$0.00</span>
+                  <span className="text-emerald-500 italic">Sponsored</span>
                 </div>
               </div>
             </div>
@@ -125,11 +165,11 @@ export default function CheckoutSelectionPage() {
             <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <div className="relative z-10">
               <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mb-3 italic">
-                <ShieldCheck className="w-4 h-4" /> SECURE ESCROW
+                <CreditCard className="w-4 h-4" /> SECURE CHECKOUT
               </div>
-              <p className="text-xs text-white/40 leading-relaxed font-black uppercase tracking-widest">
-                Funds are held in a secure multi-sig vault until milestone
-                approval.
+              <p className="text-[10px] text-white/40 leading-relaxed font-black uppercase tracking-widest mt-2">
+                Approving this transaction securely deposits your funds into the
+                Web3 vault.
               </p>
             </div>
           </div>
@@ -145,85 +185,39 @@ export default function CheckoutSelectionPage() {
             >
               <div className="text-center space-y-4">
                 <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
-                  Funding Protocol
+                  Authorize Deposit
                 </h2>
                 <p className="text-xs font-black text-white/30 uppercase tracking-[0.3em]">
-                  Select your primary project liquidation method
+                  Complete Checkout via Partna / Paycrest
                 </p>
-                {!isKycVerified && (
-                  <div className="mt-8 p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex items-center gap-4 text-left">
-                    <ShieldCheck className="w-6 h-6 text-amber-500 shrink-0" />
-                    <div>
-                      <p className="text-[10px] text-amber-500 font-black uppercase tracking-widest leading-relaxed">
-                        KYC VERIFICATION REQUIRED
-                      </p>
-                      <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-1">
-                        Please complete identity verification in your{" "}
-                        <span
-                          className="text-white cursor-pointer underline underline-offset-4"
-                          onClick={() => router.push("/client/settings")}
-                        >
-                          settings
-                        </span>{" "}
-                        before funding.
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div className="grid gap-6">
-                <MethodBtn
-                  icon={<CreditCard className="w-8 h-8" />}
-                  title="Card Liquidity"
-                  desc="Visa, Mastercard, Amex"
-                  onClick={() => router.push(`/checkout/${vaultId}/card`)}
-                />
-                <MethodBtn
-                  icon={<Building2 className="w-8 h-8" />}
-                  title="Bank Transfer"
-                  desc="Direct bank-to-terminal settlement."
-                  onClick={() => router.push(`/checkout/${vaultId}/bank`)}
-                />
+                {/* Web3 Deposit Button */}
+                <button
+                  onClick={simulateFiatPayment}
+                  disabled={isDepositing || !vault?.vaultAddress}
+                  className="w-full p-8 bg-blue-500/10 border border-blue-500/50 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 group hover:bg-blue-500/20 transition-all text-center shadow-2xl relative overflow-hidden disabled:opacity-50"
+                >
+                  <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-black transition-all shadow-inner">
+                    <Building2 className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <p className="text-blue-500 font-black text-2xl uppercase tracking-tighter italic group-hover:text-blue-400 transition-colors">
+                      {isDepositing
+                        ? "Processing Payment..."
+                        : "Simulate Fiat Payment"}
+                    </p>
+                    <p className="text-[10px] font-black text-blue-500/50 uppercase tracking-[0.2em] mt-2 group-hover:text-blue-500/80 transition-colors">
+                      PAY WITH CREDIT CARD OR BANK TRANSFER
+                    </p>
+                  </div>
+                </button>
               </div>
             </motion.div>
           </div>
         </main>
       </div>
     </div>
-  );
-}
-
-// --- COMPONENTS ---
-
-interface MethodBtnProps {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-  onClick: () => void;
-}
-
-function MethodBtn({ icon, title, desc, onClick }: MethodBtnProps) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full p-8 bg-white/2 border border-white/5 rounded-[2.5rem] flex items-center gap-8 group hover:bg-emerald-500/3 hover:border-emerald-500/30 transition-all text-left shadow-2xl relative overflow-hidden"
-    >
-      <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-white/40 group-hover:bg-emerald-500 group-hover:text-black transition-all shadow-inner">
-        {icon}
-      </div>
-      <div className="flex-1">
-        <p className="text-white font-black text-xl uppercase tracking-tighter italic group-hover:text-emerald-500 transition-colors">
-          {title}
-        </p>
-        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-2 group-hover:text-white/40 transition-colors">
-          {desc}
-        </p>
-      </div>
-      <div className="w-12 h-12 rounded-xl bg-white/2 border border-white/5 flex items-center justify-center group-hover:border-emerald-500/20 transition-all">
-        <ChevronRight className="w-5 h-5 text-white/10 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
-      </div>
-    </button>
   );
 }

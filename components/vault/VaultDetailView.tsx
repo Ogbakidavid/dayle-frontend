@@ -9,14 +9,9 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { EvidencePanel } from "@/components/shared/EvidencePanel";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api-client";
+import { DotLoader } from "@/components/ui/dot-loader";
 import type { Vault, Milestone } from "@/lib/store/vault-context";
-import {
-  Calendar,
-  FileText,
-  ShieldCheck,
-  ClipboardList,
-  Loader2,
-} from "lucide-react";
+import { Calendar, FileText, ShieldCheck, ClipboardList } from "lucide-react";
 
 export interface VaultDetailViewProps {
   vaultId: string;
@@ -77,7 +72,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-white/50 gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+        <DotLoader size="lg" />
         <p className="font-bold uppercase tracking-widest text-xs">
           Securing data link...
         </p>

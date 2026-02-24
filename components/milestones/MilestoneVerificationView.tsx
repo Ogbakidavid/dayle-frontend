@@ -11,14 +11,9 @@ import {
 } from "@/components/shared/EvidencePanel";
 import { DisputeInitiationPanel } from "@/components/disputes/DisputeInitiationPanel";
 import { MILESTONE_STATUS_LABELS } from "@/lib/rules/milestones";
-import {
-  BadgeCheck,
-  Ban,
-  ChevronLeft,
-  ShieldCheck,
-  Loader2,
-} from "lucide-react";
+import { BadgeCheck, Ban, ChevronLeft, ShieldCheck } from "lucide-react";
 import { api } from "@/lib/api-client";
+import { DotLoader } from "@/components/ui/dot-loader";
 import type { Vault, Milestone } from "@/lib/store/vault-context";
 
 const statusStyles = {
@@ -76,7 +71,7 @@ export function MilestoneVerificationView({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-white/50 gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+        <DotLoader size="lg" />
         <p className="font-bold uppercase tracking-widest text-xs">
           Securing data link...
         </p>
