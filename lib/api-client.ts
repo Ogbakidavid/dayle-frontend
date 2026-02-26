@@ -298,6 +298,10 @@ export const api = {
     getStatus: async (): Promise<any> => {
       return await request("/onboarding/status");
     },
+
+    getDiditSession: async (): Promise<{ sessionId: string; url: string }> => {
+      return await request("/onboarding/didit/session");
+    },
   },
 
   evidence: {

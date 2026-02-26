@@ -57,26 +57,29 @@ export default function CheckoutSelectionPage() {
     setIsDepositing(true);
     try {
       // In production, this button would redirect to Partna/Paycrest UI.
-      // For local testing, we send a mock webhook to our backend to simulate 
+      // For local testing, we send a mock webhook to our backend to simulate
       // the payment provider telling us the card charge was successful.
-      
+
       const providerRef = `mock_fiat_${Date.now()}`;
-      
+
       // Step 1: Create the pending ledger entry (normally done by the Fund API before redirecting)
-      await api.vaults.fund(vaultId, { paymentMethod: "card" });
-      
-      // Step 2: Simulate the Partna Webhook hitting our backend
-      await fetch("http://localhost:3000/api/webhooks/partna", {
+      await api.vaults.fund(vaultId, {
+        paymentMethod: "card",
+        idempotencyKey: crypto.randomUUID(),
+      });
+
+      // Step 2: Simulate the Partna Webhook hitting our backend directly
+      const backendUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      await fetch(`${backendUrl}/api/webhooks/partna`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          reference: `vault_fund_${vaultId}`, // The vaults.service.ts uses this prefix 
-          // Note: To make this robust, we should really hit a dedicated debug API 
-          // but for simplicity, we mock the exact payload format:
+          reference: `vault_fund_${vaultId}`, // The vaults.service.ts uses this prefix
           status: "success",
-          amount: amount,
-          type: "collection"
-        })
+          amount: String(amount),
+          type: "collection",
+        }),
       });
 
       // Redirect back to vault summary to see the FUNDED status

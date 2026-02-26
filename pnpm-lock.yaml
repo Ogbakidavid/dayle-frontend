@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@didit-protocol/sdk-web':
+        specifier: ^0.1.6
+        version: 0.1.6
       '@fontsource/inter':
         specifier: ^5.2.8
         version: 5.2.8
@@ -248,6 +251,10 @@ packages:
 
   '@date-fns/tz@1.4.1':
     resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
+
+  '@didit-protocol/sdk-web@0.1.6':
+    resolution: {integrity: sha512-bRY//02/Dgumt9dPTNa993h1o6scBx7Im1IzTpo4DgWaNreiKy9/ZhDSoXk53OvCnkaUA4ISUBJw5xhriM5AxQ==}
+    engines: {node: '>=16.0.0'}
 
   '@ecies/ciphers@0.2.5':
     resolution: {integrity: sha512-GalEZH4JgOMHYYcYmVqnFirFsjZHeoGMDt9IxEnM9F7GRUUyUksJ7Ou53L83WHJq3RWKD3AcBpo0iQh0oMpf8A==}
@@ -5577,6 +5584,8 @@ snapshots:
       - zod
 
   '@date-fns/tz@1.4.1': {}
+
+  '@didit-protocol/sdk-web@0.1.6': {}
 
   '@ecies/ciphers@0.2.5(@noble/ciphers@1.3.0)':
     dependencies:

@@ -28,7 +28,6 @@ import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 import { api } from "@/lib/api-client";
 import { useVault } from "@/lib/store/vault-context";
 
-
 const variants: Variants = {
   enter: (direction: number) => ({
     x: direction > 0 ? 20 : -20,
@@ -167,7 +166,7 @@ export default function CreateVaultPage() {
         })),
         idempotencyKey,
       };
-      
+
       const newVault = await createVault(payload);
 
       // 2. Send invitation to freelancer if email provided
