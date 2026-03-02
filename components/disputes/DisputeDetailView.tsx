@@ -7,7 +7,7 @@ import { api } from "@/lib/api-client";
 import { useEffect, useState } from "react";
 import { DISPUTE_REASON_CODES } from "@/lib/rules/disputes";
 import { ChevronLeft, Gavel, FileText } from "lucide-react";
-import type { Vault, Milestone } from "@/lib/store/vault-context";
+import type { Vault } from "@/lib/store/vault-context";
 
 interface DisputeEvent {
   type: string;
@@ -22,7 +22,6 @@ interface DisputeEvent {
 interface Dispute {
   id: string;
   vaultId: string;
-  milestoneId: string;
   status: string;
   openedBy: string;
   requirementRef?: string;
@@ -68,15 +67,19 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
   const events = dispute?.events || [];
 
   if (loading)
-    return <div className="text-white/70 p-8 text-center bg-black/20 rounded-xl border border-white/5">Loading case file...</div>;
+    return (
+      <div className="text-white/70 p-8 text-center bg-black/20 rounded-xl border border-white/5">
+        Loading case file...
+      </div>
+    );
 
   if (!dispute) {
-    return <div className="text-white/70 p-8 text-center bg-black/20 rounded-xl border border-white/5">Dispute not found.</div>;
+    return (
+      <div className="text-white/70 p-8 text-center bg-black/20 rounded-xl border border-white/5">
+        Dispute not found.
+      </div>
+    );
   }
-
-  const milestone = vault?.milestones?.find(
-    (m) => m.id === dispute.milestoneId
-  );
 
   return (
     <div className="space-y-8 pb-20">
@@ -99,8 +102,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
           Case #{dispute.id}
         </h1>
         <p className="text-sm text-white/60">
-          Vault: {vault?.title || "Vault"} · Milestone:{" "}
-          {milestone?.title || dispute.milestoneId}
+          Vault: {vault?.title || "Vault"}
         </p>
       </header>
 
@@ -108,7 +110,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
         {/* Timeline / Evidence Ledger */}
         <div className="space-y-6">
           <Card className="bg-[#0D0D0E] border-white/5 shadow-2xl">
-            <CardHeader className="border-b border-white/5 bg-white/[0.01]">
+            <CardHeader className="border-b border-white/5 bg-white/1">
               <CardTitle className="text-white text-lg flex items-center justify-between">
                 <span>Evidence Ledger</span>
                 <Button
@@ -123,10 +125,15 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
             <CardContent className="p-0">
               <div className="divide-y divide-white/5">
                 {events.length === 0 ? (
-                  <div className="p-12 text-center text-white/30 text-sm">No events logged in the evidence ledger yet.</div>
+                  <div className="p-12 text-center text-white/30 text-sm">
+                    No events logged in the evidence ledger yet.
+                  </div>
                 ) : (
                   events.map((ev, i) => (
-                    <div key={i} className="p-6 hover:bg-white/[0.01] transition-colors">
+                    <div
+                      key={i}
+                      className="p-6 hover:bg-white/1 transition-colors"
+                    >
                       <div className="flex items-start gap-4">
                         {/* Icon/Actor */}
                         <div className="flex flex-col items-center gap-1">
@@ -155,7 +162,9 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                             {ev.payloadJson?.notes ||
                               ev.payload?.note ||
                               ev.payload?.decision ||
-                              (typeof ev.payload === 'string' ? ev.payload : JSON.stringify(ev.payload || {}))}
+                              (typeof ev.payload === "string"
+                                ? ev.payload
+                                : JSON.stringify(ev.payload || {}))}
                           </div>
 
                           {/* Reason Codes Badge */}
@@ -165,7 +174,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                               <div className="text-[10px] font-bold uppercase tracking-wide text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 shadow-sm shadow-amber-500/10">
                                 {getReasonLabel(
                                   ev.payload.reasonCode ||
-                                    ev.payload.reasonCodes?.[0]
+                                    ev.payload.reasonCodes?.[0],
                                 )}
                               </div>
                             </div>
@@ -177,7 +186,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                               {ev.files?.map((file, k) => (
                                 <div
                                   key={k}
-                                  className="flex items-center gap-2 text-xs text-white/50 bg-white/[0.03] px-3 py-1.5 rounded-lg border border-white/5 hover:border-white/20 hover:text-white transition-all cursor-pointer"
+                                  className="flex items-center gap-2 text-xs text-white/50 bg-white/3 px-3 py-1.5 rounded-lg border border-white/5 hover:border-white/20 hover:text-white transition-all cursor-pointer"
                                 >
                                   <FileText className="w-3 h-3 text-emerald-500" />
                                   {file.name}
@@ -197,7 +206,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
 
         {/* Sidebar Info */}
         <div className="space-y-6">
-          <Card className="bg-[#111111] border-white/10 sticky top-8 shadow-xl">
+          <Card className="bg-muted border-white/10 sticky top-8 shadow-xl">
             <CardHeader className="border-b border-white/5">
               <CardTitle className="text-white text-xs font-bold uppercase tracking-wide opacity-60">
                 Case Details
@@ -209,7 +218,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                   Status
                 </p>
                 <div className="inline-flex">
-                   <p className="text-base font-bold text-white capitalize bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                  <p className="text-base font-bold text-white capitalize bg-white/5 px-3 py-1 rounded-full border border-white/5">
                     {dispute.status?.replace("_", " ")}
                   </p>
                 </div>
@@ -238,7 +247,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                 </p>
                 <div className="text-xs leading-relaxed text-white/70 bg-white/5 p-3 rounded-xl border border-white/5 font-medium">
                   {getReasonLabel(
-                    dispute.reasonCode || dispute.reasonCodes?.[0] || ""
+                    dispute.reasonCode || dispute.reasonCodes?.[0] || "",
                   )}
                 </div>
               </div>

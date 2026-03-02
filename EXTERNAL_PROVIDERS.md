@@ -14,3 +14,6 @@
 
 ## Didit Docs
 [Didit Docs](https://docs.didit.me/)
+
+## Resend Docs
+[Resend Docs](https://resend.com/docs/introduction)

@@ -1,11 +1,9 @@
 import {
   VaultStatus,
-  MilestoneStatus,
   UserRole,
   UserStatus,
   KycStatus,
   VerificationResult,
-  MilestoneReviewOutcome,
   DisputeStatus,
   DisputeType,
   EvidenceType,
@@ -59,35 +57,16 @@ export interface Vault {
   frozenReason?: string | null;
   createdAt: string;
   updatedAt?: string;
-  milestones?: Milestone[];
-}
-
-export interface Milestone {
-  id: string;
-  vaultId?: string;
-  title: string;
-  status: MilestoneStatus;
-  amount: number;
-  dueDate?: string | null;
-  deliverableTypeId?: string | null;
-  deliverableMode?: string | null;
-  auditEnabled: boolean;
-  requirementItemsJson?: any; // Json
-  createdAt?: string;
-  updatedAt?: string;
   
-  // Relations / Computed
+  // Single-release model
   submission?: Submission | null;
   verification?: Verification | null;
-  review?: MilestoneReview | null;
-  
-  releaseStatus?: string; // Computed
-  refundStatus?: string; // Computed
+  review?: VaultReview | null;
 }
 
 export interface Submission {
   id: string;
-  milestoneId: string;
+  vaultId: string;
   submittedAt: string;
   submittedBy: string;
   notes?: string | null;
@@ -95,11 +74,12 @@ export interface Submission {
   deliverableType?: string | null;
   url?: string | null;
   fileUrl?: string | null;
+  requirements?: any; // Added for convenience in frontend
 }
 
 export interface Verification {
   id: string;
-  milestoneId: string;
+  vaultId: string;
   result: VerificationResult;
   verifiedAt: string;
   verifiedBy: string;
@@ -113,11 +93,11 @@ export interface Verification {
   notes?: string | null;
 }
 
-export interface MilestoneReview {
+export interface VaultReview {
   id: string;
-  milestoneId: string;
+  vaultId: string;
   reviewerId: string;
-  outcome: MilestoneReviewOutcome;
+  outcome: string; // RELEASE | REFUND | REQUEST_CHANGES
   reasonCodes?: any;
   notes?: string | null;
   reviewedAt: string;
@@ -126,7 +106,6 @@ export interface MilestoneReview {
 export interface Dispute {
   id: string;
   vaultId: string;
-  milestoneId: string;
   requirementRef?: string | null;
   disputeType: DisputeType;
   reasonCode: string;
@@ -155,7 +134,6 @@ export interface DisputeEvent {
 export interface Evidence {
   id: string;
   vaultId: string;
-  milestoneId?: string | null;
   disputeId?: string | null;
   type: EvidenceType;
   payload: any;

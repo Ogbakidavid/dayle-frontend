@@ -10,24 +10,14 @@ import {
 import { api } from "@/lib/api-client";
 import { useUser } from "./user-context";
 
-export interface Milestone {
-  id: string;
-  title: string;
-  description?: string;
-  status: string;
-  dueDate?: string;
-  amount?: string | number;
-  completionPercentage?: number;
-  [key: string]: any;
-}
-
 export interface Vault {
   id: string;
   title: string;
   description?: string;
   status: string;
   amount?: string | number;
-  milestones?: Milestone[];
+  totalAmount?: string | number;
+  submission?: any;
   [key: string]: any;
 }
 

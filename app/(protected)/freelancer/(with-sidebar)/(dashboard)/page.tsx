@@ -15,10 +15,12 @@ import {
   Activity,
   CheckCircle,
   Zap,
-  Badge,
+  Award, // Use Award instead of Badge icon to avoid conflict
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge"; // Import the actual component
 import { VaultStatus } from "@/lib/domain/enums";
 import { getVaultDerivedLabel } from "@/lib/domain/enums";
+import { api } from "@/lib/api-client";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -41,15 +43,31 @@ export default function FreelancerDashboard() {
   const { balance } = useLedger();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
+  const [invitations, setInvitations] = useState<any[]>([]);
+  const [invitationsLoading, setInvitationsLoading] = useState(false);
+
+  React.useEffect(() => {
+    async function fetchInvitations() {
+      try {
+        setInvitationsLoading(true);
+        const data = await api.invites.listMyInvites();
+        setInvitations(data);
+      } catch (err) {
+        console.error("Failed to fetch invitations:", err);
+      } finally {
+        setInvitationsLoading(false);
+      }
+    }
+    fetchInvitations();
+  }, []);
 
   // Work categories
   const activeVaults = vaults.filter((v: any) =>
-    [VaultStatus.FUNDED, VaultStatus.PAUSED, VaultStatus.DISPUTED].includes(
-      v.status,
-    ),
+    [VaultStatus.FUNDED, VaultStatus.DISPUTED].includes(v.status),
   );
   const completedVaults = vaults.filter(
-    (v: any) => v.status === VaultStatus.CLOSED,
+    (v: any) =>
+      v.status === VaultStatus.RELEASED || v.status === VaultStatus.REFUNDED,
   );
   const totalPending = activeVaults.reduce(
     (acc: number, v: any) => acc + (v.totalAmount || v.amount),
@@ -157,6 +175,79 @@ export default function FreelancerDashboard() {
           </div>
         </motion.div>
       </div>
+
+      {/* Pending Invitations Section */}
+      {invitations.length > 0 && (
+        <div className="pt-4 space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                <Shield className="w-5 h-5 text-emerald-500" />
+              </div>
+              <h2 className="text-xl font-black uppercase tracking-widest text-white italic">
+                Pending Project Invitations
+              </h2>
+            </div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/5 px-3 py-1 rounded-full border border-blue-500/10">
+              {invitations.length} New
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {invitations.map((invite: any) => (
+              <div
+                key={invite.id}
+                className="group flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-[#0D0D0E] border border-blue-500/30 rounded-2xl hover:border-emerald-500/30 transition-all gap-6 shadow-xl relative overflow-hidden"
+              >
+                <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50" />
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-2">
+                    <h4 className="text-lg font-black uppercase tracking-tight text-white">
+                      {invite.vault?.title}
+                    </h4>
+                    <span className="bg-blue-500/10 text-blue-500 text-[9px] font-black uppercase tracking-widest rounded-lg border border-blue-500/20 py-1 px-3">
+                      Action Required
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                      <Landmark className="w-2.5 h-2.5 text-white/40" />
+                    </div>
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">
+                      From:{" "}
+                      <span className="text-white/80">
+                        {invite.vault?.client?.name || "Dayle Client"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  <div className="text-right">
+                    <p className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em] mb-1">
+                      Vault Value
+                    </p>
+                    <p className="text-xl font-black text-white uppercase tracking-tight font-mono">
+                      $
+                      {(
+                        invite.vault?.totalAmount ||
+                        invite.vault?.amount ||
+                        0
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+                  <Link href={`/invite/${invite.token}`}>
+                    <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/10">
+                      View Invitation
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Active Assignments Section */}
       <div className="pt-8 space-y-6">

@@ -55,7 +55,7 @@ function KYCPageContent() {
               Verify Your Identity
             </h1>
             <p className="text-sm text-zinc-400">
-              We've partnered with Didit to provide bank-grade identity
+              We&apos;ve partnered with Didit to provide bank-grade identity
               verification. Unlock full access to funding and withdrawals in
               under 60 seconds.
             </p>

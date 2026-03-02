@@ -337,7 +337,7 @@ function Sidebar({ amount, transactionId, step }: SidebarProps) {
             <Shield className="w-4 h-4" /> SECURE ONRAMP
           </div>
           <p className="text-xs text-white/40 leading-relaxed font-black uppercase tracking-widest italic">
-            Bank-verified high-integrity onramp. Assets are cryptographically
+            Bank-verified high-integrity onramp. Assets are securely
             secured.
           </p>
         </div>
@@ -575,7 +575,7 @@ function ProcessingStatusScreen({
       case "processing":
         return "Authenticating liquidity stream...";
       case "completed":
-        return "Finalizing cryptographic ledger update...";
+        return "Finalizing secure ledger update...";
       default:
         return "Executing financial protocol...";
     }

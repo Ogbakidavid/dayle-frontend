@@ -195,7 +195,7 @@ export default function LoginPage() {
               },
               {
                 title: "Automated Payouts",
-                text: "Milestone-based fund release upon completion.",
+                text: "Vault-based fund release upon completion.",
               },
               {
                 title: "Verified Solvency",

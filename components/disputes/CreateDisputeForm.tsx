@@ -29,7 +29,7 @@ import {
 
 import { getDisputeEligibility } from "@/lib/rules/disputes";
 import { api } from "@/lib/api-client";
-import type { Vault, Milestone } from "@/lib/store/vault-context";
+import type { Vault } from "@/lib/store/vault-context";
 
 const MAX_FILE_MB = 10;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
@@ -115,7 +115,6 @@ export function CreateDisputeForm({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [selectedVaultId, setSelectedVaultId] = useState(initialVaultId || "");
-  const [selectedMilestoneId, setSelectedMilestoneId] = useState("");
   const [selectedRequirementId, setSelectedRequirementId] = useState("");
   const [selectedReasonCode, setSelectedReasonCode] = useState("");
   const [description, setDescription] = useState("");
@@ -145,30 +144,17 @@ export function CreateDisputeForm({
     return availableVaults.find((v) => v.id === selectedVaultId) || null;
   }, [selectedVaultId, availableVaults]);
 
-  const availableMilestones = useMemo(() => {
-    return selectedVault?.milestones || [];
-  }, [selectedVault]);
-
-  const selectedMilestone = useMemo(() => {
-    return (
-      availableMilestones.find((m) => m.id === selectedMilestoneId) || null
-    );
-  }, [availableMilestones, selectedMilestoneId]);
+  const eligibility = useMemo(() => {
+    return getDisputeEligibility(selectedVault, selectedRequirementId);
+  }, [selectedVault, selectedRequirementId]);
 
   const selectedRequirement = useMemo(() => {
     return (
-      ((selectedMilestone as any)?.requirements || []).find(
+      (selectedVault?.submission?.requirements || []).find(
         (r: any) => r.reqId === selectedRequirementId,
       ) || null
     );
-  }, [selectedMilestone, selectedRequirementId]);
-
-  const eligibility = useMemo(() => {
-    return getDisputeEligibility(
-      selectedMilestone as any,
-      selectedRequirementId,
-    );
-  }, [selectedMilestone, selectedRequirementId]);
+  }, [selectedVault, selectedRequirementId]);
 
   // Determine if the *current* selection requires a requirement reference
   const requiresRequirementRef = useMemo(() => {
@@ -179,20 +165,17 @@ export function CreateDisputeForm({
     return Boolean(codeDef?.requiresRequirementRef);
   }, [selectedReasonCode, eligibility]);
 
-  const step1Complete = Boolean(
-    selectedVaultId && selectedMilestoneId && selectedMilestone,
-  );
+  const step1Complete = Boolean(selectedVaultId && selectedVault);
   const step2Ready = step1Complete && eligibility?.eligible;
 
   const canSubmit =
-    Boolean(selectedMilestone) &&
+    Boolean(selectedVault) &&
     Boolean(eligibility?.eligible) &&
     Boolean(selectedReasonCode) &&
     (!requiresRequirementRef || Boolean(selectedRequirementId)) &&
     !isSubmitting;
 
   const resetDownstream = useCallback(() => {
-    setSelectedMilestoneId("");
     setSelectedRequirementId("");
     setSelectedReasonCode("");
     setDescription("");
@@ -266,10 +249,8 @@ export function CreateDisputeForm({
     setFormError("");
 
     if (!selectedVaultId) return setFormError("Select a vault.");
-    if (!selectedMilestoneId || !selectedMilestone)
-      return setFormError("Select a milestone.");
     if (!eligibility?.eligible)
-      return setFormError("This milestone is not eligible for dispute.");
+      return setFormError("This vault is not eligible for dispute.");
     if (!selectedReasonCode) return setFormError("Select a reason code.");
     if (requiresRequirementRef && !selectedRequirementId)
       return setFormError("This dispute type requires a linked requirement.");
@@ -279,7 +260,7 @@ export function CreateDisputeForm({
     try {
       await api.disputes.create({
         vaultId: selectedVaultId,
-        milestoneId: selectedMilestoneId,
+        milestoneId: selectedVaultId,
         requirementRef: selectedRequirementId || null,
         reasonCode: selectedReasonCode,
         description,
@@ -287,7 +268,6 @@ export function CreateDisputeForm({
 
       console.log("Submitted dispute", {
         selectedVaultId,
-        selectedMilestoneId,
         selectedRequirementId,
         selectedReasonCode,
         description,
@@ -342,7 +322,7 @@ export function CreateDisputeForm({
           Open a dispute
         </h1>
         <p className="text-sm leading-relaxed text-white/60">
-          Disputes are scoped to a specific milestone and a reason code. Choose
+          Disputes are scoped to a specific vault and a reason code. Choose
           carefully. Weak or vague disputes get rejected.
         </p>
       </header>
@@ -363,7 +343,7 @@ export function CreateDisputeForm({
             <StepHeader
               step="1"
               title="Select scope"
-              subtitle="Pick the vault and milestone this dispute applies to."
+              subtitle="Pick the vault this dispute applies to."
               right={
                 selectedVault ? (
                   <div className="rounded-lg border border-white/10 bg-white/3 px-3 py-1 text-xs text-white/60">
@@ -375,7 +355,7 @@ export function CreateDisputeForm({
           </CardHeader>
 
           <CardContent className="space-y-5">
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-1">
               {/* Vault */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-white">Vault</Label>
@@ -422,113 +402,29 @@ export function CreateDisputeForm({
                   This determines the dispute jurisdiction and parties.
                 </p>
               </div>
-
-              {/* Milestone */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-white">
-                  Milestone
-                </Label>
-                <Select
-                  value={selectedMilestoneId}
-                  disabled={!selectedVaultId}
-                  onValueChange={(val) => {
-                    setSelectedMilestoneId(val);
-                    resetReasonAndBelow();
-                  }}
-                >
-                  <SelectTrigger className="h-11 w-full border-white/10 bg-black/40 text-white hover:border-white/20 disabled:opacity-50 focus:ring-2 focus:ring-amber-500/30">
-                    <SelectValue
-                      placeholder={
-                        selectedVaultId
-                          ? "Select a milestone..."
-                          : "Select a vault first"
-                      }
-                    >
-                      {selectedMilestone ? (
-                        <span className="block w-full truncate">
-                          {selectedMilestone.title}
-                        </span>
-                      ) : null}
-                    </SelectValue>
-                  </SelectTrigger>
-
-                  <SelectContent
-                    className="
-                      w-(--radix-select-trigger-width)
-                      border-white/10 bg-[#141416] text-white
-                    "
-                  >
-                    {availableMilestones.length === 0 ? (
-                      <div className="p-3 text-sm text-white/50">
-                        No milestones found.
-                      </div>
-                    ) : (
-                      availableMilestones.map((m) => (
-                        <SelectItem
-                          key={m.id}
-                          value={m.id}
-                          className="focus:bg-white/10 focus:text-white"
-                        >
-                          <div className="flex flex-col items-start py-1">
-                            <span className="text-sm font-medium">
-                              {m.title}
-                            </span>
-                            <span className="text-xs text-white/40">
-                              {m.status} • {m.type}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-white/40">
-                  Disputes are tied to one milestone only.
-                </p>
-              </div>
             </div>
 
-            {/* Quick milestone context */}
-            {selectedMilestone ? (
+            {/* Quick vault context */}
+            {selectedVault ? (
               <div className="rounded-xl border border-white/10 bg-white/3 p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 space-y-2">
                     <div className="text-sm font-semibold text-white">
-                      {selectedMilestone.title}
+                      {selectedVault.title}
                     </div>
                     <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-xs text-white/50">
                       <div>
                         Status:{" "}
                         <span className="text-white/70 uppercase font-bold">
-                          {selectedMilestone.status.replace("_", " ")}
+                          {selectedVault.status}
                         </span>
                       </div>
                       <div>
                         Type:{" "}
                         <span className="text-white/70 uppercase font-bold">
-                          {selectedMilestone.type}
+                          SINGLE RELEASE
                         </span>
                       </div>
-                      {selectedMilestone.type === "COMPLIANCE" && (
-                        <div className="col-span-2 mt-1">
-                          Verification:{" "}
-                          <span
-                            className={cn(
-                              "uppercase font-bold",
-                              (selectedMilestone as any).verification
-                                ?.status === "PASS"
-                                ? "text-emerald-400"
-                                : (selectedMilestone as any).verification
-                                      ?.status === "FAIL"
-                                  ? "text-red-400"
-                                  : "text-amber-400",
-                            )}
-                          >
-                            {(selectedMilestone as any).verification?.status ||
-                              "PENDING"}
-                          </span>
-                        </div>
-                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-1 text-xs text-white/60">
@@ -594,7 +490,7 @@ export function CreateDisputeForm({
                         border-white/10 bg-[#141416] text-white
                       "
                     >
-                      {((selectedMilestone as any)?.requirements || []).map(
+                      {(selectedVault?.submission?.requirements || []).map(
                         (req: any) => (
                           <SelectItem
                             key={req.reqId}

@@ -17,7 +17,6 @@ export default function SubmissionPage() {
   const params = useParams();
   const router = useRouter();
   const vaultId = params.vaultId as string;
-  const milestoneId = params.milestoneId as string;
 
   const [files, setFiles] = useState<File[]>([]);
   const [comment, setComment] = useState("");
@@ -37,9 +36,10 @@ export default function SubmissionPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await api.milestones.submit(milestoneId, {
+      await api.vaults.submit(vaultId, {
         files: files.map((f) => ({ name: f.name, size: f.size })), // Mock file upload
         comments: comment,
+        idempotencyKey: crypto.randomUUID(),
       });
       toast.success("Work submitted successfully");
       router.replace(`/freelancer/vault/${vaultId}`);

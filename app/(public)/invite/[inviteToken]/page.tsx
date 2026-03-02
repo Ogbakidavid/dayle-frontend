@@ -32,8 +32,10 @@ interface InviteData {
     title: string;
     amount: number;
     clientName: string;
-    milestoneCount: number;
+    deliverableCount: number;
     isFunded: boolean;
+    vaultAddress?: string;
+    totalAmount?: number;
   };
 }
 
@@ -71,9 +73,14 @@ export default function InvitePage() {
     async function loadData() {
       try {
         setLoading(true);
-        // 1. Get User Session
-        const user = (await api.auth.getCurrentUser()) as CurrentUser | null;
-        setCurrentUser(user);
+        // 1. Get User Session (Optional)
+        try {
+          const user = (await api.auth.getCurrentUser()) as CurrentUser | null;
+          setCurrentUser(user);
+        } catch (authErr) {
+          // Ignore auth errors, user might be a guest
+          console.log("User is not logged in (Guest mode)");
+        }
 
         // 2. Get Invite Data
         if (inviteToken) {
@@ -296,18 +303,7 @@ export default function InvitePage() {
                   </p>
                   <div className="text-3xl font-black text-white tracking-tight flex items-baseline gap-1">
                     <span className="text-lg text-emerald-500">$</span>
-                    {vault.amount.toLocaleString()}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-white/40 text-xs font-bold uppercase tracking-wide mb-1">
-                    Milestones
-                  </p>
-                  <div className="text-3xl font-black text-white tracking-tight flex items-baseline gap-2">
-                    {vault.milestoneCount}
-                    <span className="text-sm font-bold text-white/30 uppercase font-['Poppins',sans-serif]">
-                      Phases
-                    </span>
+                    {(vault.totalAmount || vault.amount || 0).toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -338,6 +334,22 @@ export default function InvitePage() {
                     </p>
                   </div>
                 </div>
+
+                {vault.vaultAddress && (
+                  <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2 duration-700 delay-300">
+                    <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400 border border-emerald-500/20">
+                      <Shield className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-emerald-400 font-black text-[10px] uppercase tracking-widest">
+                        Securely Verified Escrow
+                      </p>
+                      <p className="text-white/30 text-[10px] font-mono mt-0.5 break-all">
+                        {vault.vaultAddress}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -447,7 +459,7 @@ export default function InvitePage() {
                   </h3>
                   <p className="text-white/50 text-sm mt-2 font-medium">
                     Accepting creates a binding workspace. You can review full
-                    requirements before confirming any milestones.
+                    requirements before confirming the vault.
                   </p>
                 </div>
 

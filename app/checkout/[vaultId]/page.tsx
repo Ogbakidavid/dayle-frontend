@@ -27,16 +27,7 @@ export default function CheckoutSelectionPage() {
   const [localVault, setLocalVault] = React.useState<Vault | null>(null);
   const [fetching, setFetching] = React.useState(false);
 
-  React.useEffect(() => {
-    const cachedVault = (vaults || []).find((v) => v.id === vaultId);
-    if (cachedVault) {
-      setLocalVault(cachedVault);
-    } else if (vaultId && !contextLoading) {
-      fetchVault();
-    }
-  }, [vaults, vaultId, contextLoading]);
-
-  const fetchVault = async () => {
+  const fetchVault = React.useCallback(async () => {
     setFetching(true);
     try {
       const v = await api.vaults.getById(vaultId);
@@ -46,7 +37,16 @@ export default function CheckoutSelectionPage() {
     } finally {
       setFetching(false);
     }
-  };
+  }, [vaultId]);
+
+  React.useEffect(() => {
+    const cachedVault = (vaults || []).find((v) => v.id === vaultId);
+    if (cachedVault) {
+      setLocalVault(cachedVault);
+    } else if (vaultId && !contextLoading) {
+      fetchVault();
+    }
+  }, [vaults, vaultId, contextLoading, fetchVault]);
 
   const vault = localVault;
   const amount = vault?.totalAmount || 0;
@@ -63,7 +63,7 @@ export default function CheckoutSelectionPage() {
       const providerRef = `mock_fiat_${Date.now()}`;
 
       // Step 1: Create the pending ledger entry (normally done by the Fund API before redirecting)
-      await api.vaults.fund(vaultId, {
+      const fundRes = await api.vaults.fund(vaultId, {
         paymentMethod: "card",
         idempotencyKey: crypto.randomUUID(),
       });
@@ -75,7 +75,7 @@ export default function CheckoutSelectionPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          reference: `vault_fund_${vaultId}`, // The vaults.service.ts uses this prefix
+          reference: fundRes.providerRef || `vault_fund_${vaultId}`,
           status: "success",
           amount: String(amount),
           type: "collection",
@@ -199,7 +199,7 @@ export default function CheckoutSelectionPage() {
                 {/* Web3 Deposit Button */}
                 <button
                   onClick={simulateFiatPayment}
-                  disabled={isDepositing || !vault?.vaultAddress}
+                  disabled={isDepositing}
                   className="w-full p-8 bg-blue-500/10 border border-blue-500/50 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 group hover:bg-blue-500/20 transition-all text-center shadow-2xl relative overflow-hidden disabled:opacity-50"
                 >
                   <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-black transition-all shadow-inner">

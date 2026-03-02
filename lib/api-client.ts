@@ -6,7 +6,6 @@
 // Re-export enums from domain
 export {
   VaultStatus,
-  MilestoneStatus,
   UserRole,
   UserStatus,
   DisputeStatus,
@@ -17,7 +16,6 @@ export {
   EvidenceType,
   KycStatus,
   LedgerEntryType,
-  MilestoneReviewOutcome,
   DisputeType,
 } from "@/lib/domain/enums";
 
@@ -178,17 +176,24 @@ export const api = {
       });
     },
 
-    releaseMilestone: async (vaultId: string, milestoneId: string, opts: any = {}): Promise<any> => {
-      return await request(`/vaults/${vaultId}/release-milestone`, {
+    release: async (vaultId: string, opts: any = {}): Promise<any> => {
+      return await request(`/vaults/${vaultId}/release`, {
         method: "POST",
-        body: { milestoneId, ...opts },
+        body: { ...opts },
       });
     },
 
-    refund: async (vaultId: string, milestoneId: string, opts: any = {}): Promise<any> => {
+    submit: async (vaultId: string, opts: any = {}): Promise<any> => {
+      return await request(`/vaults/${vaultId}/submit`, {
+        method: "POST",
+        body: { ...opts },
+      });
+    },
+
+    refund: async (vaultId: string, opts: any = {}): Promise<any> => {
       return await request(`/vaults/${vaultId}/refund`, {
         method: "POST",
-        body: { milestoneId, ...opts },
+        body: { ...opts },
       });
     },
 
@@ -200,6 +205,20 @@ export const api = {
       return await request(`/vaults/${id}/status`, {
         method: "PATCH",
         body: { status },
+      });
+    },
+
+    requestRefund: async (vaultId: string, data: any): Promise<any> => {
+      return await request(`/vaults/${vaultId}/request-refund`, {
+        method: "POST",
+        body: data,
+      });
+    },
+
+    updateFreelancer: async (vaultId: string, data: any): Promise<any> => {
+      return await request(`/vaults/${vaultId}/update-freelancer`, {
+        method: "PATCH",
+        body: data,
       });
     },
   },
@@ -235,6 +254,10 @@ export const api = {
     getByVaultId: async (vaultId: string): Promise<any> => {
       return await request(`/invites/vault/${vaultId}`);
     },
+
+    listMyInvites: async (): Promise<any[]> => {
+      return await request("/invites/my-invites");
+    },
     
     create: async (payload: any): Promise<any> => {
       return await request("/invites", {
@@ -254,31 +277,6 @@ export const api = {
     },
   },
 
-  milestones: {
-    submit: async (milestoneId: string, submissionData: any): Promise<any> => {
-      return await request(`/milestones/${milestoneId}/submit`, {
-        method: "POST",
-        body: submissionData,
-      });
-    },
-
-    verify: async (milestoneId: string): Promise<any> => {
-      return await request(`/milestones/${milestoneId}/verify`, {
-        method: "POST",
-      });
-    },
-
-    review: async (milestoneId: string, reviewData: any): Promise<any> => {
-      return await request(`/milestones/${milestoneId}/review`, {
-        method: "POST",
-        body: reviewData,
-      });
-    },
-
-    getEvidence: async (milestoneId: string): Promise<any> => {
-      return await request(`/milestones/${milestoneId}/evidence`);
-    },
-  },
 
   onboarding: {
     setRole: async (role: string): Promise<any> => {
@@ -305,10 +303,9 @@ export const api = {
   },
 
   evidence: {
-    list: async (params?: { vaultId?: string; milestoneId?: string; disputeId?: string }): Promise<any[]> => {
+    list: async (params?: { vaultId?: string; disputeId?: string }): Promise<any[]> => {
       const queryParams = new URLSearchParams();
       if (params?.vaultId) queryParams.append("vaultId", params.vaultId);
-      if (params?.milestoneId) queryParams.append("milestoneId", params.milestoneId);
       if (params?.disputeId) queryParams.append("disputeId", params.disputeId);
       
       const query = queryParams.toString();

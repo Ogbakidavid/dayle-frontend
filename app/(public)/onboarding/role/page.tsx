@@ -132,7 +132,7 @@ export default function RoleSelectionPage() {
 
               <p className="text-white text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
                 I want to work with verified clients and receive guaranteed,
-                milestone-based payouts for my projects.
+                vault-based payouts for my projects.
               </p>
               <Button
                 variant="ghost"

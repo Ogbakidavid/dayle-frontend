@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -10,14 +9,12 @@ import { api } from "@/lib/api-client";
 import {
   Upload,
   FileText,
-  Users,
   Zap,
-  Clock,
   CheckCircle,
   AlertTriangle,
   ArrowLeft,
   Gavel,
-  ShieldCheck
+  ShieldCheck,
 } from "lucide-react";
 import {
   Card,
@@ -31,8 +28,6 @@ import { cn } from "@/lib/utils";
 import { getDisputeEligibility } from "@/lib/rules/disputes";
 import {
   VaultStatus,
-  MilestoneStatus,
-  ReleaseStatus,
 } from "@/lib/domain/enums";
 import { getVaultDerivedLabel } from "@/lib/domain/enums";
 
@@ -62,77 +57,14 @@ export default function FreelancerVaultDetailPage() {
     }
   }, [vaultId]);
 
-  const displayMilestones = useMemo(() => {
-    if (!vault || !vault.milestones) return [];
-
-    return vault.milestones.map((m: any) => ({
-      ...m,
-      type: "APPROVAL",
-      complianceStatus: m.verification?.result || "PENDING",
-      status: m.status || MilestoneStatus.AWAITING_APPROVAL,
-      displayAmount: m.totalAmount || m.amount,
-      deliverable:
-        m.deliverable ||
-        (m.deliverableTypeId
-          ? m.deliverableTypeId.replace(/_/g, " ")
-          : "Deliverable"),
-    }));
-  }, [vault]);
-
-  const anyEligibleForDispute = useMemo(() => {
-    return displayMilestones.some(
-      (m: any) => getDisputeEligibility(m).eligible,
-    );
-  }, [displayMilestones]);
-
-  const getStatusDisplay = (milestone: any) => {
-    const status = milestone.status?.toUpperCase();
-    const releaseStatus = milestone.releaseStatus?.toUpperCase();
-
-    if (releaseStatus === ReleaseStatus.CONFIRMED) {
-      return { label: "PAID", color: "text-emerald-500", icon: CheckCircle };
-    }
-
-    if (status === MilestoneStatus.VERIFIED) {
-      return {
-        label: "APPROVED",
-        color: "text-emerald-400",
-        icon: CheckCircle,
-      };
-    }
-
-    if (
-      status === MilestoneStatus.AWAITING_APPROVAL ||
-      status === MilestoneStatus.SUBMITTED
-    ) {
-      return { label: "IN REVIEW", color: "text-amber-500", icon: Clock };
-    }
-
-    if (
-      status === MilestoneStatus.REJECTED ||
-      status === MilestoneStatus.REVISION_REQUESTED
-    ) {
-      return {
-        label: "NEED CHANGES",
-        color: "text-red-500",
-        icon: AlertTriangle,
-      };
-    }
-
-    if (status === MilestoneStatus.DISPUTED) {
-      return { label: "DISPUTED", color: "text-red-400", icon: Gavel };
-    }
-
-    return { label: "PENDING", color: "text-gray-400", icon: Clock };
-  };
-
+  // Single submission for the vault
   const [evidence, setEvidence] = useState<any>(null);
   useEffect(() => {
     async function loadEvidence() {
-      if (displayMilestones.length > 0) {
+      if (vault) {
         try {
           const data = await api.evidence.list({
-            milestoneId: displayMilestones[0].id,
+            vaultId: vault.id,
           });
           setEvidence(data);
         } catch (err) {
@@ -141,7 +73,7 @@ export default function FreelancerVaultDetailPage() {
       }
     }
     loadEvidence();
-  }, [displayMilestones]);
+  }, [vault]);
 
   if (vaultsLoading) {
     return (
@@ -176,6 +108,8 @@ export default function FreelancerVaultDetailPage() {
       </div>
     );
   }
+
+  const isEligibleForDispute = getDisputeEligibility(vault).eligible;
 
   return (
     <div className="min-h-screen text-gray-400 selection:bg-emerald-500/30 pb-20 font-['Poppins',sans-serif]">
@@ -233,161 +167,66 @@ export default function FreelancerVaultDetailPage() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* LEFT COLUMN: MILESTONES */}
+          {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             <Card className="bg-[#0D0D0E] border-white/5 shadow-2xl overflow-hidden relative">
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/2 rounded-full -mr-32 -mt-32 blur-3xl pointer-events-none" />
               <CardHeader className="pb-8 border-b border-white/5">
                 <CardTitle className="text-white font-black uppercase tracking-widest text-lg italic flex items-center gap-3">
                   <Zap className="w-5 h-5 text-emerald-500" />
-                  Project Milestones
+                  Project Deliverable
                 </CardTitle>
                 <CardDescription className="text-white/30 uppercase font-bold tracking-widest text-[10px] mt-2">
-                  Automated verification and manual approval protocol
+                  Submit your work for verification and payment release
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 pt-8">
-                {displayMilestones.map((milestone: any, index: number) => (
-                  <div
-                    key={milestone.id}
-                    className="group relative bg-white/2 border border-white/5 rounded-2xl p-6 hover:bg-white/4 hover:border-emerald-500/20 transition-all shadow-xl"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
-                      {/* Left: Info */}
-                      <div className="flex items-start gap-5 min-w-0">
-                        <div className="mt-1 w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-xs font-black text-white/40 group-hover:text-emerald-500 group-hover:border-emerald-500/30 transition-all shadow-inner italic">
-                          M{index + 1}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-xl font-black text-white uppercase tracking-tight truncate mb-4 italic">
-                            {milestone.title}
-                          </h3>
-
-                          {/* Escrow Verification Protocol */}
-                          <div className="flex flex-wrap gap-3">
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 shadow-sm">
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                              <span className="uppercase tracking-[0.2em] text-[9px] font-black italic">
-                                AI CORE: {milestone.complianceStatus}
-                              </span>
-                            </div>
-                            <div
-                              className={cn(
-                                "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[9px] font-black uppercase tracking-[0.2em] italic shadow-sm transition-colors",
-                                getStatusDisplay(milestone)
-                                  .color.replace("text-", "bg-")
-                                  .replace("500", "500/5")
-                                  .replace("400", "400/5"),
-                                getStatusDisplay(milestone)
-                                  .color.replace("text-", "border-")
-                                  .replace("500", "500/10")
-                                  .replace("400", "400/10"),
-                                getStatusDisplay(milestone).color,
-                              )}
-                            >
-                              <Users className="w-3.5 h-3.5" />
-                              <span>
-                                APPROVAL: {getStatusDisplay(milestone).label}
-                              </span>
-                            </div>
-                          </div>
-
-                          {milestone.deliverable && (
-                            <div className="mt-6 p-4 rounded-xl bg-black/20 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/5">
-                                  <FileText className="w-4 h-4 text-emerald-500/50" />
-                                </div>
-                                <div>
-                                  <p className="text-[9px] text-white/20 font-black uppercase tracking-[0.2em] mb-1">
-                                    CONTRACT DELIVERABLE
-                                  </p>
-                                  <span className="text-xs text-white/80 font-black uppercase tracking-widest italic truncate max-w-[200px]">
-                                    {milestone.deliverable}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <div className="flex flex-col items-end shrink-0 sm:border-l sm:border-white/5 sm:pl-6">
-                                <p className="text-[9px] text-white/20 font-black uppercase tracking-[0.2em] mb-1">
-                                  VALUE
-                                </p>
-                                <p className="text-sm font-black text-white font-mono tracking-widest leading-none">
-                                  ${milestone.displayAmount?.toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                <div className="group relative bg-white/2 border border-white/5 rounded-2xl p-6 hover:bg-white/4 hover:border-emerald-500/20 transition-all shadow-xl">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+                    <div className="flex items-start gap-5 min-w-0">
+                      <div className="mt-1 w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-xs font-black text-white/40 group-hover:text-emerald-500 group-hover:border-emerald-500/30 transition-all shadow-inner italic">
+                        <FileText className="w-5 h-5 text-emerald-500/50" />
                       </div>
-
-                      {/* Right: Actions */}
-                      <div className="flex flex-col items-end gap-4 shrink-0 pt-1">
-                        {milestone.status === MilestoneStatus.PENDING ||
-                        !milestone.status ? (
-                          <Link
-                            href={`/freelancer/vault/${vaultId}/milestones/${milestone.id}/submit`}
-                          >
-                            <Button
-                              size="sm"
-                              className="bg-emerald-500 text-black hover:bg-emerald-400 font-black uppercase tracking-[0.15em] h-10 px-6 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all text-xs italic"
-                            >
-                              Deliver Work
-                              <Upload className="w-4 h-4 ml-2" />
-                            </Button>
-                          </Link>
-                        ) : (
-                          <div className="flex flex-col items-end gap-2">
-                            <Badge
-                              variant="outline"
-                              className={cn(
-                                "uppercase tracking-[0.2em] text-[9px] font-black h-9 px-4 flex items-center gap-2 rounded-xl italic shadow-lg",
-                                getStatusDisplay(milestone)
-                                  .color.replace("text-", "bg-")
-                                  .replace("500", "500/10")
-                                  .replace("400", "400/10"),
-                                getStatusDisplay(milestone).color,
-                                getStatusDisplay(milestone)
-                                  .color.replace("text-", "border-")
-                                  .replace("500", "500/20")
-                                  .replace("400", "400/20"),
-                              )}
-                            >
-                              {(() => {
-                                const { icon: StatusIcon, label } =
-                                  getStatusDisplay(milestone);
-                                return (
-                                  <>
-                                    <StatusIcon className="w-3.5 h-3.5" />
-                                    {label}
-                                  </>
-                                );
-                              })()}
-                            </Badge>
-                            {milestone.dueDate && (
-                              <div className="flex items-center gap-1.5 text-[9px] text-white/20 font-black uppercase tracking-widest pt-1">
-                                <Clock className="w-3 h-3" />
-                                Deadline:{" "}
-                                <span className="text-white/40">
-                                  {milestone.dueDate}
-                                </span>
-                              </div>
-                            )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-xl font-black text-white uppercase tracking-tight truncate mb-4 italic">
+                          {vault.description || "Project Scope"}
+                        </h3>
+                        <div className="flex flex-wrap gap-3">
+                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 shadow-sm">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="uppercase tracking-[0.2em] text-[9px] font-black italic">
+                              STATUS: {getVaultDerivedLabel(vault.status)}
+                            </span>
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
+
+                    <div className="flex flex-col items-end gap-4 shrink-0 pt-1">
+                      {vault.status === VaultStatus.FUNDED ? (
+                        <Link href={`/freelancer/vault/${vaultId}/submit`}>
+                          <Button
+                            size="sm"
+                            className="bg-emerald-500 text-black hover:bg-emerald-400 font-black uppercase tracking-[0.15em] h-10 px-6 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all text-xs italic"
+                          >
+                            Deliver Work
+                            <Upload className="w-4 h-4 ml-2" />
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Badge variant="outline" className="opacity-50">
+                          {getVaultDerivedLabel(vault.status)}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                ))}
+                </div>
               </CardContent>
             </Card>
 
             {/* Evidence Panel */}
             <div className="relative">
-              <EvidencePanel
-                milestone={displayMilestones[0]}
-                evidence={evidence}
-              />
+              <EvidencePanel vault={vault} evidence={evidence} />
             </div>
           </div>
 
@@ -404,18 +243,6 @@ export default function FreelancerVaultDetailPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center text-[10px] bg-white/2 p-3 rounded-xl border border-white/5">
-                    <span className="text-white/40 font-black uppercase tracking-widest">
-                      Contract Tasks:
-                    </span>
-                    <span className="text-white font-black uppercase tracking-widest font-mono text-sm">
-                      {displayMilestones.reduce(
-                        (acc: number, m: any) =>
-                          acc + (m.requirementItemsJson?.length || 0),
-                        0,
-                      )}
-                    </span>
-                  </div>
                   <div className="flex justify-between items-center text-[10px] bg-white/2 p-3 rounded-xl border border-white/5">
                     <span className="text-white/40 font-black uppercase tracking-widest">
                       Escrow Status:
@@ -449,7 +276,7 @@ export default function FreelancerVaultDetailPage() {
             <Card
               className={cn(
                 "border-white/5 bg-[#0D0D0E] shadow-2xl transition-all hover:border-amber-500/20",
-                !anyEligibleForDispute && "opacity-60",
+                !isEligibleForDispute && "opacity-60",
               )}
             >
               <CardHeader className="pb-4">
@@ -458,8 +285,8 @@ export default function FreelancerVaultDetailPage() {
                   Legal Escrow Support
                 </CardTitle>
                 <CardDescription className="font-bold uppercase tracking-widest text-[9px] mt-2 leading-relaxed italic">
-                  {anyEligibleForDispute
-                    ? "Dispute eligibility confirmed. Open a formal case file if contract terms are breach."
+                  {isEligibleForDispute
+                    ? "Dispute eligibility confirmed. Open a formal case file if contract terms are breached."
                     : "No active disputes allowed. Case files are restricted to specific breach of contract reason codes."}
                 </CardDescription>
               </CardHeader>
@@ -467,10 +294,10 @@ export default function FreelancerVaultDetailPage() {
                 <Button
                   variant="outline"
                   className="w-full border-white/5 bg-white/2 hover:bg-white/5 text-white/60 hover:text-white font-black uppercase tracking-widest text-[10px] h-12 rounded-xl transition-all shadow-lg active:scale-95"
-                  disabled={!anyEligibleForDispute}
-                  asChild={anyEligibleForDispute}
+                  disabled={!isEligibleForDispute}
+                  asChild={isEligibleForDispute}
                 >
-                  {anyEligibleForDispute ? (
+                  {isEligibleForDispute ? (
                     <Link
                       href={`/freelancer/disputes/create?vaultId=${vaultId}`}
                     >

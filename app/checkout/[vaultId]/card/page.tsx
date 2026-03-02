@@ -244,7 +244,7 @@ export default function CardPaymentPage() {
                         Liquid Input
                       </h2>
                       <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.3em] italic">
-                        Enter cryptographic card parameters
+                        Enter secure card details
                       </p>
                     </div>
                     <div className="space-y-6">

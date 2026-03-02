@@ -16,27 +16,14 @@
 
 export enum VaultStatus {
   DRAFT = "DRAFT",
-  AWAITING_FUNDING = "AWAITING_FUNDING",
   FUNDED = "FUNDED",
-  PAUSED = "PAUSED",
+  RELEASED = "RELEASED",
+  REFUNDED = "REFUNDED",
   DISPUTED = "DISPUTED",
   CANCELLED = "CANCELLED",
-  CLOSED = "CLOSED",
 }
 
-// ============================================================================
-// MILESTONE STATUS
-// ============================================================================
-
-export enum MilestoneStatus {
-  PENDING = "PENDING",
-  SUBMITTED = "SUBMITTED",
-  AWAITING_APPROVAL = "AWAITING_APPROVAL",
-  VERIFIED = "VERIFIED",
-  REVISION_REQUESTED = "REVISION_REQUESTED",
-  REJECTED = "REJECTED",
-  DISPUTED = "DISPUTED",
-}
+// MilestoneStatus removed as milestones are no longer part of the application.
 
 // ============================================================================
 // RELEASE STATUS (Money Action Status)
@@ -62,15 +49,7 @@ export enum VerificationResult {
   HUMAN_REVIEW = "HUMAN_REVIEW",
 }
 
-// ============================================================================
-// MILESTONE REVIEW OUTCOME (Client Decision)
-// ============================================================================
-
-export enum MilestoneReviewOutcome {
-  APPROVE = "APPROVE",
-  REQUEST_CHANGES = "REQUEST_CHANGES",
-  REJECT = "REJECT",
-}
+// MilestoneReviewOutcome removed.
 
 // ============================================================================
 // DISPUTE STATUS
@@ -198,58 +177,47 @@ export enum EvidenceType {
   DISPUTE_EVIDENCE = "DISPUTE_EVIDENCE",
   DISPUTE_DECISION = "DISPUTE_DECISION",
   
-  // Vault & Milestone Lifecycle
-  MILESTONE_STATUS_CHANGED = "MILESTONE_STATUS_CHANGED",
+  // Vault Lifecycle
   VAULT_FUNDED = "VAULT_FUNDED",
   VAULT_STATUS_CHANGED = "VAULT_STATUS_CHANGED",
   VAULT_PAUSED = "VAULT_PAUSED",
 }
 
-// Helper for derived UI labels (Invisible Blockchain)
 export const getVaultDerivedLabel = (status: string | undefined): string => {
   switch (status?.toUpperCase()) {
     case VaultStatus.DRAFT:
       return "DRAFT";
-    case VaultStatus.AWAITING_FUNDING:
-      return "PENDING DEPOSIT";
     case VaultStatus.FUNDED:
       return "IN PROGRESS";
-    case VaultStatus.PAUSED:
-      return "PAUSED";
+    case VaultStatus.RELEASED:
+      return "RELEASED";
+    case VaultStatus.REFUNDED:
+      return "REFUNDED";
     case VaultStatus.DISPUTED:
       return "IN DISPUTE";
     case VaultStatus.CANCELLED:
       return "CANCELLED";
-    case VaultStatus.CLOSED:
-      return "CLOSED";
     default:
       return status || "UNKNOWN";
   }
 };
 
-export const getMilestoneStatusDisplay = (milestone: any): { label: string; color: string } => {
-  const status = milestone?.status?.toUpperCase();
-  const releaseStatus = milestone?.releaseStatus?.toUpperCase();
+export const getVaultStatusDisplay = (vault: any): { label: string; color: string } => {
+  const status = vault?.status?.toUpperCase();
 
-  if (releaseStatus === ReleaseStatus.CONFIRMED) {
-    return { label: "PAID", color: "text-emerald-500" };
-  }
-  
-  if (status === MilestoneStatus.VERIFIED) {
-      return { label: "APPROVED", color: "text-emerald-400" };
-  }
-
-  if (status === MilestoneStatus.AWAITING_APPROVAL || status === MilestoneStatus.SUBMITTED) {
-    return { label: "IN REVIEW", color: "text-amber-500" };
-  }
-  
-  if (status === MilestoneStatus.REJECTED || status === MilestoneStatus.REVISION_REQUESTED) {
-    return { label: "NEED CHANGES", color: "text-red-500" };
-  }
-  
-  if (status === MilestoneStatus.DISPUTED) {
+  switch (status) {
+    case VaultStatus.RELEASED:
+      return { label: "PAID", color: "text-emerald-500" };
+    case VaultStatus.FUNDED:
+      return { label: "IN PROGRESS", color: "text-amber-500" };
+    case VaultStatus.DISPUTED:
       return { label: "DISPUTED", color: "text-red-400" };
+    case VaultStatus.REFUNDED:
+      return { label: "REFUNDED", color: "text-gray-400" };
+    case VaultStatus.CANCELLED:
+      return { label: "CANCELLED", color: "text-gray-500" };
+    case VaultStatus.DRAFT:
+    default:
+      return { label: "DRAFT", color: "text-gray-400" };
   }
-
-  return { label: "PENDING", color: "text-gray-400" };
 };

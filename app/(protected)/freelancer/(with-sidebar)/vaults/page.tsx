@@ -93,7 +93,7 @@ export default function FreelancerVaultsPage() {
               Your Vaults
             </h1>
             <p className="text-[10px] text-white/50 font-black uppercase tracking-[0.2em]">
-              Manage your active contracts and milestones
+              Manage your active contracts and payment vaults
             </p>
           </motion.div>
           <motion.div
@@ -147,7 +147,7 @@ export default function FreelancerVaultsPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-emerald-500 transition-colors" />
           <input
             type="search"
-            placeholder="Search vaults, clients, or milestones..."
+            placeholder="Search vaults or clients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-5 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/30 text-white placeholder:text-white/10 transition-all shadow-xl font-bold uppercase tracking-wide text-xs"

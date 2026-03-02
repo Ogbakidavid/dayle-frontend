@@ -36,9 +36,7 @@ export default function ActiveWorkPage() {
 
   // Filter for active work context
   const activeVaults = vaults.filter((v: any) =>
-    [VaultStatus.FUNDED, VaultStatus.PAUSED, VaultStatus.DISPUTED].includes(
-      v.status,
-    ),
+    [VaultStatus.FUNDED, VaultStatus.DISPUTED].includes(v.status),
   );
 
   const [currentPage, setCurrentPage] = useState(1);

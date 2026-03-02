@@ -284,7 +284,7 @@ export default function FreelancerWithdrawPage() {
       };
       updateStatus();
     }
-  }, [step]);
+  }, [step, amount, bankDetails]);
 
   return (
     <div className="min-h-screen bg-[#050505] text-white/80 font-['Poppins',sans-serif] antialiased overflow-hidden">
@@ -1265,7 +1265,7 @@ function ProcessingStatusScreen({
     {
       id: "processing",
       label: "Asset Liquidation",
-      log: "High-speed crypto-to-fiat conversion",
+      log: "High-speed secure currency conversion",
       status:
         status === "processing"
           ? "current"

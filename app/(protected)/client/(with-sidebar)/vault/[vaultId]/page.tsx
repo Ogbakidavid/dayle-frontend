@@ -26,6 +26,8 @@ import {
   RefreshCcw,
   ShieldAlert,
   AlertCircle,
+  ShieldCheck,
+  Copy,
 } from "lucide-react";
 import {
   Card,
@@ -57,36 +59,13 @@ import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 import { EvidencePanel } from "@/components/shared/EvidencePanel";
 import { getDisputeEligibility } from "@/lib/rules/disputes";
-import { APPROVAL_REJECTION_CODES } from "@/lib/rules/milestones";
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 import {
   VaultStatus,
-  MilestoneStatus,
-  ReleaseStatus,
   KycStatus,
+  getVaultDerivedLabel,
 } from "@/lib/domain/enums";
 import { useUser } from "@/lib/store/user-context";
-
-const getVaultDerivedLabel = (status: string) => {
-  switch (status) {
-    case VaultStatus.DRAFT:
-      return "DRAFT";
-    case VaultStatus.AWAITING_FUNDING:
-      return "PENDING DEPOSIT";
-    case VaultStatus.FUNDED:
-      return "IN PROGRESS";
-    case VaultStatus.PAUSED:
-      return "PAUSED";
-    case VaultStatus.DISPUTED:
-      return "IN DISPUTE";
-    case VaultStatus.CANCELLED:
-      return "CANCELLED";
-    case VaultStatus.CLOSED:
-      return "CLOSED";
-    default:
-      return status;
-  }
-};
 
 export default function ClientVaultDetailPage() {
   const params = useParams();
@@ -95,11 +74,6 @@ export default function ClientVaultDetailPage() {
   const { user } = useUser();
   const { vaults, loading: vaultsLoading, refreshVaults } = useVault();
 
-  // Review Modal State
-  const [activeReview, setActiveReview] = useState<any>(null);
-  const [reviewReason, setReviewReason] = useState("");
-  const [reviewFeedback, setReviewFeedback] = useState("");
-  const [reviewAction, setReviewAction] = useState<string | null>(null); // 'REVISION_REQUESTED' | 'REJECTED'
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Find vault from context or use a fallback for safety
@@ -107,8 +81,19 @@ export default function ClientVaultDetailPage() {
 
   // Invitation State
   const [inviteEmail, setInviteEmail] = useState("");
-  const [sendingInvite, setSendingInvite] = useState(false);
   const [latestInvite, setLatestInvite] = useState<any>(null);
+  const [reassigning, setReassigning] = useState(false);
+  const [requestingRefund, setRequestingRefund] = useState(false);
+
+  // Refund Form State
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [payoutMethod, setPayoutMethod] = useState<"bank" | "card">("bank");
+  const [payoutDetails, setPayoutDetails] = useState({
+    bankName: "",
+    accountNumber: "",
+    holderName: "",
+    routingNumber: "",
+  });
 
   // Fetch latest invitation status for this vault
   useEffect(() => {
@@ -124,44 +109,18 @@ export default function ClientVaultDetailPage() {
     fetchInviteStatus();
   }, [vault]);
 
-  // Process milestones from vault data
-  const displayMilestones = useMemo(() => {
-    if (!vault || !vault.milestones) return [];
-
-    return vault.milestones.map((m: any) => {
-      return {
-        ...m,
-        type: "APPROVAL",
-        complianceStatus: m.verification?.result || "PENDING",
-        status: m.status || MilestoneStatus.AWAITING_APPROVAL,
-        displayAmount: m.totalAmount || m.amount,
-        deliverable:
-          m.deliverable ||
-          (m.deliverableTypeId
-            ? m.deliverableTypeId.replace(/_/g, " ")
-            : "Deliverable"),
-      };
-    });
-  }, [vault]);
-
   const handleApprove = async () => {
-    if (activeReview) {
-      try {
-        // API call to release funds and update status
-        await api.vaults.releaseMilestone(vault.id, activeReview.id, {
-          idempotencyKey: crypto.randomUUID(),
-        });
-
-        // Refresh vault data to see new status
-        await refreshVaults();
-
-        setActiveReview(null);
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
-      } catch (err) {
-        console.error("Release failed:", err);
-        toast.error("Failed to release funds. Please try again.");
-      }
+    try {
+      await api.vaults.release(vault.id, {
+        idempotencyKey: crypto.randomUUID(),
+      });
+      await refreshVaults();
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      toast.success("Funds released successfully!");
+    } catch (err) {
+      console.error("Release failed:", err);
+      toast.error("Failed to release funds. Please try again.");
     }
   };
 
@@ -188,82 +147,61 @@ export default function ClientVaultDetailPage() {
     }
   };
 
-  const handleReviewSubmit = async () => {
-    if (!activeReview || !reviewAction || !reviewReason) return;
-
-    try {
-      const outcome =
-        reviewAction === "REJECTED" ? "REJECT" : "REQUEST_CHANGES";
-
-      await api.milestones.review(activeReview.id, {
-        outcome: outcome,
-        reasonCodes: [reviewReason],
-        notes: reviewFeedback,
-      });
-
-      await refreshVaults(); // Refresh to catch status change
-
-      // Reset
-      setActiveReview(null);
-      setReviewFeedback("");
-      toast.success("Review submitted successfully");
-    } catch (err) {
-      console.error("Review failed:", err);
-      toast.error("Failed to submit review");
-    }
+  const handleRefund = async () => {
+    setShowRefundModal(true);
   };
 
-  const handleRefund = async (milestone: any) => {
+  const submitRefundRequest = async () => {
+    setRequestingRefund(true);
     try {
-      await api.vaults.refund(vault.id, milestone.id, {
-        idempotencyKey: crypto.randomUUID(),
+      await api.vaults.requestRefund(vault.id, {
+        payoutMethod,
+        payoutDetails,
       });
+      toast.success("Refund request submitted for admin review.");
+      setShowRefundModal(false);
       await refreshVaults();
-      toast.success("Refund process initiated.");
     } catch (err: any) {
-      console.error("Refund failed:", err);
-      toast.error("Failed to process refund. " + (err.message || ""));
+      console.error("Refund request failed:", err);
+      toast.error(err.message || "Failed to submit refund request.");
+    } finally {
+      setRequestingRefund(false);
     }
   };
 
-  // Check if any milestone is eligible for dispute
+  const handleUpdateFreelancer = async (email: string) => {
+    if (!email) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    setReassigning(true);
+    try {
+      await api.vaults.updateFreelancer(vault.id, {
+        freelancerEmail: email,
+      });
+      toast.success(`Vault reassigned to ${email}`);
+      setInviteEmail("");
+      await refreshVaults();
+    } catch (err: any) {
+      console.error("Reassignment failed:", err);
+      toast.error(err.message || "Failed to reassign vault.");
+    } finally {
+      setReassigning(false);
+    }
+  };
+
+  // Check if eligible for dispute
   const anyEligibleForDispute = useMemo(() => {
-    return displayMilestones.some(
-      (m: any) => getDisputeEligibility(m).eligible,
+    return (
+      vault?.status === VaultStatus.FUNDED ||
+      vault?.status === VaultStatus.DISPUTED
     );
-  }, [displayMilestones]);
+  }, [vault]);
 
   // Aggregate all submitted deliverables for the "Contract Documents" section
   const submittedDeliverables = useMemo(() => {
-    const list: any[] = [];
-    displayMilestones.forEach((m: any) => {
-      // Logic: If status is VERIFIED or AWAITING_APPROVAL, the freelancer has submitted work.
-      const hasWork = [
-        MilestoneStatus.VERIFIED,
-        MilestoneStatus.AWAITING_APPROVAL,
-        MilestoneStatus.SUBMITTED,
-      ].includes(m.status);
-      if (hasWork && m.deliverable) {
-        const purpose = vault.type;
-        const deliverableMeta = (VAULT_PURPOSE_MAPPING as any)[
-          purpose
-        ]?.deliverables?.find((d: any) => d.id === m.deliverableTypeId);
-
-        list.push({
-          id: `${m.id}_deliverable`,
-          name: deliverableMeta?.label || m.deliverableTypeId,
-          milestoneName: m.title,
-          type:
-            deliverableMeta?.type ||
-            (m.deliverableTypeId?.toLowerCase().includes("link")
-              ? "link"
-              : "file"),
-          url: "#",
-        });
-      }
-    });
-    return list;
-  }, [displayMilestones, vault]);
+    return [];
+  }, []);
 
   if (vaultsLoading) {
     return (
@@ -281,723 +219,515 @@ export default function ClientVaultDetailPage() {
     );
   }
 
-  // Helper for status colors and labels
-  const getStatusDisplay = (milestone: any) => {
-    const status = milestone.status?.toUpperCase();
-    const releaseStatus = milestone.releaseStatus?.toUpperCase();
-    const refundStatus = milestone.refundStatus?.toUpperCase();
-
-    if (releaseStatus === ReleaseStatus.CONFIRMED) {
-      return { label: "PAID", color: "text-emerald-500", icon: CheckCircle };
-    }
-
-    if (refundStatus === ReleaseStatus.CONFIRMED) {
-      return { label: "REFUNDED", color: "text-neutral-400", icon: RefreshCcw };
-    }
-
-    if (status === MilestoneStatus.VERIFIED) {
-      return { label: "APPROVED", color: "text-emerald-400", icon: Check };
-    }
-
-    if (
-      status === MilestoneStatus.AWAITING_APPROVAL ||
-      status === MilestoneStatus.SUBMITTED
-    ) {
-      return { label: "IN REVIEW", color: "text-amber-500", icon: Clock };
-    }
-
-    if (
-      status === MilestoneStatus.REJECTED ||
-      status === MilestoneStatus.REVISION_REQUESTED
-    ) {
-      return { label: "NEED CHANGES", color: "text-red-500", icon: X };
-    }
-
-    if (status === MilestoneStatus.DISPUTED) {
-      return { label: "DISPUTED", color: "text-red-400", icon: Gavel };
-    }
-
-    return { label: "PENDING", color: "text-gray-400", icon: Clock };
-  };
-
   return (
-    <div className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30 pb-20">
-      <div className="max-w-6xl mx-auto px-6 space-y-8">
-        {/* SUCCESS ALERT */}
-        {showSuccess && (
-          <div className="fixed top-8 right-8 z-50 animate-in slide-in-from-right-10 fade-in duration-300">
-            <Alert className="bg-emerald-500 border-emerald-600 text-white w-auto min-w-[300px] shadow-2xl">
-              <CheckCircle className="h-4 w-4 text-white" />
-              <AlertTitle>Success</AlertTitle>
-              <AlertDescription>
-                Milestone approved and funds released.
-              </AlertDescription>
-            </Alert>
-          </div>
-        )}
+    <>
+      <div className="min-h-screen text-gray-400 font-sans selection:bg-emerald-500/30 pb-20">
+        <div className="max-w-6xl mx-auto px-6 space-y-8">
+          {/* SUCCESS ALERT */}
+          {showSuccess && (
+            <div className="fixed top-8 right-8 z-50 animate-in slide-in-from-right-10 fade-in duration-300">
+              <Alert className="bg-emerald-500 border-emerald-600 text-white w-auto min-w-[300px] shadow-2xl">
+                <CheckCircle className="h-4 w-4 text-white" />
+                <AlertTitle>Success</AlertTitle>
+                <AlertDescription>
+                  Vault approved and funds released.
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
 
-        {/* HEADER */}
-        <header className="pt-8">
-          <button
-            onClick={() => router.back()}
-            className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </button>
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-white uppercase tracking-tighter">
-                  {vault.title}
-                </h1>
-                <Badge
-                  variant="outline"
-                  className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px]"
-                >
-                  {getVaultDerivedLabel(vault.status)}
-                </Badge>
-                {vault.status === VaultStatus.DRAFT && (
-                  <Button
-                    size="sm"
-                    className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3 transition-all disabled:opacity-50 disabled:grayscale"
-                    onClick={handleFund}
-                    disabled={vault.isFrozen}
+          {/* HEADER */}
+          <header className="pt-8">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </button>
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-3xl font-bold text-white uppercase tracking-tighter">
+                    {vault.title}
+                  </h1>
+                  <Badge
+                    variant="outline"
+                    className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px]"
                   >
-                    <CreditCard className="w-3.5 h-3.5 mr-1.5" />
-                    Fund Vault
-                  </Button>
+                    {getVaultDerivedLabel(vault.status)}
+                  </Badge>
+                  {vault.vaultAddress && (
+                    <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 animate-in fade-in zoom-in-95 duration-500">
+                      <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                      <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">
+                        On-chain Escrow Verified
+                      </span>
+                      <button
+                        onClick={() => {
+                          if (vault.vaultAddress) {
+                            navigator.clipboard.writeText(vault.vaultAddress);
+                            toast.success("Vault Reference ID copied");
+                          }
+                        }}
+                        className="hover:text-white transition-colors"
+                      >
+                        <Copy className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+                  )}
+                  {vault.status === VaultStatus.DRAFT && (
+                    <Button
+                      size="sm"
+                      className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3 transition-all disabled:opacity-50 disabled:grayscale"
+                      onClick={() => router.push(`/checkout/${vaultId}`)}
+                      disabled={vault.isFrozen}
+                    >
+                      <CreditCard className="w-3.5 h-3.5 mr-1.5" />
+                      Fund Vault
+                    </Button>
+                  )}
+                </div>
+                <p className="text-gray-400 font-bold uppercase tracking-wide">
+                  Vault ID:{" "}
+                  <span className="text-gray-400 font-mono">{vault.id}</span>
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">
+                  Total Value
+                </p>
+                <p className="text-3xl font-bold uppercase text-white tracking-tight font-mono">
+                  ${(vault.totalAmount || vault.amount).toLocaleString()}
+                </p>
+                <p className="text-xs text-emerald-500 font-bold uppercase tracking-tight mt-1">
+                  ${(vault.paidAmount || 0).toLocaleString()} Released
+                </p>
+              </div>
+            </div>
+          </header>
+
+          {/* FROZEN VAULT BANNER */}
+          {vault.isFrozen && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center gap-6 animate-in fade-in slide-in-from-top-4">
+              <div className="p-3 bg-red-500/10 rounded-full shrink-0">
+                <ShieldAlert className="w-8 h-8 text-red-500" />
+              </div>
+              <div className="space-y-1 grow">
+                <h3 className="text-lg font-black text-red-500 uppercase tracking-wide">
+                  Security Freeze Active
+                </h3>
+                <p className="text-sm font-medium text-white/80 leading-relaxed">
+                  This vault has been automatically frozen due to a detected
+                  discrepancy. All actions (funding, submissions, reviews) are
+                  temporarily paused.
+                </p>
+                {vault.frozenReason && (
+                  <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-red-500/20 text-xs font-mono text-red-400">
+                    <AlertCircle className="w-3 h-3" />
+                    REASON: {vault.frozenReason}
+                  </div>
                 )}
               </div>
-              <p className="text-gray-400 font-bold uppercase tracking-wide">
-                Vault ID:{" "}
-                <span className="text-gray-400 font-mono">{vault.id}</span>
-              </p>
+              <Button
+                variant="outline"
+                className="border-red-500/30 text-red-500 hover:bg-red-500 hover:text-white font-bold uppercase tracking-widest text-[10px]"
+                asChild
+              >
+                <a href="mailto:support@dayle.com?subject=Frozen Vault Appeal">
+                  Contact Support
+                </a>
+              </Button>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">
-                Total Value
-              </p>
-              <p className="text-3xl font-bold uppercase text-white tracking-tight font-mono">
-                ${(vault.totalAmount || vault.amount).toLocaleString()}
-              </p>
-              <p className="text-xs text-emerald-500 font-bold uppercase tracking-tight mt-1">
-                ${(vault.paidAmount || 0).toLocaleString()} Released
-              </p>
-            </div>
-          </div>
-        </header>
+          )}
 
-        {/* FROZEN VAULT BANNER */}
-        {vault.isFrozen && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center gap-6 animate-in fade-in slide-in-from-top-4">
-            <div className="p-3 bg-red-500/10 rounded-full shrink-0">
-              <ShieldAlert className="w-8 h-8 text-red-500" />
-            </div>
-            <div className="space-y-1 grow">
-              <h3 className="text-lg font-black text-red-500 uppercase tracking-wide">
-                Security Freeze Active
-              </h3>
-              <p className="text-sm font-medium text-white/80 leading-relaxed">
-                This vault has been automatically frozen due to a detected
-                discrepancy. All actions (funding, submissions, reviews) are
-                temporarily paused.
-              </p>
-              {vault.frozenReason && (
-                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-red-500/20 text-xs font-mono text-red-400">
-                  <AlertCircle className="w-3 h-3" />
-                  REASON: {vault.frozenReason}
-                </div>
-              )}
-            </div>
-            <Button
-              variant="outline"
-              className="border-red-500/30 text-red-500 hover:bg-red-500 hover:text-white font-bold uppercase tracking-widest text-[10px]"
-              asChild
-            >
-              <a href="mailto:support@dayle.com?subject=Frozen Vault Appeal">
-                Contact Support
-              </a>
-            </Button>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-black!">
-          {/* LEFT COLUMN: MILESTONES */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Milestone List */}
-            <Card className="bg-[#0D0D0E] border-white/5">
-              <CardHeader>
-                <CardTitle className="text-white font-bold uppercase tracking-wide">
-                  Milestone Phases
-                </CardTitle>
-                <CardDescription className="text-gray-400 font-bold uppercase tracking-wide pb-3">
-                  Detailed breakdown of Compliance (AI) and Approval (Human)
-                  stages
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {displayMilestones.map((milestone: any, index: number) => (
-                  <div
-                    key={milestone.id}
-                    className="group relative border border-white/5 rounded-xl p-5 bg-white/2 hover:bg-white/4 transition-all"
-                  >
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-black!">
+            {/* LEFT COLUMN: VAULT OVERVIEW */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="bg-[#0D0D0E] border-white/5">
+                <CardHeader>
+                  <CardTitle className="text-white font-bold uppercase tracking-wide">
+                    Vault Overview
+                  </CardTitle>
+                  <CardDescription className="text-gray-400 font-bold uppercase tracking-wide pb-3">
+                    Single-release escrow contract details and actions.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="group relative border border-white/5 rounded-xl p-5 bg-white/2">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                       <div className="flex items-start gap-4 min-w-0">
-                        {/* Milestone Index */}
-                        <div className="mt-1 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-sm font-bold text-gray-400">
-                          {index + 1}
-                        </div>
-
                         <div className="flex-1 min-w-0">
                           <h3 className="text-lg font-bold text-white uppercase tracking-wide truncate">
-                            {milestone.title}
+                            {vault.title}
                           </h3>
-
-                          {/* Escrow Verification Protocol */}
                           <div className="flex flex-wrap gap-2 mt-3">
-                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
-                              <Zap className="w-3 h-3" />
-                              <span className="uppercase tracking-widest text-[9px] font-bold">
-                                AI: {milestone.complianceStatus}
-                              </span>
-                            </div>
                             <div
                               className={cn(
                                 "flex items-center gap-1.5 px-2 py-0.5 rounded border transition-all",
-                                getStatusDisplay(milestone)
-                                  .color.replace("text-", "bg-")
-                                  .replace("500", "500/10")
-                                  .replace("400", "400/10"),
-                                getStatusDisplay(milestone)
-                                  .color.replace("text-", "border-")
-                                  .replace("500", "500/20")
-                                  .replace("400", "400/20"),
-                                getStatusDisplay(milestone).color,
+                                vault.status === VaultStatus.RELEASED
+                                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                  : vault.status === VaultStatus.REFUNDED
+                                    ? "bg-neutral-500/10 border-neutral-500/20 text-neutral-400"
+                                    : vault.status === VaultStatus.DISPUTED
+                                      ? "bg-red-500/10 border-red-500/20 text-red-500"
+                                      : "bg-amber-500/10 border-amber-500/20 text-amber-500",
                               )}
                             >
-                              <Users className="w-3 h-3" />
                               <span className="uppercase tracking-widest text-[9px] font-bold">
-                                Approval: {getStatusDisplay(milestone).label}
+                                Status: {getVaultDerivedLabel(vault.status)}
                               </span>
                             </div>
                           </div>
-
-                          {(milestone.deliverable ||
-                            milestone.deliverableTypeId) && (
-                            <div className="mt-3 flex items-center gap-3">
-                              <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gray-500 font-black">
-                                <FileText className="w-3 h-3" />
-                                Deliverable:
-                              </div>
-                              <span className="text-[11px] text-gray-300 font-bold uppercase bg-white/5 px-2 py-0.5 rounded border border-white/5">
-                                {milestone.deliverable ||
-                                  milestone.deliverableTypeId}
-                              </span>
-                            </div>
-                          )}
                         </div>
                       </div>
 
                       <div className="flex flex-col items-end gap-2 shrink-0">
                         <div className="text-right">
                           <p className="text-lg font-black text-white font-mono">
-                            ${milestone.displayAmount?.toLocaleString()}
+                            $
+                            {(
+                              vault.totalAmount || vault.amount
+                            ).toLocaleString()}
                           </p>
-                          {milestone.dueDate && (
-                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
-                              Due: {milestone.dueDate}
-                            </p>
-                          )}
                         </div>
 
-                        {milestone.status ===
-                        MilestoneStatus.AWAITING_APPROVAL ? (
-                          <Sheet>
-                            <SheetTrigger asChild>
+                        <div className="flex flex-col gap-2 mt-4">
+                          {vault.status === VaultStatus.FUNDED &&
+                            vault.freelancerId && (
                               <Button
                                 size="sm"
-                                onClick={() => setActiveReview(milestone)}
+                                onClick={handleApprove}
                                 disabled={vault.isFrozen}
-                                className="bg-amber-500 text-black hover:bg-amber-400 font-bold uppercase tracking-wide text-[11px] h-8 transition-all disabled:opacity-50 disabled:grayscale"
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wide text-[11px] h-8 transition-all disabled:opacity-50 disabled:grayscale w-full"
                               >
-                                Review Work
-                                <ChevronRight className="w-4 h-4 ml-1" />
+                                <Check className="w-4 h-4 mr-1" /> Approve &
+                                Release
                               </Button>
-                            </SheetTrigger>
-                            <SheetContent className="bg-[#0D0D0E] border-l border-white/10 w-full sm:max-w-[50vw] p-6 lg:p-8 overflow-y-auto">
-                              <SheetHeader className="mb-6">
-                                <SheetTitle className="text-white text-2xl font-bold uppercase tracking-wide">
-                                  Review Deliverable
-                                </SheetTitle>
-                                <SheetDescription className="text-gray-400 font-bold uppercase tracking-normal">
-                                  Review the evidence and data provided for this
-                                  milestone before releasing funds.
-                                </SheetDescription>
-                              </SheetHeader>
-
-                              {activeReview && (
-                                <div className="space-y-6">
-                                  <EvidencePanel milestone={activeReview} />
-
-                                  <div className="space-y-4 pt-4 border-t border-white/10">
-                                    <h4 className="text-sm font-bold text-white uppercase tracking-wide">
-                                      Actions
-                                    </h4>
-
-                                    {/* Approve */}
-                                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                                      <div className="flex items-center justify-between gap-4">
-                                        <div>
-                                          <h5 className="text-sm font-bold text-emerald-500 uppercase tracking-wide">
-                                            Approve & Pay
-                                          </h5>
-                                          <p className="text-xs text-emerald-200/70 mt-1 font-semibold uppercase tracking-normal">
-                                            Release{" "}
-                                            <span className="text-white font-bold">
-                                              $
-                                              {activeReview.displayAmount?.toLocaleString()}
-                                            </span>{" "}
-                                            to freelancer.
-                                          </p>
-                                        </div>
-                                        <SheetClose asChild>
-                                          <Button
-                                            onClick={handleApprove}
-                                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wide transition-all"
-                                          >
-                                            <Check className="w-4 h-4 mr-2" />
-                                            Approve
-                                          </Button>
-                                        </SheetClose>
-                                      </div>
-                                    </div>
-
-                                    <div className="relative flex items-center py-2">
-                                      <div className="grow border-t border-white/10"></div>
-                                      <span className="shrink-0 mx-4 text-white/30 text-xs font-bold uppercase tracking-wide">
-                                        Or Request Changes
-                                      </span>
-                                      <div className="grow border-t border-white/10"></div>
-                                    </div>
-
-                                    {/* Revision / Reject */}
-                                    <div className="space-y-4">
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <Button
-                                          variant="outline"
-                                          className={cn(
-                                            "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400 font-bold uppercase tracking-wide transition-all",
-                                            reviewAction ===
-                                              "REVISION_REQUESTED" &&
-                                              "bg-amber-500/10 ring-1 ring-amber-500",
-                                          )}
-                                          onClick={() => {
-                                            setReviewAction(
-                                              "REVISION_REQUESTED",
-                                            );
-                                            setReviewReason("");
-                                          }}
-                                        >
-                                          Request Changes
-                                        </Button>
-                                        <Button
-                                          variant="outline"
-                                          className={cn(
-                                            "border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 font-bold uppercase tracking-wide transition-all",
-                                            reviewAction === "REJECTED" &&
-                                              "bg-red-500/10 ring-1 ring-red-500",
-                                          )}
-                                          onClick={() => {
-                                            setReviewAction("REJECTED");
-                                            setReviewReason("");
-                                          }}
-                                        >
-                                          Reject Work
-                                        </Button>
-                                      </div>
-
-                                      {reviewAction && (
-                                        <div className="space-y-4 p-4 rounded-lg bg-white/2 border border-white/10 animate-in slide-in-from-top-2">
-                                          <div className="space-y-2">
-                                            <Label className="text-white! uppercase tracking-widest text-[10px] mb-2 block font-bold">
-                                              Reason codes (required)
-                                            </Label>
-                                            <Select
-                                              value={reviewReason}
-                                              onValueChange={setReviewReason}
-                                            >
-                                              <SelectTrigger className="w-full bg-black/40 border-white/10 text-white">
-                                                <SelectValue placeholder="Select reason code..." />
-                                              </SelectTrigger>
-                                              <SelectContent className="bg-[#141416] border-white/10 text-white max-h-[300px] z-100">
-                                                {APPROVAL_REJECTION_CODES.filter(
-                                                  (c) =>
-                                                    reviewAction === "REJECTED"
-                                                      ? c.code !==
-                                                        "REVISION_REQUIRED"
-                                                      : true,
-                                                ).map((c) => (
-                                                  <SelectItem
-                                                    key={c.code}
-                                                    value={c.code}
-                                                    className="focus:bg-white/10 focus:text-white border-b border-white/5 last:border-0"
-                                                  >
-                                                    <div className="flex flex-col py-1">
-                                                      <span className="font-bold text-xs uppercase tracking-wide">
-                                                        {c.label}
-                                                      </span>
-                                                      <span className="text-[10px] text-white/40 font-bold uppercase mt-0.5">
-                                                        {c.description}
-                                                      </span>
-                                                    </div>
-                                                  </SelectItem>
-                                                ))}
-                                              </SelectContent>
-                                            </Select>
-
-                                            {/* Visual Reason Indicator */}
-                                            {reviewReason && (
-                                              <div className="mt-2 p-3 bg-white/3 border border-white/5 rounded-lg">
-                                                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">
-                                                  Target Protocol:
-                                                </p>
-                                                <p className="text-sm font-bold text-white uppercase">
-                                                  {
-                                                    APPROVAL_REJECTION_CODES.find(
-                                                      (c) =>
-                                                        c.code === reviewReason,
-                                                    )?.label
-                                                  }
-                                                </p>
-                                              </div>
-                                            )}
-                                          </div>
-                                          <div className="space-y-2">
-                                            <Label className="text-white! uppercase tracking-widest text-[10px] mb-2 block font-bold">
-                                              Notes (Optional)
-                                            </Label>
-                                            <Textarea
-                                              placeholder="Provide feedback..."
-                                              className="bg-muted! border-white/10! min-h-[80px] text-white!"
-                                              value={reviewFeedback}
-                                              onChange={(e) =>
-                                                setReviewFeedback(
-                                                  e.target.value,
-                                                )
-                                              }
-                                            />
-                                          </div>
-                                          <div className="flex justify-end gap-2">
-                                            <Button
-                                              variant="ghost"
-                                              onClick={() =>
-                                                setReviewAction(null)
-                                              }
-                                              className="text-white! font-bold uppercase tracking-widest text-[10px]"
-                                            >
-                                              Cancel
-                                            </Button>
-                                            <SheetClose asChild>
-                                              <Button
-                                                disabled={!reviewReason}
-                                                onClick={handleReviewSubmit}
-                                                className={cn(
-                                                  "font-bold uppercase tracking-widest text-[10px] transition-all",
-                                                  reviewAction === "REJECTED"
-                                                    ? "bg-red-600 hover:bg-red-700"
-                                                    : "bg-amber-600 hover:bg-amber-700",
-                                                )}
-                                              >
-                                                Confirm{" "}
-                                                {reviewAction === "REJECTED"
-                                                  ? "Rejection"
-                                                  : "Request"}
-                                              </Button>
-                                            </SheetClose>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </SheetContent>
-                          </Sheet>
-                        ) : (
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              "uppercase tracking-widest text-[10px] h-7 px-3 flex items-center gap-1.5 transition-all",
-                              getStatusDisplay(milestone)
-                                .color.replace("text-", "bg-")
-                                .replace("500", "500/10")
-                                .replace("400", "400/10"),
-                              getStatusDisplay(milestone).color,
-                              getStatusDisplay(milestone)
-                                .color.replace("text-", "border-")
-                                .replace("500", "500/20")
-                                .replace("400", "400/20"),
                             )}
-                          >
-                            {(() => {
-                              const { icon: StatusIcon, label } =
-                                getStatusDisplay(milestone);
-                              return (
-                                <>
-                                  <StatusIcon className="w-3.5 h-3.5" />
-                                  {label}
-                                </>
-                              );
-                            })()}
-                          </Badge>
-                        )}
-                      </div>
 
-                      {/* Refund Action for Rejected Milestones */}
-                      {milestone.status === MilestoneStatus.REJECTED &&
-                        !milestone.refundStatus && (
-                          <div className="flex justify-end w-full mt-2 pt-2 border-t border-white/5">
-                            <Button
-                              size="sm"
-                              onClick={() => handleRefund(milestone)}
-                              className="bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3 border border-red-500/20 transition-all font-['Poppins',sans-serif]"
-                            >
-                              <RefreshCcw className="w-3 h-3 mr-1.5" />
-                              Process Refund
-                            </Button>
-                          </div>
-                        )}
+                          {/* Refund Button: Shown if not released AND (no freelancer OR disputed) */}
+                          {vault.status !== VaultStatus.RELEASED &&
+                            (!vault.freelancerId ||
+                              vault.status === VaultStatus.DISPUTED) && (
+                              <Button
+                                size="sm"
+                                onClick={handleRefund}
+                                className="bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-400 font-bold uppercase tracking-wide text-[11px] h-8 border border-red-500/20 transition-all font-['Poppins',sans-serif] w-full"
+                              >
+                                <RefreshCcw className="w-3 h-3 mr-1" /> Request
+                                Refund
+                              </Button>
+                            )}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* RIGHT COLUMN: SUMMARY & ACTIONS */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Dispute CTA */}
-            <Card
-              className={cn(
-                "border-white/5 bg-[#0D0D0E]",
-                !anyEligibleForDispute && "opacity-70",
-              )}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white font-bold uppercase tracking-normal">
-                  <Gavel className="w-5 h-5 text-amber-500" />
-                  Case Files
-                </CardTitle>
-                <CardDescription className="font-semibold text-gray-400 uppercase tracking-normal mb-2">
-                  {anyEligibleForDispute
-                    ? "Open a formal case file if work does not meet requirements."
-                    : "No eligible case files for this vault right now. Case files are only allowed for specific reason codes tied to a milestone."}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  variant="outline"
-                  className="w-full border-white/10 hover:bg-white/5 text-white font-bold uppercase tracking-widest text-[10px] transition-all"
-                  disabled={!anyEligibleForDispute}
-                  asChild={anyEligibleForDispute}
-                >
-                  {
-                    (anyEligibleForDispute ? (
-                      <Link href={`/client/disputes/create?vaultId=${vaultId}`}>
-                        Open a Case
-                      </Link>
-                    ) : (
-                      <Link href="/client/disputes">Go to disputes</Link>
-                    )) as any
-                  }
-                </Button>
-              </CardContent>
-            </Card>
-
-            <div className="bg-[#0D0D0E] border border-white/5 rounded-xl p-6 space-y-4">
-              {/* Freelancer Assignment Section */}
-              {(vault.status === "FUNDED_UNASSIGNED" ||
-                vault.status === "INVITED") && (
-                <div className="mb-6">
-                  <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4">
-                    Freelancer Assignment
-                  </h4>
-                  <Card
-                    className={cn(
-                      "bg-white/2 border-white/10 transition-colors",
-                      latestInvite?.status === "DECLINED" &&
-                        "border-red-500/30 bg-red-500/5",
-                    )}
+            {/* RIGHT COLUMN: SUMMARY & ACTIONS */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Dispute CTA */}
+              <Card
+                className={cn(
+                  "border-white/5 bg-[#0D0D0E]",
+                  !anyEligibleForDispute && "opacity-70",
+                )}
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-white font-bold uppercase tracking-normal">
+                    <Gavel className="w-5 h-5 text-amber-500" />
+                    Case Files
+                  </CardTitle>
+                  <CardDescription className="font-semibold text-gray-400 uppercase tracking-normal mb-2">
+                    {anyEligibleForDispute
+                      ? "Open a formal case file if work does not meet requirements."
+                      : "No eligible case files for this vault right now. Case files are only allowed for specific reason codes."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    variant="outline"
+                    className="w-full border-white/10 hover:bg-white/5 text-white font-bold uppercase tracking-widest text-[10px] transition-all"
+                    disabled={!anyEligibleForDispute}
+                    asChild={anyEligibleForDispute}
                   >
-                    <CardContent className="p-4 space-y-4">
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={cn(
-                            "p-2 rounded-lg",
-                            latestInvite?.status === "DECLINED"
-                              ? "bg-red-500/10"
-                              : "bg-amber-500/10",
-                          )}
+                    {
+                      (anyEligibleForDispute ? (
+                        <Link
+                          href={`/client/disputes/create?vaultId=${vaultId}`}
                         >
-                          <UserPlus
-                            className={cn(
-                              "w-5 h-5",
-                              latestInvite?.status === "DECLINED"
-                                ? "text-red-500"
-                                : "text-amber-500",
-                            )}
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className="text-sm font-bold text-white uppercase tracking-tighter">
-                              {latestInvite?.status === "DECLINED"
-                                ? "Freelancer Declined Invitation"
-                                : vault.status === "FUNDED_UNASSIGNED"
-                                  ? "Awaiting Freelancer Assignment"
-                                  : "Invitation Pending"}
-                            </p>
-                            {latestInvite?.status === "DECLINED" && (
-                              <Badge
-                                variant="destructive"
-                                className="text-[10px] uppercase h-4 px-1"
-                              >
-                                Declined
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-gray-400 font-bold uppercase tracking-normal">
-                            {latestInvite?.status === "DECLINED" ? (
-                              <>
-                                The previous freelancer{" "}
-                                <span className="text-white">
-                                  ({latestInvite.email})
-                                </span>{" "}
-                                declined this invitation.
-                                {latestInvite.declineReason && (
-                                  <span className="block mt-1 text-red-400/70 italic text-[11px]">
-                                    Reason:{" "}
-                                    {latestInvite.declineReason.replace(
-                                      /_/g,
-                                      " ",
-                                    )}
-                                  </span>
-                                )}
-                              </>
-                            ) : (
-                              "Enter a freelancer's email address to send them an invitation to this vault."
-                            )}
-                          </p>
-                        </div>
-                      </div>
+                          Open a Case
+                        </Link>
+                      ) : (
+                        <Link href="/client/disputes">Go to disputes</Link>
+                      )) as any
+                    }
+                  </Button>
+                </CardContent>
+              </Card>
 
-                      <div className="space-y-3 pt-2">
-                        <div>
-                          <Label
-                            htmlFor="invite-email"
-                            className="text-white! text-[10px] font-bold uppercase tracking-widest mb-2 block opacity-50"
+              <div className="bg-[#0D0D0E] border border-white/5 rounded-xl p-6 space-y-4">
+                {vault.status === VaultStatus.FUNDED && (
+                  <div className="mb-6">
+                    <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4">
+                      Freelancer Assignment
+                    </h4>
+                    <Card
+                      className={cn(
+                        "bg-white/2 border-white/10 transition-colors",
+                        latestInvite?.status === "DECLINED" &&
+                          "border-red-500/30 bg-red-500/5",
+                      )}
+                    >
+                      <CardContent className="p-4 space-y-4">
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={cn(
+                              "p-2 rounded-lg",
+                              latestInvite?.status === "DECLINED"
+                                ? "bg-red-500/10"
+                                : "bg-amber-500/10",
+                            )}
                           >
-                            REASSIGN FREELANCER
-                          </Label>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input
-                              id="invite-email"
-                              type="email"
-                              value={inviteEmail}
-                              onChange={(e) => setInviteEmail(e.target.value)}
-                              placeholder="freelancer@example.com"
-                              className="w-full bg-black/60 border border-white/10 rounded-lg px-10 py-2.5 text-white text-sm placeholder:text-gray-400 focus:border-emerald-500/50 focus:outline-none transition-all font-bold uppercase"
+                            <UserPlus
+                              className={cn(
+                                "w-5 h-5",
+                                latestInvite?.status === "DECLINED"
+                                  ? "text-red-500"
+                                  : "text-amber-500",
+                              )}
                             />
                           </div>
-                        </div>
-
-                        <Button
-                          onClick={async () => {
-                            if (!inviteEmail) {
-                              toast.error("Please enter a valid email address");
-                              return;
-                            }
-                            setSendingInvite(true);
-                            try {
-                              await api.invites.create({
-                                vaultId: vault.id,
-                                email: inviteEmail,
-                              });
-                              toast.success(
-                                `Invitation sent to ${inviteEmail}`,
-                              );
-                              setInviteEmail("");
-                              refreshVaults();
-                            } catch (err: any) {
-                              console.error("Failed to send invite:", err);
-                              toast.error(
-                                err.message || "Failed to send invitation",
-                              );
-                            } finally {
-                              setSendingInvite(false);
-                            }
-                          }}
-                          disabled={sendingInvite || !inviteEmail}
-                          className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-xs h-10 transition-all font-['Poppins',sans-serif]"
-                        >
-                          {sendingInvite ? "Sending..." : "Send New Invitation"}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-
-              <div className="relative">
-                <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4">
-                  Contract Deliverables
-                </h4>
-                <div className="space-y-2">
-                  {submittedDeliverables.length > 0 ? (
-                    submittedDeliverables.map((doc: any) => (
-                      <Button
-                        key={doc.id}
-                        variant="ghost"
-                        onClick={() => {
-                          toast.info(
-                            `Opening ${doc.name} submitted for ${doc.milestoneName}`,
-                          );
-                        }}
-                        className="w-full justify-between items-center text-gray-500 hover:text-white h-auto py-3 px-4 border border-white/5 bg-white/2 hover:bg-white/5 transition-all group font-['Poppins',sans-serif]"
-                      >
-                        <div className="flex items-center min-w-0 mr-3">
-                          {doc.type === "link" ? (
-                            <ExternalLink className="w-4 h-4 mr-3 shrink-0 text-emerald-500/70" />
-                          ) : (
-                            <Download className="w-4 h-4 mr-3 shrink-0" />
-                          )}
-                          <div className="text-left min-w-0">
-                            <span className="block text-[11px] font-bold text-white uppercase truncate">
-                              {doc.name}
-                            </span>
-                            <span className="block text-[9px] text-gray-600 font-bold uppercase tracking-tighter mt-0.5">
-                              {doc.milestoneName}
-                            </span>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="text-sm font-bold text-white uppercase tracking-tighter">
+                                {latestInvite?.status === "DECLINED"
+                                  ? "Freelancer Declined Invitation"
+                                  : !vault.freelancerId
+                                    ? "Awaiting Freelancer Assignment"
+                                    : "Reassign Freelancer"}
+                              </p>
+                              {latestInvite?.status === "DECLINED" && (
+                                <Badge
+                                  variant="destructive"
+                                  className="text-[10px] uppercase h-4 px-1"
+                                >
+                                  Declined
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-400 font-bold uppercase tracking-normal">
+                              {latestInvite?.status === "DECLINED" ? (
+                                <>
+                                  The previous freelancer{" "}
+                                  <span className="text-white">
+                                    ({latestInvite.email})
+                                  </span>{" "}
+                                  declined this invitation.
+                                </>
+                              ) : !vault.freelancerId ? (
+                                "Enter a freelancer's email address to send them an invitation to this vault."
+                              ) : (
+                                "Assign this project to someone else? This will update the secure escrow account to the new freelancer once they accept."
+                              )}
+                            </p>
                           </div>
                         </div>
-                        <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                      </Button>
-                    ))
-                  ) : (
-                    <div className="p-4 border border-dashed border-white/5 rounded-lg text-center">
-                      <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">
-                        No deliverables submitted yet
-                      </p>
-                    </div>
-                  )}
+
+                        <div className="space-y-3 pt-2">
+                          <div>
+                            <Label
+                              htmlFor="invite-email"
+                              className="text-white! text-[10px] font-bold uppercase tracking-widest mb-2 block opacity-50"
+                            >
+                              REASSIGN FREELANCER
+                            </Label>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                              <input
+                                id="invite-email"
+                                type="email"
+                                value={inviteEmail}
+                                onChange={(e) => setInviteEmail(e.target.value)}
+                                placeholder="freelancer@example.com"
+                                className="w-full bg-black/60 border border-white/10 rounded-lg px-10 py-2.5 text-white text-sm placeholder:text-gray-400 focus:border-emerald-500/50 focus:outline-none transition-all font-bold"
+                              />
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={() => handleUpdateFreelancer(inviteEmail)}
+                            disabled={reassigning || !inviteEmail}
+                            className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-xs h-10 transition-all font-['Poppins',sans-serif]"
+                          >
+                            {reassigning
+                              ? "Updating..."
+                              : !vault.freelancerId
+                                ? "Send Invitation"
+                                : "Reassign Project"}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                <div className="relative">
+                  <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4">
+                    Contract Deliverables
+                  </h4>
+                  <div className="space-y-2">
+                    {submittedDeliverables.length > 0 ? (
+                      submittedDeliverables.map((doc: any) => (
+                        <Button
+                          key={doc.id}
+                          variant="ghost"
+                          onClick={() => {
+                            toast.info(`Opening ${doc.name}`);
+                          }}
+                          className="w-full justify-between items-center text-gray-500 hover:text-white h-auto py-3 px-4 border border-white/5 bg-white/2 hover:bg-white/5 transition-all group font-['Poppins',sans-serif]"
+                        >
+                          <div className="flex items-center min-w-0 mr-3">
+                            {doc.type === "link" ? (
+                              <ExternalLink className="w-4 h-4 mr-3 shrink-0 text-emerald-500/70" />
+                            ) : (
+                              <Download className="w-4 h-4 mr-3 shrink-0" />
+                            )}
+                            <div className="text-left min-w-0">
+                              <span className="block text-[11px] font-bold text-white uppercase truncate">
+                                {doc.name}
+                              </span>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                        </Button>
+                      ))
+                    ) : (
+                      <div className="p-4 border border-dashed border-white/5 rounded-lg text-center">
+                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">
+                          No deliverables submitted yet
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* REFUND REQUEST MODAL */}
+      <Sheet open={showRefundModal} onOpenChange={setShowRefundModal}>
+        <SheetContent
+          side="right"
+          className="bg-[#0D0D0E] border-white/5 text-white w-[400px] sm:w-[540px]"
+        >
+          <SheetHeader>
+            <SheetTitle className="text-2xl font-black uppercase tracking-tighter text-white">
+              Request Refund
+            </SheetTitle>
+            <SheetDescription className="text-gray-400 font-bold uppercase tracking-wide">
+              Since you don&apos;t have a payment account, refunds are processed
+              manually by our team. Please provide your payout details.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-8 space-y-6">
+            <div className="space-y-3">
+              <Label className="text-xs font-bold uppercase tracking-widest opacity-50">
+                Payout Method
+              </Label>
+              <Select
+                value={payoutMethod}
+                onValueChange={(v: any) => setPayoutMethod(v)}
+              >
+                <SelectTrigger className="bg-white/5 border-white/10 text-white font-bold uppercase">
+                  <SelectValue placeholder="Select Method" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#161618] border-white/10 text-white">
+                  <SelectItem value="bank">Bank Transfer</SelectItem>
+                  <SelectItem value="card">Debit/Credit Card</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {payoutMethod === "bank" && (
+              <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest opacity-50">
+                    Bank Name
+                  </Label>
+                  <input
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-emerald-500/50 focus:outline-none transition-all"
+                    value={payoutDetails.bankName}
+                    onChange={(e) =>
+                      setPayoutDetails({
+                        ...payoutDetails,
+                        bankName: e.target.value,
+                      })
+                    }
+                    placeholder="e.g. Chase, Zenith, etc."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest opacity-50">
+                    Account Number / IBAN
+                  </Label>
+                  <input
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-emerald-500/50 focus:outline-none transition-all"
+                    value={payoutDetails.accountNumber}
+                    onChange={(e) =>
+                      setPayoutDetails({
+                        ...payoutDetails,
+                        accountNumber: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest opacity-50">
+                    Account Holder Name
+                  </Label>
+                  <input
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-emerald-500/50 focus:outline-none transition-all"
+                    value={payoutDetails.holderName}
+                    onChange={(e) =>
+                      setPayoutDetails({
+                        ...payoutDetails,
+                        holderName: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="pt-4 space-y-3">
+              <Alert className="bg-amber-500/10 border-amber-500/20 text-amber-500">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle className="text-[10px] font-black uppercase">
+                  Note
+                </AlertTitle>
+                <AlertDescription className="text-[10px] font-bold uppercase">
+                  Our team will process this within 1-3 business days. Funds
+                  will be returned minus any platform processing fees.
+                </AlertDescription>
+              </Alert>
+
+              <Button
+                className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-black uppercase tracking-widest"
+                onClick={submitRefundRequest}
+                disabled={requestingRefund}
+              >
+                {requestingRefund ? "Submitting..." : "Submit Refund Request"}
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

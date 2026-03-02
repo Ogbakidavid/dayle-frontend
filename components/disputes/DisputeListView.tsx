@@ -26,7 +26,6 @@ import type { Vault } from "@/lib/store/vault-context";
 interface Dispute {
   id: string;
   vaultId: string;
-  milestoneId: string;
   status: "open" | "resolved" | "investigating" | "closed" | string;
   openedAt: string;
   openedBy: string;
@@ -112,7 +111,7 @@ function StatusPill({ status }: StatusPillProps) {
     <span
       className={cn(
         "inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide",
-        cfg.pill
+        cfg.pill,
       )}
     >
       {cfg.label}
@@ -131,7 +130,7 @@ function IconBadge({ status }: IconBadgeProps) {
     <div
       className={cn(
         "flex h-9 w-9 items-center justify-center rounded-xl border",
-        cfg.iconWrap
+        cfg.iconWrap,
       )}
     >
       <Icon className={cn("h-4 w-4", cfg.iconColor)} />
@@ -147,7 +146,13 @@ interface StatCardProps {
   tone?: "neutral" | "amber" | "emerald" | "sky";
 }
 
-function StatCard({ title, value, hint, icon: Icon, tone = "neutral" }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  hint,
+  icon: Icon,
+  tone = "neutral",
+}: StatCardProps) {
   const toneMap = {
     neutral: "border-white/10 bg-white/[0.03] hover:bg-white/[0.05]",
     amber: "border-amber-500/15 bg-amber-500/[0.06] hover:bg-amber-500/[0.09]",
@@ -158,7 +163,9 @@ function StatCard({ title, value, hint, icon: Icon, tone = "neutral" }: StatCard
 
   return (
     <motion.div variants={itemVariants}>
-      <Card className={cn("transition-colors", toneMap[tone] || toneMap.neutral)}>
+      <Card
+        className={cn("transition-colors", toneMap[tone] || toneMap.neutral)}
+      >
         <CardContent className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -168,7 +175,11 @@ function StatCard({ title, value, hint, icon: Icon, tone = "neutral" }: StatCard
               <p className="mt-2 text-3xl font-semibold tracking-tight text-white">
                 {value}
               </p>
-              {hint ? <p className="mt-1 text-[10px] text-white/45 font-bold uppercase tracking-widest">{hint}</p> : null}
+              {hint ? (
+                <p className="mt-1 text-[10px] text-white/45 font-bold uppercase tracking-widest">
+                  {hint}
+                </p>
+              ) : null}
             </div>
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-black/30">
               <Icon className="h-5 w-5 text-white/70" />
@@ -215,7 +226,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
   const counts = useMemo(() => {
     const open = disputesData.filter((d) => d.status === "open").length;
     const investigating = disputesData.filter(
-      (d) => d.status === "investigating"
+      (d) => d.status === "investigating",
     ).length;
     const resolved = disputesData.filter((d) => d.status === "resolved").length;
     const closed = disputesData.filter((d) => d.status === "closed").length;
@@ -248,7 +259,6 @@ export function DisputeListView({ role }: DisputeListViewProps) {
         const hay = [
           d.id,
           d.vaultTitle,
-          d.milestoneId,
           d.requirementRef || "",
           d.description || "",
           d.status,
@@ -300,8 +310,8 @@ export function DisputeListView({ role }: DisputeListViewProps) {
               </h1>
               <p className="text-xs md:text-sm text-white/50 font-bold uppercase tracking-wide">
                 {role === "client"
-                  ? "Review and manage disputes tied to your milestones."
-                  : "Open and track disputes for fair milestone resolution."}
+                  ? "Review and manage disputes tied to your vaults."
+                  : "Open and track disputes for fair vault resolution."}
               </p>
             </div>
           </div>
@@ -409,13 +419,13 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                       "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all",
                       active
                         ? "border-amber-500/30 bg-amber-500/10 text-amber-200 shadow-inner"
-                        : "border-white/10 bg-white/3 text-white/60 hover:bg-white/6 hover:text-white"
+                        : "border-white/10 bg-white/3 text-white/60 hover:bg-white/6 hover:text-white",
                     )}
                   >
                     <Filter
                       className={cn(
                         "h-3 w-3",
-                        active ? "text-amber-200" : "text-white/40"
+                        active ? "text-amber-200" : "text-white/40",
                       )}
                     />
                     {t.label}
@@ -424,7 +434,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                         "ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold",
                         active
                           ? "bg-amber-500/15 text-amber-200"
-                          : "bg-white/5 text-white/50"
+                          : "bg-white/5 text-white/50",
                       )}
                     >
                       {t.count}
@@ -440,7 +450,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
       {/* List */}
       <motion.div variants={itemVariants}>
         <Card className="border-white/10 bg-[#0B0B0C] shadow-2xl overflow-hidden">
-          <CardHeader className="border-b border-white/5 bg-white/[0.01]">
+          <CardHeader className="border-b border-white/5 bg-white/1">
             <CardTitle className="flex items-center justify-between gap-3 text-white">
               <div className="flex items-center gap-2">
                 <Gavel className="h-5 w-5 text-amber-300" />
@@ -458,7 +468,9 @@ export function DisputeListView({ role }: DisputeListViewProps) {
             {loading ? (
               <div className="p-20 text-center">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-amber-500/20 border-t-amber-500" />
-                <p className="mt-4 text-sm font-bold uppercase tracking-widest text-white/30">Syncing ledger...</p>
+                <p className="mt-4 text-sm font-bold uppercase tracking-widest text-white/30">
+                  Syncing ledger...
+                </p>
               </div>
             ) : filtered.length === 0 ? (
               <div className="p-10 md:p-14">
@@ -488,7 +500,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                   return (
                     <div
                       key={dispute.id}
-                      className="group px-6 py-6 transition-all hover:bg-white/[0.01] md:px-8 border-l-2 border-l-transparent hover:border-l-amber-500/40"
+                      className="group px-6 py-6 transition-all hover:bg-white/1 md:px-8 border-l-2 border-l-transparent hover:border-l-amber-500/40"
                     >
                       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                         {/* Left */}
@@ -512,9 +524,9 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                             {/* Metadata */}
                             <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-white/30">
                               <span className="flex items-center gap-1.5">
-                                <span className="text-white/20">Milestone:</span>
+                                <span className="text-white/20">Vault:</span>
                                 <span className="text-white/60">
-                                  {dispute.milestoneId}
+                                  {dispute.vaultId}
                                 </span>
                               </span>
 
@@ -552,7 +564,10 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
                         {/* Right */}
                         <div className="flex items-center gap-3 lg:justify-end shrink-0">
-                          <Link href={`/${role}/disputes/${dispute.id}`} className="w-full lg:w-auto">
+                          <Link
+                            href={`/${role}/disputes/${dispute.id}`}
+                            className="w-full lg:w-auto"
+                          >
                             <Button
                               variant="outline"
                               className="

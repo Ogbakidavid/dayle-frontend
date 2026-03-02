@@ -48,15 +48,6 @@ const variants: Variants = {
   }),
 };
 
-interface Milestone {
-  title: string;
-  amount: string;
-  dueDate: string;
-  deliverableType: string;
-  aiVerificationEnabled: boolean;
-  requirementItemsJson: any[];
-}
-
 export default function CreateVaultPage() {
   const router = useRouter();
   const { createVault } = useVault();
@@ -73,26 +64,13 @@ export default function CreateVaultPage() {
   const [vaultTitle, setVaultTitle] = useState("");
   const [vaultDescription, setVaultDescription] = useState("");
   const [budgetAmount, setBudgetAmount] = useState("");
-  const [totalAmount, setTotalAmount] = useState(0);
   const [freelancerEmail, setFreelancerEmail] = useState("");
   const [freelancerName, setFreelancerName] = useState("");
 
-  const [milestones, setMilestones] = useState<Milestone[]>([
-    {
-      title: "",
-      amount: "",
-      dueDate: "",
-      deliverableType: "",
-      aiVerificationEnabled: true,
-      requirementItemsJson: [],
-    },
-  ]);
-
   const steps = [
     { id: 1, name: "Basics", icon: Info },
-    { id: 2, name: "Milestones", icon: ListChecks },
-    { id: 3, name: "Assign", icon: Users },
-    { id: 4, name: "Review", icon: ShieldCheck },
+    { id: 2, name: "Assign", icon: Users },
+    { id: 3, name: "Review", icon: ShieldCheck },
   ];
 
   const budget = Number(budgetAmount) || 0;
@@ -109,37 +87,11 @@ export default function CreateVaultPage() {
   const isStep1Complete =
     vaultTitle.trim() !== "" && vaultPurpose !== "" && budget > 0;
   const isStep2Complete =
-    milestones.length > 0 &&
-    milestones.every(
-      (m) =>
-        m.title.trim() !== "" && m.amount !== "" && m.deliverableType !== "",
-    ) &&
-    totalAmount <= budget;
-  const isStep3Complete =
     freelancerEmail.trim() !== "" &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(freelancerEmail);
 
   const canContinue =
-    step === 1
-      ? isStep1Complete
-      : step === 2
-        ? isStep2Complete
-        : step === 3
-          ? isStep3Complete
-          : true;
-
-  const updateMilestone = (
-    index: number,
-    field: keyof Milestone,
-    value: any,
-  ) => {
-    const updated = [...milestones];
-    (updated[index] as any)[field] = value;
-    setMilestones(updated);
-    setTotalAmount(
-      updated.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0),
-    );
-  };
+    step === 1 ? isStep1Complete : step === 2 ? isStep2Complete : true;
 
   const handleDeploy = async () => {
     // Create vault via API with idempotency to prevent duplicate creations
@@ -149,21 +101,12 @@ export default function CreateVaultPage() {
     const idempotencyKey = makeIdempotencyKey();
     try {
       // 1. Call backend DB creation. The backend will now automatically
-      // deploy the Web3 Vault using the Treasury wallet behind the scenes.
+      // initialize the secure vault account behind the scenes.
       const payload = {
         title: vaultTitle,
         type: vaultPurpose,
         description: vaultDescription,
-        totalAmount: totalAmount,
-        // vaultAddress is intentionally omitted so the backend provisions it
-        milestones: milestones.map((m) => ({
-          title: m.title,
-          amount: Number(m.amount),
-          dueDate: m.dueDate || undefined,
-          deliverableTypeId: m.deliverableType,
-          auditEnabled: m.aiVerificationEnabled,
-          requirementItemsJson: m.requirementItemsJson,
-        })),
+        totalAmount: budget,
         idempotencyKey,
       };
 
@@ -350,137 +293,8 @@ export default function CreateVaultPage() {
                     </div>
                   )}
 
-                  {/* STEP 2: MILESTONES */}
+                  {/* STEP 2: ASSIGN */}
                   {step === 2 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-500">
-                          Phases & Governance
-                        </h2>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            setMilestones([
-                              ...milestones,
-                              {
-                                title: "",
-                                amount: "",
-                                dueDate: "",
-                                deliverableType: "",
-                                aiVerificationEnabled: true,
-                                requirementItemsJson: [],
-                              },
-                            ])
-                          }
-                          className="text-[10px] uppercase tracking-widest hover:bg-emerald-500/10 hover:text-emerald-400 transition-all"
-                        >
-                          <Plus className="w-3 h-3 mr-2" /> Add Phase
-                        </Button>
-                      </div>
-
-                      <div className="space-y-4 max-h-[450px] overflow-y-auto pr-2 custom-scrollbar">
-                        {milestones.map((m, i) => (
-                          <div
-                            key={i}
-                            className="group relative bg-white/2 border border-white/5 hover:border-white/10 p-5 rounded-2xl transition-all"
-                          >
-                            <div className="flex items-start justify-between gap-4 mb-4">
-                              <div className="flex-1">
-                                <Input
-                                  placeholder={`Phase 0${i + 1} Deliverable Name`}
-                                  value={m.title}
-                                  onChange={(e) =>
-                                    updateMilestone(i, "title", e.target.value)
-                                  }
-                                  className="bg-transparent! border-0! border-b! border-b-white/20! rounded-none px-0 pb-2 text-sm font-bold uppercase tracking-wider placeholder:text-white/20 h-auto focus-visible:ring-0 focus-visible:border-0 focus-visible:border-b focus-visible:border-b-emerald-500 transition-colors"
-                                />
-                              </div>
-                              <button
-                                onClick={() =>
-                                  setMilestones(
-                                    milestones.filter((_, idx) => idx !== i),
-                                  )
-                                }
-                                className="opacity-0 group-hover:opacity-100 p-1 text-white/20 hover:text-red-500 transition-all"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 mb-4">
-                              <div className="bg-black/40 rounded-xl p-3 border border-white/3">
-                                <Label className="text-[12px] uppercase text-white/30 font-bold block mb-1">
-                                  Release Amount
-                                </Label>
-                                <div className="flex items-center gap-2">
-                                  <DollarSign className="w-3 h-3 text-emerald-500" />
-                                  <input
-                                    type="number"
-                                    value={m.amount}
-                                    onChange={(e) =>
-                                      updateMilestone(
-                                        i,
-                                        "amount",
-                                        e.target.value,
-                                      )
-                                    }
-                                    className="bg-transparent border-none text-[12px] font-mono focus:outline-none focus:ring-0 w-full text-white"
-                                    placeholder="0"
-                                  />
-                                </div>
-                              </div>
-                              <div className="bg-black/40 rounded-xl p-3 border border-white/3">
-                                <Label className="text-[12px] uppercase text-white/30 font-bold block mb-1">
-                                  Deadline
-                                </Label>
-                                <div className="flex items-center gap-2">
-                                  <Calendar className="w-3 h-3 text-blue-500" />
-                                  <input
-                                    type="date"
-                                    value={m.dueDate}
-                                    onChange={(e) =>
-                                      updateMilestone(
-                                        i,
-                                        "dueDate",
-                                        e.target.value,
-                                      )
-                                    }
-                                    className="bg-transparent border-none text-[12px] focus:outline-none focus:ring-0 w-full text-white scheme:dark"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-
-                            <select
-                              value={m.deliverableType}
-                              onChange={(e) =>
-                                updateMilestone(
-                                  i,
-                                  "deliverableType",
-                                  e.target.value,
-                                )
-                              }
-                              className="w-full bg-black border border-white/5 text-[12px] p-3 rounded-xl focus:border-emerald-500/50 outline-none font-bold uppercase tracking-widest text-white/60 appearance-none"
-                            >
-                              <option value="">Select Deliverable Type</option>
-                              {(
-                                (VAULT_PURPOSE_MAPPING as any)[vaultPurpose]
-                                  ?.deliverables || []
-                              ).map((d: any) => (
-                                <option key={d.id} value={d.id}>
-                                  {d.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* STEP 3: ASSIGN */}
-                  {step === 3 && (
                     <div className="max-w-md mx-auto py-10 space-y-8">
                       <div className="text-center space-y-2">
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl rotate-12 flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
@@ -518,8 +332,8 @@ export default function CreateVaultPage() {
                     </div>
                   )}
 
-                  {/* STEP 4: REVIEW */}
-                  {step === 4 && (
+                  {/* STEP 3: REVIEW */}
+                  {step === 3 && (
                     <div className="space-y-8">
                       <div className="flex items-center justify-between">
                         <h2 className="text-xl font-black uppercase tracking-tighter italic">
@@ -539,7 +353,7 @@ export default function CreateVaultPage() {
                             Total Value
                           </Label>
                           <p className="text-2xl font-black text-emerald-500 font-mono">
-                            ${totalAmount.toLocaleString()}
+                            ${budget.toLocaleString()}
                           </p>
                         </div>
                         <div className="p-5 bg-white/3 border border-white/5 rounded-2xl">
@@ -552,45 +366,22 @@ export default function CreateVaultPage() {
                         </div>
                       </div>
 
-                      {/* Milestones Ledger */}
-                      <div className="space-y-3">
-                        <h3 className="text-[13px] font-black uppercase tracking-[0.2em] text-white/30 ml-1">
-                          Manifest ({milestones.length} Phases)
-                        </h3>
-                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                          {milestones.map((m, i) => (
-                            <div
-                              key={i}
-                              className="bg-black/40 border border-white/3 p-4 rounded-xl flex items-center justify-between group"
-                            >
-                              <div className="flex items-center gap-4">
-                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] text-white/40 font-mono border border-white/5">
-                                  0{i + 1}
-                                </div>
-                                <div>
-                                  <p className="text-sm font-black uppercase tracking-widest text-white">
-                                    {m.title}
-                                  </p>
-                                  <div className="flex items-center gap-3 mt-1">
-                                    <span className="text-[12px] text-emerald-500/70 font-bold uppercase tracking-widest">
-                                      {getDeliverableLabel(m.deliverableType)}
-                                    </span>
-                                    <span className="text-[12px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-black uppercase">
-                                      AI AUDIT ON
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-sm font-mono font-black text-white">
-                                  ${Number(m.amount).toLocaleString()}
-                                </p>
-                                <p className="text-[12px] text-white/20 uppercase font-bold mt-1">
-                                  {m.dueDate || "NO DATE"}
-                                </p>
-                              </div>
+                      {/* Single Deliverable Info */}
+                      <div className="bg-black/40 border border-white/3 p-4 rounded-xl flex items-center justify-between group">
+                        <div className="flex items-center gap-4">
+                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] text-white/40 font-mono border border-white/5">
+                            01
+                          </div>
+                          <div>
+                            <p className="text-sm font-black uppercase tracking-widest text-white">
+                              {vaultTitle || "UNTITLED PROJECT"}
+                            </p>
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="text-[12px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-black uppercase">
+                                SINGLE RELEASE
+                              </span>
                             </div>
-                          ))}
+                          </div>
                         </div>
                       </div>
 
@@ -634,7 +425,7 @@ export default function CreateVaultPage() {
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back
               </Button>
 
-              {step < 4 ? (
+              {step < 3 ? (
                 <Button
                   onClick={() => paginate(1)}
                   disabled={!canContinue}
@@ -683,39 +474,17 @@ export default function CreateVaultPage() {
           <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-12">
             <div className="bg-white/2 border border-white/5 rounded-3xl p-6">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-6 italic">
-                Live Allocation
+                Vault Configuration
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <span className="text-2xl font-black font-mono">
-                    ${totalAmount}
-                  </span>
                   <span className="text-[10px] text-white/20 uppercase font-bold">
-                    of ${budget}
+                    Total Value
+                  </span>
+                  <span className="text-2xl font-black font-mono">
+                    ${budget.toLocaleString()}
                   </span>
                 </div>
-                <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                  <motion.div
-                    className={cn(
-                      "h-full",
-                      totalAmount > budget
-                        ? "bg-red-500"
-                        : "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]",
-                    )}
-                    initial={{ width: 0 }}
-                    animate={{
-                      width: `${Math.min((totalAmount / budget) * 100 || 0, 100)}%`,
-                    }}
-                  />
-                </div>
-                {totalAmount > budget && (
-                  <div className="flex items-center gap-2 text-red-500 animate-pulse">
-                    <AlertCircle className="w-3 h-3" />
-                    <span className="text-[9px] font-black uppercase">
-                      Budget Overflow
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
           </aside>
