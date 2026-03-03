@@ -93,12 +93,12 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
 
       <header className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-bold uppercase tracking-wide text-emerald-400 flex items-center gap-2">
+          <div className="text-xs font-bold tracking-wide text-emerald-400 flex items-center gap-2">
             <Gavel className="w-3 h-3" />
-            Case File
+            Case file
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-white uppercase tracking-tight">
+        <h1 className="text-3xl font-bold text-white tracking-tight">
           Case #{dispute.id}
         </h1>
         <p className="text-sm text-white/60">
@@ -116,9 +116,9 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-white/10 text-white/70 hover:text-white bg-transparent text-xs uppercase tracking-wide"
+                  className="border-white/10 text-white/70 hover:text-white bg-transparent text-xs tracking-wide"
                 >
-                  + Add Evidence
+                  + Add evidence
                 </Button>
               </CardTitle>
             </CardHeader>
@@ -145,14 +145,14 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                           {/* Header */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                                {ev.type?.replace("_", " ") || "EVENT"}
+                              <span className="text-xs font-bold tracking-wider text-emerald-400">
+                                {ev.type?.replace("_", " ").toLowerCase()}
                               </span>
                               <span className="text-xs text-white/40 font-mono">
                                 {new Date(ev.timestamp).toLocaleString()}
                               </span>
                             </div>
-                            <span className="text-xs font-bold text-white/30 uppercase tracking-wide">
+                            <span className="text-xs font-bold text-white/30 tracking-wide">
                               {ev.actor}
                             </span>
                           </div>
@@ -171,7 +171,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                           {(ev.payload?.reasonCode ||
                             ev.payload?.reasonCodes) && (
                             <div className="flex flex-wrap gap-2 pt-1">
-                              <div className="text-[10px] font-bold uppercase tracking-wide text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 shadow-sm shadow-amber-500/10">
+                              <div className="text-[10px] font-bold tracking-wide text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 shadow-sm shadow-amber-500/10">
                                 {getReasonLabel(
                                   ev.payload.reasonCode ||
                                     ev.payload.reasonCodes?.[0],
@@ -208,13 +208,13 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
         <div className="space-y-6">
           <Card className="bg-muted border-white/10 sticky top-8 shadow-xl">
             <CardHeader className="border-b border-white/5">
-              <CardTitle className="text-white text-xs font-bold uppercase tracking-wide opacity-60">
-                Case Details
+              <CardTitle className="text-white text-xs font-bold tracking-wide opacity-60">
+                Case details
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div className="space-y-1">
-                <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">
+                <p className="text-[10px] text-white/30 font-bold tracking-wide">
                   Status
                 </p>
                 <div className="inline-flex">
@@ -224,8 +224,8 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">
-                  Opened By
+                <p className="text-[10px] text-white/30 font-bold tracking-wide">
+                  Opened by
                 </p>
                 <p className="text-sm font-medium text-white/80">
                   {dispute.openedBy}
@@ -233,8 +233,8 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
               </div>
               {dispute.requirementRef && (
                 <div className="space-y-2">
-                  <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">
-                    Target Requirement
+                  <p className="text-[10px] text-white/30 font-bold tracking-wide">
+                    Target requirement
                   </p>
                   <div className="bg-emerald-500/5 rounded p-2.5 text-xs font-mono text-emerald-400 border border-emerald-500/10 shadow-inner">
                     {dispute.requirementRef}
@@ -242,8 +242,8 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                 </div>
               )}
               <div className="space-y-3">
-                <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">
-                  Reason Protocol
+                <p className="text-[10px] text-white/30 font-bold tracking-wide">
+                  Reason protocol
                 </p>
                 <div className="text-xs leading-relaxed text-white/70 bg-white/5 p-3 rounded-xl border border-white/5 font-medium">
                   {getReasonLabel(

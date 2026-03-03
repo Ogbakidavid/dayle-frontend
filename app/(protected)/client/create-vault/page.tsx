@@ -21,9 +21,10 @@ import {
   DollarSign,
   AlertCircle,
   Calendar,
+  GripVertical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants, Reorder } from "framer-motion";
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 import { api } from "@/lib/api-client";
 import { useVault } from "@/lib/store/vault-context";
@@ -66,6 +67,34 @@ export default function CreateVaultPage() {
   const [budgetAmount, setBudgetAmount] = useState("");
   const [freelancerEmail, setFreelancerEmail] = useState("");
   const [freelancerName, setFreelancerName] = useState("");
+  const [deliverables, setDeliverables] = useState<
+    { title: string; description: string; id: string }[]
+  >([{ title: "", description: "", id: crypto.randomUUID() }]);
+
+  const handleAddDeliverable = () => {
+    if (deliverables.length < 10) {
+      setDeliverables([
+        ...deliverables,
+        { title: "", description: "", id: crypto.randomUUID() },
+      ]);
+    }
+  };
+
+  const handleRemoveDeliverable = (id: string) => {
+    if (deliverables.length > 1) {
+      setDeliverables(deliverables.filter((d) => d.id !== id));
+    }
+  };
+
+  const updateDeliverable = (
+    id: string,
+    field: "title" | "description",
+    value: string,
+  ) => {
+    setDeliverables(
+      deliverables.map((d) => (d.id === id ? { ...d, [field]: value } : d)),
+    );
+  };
 
   const steps = [
     { id: 1, name: "Basics", icon: Info },
@@ -85,7 +114,10 @@ export default function CreateVaultPage() {
 
   // Validation
   const isStep1Complete =
-    vaultTitle.trim() !== "" && vaultPurpose !== "" && budget > 0;
+    vaultTitle.trim() !== "" &&
+    vaultPurpose !== "" &&
+    budget > 0 &&
+    deliverables.every((d) => d.title.trim() !== "");
   const isStep2Complete =
     freelancerEmail.trim() !== "" &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(freelancerEmail);
@@ -108,6 +140,10 @@ export default function CreateVaultPage() {
         description: vaultDescription,
         totalAmount: budget,
         idempotencyKey,
+        deliverables: deliverables.map(({ title, description }) => ({
+          title,
+          description,
+        })),
       };
 
       const newVault = await createVault(payload);
@@ -145,11 +181,11 @@ export default function CreateVaultPage() {
         {/* Header Section */}
         <header className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
-              <Lock className="w-3 h-3" /> Secure Escrow Vault
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold tracking-[0.2em] mb-4">
+              <Lock className="w-3 h-3" /> Secure project account
             </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase">
-              New <span className="text-emerald-500">Vault</span>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">
+              New <span className="text-emerald-500">project</span>
             </h1>
           </div>
 
@@ -158,10 +194,10 @@ export default function CreateVaultPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white/40 hover:text-white uppercase text-[10px] font-black tracking-widest transition-all"
+                className="text-white/40 hover:text-white text-[10px] font-bold tracking-widest transition-all"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
+                Back to dashboard
               </Button>
             </Link>
 
@@ -178,7 +214,7 @@ export default function CreateVaultPage() {
                   )}
                 >
                   <s.icon className="w-4 h-4" />
-                  <span className="text-xs uppercase tracking-widest">
+                  <span className="text-xs tracking-widest text-inherit">
                     {s.name}
                   </span>
                 </div>
@@ -205,8 +241,8 @@ export default function CreateVaultPage() {
                   {step === 1 && (
                     <div className="space-y-8">
                       <div className="space-y-4">
-                        <Label className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">
-                          1. Select Project Type
+                        <Label className="text-[10px] tracking-[0.2em] text-white/40 font-bold">
+                          1. Select project type
                         </Label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                           {Object.entries(VAULT_PURPOSE_MAPPING).map(
@@ -234,7 +270,7 @@ export default function CreateVaultPage() {
                                   />
                                   <span
                                     className={cn(
-                                      "text-[10px] font-bold uppercase tracking-widest",
+                                      "text-[10px] font-bold tracking-widest",
                                       isActive ? "text-white" : "text-white/40",
                                     )}
                                   >
@@ -249,20 +285,20 @@ export default function CreateVaultPage() {
 
                       <div className="grid grid-cols-1 gap-6">
                         <div className="space-y-2">
-                          <Label className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">
-                            2. Contract Identity
+                          <Label className="text-[10px] tracking-[0.2em] text-white/40 font-bold">
+                            2. Project identity
                           </Label>
                           <Input
                             value={vaultTitle}
                             onChange={(e) => setVaultTitle(e.target.value)}
-                            placeholder="PROJECT TITLE"
+                            placeholder="Project title"
                             className="bg-muted! border-white/10! h-14 text-lg font-bold placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-emerald-500/20 rounded-xl"
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">
-                            3. Total Allocation
+                          <Label className="text-[10px] tracking-[0.2em] text-white/40 font-bold">
+                            3. Total allocation
                           </Label>
                           <div className="relative group">
                             <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500 group-focus-within:animate-pulse" />
@@ -277,8 +313,8 @@ export default function CreateVaultPage() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">
-                            4. Brief Description
+                          <Label className="text-[10px] tracking-[0.2em] text-white/40 font-bold">
+                            4. Brief description
                           </Label>
                           <Textarea
                             value={vaultDescription}
@@ -288,6 +324,103 @@ export default function CreateVaultPage() {
                             placeholder="Describe the overall scope..."
                             className="bg-muted! border-white/10! min-h-[120px] focus:border-emerald-500/50 rounded-xl text-white/80"
                           />
+                        </div>
+
+                        {/* DELIVERABLES CHECKLIST */}
+                        <div className="space-y-4 pt-4 border-t border-white/5">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                              <Label className="text-[10px] tracking-[0.2em] text-emerald-500 font-bold">
+                                Deliverables checklist (Required)
+                              </Label>
+                              <p className="text-[10px] text-white/40 font-bold tracking-widest leading-relaxed max-w-sm">
+                                Add the specific items the freelancer will
+                                deliver. This prevents disputes by making
+                                expectations clear.
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              onClick={handleAddDeliverable}
+                              disabled={deliverables.length >= 10}
+                              variant="outline"
+                              size="sm"
+                              className="bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white text-[10px] font-bold tracking-widest h-9 rounded-xl transition-all"
+                            >
+                              <Plus className="w-3 h-3 mr-2" /> Add Deliverable
+                            </Button>
+                          </div>
+
+                          <Reorder.Group
+                            axis="y"
+                            values={deliverables}
+                            onReorder={setDeliverables}
+                            className="space-y-4"
+                          >
+                            {deliverables.map((deliverable, index) => (
+                              <Reorder.Item
+                                key={deliverable.id}
+                                value={deliverable}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
+                                className="group relative bg-white/3 border border-white/5 hover:border-white/10 p-5 rounded-2xl transition-all cursor-grab active:cursor-grabbing"
+                              >
+                                {deliverables.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleRemoveDeliverable(deliverable.id)
+                                    }
+                                    className="absolute -top-2 -right-2 p-1.5 bg-red-500/20 border border-red-500/30 rounded-lg text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white z-10"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                )}
+
+                                <div className="space-y-4">
+                                  <div className="flex items-start gap-3">
+                                    <div className="flex flex-col items-center gap-1 shrink-0">
+                                      <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                        <span className="text-[10px] font-bold text-emerald-500 font-mono">
+                                          {String(index + 1).padStart(2, "0")}
+                                        </span>
+                                      </div>
+                                      <GripVertical className="w-3 h-3 text-white/10 group-hover:text-white/30 transition-colors" />
+                                    </div>
+                                    <div className="flex-1 space-y-3">
+                                      <Input
+                                        value={deliverable.title}
+                                        onChange={(e) =>
+                                          updateDeliverable(
+                                            deliverable.id,
+                                            "title",
+                                            e.target.value,
+                                          )
+                                        }
+                                        maxLength={100}
+                                        placeholder="Deliverable Title (e.g. Frontend UI Components)"
+                                        className="bg-transparent! border-none! h-6 p-0 text-sm font-bold tracking-widest placeholder:text-white/10 focus:ring-0! rounded-none"
+                                      />
+                                      <Textarea
+                                        value={deliverable.description}
+                                        onChange={(e) =>
+                                          updateDeliverable(
+                                            deliverable.id,
+                                            "description",
+                                            e.target.value,
+                                          )
+                                        }
+                                        maxLength={500}
+                                        placeholder="Brief description of requirements... (Optional)"
+                                        className="bg-transparent! border-white/5! min-h-[60px] p-3 text-xs text-white/40 focus:border-emerald-500/30 rounded-xl leading-relaxed transition-all"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </Reorder.Item>
+                            ))}
+                          </Reorder.Group>
                         </div>
                       </div>
                     </div>
@@ -300,11 +433,11 @@ export default function CreateVaultPage() {
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl rotate-12 flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
                           <Users className="w-10 h-10 text-emerald-500 -rotate-12" />
                         </div>
-                        <h2 className="text-2xl font-black uppercase italic tracking-tighter">
-                          Assign Operator
+                        <h2 className="text-2xl font-bold italic tracking-tighter">
+                          Assign freelancer
                         </h2>
-                        <p className="text-white/40 text-xs font-bold uppercase tracking-widest">
-                          Identify the vault beneficiary
+                        <p className="text-white/40 text-xs font-bold tracking-widest">
+                          Identify the project freelancer
                         </p>
                       </div>
 
@@ -312,19 +445,19 @@ export default function CreateVaultPage() {
                         <Input
                           value={freelancerEmail}
                           onChange={(e) => setFreelancerEmail(e.target.value)}
-                          placeholder="OPERATOR EMAIL"
+                          placeholder="Freelancer email"
                           className="bg-muted! border-white/10! h-14 rounded-xl text-center font-bold tracking-widest placeholder:text-gray-400"
                         />
                         <Input
                           value={freelancerName}
                           onChange={(e) => setFreelancerName(e.target.value)}
-                          placeholder="FULL NAME (OPTIONAL)"
+                          placeholder="Full name (optional)"
                           className="bg-muted! border-white/10! h-14 rounded-xl text-center font-bold tracking-widest placeholder:text-gray-400"
                         />
                         <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 flex gap-3 items-center">
                           <ShieldCheck className="w-5 h-5 text-blue-500 shrink-0" />
-                          <p className="text-[10px] text-blue-200/60 leading-relaxed uppercase font-bold">
-                            Vault protocol will verify user identity upon
+                          <p className="text-[10px] text-blue-200/60 leading-relaxed font-bold">
+                            Project system will verify user identity upon
                             acceptance.
                           </p>
                         </div>
@@ -336,12 +469,12 @@ export default function CreateVaultPage() {
                   {step === 3 && (
                     <div className="space-y-8">
                       <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-black uppercase tracking-tighter italic">
-                          Confirm Deployment
+                        <h2 className="text-xl font-bold tracking-tighter italic">
+                          Confirm project
                         </h2>
                         <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                          <span className="text-emerald-500 text-[10px] font-black uppercase tracking-widest">
-                            Protocol Verified
+                          <span className="text-emerald-500 text-[10px] font-bold tracking-widest">
+                            System verified
                           </span>
                         </div>
                       </div>
@@ -349,18 +482,18 @@ export default function CreateVaultPage() {
                       {/* Header Summary */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="p-5 bg-white/3 border border-white/5 rounded-2xl">
-                          <Label className="text-[12px] font-bold uppercase text-white/30 tracking-widest block mb-1">
-                            Total Value
+                          <Label className="text-[12px] font-bold text-white/30 tracking-widest block mb-1">
+                            Total value
                           </Label>
-                          <p className="text-2xl font-black text-emerald-500 font-mono">
+                          <p className="text-2xl font-bold text-emerald-500 font-mono">
                             ${budget.toLocaleString()}
                           </p>
                         </div>
                         <div className="p-5 bg-white/3 border border-white/5 rounded-2xl">
-                          <Label className="text-[12px] font-bold uppercase text-white/30 tracking-widest block mb-1">
+                          <Label className="text-[12px] font-bold text-white/30 tracking-widest block mb-1">
                             Beneficiary
                           </Label>
-                          <p className="text-sm font-bold truncate text-white uppercase tracking-wider">
+                          <p className="text-sm font-bold truncate text-white tracking-wider">
                             {freelancerEmail}
                           </p>
                         </div>
@@ -373,12 +506,12 @@ export default function CreateVaultPage() {
                             01
                           </div>
                           <div>
-                            <p className="text-sm font-black uppercase tracking-widest text-white">
-                              {vaultTitle || "UNTITLED PROJECT"}
+                            <p className="text-sm font-bold tracking-widest text-white">
+                              {vaultTitle || "Untitled project"}
                             </p>
                             <div className="flex items-center gap-3 mt-1">
-                              <span className="text-[12px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-black uppercase">
-                                SINGLE RELEASE
+                              <span className="text-[12px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">
+                                Single release
                               </span>
                             </div>
                           </div>
@@ -391,16 +524,12 @@ export default function CreateVaultPage() {
                           <ShieldCheck className="w-5 h-5 text-emerald-500" />
                         </div>
                         <div>
-                          <h4 className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">
-                            Escrow Verification Protocol
+                          <h4 className="text-[10px] font-bold text-emerald-500 tracking-widest">
+                            Escrow verification system
                           </h4>
-                          <p className="text-[10px] text-white/50 mt-1 leading-relaxed uppercase font-bold">
-                            Funds are locked in a secure escrow vault. Release
-                            requires{" "}
-                            <span className="text-white">
-                              AI Deliverable Audit
-                            </span>{" "}
-                            and{" "}
+                          <p className="text-[10px] text-white/50 mt-1 leading-relaxed font-bold">
+                            Funds are locked in a secure project account.
+                            Release requires{" "}
                             <span className="text-white">
                               Manual Client Sign-off
                             </span>
@@ -420,7 +549,7 @@ export default function CreateVaultPage() {
                 variant="ghost"
                 onClick={() => paginate(-1)}
                 disabled={step === 1 || isDeploying}
-                className="text-white/40 hover:text-white uppercase text-[10px] font-black tracking-widest w-full sm:w-auto transition-all"
+                className="text-white/40 hover:text-white text-[10px] font-bold tracking-widest w-full sm:w-auto transition-all"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back
               </Button>
@@ -430,7 +559,7 @@ export default function CreateVaultPage() {
                   onClick={() => paginate(1)}
                   disabled={!canContinue}
                   className={cn(
-                    "h-12 px-10 rounded-xl font-black uppercase tracking-widest transition-all w-full sm:w-auto",
+                    "h-12 px-10 rounded-xl font-bold tracking-widest transition-all w-full sm:w-auto",
                     canContinue
                       ? "bg-white text-black hover:bg-emerald-500 hover:text-white"
                       : "bg-white/5 text-white/20",
@@ -442,11 +571,13 @@ export default function CreateVaultPage() {
                 <Button
                   onClick={handleDeploy}
                   disabled={isDeploying}
-                  className="h-12 px-12 bg-emerald-500 text-black rounded-xl font-black uppercase tracking-widest hover:bg-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)] w-full sm:w-auto disabled:opacity-50 transition-all"
+                  className="h-12 px-12 bg-emerald-500 text-black rounded-xl font-bold tracking-widest hover:bg-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)] w-full sm:w-auto disabled:opacity-50 transition-all"
                 >
                   {isDeploying ? (
                     <div className="flex items-center gap-2">
-                      <span className="animate-pulse">Initializing Vault</span>
+                      <span className="animate-pulse">
+                        Initializing project
+                      </span>
                       <div className="flex gap-1">
                         {[0, 1, 2].map((i) => (
                           <motion.span
@@ -463,7 +594,7 @@ export default function CreateVaultPage() {
                       </div>
                     </div>
                   ) : (
-                    "Deploy Vault"
+                    "Start project"
                   )}
                 </Button>
               )}
@@ -473,15 +604,15 @@ export default function CreateVaultPage() {
           {/* Sidebar Info */}
           <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-12">
             <div className="bg-white/2 border border-white/5 rounded-3xl p-6">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-6 italic">
-                Vault Configuration
+              <h3 className="text-[10px] font-bold tracking-[0.2em] text-white/40 mb-6 italic">
+                Project configuration
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <span className="text-[10px] text-white/20 uppercase font-bold">
-                    Total Value
+                  <span className="text-[10px] text-white/20 font-bold">
+                    Total value
                   </span>
-                  <span className="text-2xl font-black font-mono">
+                  <span className="text-2xl font-bold font-mono">
                     ${budget.toLocaleString()}
                   </span>
                 </div>
@@ -493,8 +624,8 @@ export default function CreateVaultPage() {
         {/* Footer */}
         <div className="mt-12 flex items-center justify-center gap-3 text-white/20">
           <Lock className="w-3 h-3" />
-          <span className="text-[10px] uppercase tracking-[0.3em] font-black">
-            Secured by Dayle Escrow Protocol
+          <span className="text-[10px] tracking-[0.3em] font-bold">
+            Secured by Dayle escrow system
           </span>
         </div>
       </div>

@@ -56,9 +56,9 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
   return (
     <Card className="bg-muted border-white/10 shadow-xl overflow-hidden">
       <CardHeader className="border-b border-white/5 bg-white/2">
-        <CardTitle className="text-white flex items-center gap-2 text-base font-bold uppercase tracking-wide">
+        <CardTitle className="text-white flex items-center gap-2 text-base font-bold tracking-wide">
           <Gavel className="w-4 h-4 text-amber-400" />
-          Dispute Initiation
+          Dispute initiation
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
@@ -69,7 +69,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
 
         {vault && policy.requiresRequirementId && (
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+            <p className="text-[10px] font-bold tracking-widest text-white/40">
               Requirement scope
             </p>
             <select
@@ -88,7 +88,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
         )}
 
         <div className="space-y-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+          <p className="text-[10px] font-bold tracking-widest text-white/40">
             Reason codes
           </p>
           <div className="grid gap-2">
@@ -135,7 +135,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
           />
           <div className="min-w-0">
             <p className="text-sm font-semibold">
-              {eligibility.eligible ? "Ready to Open" : "Action Required"}
+              {eligibility.eligible ? "Ready to open" : "Action required"}
             </p>
             <p className="text-xs text-white/70">
               {eligibility.reason || "Select scope above"}
@@ -144,14 +144,14 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
         </div>
 
         <Button
-          className={`w-full h-11 transition-all font-bold uppercase tracking-wider ${
+          className={`w-full h-11 transition-all font-bold tracking-wider ${
             canSubmit
               ? "bg-amber-500 hover:bg-amber-400 text-black shadow-lg shadow-amber-500/20"
               : "bg-white/5 text-white/20 border border-white/5"
           }`}
           disabled={!canSubmit}
         >
-          {canSubmit ? "Submit Dispute" : "Dispute Locked"}
+          {canSubmit ? "Submit dispute" : "Dispute locked"}
         </Button>
       </CardContent>
     </Card>

@@ -352,13 +352,13 @@ export default function SettingsPageContent({ role = "client" }) {
             className="flex items-center gap-2 group transition-colors"
           >
             <ChevronLeft className="w-4 h-4 text-white group-hover:text-emerald-500 transition-transform group-hover:-translate-x-1" />
-            <span className="text-sm font-black uppercase tracking-wide text-white group-hover:text-white">
-              {isClient ? "Dashboard" : "Freelancer Dashboard"}
+            <span className="text-sm font-bold tracking-wide text-white group-hover:text-white">
+              {isClient ? "Dashboard" : "Freelancer dashboard"}
             </span>
           </Link>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-black text-white uppercase tracking-wide">
-              Account Center
+            <span className="text-sm font-bold text-white tracking-wide">
+              Account center
             </span>
             <div className="h-4 w-px bg-white/5" />
             <div className="flex items-center gap-2">
@@ -388,10 +388,10 @@ export default function SettingsPageContent({ role = "client" }) {
           {/* Sidebar: Clean & Floating */}
           <aside className="md:w-64 shrink-0">
             <div className="mb-8">
-              <h1 className="text-2xl font-black text-white uppercase tracking-tighter">
+              <h1 className="text-2xl font-bold text-white tracking-tighter">
                 Settings
               </h1>
-              <p className="text-sm font-bold text-white uppercase tracking-wide mt-2">
+              <p className="text-sm font-bold text-white tracking-wide mt-2">
                 {isClient
                   ? "Manage account preferences"
                   : "Manage freelancer preferences"}
@@ -404,7 +404,7 @@ export default function SettingsPageContent({ role = "client" }) {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-black uppercase tracking-wide relative group",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-bold tracking-wide relative group",
                     activeTab === tab.id
                       ? "text-emerald-400 bg-emerald-400/5"
                       : "text-white hover:text-white hover:bg-white/5",
@@ -434,10 +434,10 @@ export default function SettingsPageContent({ role = "client" }) {
             <div className="mt-12 pt-8 border-t border-white/5">
               <button
                 onClick={logout}
-                className="flex items-center gap-3 px-3 py-2 text-sm font-black uppercase tracking-wide text-white hover:text-red-400 transition-colors w-full"
+                className="flex items-center gap-3 px-3 py-2 text-sm font-bold tracking-wide text-white hover:text-red-400 transition-colors w-full"
               >
                 <LogOut className="w-4 h-4" />
-                Sign Out
+                Sign out
               </button>
             </div>
           </aside>
@@ -461,7 +461,7 @@ export default function SettingsPageContent({ role = "client" }) {
                           className="w-3.5 h-3.5 text-emerald-500"
                           strokeWidth={3}
                         />
-                        <span className="text-[10px] font-black uppercase tracking-tighter text-emerald-500">
+                        <span className="text-[10px] font-bold tracking-tighter text-emerald-500">
                           Verified
                         </span>
                       </div>
@@ -481,10 +481,10 @@ export default function SettingsPageContent({ role = "client" }) {
                     />
                   </div>
                   <div className="pb-1">
-                    <h3 className="text-lg font-black text-white uppercase tracking-tight">
-                      {isClient ? "Profile Picture" : "Freelancer Profile"}
+                    <h3 className="text-lg font-bold text-white tracking-tight">
+                      {isClient ? "Profile picture" : "Freelancer profile"}
                     </h3>
-                    <p className="text-sm font-bold text-white uppercase tracking-wide mt-1">
+                    <p className="text-sm font-bold text-white tracking-wide mt-1">
                       PNG, JPG or GIF up to 10MB
                     </p>
                   </div>
@@ -504,8 +504,8 @@ export default function SettingsPageContent({ role = "client" }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
                   <div className="space-y-2">
-                    <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
-                      {isClient ? "Full Name" : "Public Name"}
+                    <Label className="text-sm font-bold text-white tracking-wide ml-1">
+                      {isClient ? "Full name" : "Public name"}
                     </Label>
                     <Input
                       value={profileName}
@@ -514,8 +514,8 @@ export default function SettingsPageContent({ role = "client" }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
-                      Email Address
+                    <Label className="text-sm font-bold text-white tracking-wide ml-1">
+                      Email address
                     </Label>
                     <Input
                       value={user?.email || ""}
@@ -525,8 +525,8 @@ export default function SettingsPageContent({ role = "client" }) {
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
-                      {isClient ? "Company" : "Professional Bio"}
+                    <Label className="text-sm font-bold text-white tracking-wide ml-1">
+                      {isClient ? "Company" : "Professional bio"}
                     </Label>
                     <Input
                       defaultValue={""}
@@ -544,7 +544,7 @@ export default function SettingsPageContent({ role = "client" }) {
                     disabled={savingProfile}
                     className="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold px-6 rounded-lg transition-all shadow-lg shadow-emerald-600/10 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {savingProfile ? "Saving..." : "Save Changes"}
+                    {savingProfile ? "Saving..." : "Save changes"}
                   </Button>
                 </div>
               </div>
@@ -554,14 +554,14 @@ export default function SettingsPageContent({ role = "client" }) {
             {activeTab === "payment" && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-black text-white uppercase tracking-wide">
-                    {isClient ? "Cards on file" : "Settlement Methods"}
+                  <h3 className="text-sm font-bold text-white tracking-wide">
+                    {isClient ? "Cards on file" : "Settlement methods"}
                   </h3>
                   <Button
                     variant="link"
-                    className="text-emerald-500 text-sm font-black uppercase tracking-wide p-0 h-auto"
+                    className="text-emerald-500 text-sm font-bold tracking-wide p-0 h-auto"
                   >
-                    {isClient ? "View Invoices" : "View Statements"}
+                    {isClient ? "View invoices" : "View statements"}
                   </Button>
                 </div>
 
@@ -577,7 +577,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-bold text-white uppercase tracking-tight">
+                            <p className="text-sm font-bold text-white tracking-tight">
                               {isClient && "last4" in item
                                 ? `•••• ${item.last4}`
                                 : "label" in item
@@ -585,13 +585,13 @@ export default function SettingsPageContent({ role = "client" }) {
                                   : ""}
                             </p>
                             {item.primary && (
-                              <span className="text-sm px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 rounded font-black uppercase tracking-tighter">
+                              <span className="text-sm px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 rounded font-bold tracking-tight">
                                 Primary
                               </span>
                             )}
                           </div>
                           {isClient && "exp" in item && (
-                            <p className="text-[11px] font-bold text-white uppercase tracking-wide">
+                            <p className="text-[11px] font-bold text-white tracking-wide">
                               Expires {item.exp}
                             </p>
                           )}
@@ -608,9 +608,9 @@ export default function SettingsPageContent({ role = "client" }) {
                   ))}
                 </div>
 
-                <Button className="w-full py-6 bg-transparent border border-dashed border-white/5 hover:border-emerald-500/50 hover:bg-emerald-500/5 text-white hover:text-emerald-500 transition-all rounded-xl font-black uppercase text-sm tracking-wide">
+                <Button className="w-full py-6 bg-transparent border border-dashed border-white/5 hover:border-emerald-500/50 hover:bg-emerald-500/5 text-white hover:text-emerald-500 transition-all rounded-xl font-bold tracking-wide text-sm">
                   <Plus className="w-4 h-4 mr-2" />{" "}
-                  {isClient ? "Add Payment Method" : "Add Settlement Method"}
+                  {isClient ? "Add payment method" : "Add settlement method"}
                 </Button>
               </div>
             )}
@@ -620,8 +620,8 @@ export default function SettingsPageContent({ role = "client" }) {
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 {/* Header */}
                 <div>
-                  <h3 className="text-sm font-black text-white uppercase tracking-wide mb-1">
-                    Notification Channels
+                  <h3 className="text-sm font-bold text-white tracking-wide mb-1">
+                    Notification channels
                   </h3>
                   <p className="text-sm text-white/60 leading-relaxed">
                     Choose how you want to receive alerts
@@ -656,14 +656,14 @@ export default function SettingsPageContent({ role = "client" }) {
                             <Bell className="w-5 h-5 text-emerald-500" />
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-black text-white uppercase tracking-tight">
-                              In-App Notifications
+                            <h4 className="text-sm font-bold text-white tracking-tight">
+                              In-app notifications
                             </h4>
                             <p className="text-sm text-white/60 leading-relaxed max-w-md">
                               Receive notifications within the platform
                             </p>
-                            <span className="inline-block text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                              Always Enabled
+                            <span className="inline-block text-xs px-2 py-1 rounded-full font-bold tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                              Always enabled
                             </span>
                           </div>
                         </div>
@@ -676,8 +676,8 @@ export default function SettingsPageContent({ role = "client" }) {
                             <Mail className="w-5 h-5 text-blue-500" />
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-black text-white uppercase tracking-tight">
-                              Email Notifications
+                            <h4 className="text-sm font-bold text-white tracking-tight">
+                              Email notifications
                             </h4>
                             <p className="text-sm text-white/60 leading-relaxed max-w-md">
                               Get important updates via email
@@ -702,8 +702,8 @@ export default function SettingsPageContent({ role = "client" }) {
                             <Shield className="w-5 h-5 text-purple-500" />
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-black text-white uppercase tracking-tight">
-                              Transaction Security (MFA)
+                            <h4 className="text-sm font-bold text-white tracking-tight">
+                              Transaction security (MFA)
                             </h4>
                             <p className="text-sm text-white/60 leading-relaxed max-w-md">
                               Require verification for high-value transactions
@@ -725,7 +725,7 @@ export default function SettingsPageContent({ role = "client" }) {
                             <MessageSquare className="w-5 h-5 text-sky-500" />
                           </div>
                           <div className="space-y-2 flex-1">
-                            <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                            <h4 className="text-sm font-bold text-white tracking-tight">
                               Telegram
                             </h4>
                             <p className="text-sm text-white/60 leading-relaxed max-w-md">
@@ -733,7 +733,7 @@ export default function SettingsPageContent({ role = "client" }) {
                             </p>
                             {notificationPrefs.telegram.connected && (
                               <div className="flex items-center gap-2">
-                                <span className="text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <span className="text-xs px-2 py-1 rounded-full font-bold tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                   Connected
                                 </span>
                                 <span className="text-xs text-white/60">
@@ -775,7 +775,7 @@ export default function SettingsPageContent({ role = "client" }) {
                               <Phone className="w-5 h-5 text-green-500" />
                             </div>
                             <div className="space-y-2 flex-1">
-                              <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                              <h4 className="text-sm font-bold text-white tracking-tight">
                                 WhatsApp
                               </h4>
                               <p className="text-sm text-white/60 leading-relaxed max-w-md">
@@ -783,7 +783,7 @@ export default function SettingsPageContent({ role = "client" }) {
                               </p>
                               {notificationPrefs.whatsapp.phoneVerified && (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                  <span className="text-xs px-2 py-1 rounded-full font-bold tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                     Verified
                                   </span>
                                   <span className="text-xs text-white/60">
@@ -799,7 +799,7 @@ export default function SettingsPageContent({ role = "client" }) {
                                 onClick={() => setShowWhatsAppFlow(true)}
                                 className="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 text-sm rounded-lg"
                               >
-                                Add Phone
+                                Add phone
                               </Button>
                             ) : (
                               <Button
@@ -845,7 +845,7 @@ export default function SettingsPageContent({ role = "client" }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-3">
-                      <h3 className="text-sm font-black text-white uppercase tracking-wide">
+                      <h3 className="text-sm font-bold text-white tracking-wide">
                         Notifications
                       </h3>
                       {unreadCount > 0 && (
@@ -865,7 +865,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       onClick={markAllAsRead}
                       variant="ghost"
                       size="sm"
-                      className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-bold uppercase tracking-wide text-xs"
+                      className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-bold tracking-wide text-xs"
                     >
                       Mark all read
                     </Button>
@@ -883,9 +883,9 @@ export default function SettingsPageContent({ role = "client" }) {
                     }}
                     variant="outline"
                     size="sm"
-                    className="ml-2 text-zinc-400 hover:text-white border-zinc-700 font-bold uppercase tracking-wide text-xs"
+                    className="ml-2 text-zinc-400 hover:text-white border-zinc-700 font-bold tracking-wide text-xs"
                   >
-                    Send Test
+                    Send test
                   </Button>
                 </div>
 
@@ -942,7 +942,7 @@ export default function SettingsPageContent({ role = "client" }) {
                                 <div className="flex items-center gap-2">
                                   <p
                                     className={cn(
-                                      "text-sm font-bold uppercase tracking-tight",
+                                      "text-sm font-bold tracking-tight",
                                       notification.read
                                         ? "text-white/70"
                                         : "text-white",
@@ -976,7 +976,7 @@ export default function SettingsPageContent({ role = "client" }) {
                                   <Button
                                     size="sm"
                                     className={cn(
-                                      "font-bold uppercase tracking-wide text-xs h-8 px-3 shrink-0",
+                                      "font-bold tracking-wide text-xs h-8 px-3 shrink-0",
                                       color === "amber" &&
                                         "bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30",
                                     )}
@@ -1012,7 +1012,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         disabled={currentPage === 1}
                         variant="outline"
                         size="sm"
-                        className="h-8 px-3 text-xs font-bold uppercase tracking-wide disabled:opacity-30"
+                        className="h-8 px-3 text-xs font-bold tracking-wide disabled:opacity-30"
                       >
                         Previous
                       </Button>
@@ -1042,7 +1042,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         disabled={currentPage === totalPages}
                         variant="outline"
                         size="sm"
-                        className="h-8 px-3 text-xs font-bold uppercase tracking-wide disabled:opacity-30"
+                        className="h-8 px-3 text-xs font-bold tracking-wide disabled:opacity-30"
                       >
                         Next
                       </Button>
@@ -1058,7 +1058,7 @@ export default function SettingsPageContent({ role = "client" }) {
       {/* WhatsApp Setup Modal */}
       {showWhatsAppFlow && !notificationPrefs?.whatsapp?.phoneVerified && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0a0a0a] border border-zinc-800 rounded-2xl max-w-lg w-full p-6 relative">
+          <div className="bg-background border border-zinc-800 rounded-2xl max-w-lg w-full p-6 relative">
             <button
               onClick={closeWhatsAppFlow}
               className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-lg transition-colors"
@@ -1066,16 +1066,16 @@ export default function SettingsPageContent({ role = "client" }) {
               <X className="w-4 h-4 text-white" />
             </button>
 
-            <h2 className="text-xl font-black text-white uppercase tracking-tight mb-6">
-              Add WhatsApp Number
+            <h2 className="text-xl font-bold text-white tracking-tight mb-6">
+              Add WhatsApp number
             </h2>
 
             <div className="space-y-6">
               {whatsappStep === 1 ? (
                 <>
                   <div className="space-y-2">
-                    <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
-                      Phone Number (E.164 format)
+                    <Label className="text-sm font-bold text-white tracking-wide ml-1">
+                      Phone number (E.164 format)
                     </Label>
                     <Input
                       type="tel"
@@ -1084,7 +1084,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       onChange={(e) => setWhatsappPhone(e.target.value)}
                       className="bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-green-500/50 h-11"
                     />
-                    <p className="text-xs text-white/40 uppercase tracking-wide font-bold">
+                    <p className="text-xs text-white/40 tracking-wide font-bold">
                       Include country code (e.g., +1 for US)
                     </p>
                   </div>
@@ -1099,16 +1099,16 @@ export default function SettingsPageContent({ role = "client" }) {
                     <Button
                       onClick={closeWhatsAppFlow}
                       variant="outline"
-                      className="flex-1 border-white/5 hover:bg-white/5 text-white font-bold uppercase tracking-wide"
+                      className="flex-1 border-white/5 hover:bg-white/5 text-white font-bold tracking-wide"
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={handleWhatsAppStartVerification}
                       disabled={loadingWhatsApp || !whatsappPhone}
-                      className="flex-1 bg-green-600 hover:bg-green-500 text-black font-black uppercase tracking-wide"
+                      className="flex-1 bg-green-600 hover:bg-green-500 text-black font-bold tracking-wide"
                     >
-                      {loadingWhatsApp ? "Sending..." : "Send Code"}
+                      {loadingWhatsApp ? "Sending..." : "Send code"}
                     </Button>
                   </div>
                 </>
@@ -1116,8 +1116,8 @@ export default function SettingsPageContent({ role = "client" }) {
                 <>
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label className="text-sm font-black text-white uppercase tracking-wide ml-1">
-                        Verification Code
+                      <Label className="text-sm font-bold text-white tracking-wide ml-1">
+                        Verification code
                       </Label>
                       <Input
                         type="text"
@@ -1131,7 +1131,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         className="bg-zinc-900/50 border-zinc-800 text-zinc-200 text-center text-2xl font-mono tracking-[0.5em] h-14"
                         maxLength={6}
                       />
-                      <p className="text-xs text-white/40 text-center uppercase tracking-wide font-bold">
+                      <p className="text-xs text-white/40 text-center tracking-wide font-bold">
                         Enter the 6-digit code sent to your phone
                       </p>
                     </div>
@@ -1149,7 +1149,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       </div>
                       <label
                         htmlFor="whatsapp-consent-modal"
-                        className="text-xs text-white/70 leading-relaxed uppercase font-bold tracking-tight"
+                        className="text-xs text-white/70 leading-relaxed font-bold tracking-tight"
                       >
                         I agree to receive WhatsApp alerts for vault activity.
                         Reply STOP to opt out.
@@ -1172,7 +1172,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         setWhatsappError("");
                       }}
                       variant="outline"
-                      className="flex-1 border-white/5 hover:bg-white/5 text-white font-bold uppercase tracking-wide"
+                      className="flex-1 border-white/5 hover:bg-white/5 text-white font-bold tracking-wide"
                     >
                       Back
                     </Button>
@@ -1183,9 +1183,9 @@ export default function SettingsPageContent({ role = "client" }) {
                         whatsappCode.length !== 6 ||
                         !whatsappConsent
                       }
-                      className="flex-1 bg-green-600 hover:bg-green-500 text-black font-black uppercase tracking-wide"
+                      className="flex-1 bg-green-600 hover:bg-green-500 text-black font-bold tracking-wide"
                     >
-                      {loadingWhatsApp ? "Verifying..." : "Verify & Enable"}
+                      {loadingWhatsApp ? "Verifying..." : "Verify & enable"}
                     </Button>
                   </div>
                 </>

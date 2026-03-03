@@ -17,6 +17,7 @@ import {
   Plus,
 } from "lucide-react";
 import { getVaultDerivedLabel } from "@/lib/domain/enums";
+import { cn } from "@/lib/utils";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -64,10 +65,10 @@ export default function ClientDashboard() {
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <motion.div variants={itemVariants} className="space-y-1">
-          <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-white">
             Overview
           </h1>
-          <p className="text-sm text-white font-bold uppercase tracking-wide">
+          <p className="text-sm text-white font-bold tracking-wide">
             Welcome back to your client dashboard
           </p>
         </motion.div>
@@ -82,17 +83,17 @@ export default function ClientDashboard() {
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
               <Landmark className="w-4 h-4 text-emerald-500" />
             </div>
-            <span className="text-sm font-bold uppercase tracking-wide text-white">
-              Available Balance
+            <span className="text-sm font-bold tracking-wide text-white">
+              Available balance
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-black tracking-tighter text-white">
+            <h2 className="text-4xl font-bold tracking-tighter text-white">
               ${balance?.available?.toLocaleString() || "0.00"}
             </h2>
-            <div className="flex items-center gap-2 text-emerald-500 text-sm font-bold uppercase tracking-wide">
+            <div className="flex items-center gap-2 text-emerald-500 text-sm font-bold tracking-wide">
               <Zap className="w-4 h-4" />
-              Fully Liquid
+              Fully liquid
             </div>
           </div>
         </motion.div>
@@ -105,16 +106,16 @@ export default function ClientDashboard() {
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
               <Shield className="w-4 h-4 text-emerald-500" />
             </div>
-            <span className="text-sm font-bold uppercase tracking-wide text-white">
-              Locked in Vaults
+            <span className="text-sm font-bold tracking-wide text-white">
+              Secured in projects
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-black tracking-tighter text-white">
+            <h2 className="text-4xl font-bold tracking-tighter text-white">
               ${totalLocked.toLocaleString()}
             </h2>
-            <p className="text-white text-sm font-bold uppercase tracking-wide">
-              {activeVaults.length} Active Contracts
+            <p className="text-white text-sm font-bold tracking-wide">
+              {activeVaults.length} active contracts
             </p>
           </div>
         </motion.div>
@@ -128,11 +129,11 @@ export default function ClientDashboard() {
         >
           <div className="flex items-center gap-3">
             <LayoutGrid className="w-5 h-5 text-emerald-500" />
-            <h2 className="text-xl font-bold uppercase tracking-tight text-white">
-              Active Vaults
+            <h2 className="text-xl font-bold tracking-tight text-white">
+              Active projects
             </h2>
           </div>
-          <div className="text-sm text-white font-bold uppercase tracking-wide">
+          <div className="text-sm text-white font-bold tracking-wide">
             {activeVaults.length} active
           </div>
         </motion.div>
@@ -154,16 +155,16 @@ export default function ClientDashboard() {
             className="py-16 text-center bg-muted border border-white/10 rounded-sm"
           >
             <Activity className="w-12 h-12 text-white mx-auto mb-4" />
-            <p className="text-white font-bold uppercase tracking-wide">
-              No active vaults
+            <p className="text-white font-bold tracking-wide">
+              No active projects
             </p>
-            <p className="text-sm text-white mt-2 font-bold uppercase tracking-wide">
-              Get started by creating your first vault
+            <p className="text-sm text-white mt-2 font-bold tracking-wide">
+              Get started by creating your first project
             </p>
             <Link href="/client/create-vault">
-              <Button className="mt-6 bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-wide transition-all">
+              <Button className="mt-6 bg-emerald-600 hover:bg-emerald-700 font-bold transition-all">
                 <Plus className="w-4 h-4 mr-2" />
-                Create Vault
+                New project
               </Button>
             </Link>
           </motion.div>
@@ -185,32 +186,47 @@ export default function ClientDashboard() {
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <h4 className="font-bold uppercase tracking-wide text-white truncate">
+                        <h4 className="font-bold tracking-wide text-white truncate">
                           {vault.title}
                         </h4>
-                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-xs font-black uppercase tracking-wide rounded-sm border border-emerald-500/20 whitespace-nowrap">
+                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold tracking-wide rounded-sm border border-emerald-500/20 whitespace-nowrap">
                           {getVaultDerivedLabel(vault.status)}
                         </span>
                       </div>
-                      {vault.description && (
-                        <p className="text-gray-400 mb-2 line-clamp-1 max-w-xl font-bold uppercase tracking-wide truncate">
-                          {vault.description}
+                      <div className="flex flex-col gap-1 mb-2">
+                        <p className="text-sm font-bold tracking-wide text-white/50 truncate">
+                          {vault.freelancerName ||
+                            vault.freelancerEmail ||
+                            vault.freelancer?.email ||
+                            "Unassigned"}
                         </p>
-                      )}
-                      <p className="text-sm font-bold uppercase tracking-wide text-white/50 truncate">
-                        {vault.freelancerName ||
-                          vault.freelancerEmail ||
-                          vault.freelancer?.email ||
-                          "Unassigned"}
-                      </p>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[10px] font-bold tracking-wide text-white/30">
+                            {vault.deliverables?.length || 0} deliverables
+                          </span>
+                          <span className="w-1 h-1 rounded-full bg-white/10" />
+                          <span
+                            className={cn(
+                              "text-[10px] font-bold tracking-wide",
+                              vault.submissions?.length > 0
+                                ? "text-emerald-500"
+                                : "text-white/30",
+                            )}
+                          >
+                            {vault.submissions?.length > 0
+                              ? "Submission received"
+                              : "Waiting for submission"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-t-0 border-white/5 pt-4 sm:pt-0">
                       <div className="sm:text-right">
-                        <p className="text-[10px] sm:text-sm font-bold uppercase tracking-wide text-white/40 sm:text-white mb-0.5 sm:mb-1">
+                        <p className="text-[10px] sm:text-sm font-bold tracking-wide text-white/40 sm:text-white mb-0.5 sm:mb-1">
                           Value
                         </p>
-                        <p className="text-lg font-bold uppercase tracking-wide text-white">
+                        <p className="text-lg font-bold tracking-wide text-white">
                           $
                           {(vault.totalAmount || vault.amount).toLocaleString()}
                         </p>
@@ -227,7 +243,7 @@ export default function ClientDashboard() {
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="mt-6 flex items-center justify-between px-2">
-                <p className="text-sm font-black text-white uppercase tracking-wide">
+                <p className="text-sm font-bold text-white tracking-wide">
                   Page {currentPage} of {totalPages}
                 </p>
                 <div className="flex gap-2">
@@ -238,7 +254,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(1, prev - 1))
                     }
-                    className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/5 text-white font-bold uppercase tracking-wide transition-all"
+                    className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/5 text-white font-bold tracking-wide transition-all"
                   >
                     Previous
                   </Button>
@@ -249,7 +265,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                     }
-                    className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/5 text-white font-bold uppercase tracking-wide transition-all"
+                    className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/5 text-white font-bold tracking-wide transition-all"
                   >
                     Next
                   </Button>

@@ -49,14 +49,14 @@ export default function ForgotPasswordPage() {
             <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-emerald-500/20 text-black">
               <Shield className="w-7 h-7 stroke-[3px]" />
             </div>
-            <span className="font-black tracking-tighter text-white text-3xl uppercase">
+            <span className="font-bold tracking-tighter text-white text-3xl">
               Dayle
             </span>
           </Link>
 
-          <h1 className="text-6xl lg:text-7xl font-black text-white leading-[0.95] uppercase tracking-tighter mb-12">
+          <h1 className="text-6xl lg:text-7xl font-bold text-white leading-[0.95] tracking-tighter mb-12">
             Recover <br />
-            <span className="text-emerald-500 italic">Access.</span>
+            <span className="text-emerald-500 italic">access.</span>
           </h1>
 
           <div className="space-y-8">
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
                   <CheckCircle2 className="w-6 h-6 text-emerald-500 transition-transform group-hover:scale-110" />
                 </div>
                 <div>
-                  <h4 className="text-white font-black uppercase text-sm tracking-wide mb-1">
+                  <h4 className="text-white font-bold text-sm tracking-wide mb-1">
                     {item.title}
                   </h4>
                   <p className="text-white font-bold text-lg leading-snug">
@@ -100,17 +100,17 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-[440px] relative z-10">
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 text-white/50 hover:text-emerald-500 mb-8 font-black uppercase tracking-wide text-xs transition-colors group"
+            className="inline-flex items-center gap-2 text-white/50 hover:text-emerald-500 mb-8 font-bold tracking-wide text-xs transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />{" "}
-            Back to Login
+            Back to login
           </Link>
 
           <div className="mb-12">
-            <h2 className="text-4xl font-black text-white tracking-tight uppercase leading-none">
-              Forgot Password
+            <h2 className="text-4xl font-bold text-white tracking-tight leading-none">
+              Forgot password
             </h2>
-            <p className="text-white mt-4 text-sm font-bold uppercase tracking-wide leading-relaxed">
+            <p className="text-white mt-4 text-sm font-bold tracking-wide leading-relaxed">
               Enter your email to receive a password reset link.
             </p>
           </div>
@@ -120,9 +120,9 @@ export default function ForgotPasswordPage() {
               <div className="space-y-3">
                 <Label
                   htmlFor="email"
-                  className="text-sm font-black uppercase tracking-wide text-white ml-1"
+                  className="text-sm font-bold tracking-wide text-white ml-1"
                 >
-                  Email Address
+                  Email address
                 </Label>
                 <div className="relative group">
                   <Input
@@ -139,7 +139,7 @@ export default function ForgotPasswordPage() {
 
               {error && (
                 <div className="flex items-center gap-3 text-red-400 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <p className="text-sm font-bold uppercase tracking-wide leading-relaxed">
+                  <p className="text-sm font-bold tracking-wide leading-relaxed">
                     {error}
                   </p>
                 </div>
@@ -148,7 +148,7 @@ export default function ForgotPasswordPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-16 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-black text-base uppercase tracking-wide transition-all shadow-xl active:scale-[0.98]"
+                className="w-full h-16 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-bold text-base transition-all shadow-xl active:scale-[0.98]"
               >
                 {loading ? (
                   <div className="flex items-center gap-3">
@@ -168,28 +168,28 @@ export default function ForgotPasswordPage() {
                 <CheckCircle2 className="w-8 h-8 text-black" />
               </div>
               <div>
-                <h3 className="text-2xl font-black text-white uppercase tracking-tight">
-                  Link Sent!
+                <h3 className="text-2xl font-bold text-white tracking-tight">
+                  Link sent!
                 </h3>
-                <p className="text-white/70 text-sm font-bold uppercase tracking-wide mt-2 leading-relaxed">
+                <p className="text-white/70 text-sm font-bold tracking-wide mt-2 leading-relaxed">
                   We&apos;ve sent a password reset link to your email address.
                   Please check your inbox.
                 </p>
               </div>
               <Button
                 onClick={() => router.push("/reset-password")} // Simulate clicking logic for demo
-                className="w-full h-14 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl font-black text-sm uppercase tracking-wide transition-all"
+                className="w-full h-14 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl font-bold text-sm transition-all"
               >
-                Open Email App
+                Open email app
               </Button>
 
               {/* For Demo purposes, a direct link */}
               <div className="pt-4 border-t border-white/5">
                 <Link
                   href="/reset-password"
-                  className="text-emerald-500 text-xs font-black uppercase tracking-wide hover:underline"
+                  className="text-emerald-500 text-xs font-bold tracking-wide hover:underline"
                 >
-                  (Demo: Go to Reset Password Page)
+                  (Demo: go to reset password page)
                 </Link>
               </div>
             </div>

@@ -58,7 +58,7 @@ export default function ActiveWorkPage() {
       <div className="space-y-6">
         <motion.div
           variants={itemVariants}
-          className="flex items-center gap-3 text-[10px] font-black text-white/20 uppercase tracking-[0.3em] italic"
+          className="flex items-center gap-3 text-[10px] font-bold text-white/20 tracking-[0.3em] italic"
         >
           <Link
             href="/freelancer"
@@ -72,10 +72,10 @@ export default function ActiveWorkPage() {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-white/5 pb-10">
           <motion.div variants={itemVariants} className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white uppercase italic leading-none">
-              Active Assignments
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-white italic leading-none">
+              Active assignments
             </h1>
-            <p className="text-[10px] md:text-xs text-white/30 font-black uppercase tracking-[0.4em] italic">
+            <p className="text-[10px] md:text-xs text-white/30 font-bold tracking-[0.4em] italic">
               Authorized project streams and deliverable pipelines
             </p>
           </motion.div>
@@ -101,10 +101,10 @@ export default function ActiveWorkPage() {
             <div className="w-20 h-20 bg-white/5 rounded-4xl flex items-center justify-center mx-auto mb-6">
               <Activity className="w-10 h-10 text-white/10" />
             </div>
-            <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-2">
-              Zero Active Signals
+            <h3 className="text-2xl font-bold text-white italic tracking-tighter mb-2">
+              Zero active signals
             </h3>
-            <p className="text-xs text-white/30 font-black uppercase tracking-[0.3em] max-w-sm mx-auto italic">
+            <p className="text-xs text-white/30 font-bold tracking-[0.3em] max-w-sm mx-auto italic">
               No ongoing assignments detected in the current scope. New project
               links will materialize here.
             </p>
@@ -121,14 +121,14 @@ export default function ActiveWorkPage() {
                     <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="space-y-3 min-w-0 relative z-10">
                       <div className="flex flex-wrap items-center gap-4">
-                        <h4 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-tighter group-hover:text-emerald-500 transition-colors truncate">
+                        <h4 className="text-xl md:text-2xl font-bold text-white italic tracking-tighter group-hover:text-emerald-500 transition-colors truncate">
                           {vault.title}
                         </h4>
-                        <span className="px-4 py-1.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-emerald-500/10 whitespace-nowrap shadow-sm">
-                          {vault.status}
+                        <span className="px-4 py-1.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold tracking-[0.2em] rounded-full border border-emerald-500/10 whitespace-nowrap shadow-sm">
+                          {vault.status.toLowerCase()}
                         </span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[10px] text-white/20 font-black uppercase tracking-[0.2em] italic">
+                      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[10px] text-white/20 font-bold tracking-[0.2em] italic">
                         <p className="flex items-center gap-2">
                           Partner node:{" "}
                           <span className="text-white/40 truncate max-w-[150px]">
@@ -156,10 +156,10 @@ export default function ActiveWorkPage() {
 
                     <div className="flex items-center justify-between lg:justify-end gap-10 border-t lg:border-t-0 border-white/5 pt-8 lg:pt-0 relative z-10">
                       <div className="text-left lg:text-right">
-                        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-2 italic">
-                          Protocol Value
+                        <p className="text-[10px] font-bold text-white/20 tracking-[0.3em] mb-2 italic">
+                          Protocol value
                         </p>
-                        <p className="text-3xl font-black text-white tracking-widest font-mono italic">
+                        <p className="text-3xl font-bold text-white tracking-widest font-mono italic">
                           $
                           {(vault.totalAmount || vault.amount).toLocaleString()}
                         </p>
@@ -179,7 +179,7 @@ export default function ActiveWorkPage() {
                 variants={itemVariants}
                 className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-white/5 pt-10"
               >
-                <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] italic">
+                <p className="text-[10px] font-bold text-white/20 tracking-[0.3em] italic">
                   Displaying {paginatedVaults.length} of {activeVaults.length}{" "}
                   active assignments
                 </p>
@@ -190,7 +190,7 @@ export default function ActiveWorkPage() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(1, prev - 1))
                     }
-                    className="h-12 px-8 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 font-black uppercase tracking-[0.3em] hover:text-white transition-all rounded-xl disabled:opacity-20"
+                    className="h-12 px-8 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 font-bold tracking-[0.3em] hover:text-white transition-all rounded-xl disabled:opacity-20"
                   >
                     Back
                   </Button>
@@ -200,7 +200,7 @@ export default function ActiveWorkPage() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                     }
-                    className="h-12 px-8 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 font-black uppercase tracking-[0.3em] hover:text-white transition-all rounded-xl disabled:opacity-20"
+                    className="h-12 px-8 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 font-bold tracking-[0.3em] hover:text-white transition-all rounded-xl disabled:opacity-20"
                   >
                     Next
                   </Button>

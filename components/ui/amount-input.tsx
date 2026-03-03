@@ -82,9 +82,7 @@ const AmountInput = React.forwardRef<HTMLInputElement, AmountInputProps>(
           placeholder="0.00"
           {...props}
         />
-        <div className="absolute left-3 top-[38px] text-white font-black">
-          $
-        </div>
+        <div className="absolute left-3 top-[38px] text-white font-bold">$</div>
       </div>
     );
   },

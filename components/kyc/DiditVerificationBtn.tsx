@@ -41,20 +41,20 @@ export default function DiditVerificationBtn({
       // 2. Setup Global Callbacks using idiomatic switch
       DiditSdk.shared.onComplete = (result) => {
         switch (result.type) {
-          case 'completed':
-            console.log('Verification completed!', result.session?.status);
+          case "completed":
+            console.log("Verification completed!", result.session?.status);
             if (onSuccess) {
               onSuccess();
             } else {
               router.push("/client");
             }
             break;
-          case 'cancelled':
-            console.log('User cancelled verification');
+          case "cancelled":
+            console.log("User cancelled verification");
             setLoading(false);
             break;
-          case 'failed':
-            console.error('Verification failed:', result.error?.message);
+          case "failed":
+            console.error("Verification failed:", result.error?.message);
             setLoading(false);
             break;
         }
@@ -90,7 +90,7 @@ export default function DiditVerificationBtn({
       ) : (
         <span className="flex items-center justify-center gap-2">
           <ScanFace className="w-5 h-5" />
-          Verify Identity with Didit
+          Verify identity with Didit
         </span>
       )}
     </Button>

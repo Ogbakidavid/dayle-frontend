@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge"; // Import the actual component
 import { VaultStatus } from "@/lib/domain/enums";
 import { getVaultDerivedLabel } from "@/lib/domain/enums";
 import { api } from "@/lib/api-client";
+import { cn } from "@/lib/utils";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -90,17 +91,17 @@ export default function FreelancerDashboard() {
       {/* Header */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
         <motion.div variants={itemVariants} className="space-y-2">
-          <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-white uppercase italic">
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-white italic">
             Overview
           </h1>
-          <p className="text-[10px] md:text-xs text-white/50 font-black uppercase tracking-[0.2em]">
+          <p className="text-[10px] md:text-xs text-white/50 font-bold tracking-wide">
             Track your deliverables and secure earnings
           </p>
         </motion.div>
         <motion.div variants={itemVariants} className="flex gap-3">
           <Link href="/freelancer/balance" className="w-full sm:w-auto">
-            <Button className="w-full sm:w-auto bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black uppercase tracking-widest text-xs h-11 px-6 transition-all">
-              Withdraw Funds
+            <Button className="w-full sm:w-auto bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold text-xs h-11 px-6 transition-all">
+              Withdraw funds
             </Button>
           </Link>
         </motion.div>
@@ -116,17 +117,17 @@ export default function FreelancerDashboard() {
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform">
               <Landmark className="w-5 h-5 text-emerald-500" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/40 group-hover:text-white/60 transition-colors">
-              Available to Withdraw
+            <span className="text-[10px] font-bold tracking-wide text-white/40 group-hover:text-white/60 transition-colors">
+              Available to withdraw
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-black text-white tracking-tighter font-mono">
+            <h2 className="text-4xl font-bold text-white tracking-tighter font-mono">
               ${balance?.available?.toLocaleString() || "0.00"}
             </h2>
-            <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+            <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-bold tracking-wide">
               <Zap className="w-3.5 h-3.5" />
-              Funds Liquid
+              Funds liquid
             </div>
           </div>
         </motion.div>
@@ -139,16 +140,16 @@ export default function FreelancerDashboard() {
             <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform">
               <Shield className="w-5 h-5 text-blue-500" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/40 group-hover:text-white/60 transition-colors">
-              Pending in Vaults
+            <span className="text-[10px] font-bold tracking-wide text-white/40 group-hover:text-white/60 transition-colors">
+              Pending in projects
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-black text-white tracking-tighter font-mono">
+            <h2 className="text-4xl font-bold text-white tracking-tighter font-mono">
               ${totalPending.toLocaleString()}
             </h2>
-            <p className="text-blue-400 text-[10px] font-black uppercase tracking-widest">
-              {activeVaults.length} Active Assignments
+            <p className="text-blue-400 text-[10px] font-bold tracking-wide">
+              {activeVaults.length} active assignments
             </p>
           </div>
         </motion.div>
@@ -161,16 +162,16 @@ export default function FreelancerDashboard() {
             <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 transition-transform">
               <CheckCircle className="w-5 h-5 text-amber-500" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/40 group-hover:text-white/60 transition-colors">
-              Completed Projects
+            <span className="text-[10px] font-bold tracking-wide text-white/40 group-hover:text-white/60 transition-colors">
+              Completed projects
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-black text-white tracking-tighter font-mono">
+            <h2 className="text-4xl font-bold text-white tracking-tighter font-mono">
               {completedVaults.length}
             </h2>
-            <p className="text-amber-400 text-[10px] font-black uppercase tracking-widest">
-              Vault Access Level 1
+            <p className="text-amber-400 text-[10px] font-bold tracking-wide">
+              Project access level 1
             </p>
           </div>
         </motion.div>
@@ -184,12 +185,12 @@ export default function FreelancerDashboard() {
               <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                 <Shield className="w-5 h-5 text-emerald-500" />
               </div>
-              <h2 className="text-xl font-black uppercase tracking-widest text-white italic">
-                Pending Project Invitations
+              <h2 className="text-xl font-bold tracking-wide text-white italic">
+                Pending project invitations
               </h2>
             </div>
-            <div className="text-[10px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/5 px-3 py-1 rounded-full border border-blue-500/10">
-              {invitations.length} New
+            <div className="text-[10px] font-bold tracking-widest text-blue-400 bg-blue-500/5 px-3 py-1 rounded-full border border-blue-500/10">
+              {invitations.length} new
             </div>
           </div>
 
@@ -203,18 +204,18 @@ export default function FreelancerDashboard() {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <h4 className="text-lg font-black uppercase tracking-tight text-white">
+                    <h4 className="text-lg font-bold tracking-tight text-white">
                       {invite.vault?.title}
                     </h4>
-                    <span className="bg-blue-500/10 text-blue-500 text-[9px] font-black uppercase tracking-widest rounded-lg border border-blue-500/20 py-1 px-3">
-                      Action Required
+                    <span className="bg-blue-500/10 text-blue-500 text-[9px] font-bold tracking-wide rounded-lg border border-blue-500/20 py-1 px-3">
+                      Action required
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
                       <Landmark className="w-2.5 h-2.5 text-white/40" />
                     </div>
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">
+                    <p className="text-[10px] text-white/40 font-bold tracking-widest">
                       From:{" "}
                       <span className="text-white/80">
                         {invite.vault?.client?.name || "Dayle Client"}
@@ -225,10 +226,10 @@ export default function FreelancerDashboard() {
 
                 <div className="flex items-center gap-6">
                   <div className="text-right">
-                    <p className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em] mb-1">
-                      Vault Value
+                    <p className="text-[9px] text-white/30 font-bold tracking-wide mb-1">
+                      Project value
                     </p>
-                    <p className="text-xl font-black text-white uppercase tracking-tight font-mono">
+                    <p className="text-xl font-bold text-white tracking-tight font-mono">
                       $
                       {(
                         invite.vault?.totalAmount ||
@@ -238,8 +239,8 @@ export default function FreelancerDashboard() {
                     </p>
                   </div>
                   <Link href={`/invite/${invite.token}`}>
-                    <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/10">
-                      View Invitation
+                    <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold text-[10px] h-10 px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/10">
+                      View invitation
                     </Button>
                   </Link>
                 </div>
@@ -259,12 +260,12 @@ export default function FreelancerDashboard() {
             <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <Briefcase className="w-5 h-5 text-emerald-500" />
             </div>
-            <h2 className="text-xl font-black uppercase tracking-widest text-white italic">
-              Active Assignments
+            <h2 className="text-xl font-bold tracking-wide text-white italic">
+              Active assignments
             </h2>
           </div>
-          <div className="text-[10px] font-black uppercase tracking-widest text-white/40 bg-white/5 px-3 py-1 rounded-full border border-white/10">
-            {activeVaults.length} Contracts
+          <div className="text-[10px] font-bold tracking-wide text-white/40 bg-white/5 px-3 py-1 rounded-full border border-white/10">
+            {activeVaults.length} contracts
           </div>
         </motion.div>
 
@@ -287,10 +288,10 @@ export default function FreelancerDashboard() {
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6 border border-white/10 group">
               <Activity className="w-8 h-8 text-white/20 group-hover:text-white/40 transition-colors" />
             </div>
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-white">
+            <p className="text-sm font-bold tracking-wide text-white">
               No active assignments
             </p>
-            <p className="text-[10px] text-white/40 mt-3 font-bold uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+            <p className="text-[10px] text-white/40 mt-3 font-semibold tracking-wide max-w-xs mx-auto leading-relaxed">
               Projects will appear here once secured by clients
             </p>
           </motion.div>
@@ -314,40 +315,58 @@ export default function FreelancerDashboard() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-3 mb-3">
-                        <h4 className="text-lg font-black uppercase tracking-tight text-white truncate max-w-md">
+                        <h4 className="text-lg font-bold tracking-tight text-white truncate max-w-md">
                           {vault.title}
                         </h4>
                         <Badge
                           // variant="outline"
-                          className="bg-emerald-500/10 text-emerald-500 text-[9px] font-black uppercase tracking-widest rounded-lg border-emerald-500/20 py-1 px-3 whitespace-nowrap"
+                          className="bg-emerald-500/10 text-emerald-500 text-[9px] font-bold tracking-wide rounded-lg border-emerald-500/20 py-1 px-3 whitespace-nowrap"
                         >
                           {getVaultDerivedLabel(vault.status)}
                         </Badge>
                       </div>
                       {vault.description && (
-                        <p className="text-[11px] text-white/40 mb-4 line-clamp-1 max-w-xl font-bold uppercase tracking-wide leading-relaxed">
+                        <p className="text-[11px] text-white/40 mb-3 line-clamp-1 max-w-xl font-bold tracking-wide leading-relaxed">
                           {vault.description}
                         </p>
                       )}
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                          <Briefcase className="w-2.5 h-2.5 text-white/40" />
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                            <Briefcase className="w-2.5 h-2.5 text-white/40" />
+                          </div>
+                          <p className="text-[10px] text-white/40 font-bold tracking-wide">
+                            Client:{" "}
+                            <span className="text-white/80">
+                              {vault.clientName || "Dayle Client"}
+                            </span>
+                          </p>
                         </div>
-                        <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">
-                          Client:{" "}
-                          <span className="text-white/80">
-                            {vault.clientName || "Dayle Client"}
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={cn(
+                              "text-[10px] font-bold tracking-wide px-2 py-0.5 rounded-md",
+                              vault.submissions?.length > 0
+                                ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                : "bg-white/5 text-white/30 border border-white/10",
+                            )}
+                          >
+                            {vault.status === VaultStatus.RELEASED
+                              ? "Released"
+                              : vault.submissions?.length > 0
+                                ? `${vault.submissions[0].deliverableStatus?.filter((d: any) => d.included).length || 0} of ${vault.deliverables?.length || 0} deliverables claimed`
+                                : "Not started"}
                           </span>
-                        </p>
+                        </div>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between sm:justify-end gap-8 border-t sm:border-t-0 border-white/5 pt-6 sm:pt-0">
                       <div className="sm:text-right">
-                        <p className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em] mb-1">
-                          Vault Value
+                        <p className="text-[9px] text-white/30 font-bold tracking-wide mb-1">
+                          Project value
                         </p>
-                        <p className="text-2xl font-black text-white uppercase tracking-tight font-mono">
+                        <p className="text-2xl font-bold text-white tracking-tight font-mono">
                           $
                           {(vault.totalAmount || vault.amount).toLocaleString()}
                         </p>
@@ -364,7 +383,7 @@ export default function FreelancerDashboard() {
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="mt-8 flex items-center justify-between bg-white/2 border border-white/5 rounded-2xl p-4">
-                <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
+                <p className="text-[10px] font-bold text-white/30 tracking-wide">
                   Page <span className="text-white/60">{currentPage}</span> /{" "}
                   {totalPages}
                 </p>
@@ -376,7 +395,7 @@ export default function FreelancerDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(1, prev - 1))
                     }
-                    className="h-10 px-4 text-[10px] border-white/10 bg-white/2 hover:bg-white/5 text-white/60 font-black uppercase tracking-widest transition-all disabled:opacity-20"
+                    className="h-10 px-4 text-[10px] border-white/10 bg-white/2 hover:bg-white/5 text-white/60 font-bold tracking-wide transition-all disabled:opacity-20"
                   >
                     Previous
                   </Button>
@@ -387,7 +406,7 @@ export default function FreelancerDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                     }
-                    className="h-10 px-4 text-[10px] border-white/10 bg-white/2 hover:bg-white/5 text-white/60 font-black uppercase tracking-widest transition-all disabled:opacity-20"
+                    className="h-10 px-4 text-[10px] border-white/10 bg-white/2 hover:bg-white/5 text-white/60 font-bold tracking-wide transition-all disabled:opacity-20"
                   >
                     Next
                   </Button>

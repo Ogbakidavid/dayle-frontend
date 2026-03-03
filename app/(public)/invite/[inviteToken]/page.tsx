@@ -161,8 +161,8 @@ export default function InvitePage() {
           <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
             <XCircle className="w-10 h-10 text-red-500" />
           </div>
-          <h1 className="text-3xl font-black text-white uppercase tracking-tighter">
-            {isExpired ? "Invitation Expired" : "Invitation Invalid"}
+          <h1 className="text-3xl font-bold text-white tracking-tighter">
+            {isExpired ? "Invitation expired" : "Invitation invalid"}
           </h1>
           <p className="text-white/60 font-medium font-['Poppins',sans-serif]">
             {isExpired
@@ -175,7 +175,7 @@ export default function InvitePage() {
                 variant="outline"
                 className="border-white/10 text-white hover:bg-white/5"
               >
-                Return Home
+                Return home
               </Button>
             </Link>
           </div>
@@ -199,10 +199,10 @@ export default function InvitePage() {
               <XCircle className="w-10 h-10 text-red-500" />
             )}
           </div>
-          <h1 className="text-3xl font-black text-white uppercase tracking-tighter">
+          <h1 className="text-3xl font-bold text-white tracking-tighter">
             {status === "ACCEPTED"
-              ? "Invitation Accepted"
-              : "Invitation Declined"}
+              ? "Invitation accepted"
+              : "Invitation declined"}
           </h1>
           <p className="text-white/60 font-medium font-['Poppins',sans-serif]">
             You have already responded to this invitation.
@@ -215,7 +215,7 @@ export default function InvitePage() {
                 }
                 className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold"
               >
-                View Vault
+                View project
               </Button>
             </div>
           )}
@@ -238,7 +238,7 @@ export default function InvitePage() {
             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-black">
               <Shield className="w-5 h-5 stroke-[3px]" />
             </div>
-            <span className="font-black tracking-tighter text-white text-xl uppercase">
+            <span className="font-bold tracking-tighter text-white text-xl">
               Dayle
             </span>
           </Link>
@@ -257,7 +257,7 @@ export default function InvitePage() {
                   await api.auth.logout();
                   window.location.reload();
                 }}
-                className="text-[10px] font-black uppercase tracking-widest text-emerald-500 hover:text-emerald-400 transition-colors border border-emerald-500/30 px-2 py-1 rounded"
+                className="text-[10px] font-bold tracking-wide text-emerald-500 hover:text-emerald-400 transition-colors border border-emerald-500/30 px-2 py-1 rounded"
               >
                 Switch
               </button>
@@ -271,12 +271,12 @@ export default function InvitePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm font-bold uppercase tracking-wide mb-6"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm font-bold tracking-wide mb-6"
           >
             <Briefcase className="w-4 h-4" />
-            <span>Project Invitation</span>
+            <span>Project invitation</span>
           </motion.div>
-          <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tighter mb-4">
             {vault.title}
           </h1>
           <p className="text-xl text-white/50 font-medium">
@@ -292,16 +292,16 @@ export default function InvitePage() {
             </div>
 
             <div className="relative z-10">
-              <h3 className="text-xs font-black uppercase tracking-widest text-white/40 mb-6 font-['Poppins',sans-serif]">
-                Safe Project Summary
+              <h3 className="text-xs font-bold tracking-wide text-white/40 mb-6">
+                Safe project summary
               </h3>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-white/40 text-xs font-bold uppercase tracking-wide mb-1">
-                    Total Value
+                  <p className="text-white/40 text-xs font-bold tracking-wide mb-1">
+                    Total value
                   </p>
-                  <div className="text-3xl font-black text-white tracking-tight flex items-baseline gap-1">
+                  <div className="text-3xl font-bold text-white tracking-tight flex items-baseline gap-1">
                     <span className="text-lg text-emerald-500">$</span>
                     {(vault.totalAmount || vault.amount || 0).toLocaleString()}
                   </div>
@@ -322,14 +322,14 @@ export default function InvitePage() {
                     </div>
                   )}
                   <div>
-                    <p className="text-white font-bold text-sm uppercase tracking-wide font-['Poppins',sans-serif]">
+                    <p className="text-white font-bold text-sm tracking-wide">
                       {vault.isFunded
-                        ? "Funds Verified & Secured"
-                        : "Awaiting Client Funding"}
+                        ? "Funds verified & secured"
+                        : "Awaiting client funding"}
                     </p>
                     <p className="text-white/40 text-xs font-medium mt-0.5">
                       {vault.isFunded
-                        ? "Capital is held in a secure escrow vault."
+                        ? "Capital is held in a secure escrow account."
                         : "Funds must be secured before work begins."}
                     </p>
                   </div>
@@ -341,8 +341,8 @@ export default function InvitePage() {
                       <Shield className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-emerald-400 font-black text-[10px] uppercase tracking-widest">
-                        Securely Verified Escrow
+                      <p className="text-emerald-400 font-bold text-[10px] tracking-wide">
+                        Securely verified escrow
                       </p>
                       <p className="text-white/30 text-[10px] font-mono mt-0.5 break-all">
                         {vault.vaultAddress}
@@ -362,8 +362,8 @@ export default function InvitePage() {
                   <User className="w-8 h-8 text-white/70" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white uppercase tracking-tight italic">
-                    Join to Respond
+                  <h3 className="text-xl font-bold text-white tracking-tight italic">
+                    Join to respond
                   </h3>
                   <p className="text-white/50 text-sm mt-2 font-medium">
                     Create an account or sign in to accept this project
@@ -373,16 +373,16 @@ export default function InvitePage() {
                 <div className="grid gap-3">
                   <Button
                     onClick={handleLoginRedirect}
-                    className="w-full h-12 bg-white text-black hover:bg-emerald-500 hover:text-black font-bold uppercase tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
+                    className="w-full h-12 bg-white text-black hover:bg-emerald-500 hover:text-black font-bold tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
                   >
-                    Log In
+                    Log in
                   </Button>
                   <Button
                     onClick={handleSignupRedirect}
                     variant="outline"
-                    className="w-full h-12 border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wide rounded-xl transition-all active:scale-95"
+                    className="w-full h-12 border-white/10 text-white hover:bg-white/5 font-bold tracking-wide rounded-xl transition-all active:scale-95"
                   >
-                    Create Account
+                    Create account
                   </Button>
                 </div>
               </div>
@@ -392,8 +392,8 @@ export default function InvitePage() {
                   <AlertCircle className="w-8 h-8 text-amber-500" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white uppercase tracking-tight">
-                    Freelancer Access Only
+                  <h3 className="text-xl font-bold text-white tracking-tight">
+                    Freelancer access only
                   </h3>
                   <p className="text-white/50 text-sm mt-2 font-medium">
                     You are logged in as a Client. This invitation is intended
@@ -404,9 +404,9 @@ export default function InvitePage() {
                   <Button
                     onClick={() => router.push("/client")}
                     variant="outline"
-                    className="w-full h-12 border-white/10 hover:bg-white/5 text-white font-bold uppercase tracking-wide rounded-xl transition-all"
+                    className="w-full h-12 border-white/10 hover:bg-white/5 text-white font-bold tracking-wide rounded-xl transition-all"
                   >
-                    Return to Dashboard
+                    Return to dashboard
                   </Button>
                   <Button
                     onClick={async () => {
@@ -414,9 +414,9 @@ export default function InvitePage() {
                       window.location.reload();
                     }}
                     variant="ghost"
-                    className="w-full h-10 text-white/30 hover:text-white font-bold uppercase text-[10px] tracking-widest"
+                    className="w-full h-10 text-white/30 hover:text-white font-bold text-[10px] tracking-widest"
                   >
-                    Switch Account
+                    Switch account
                   </Button>
                 </div>
               </div>
@@ -426,8 +426,8 @@ export default function InvitePage() {
                   <Lock className="w-8 h-8 text-red-500" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold uppercase tracking-tight italic text-red-400">
-                    Identity Mismatch
+                  <h3 className="text-xl font-bold tracking-tight italic text-red-400">
+                    Identity mismatch
                   </h3>
                   <p className="text-white/50 text-sm mt-2 font-medium leading-relaxed">
                     This invitation was sent to{" "}
@@ -445,21 +445,21 @@ export default function InvitePage() {
                     window.location.reload();
                   }}
                   variant="outline"
-                  className="w-full h-12 border-white/10 hover:bg-white/5 text-white font-bold uppercase tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
+                  className="w-full h-12 border-white/10 hover:bg-white/5 text-white font-bold tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
                 >
-                  Login with Different Account
+                  Login with different account
                 </Button>
               </div>
             ) : (
               // Freelancer View
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-bold text-white uppercase tracking-tight">
+                  <h3 className="text-xl font-bold text-white tracking-tight">
                     Ready to collaborate?
                   </h3>
                   <p className="text-white/50 text-sm mt-2 font-medium">
                     Accepting creates a binding workspace. You can review full
-                    requirements before confirming the vault.
+                    requirements before confirming the project.
                   </p>
                 </div>
 
@@ -467,16 +467,16 @@ export default function InvitePage() {
                   <Button
                     onClick={handleAccept}
                     disabled={processing}
-                    className="w-full h-14 bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide rounded-xl shadow-lg shadow-emerald-500/20"
+                    className="w-full h-14 bg-emerald-500 text-black hover:bg-emerald-400 font-bold tracking-wide rounded-xl shadow-lg shadow-emerald-500/20"
                   >
-                    {processing ? <DotLoader size="md" /> : "Accept Invitation"}
+                    {processing ? <DotLoader size="md" /> : "Accept invitation"}
                   </Button>
 
                   <Button
                     onClick={() => setShowDeclineModal(true)}
                     disabled={processing}
                     variant="ghost"
-                    className="w-full h-12 text-white/50 hover:text-red-400 hover:bg-red-500/10 font-bold uppercase tracking-wide rounded-xl"
+                    className="w-full h-12 text-white/50 hover:text-red-400 hover:bg-red-500/10 font-bold tracking-wide rounded-xl"
                   >
                     Decline
                   </Button>
@@ -486,9 +486,9 @@ export default function InvitePage() {
           </div>
         </div>
 
-        <p className="mt-12 text-white/20 text-xs uppercase tracking-widest font-bold flex items-center gap-2 font-['Poppins',sans-serif]">
+        <p className="mt-12 text-white/20 text-xs tracking-widest font-bold flex items-center gap-2">
           <Shield className="w-3 h-3" />
-          Secured by Dayle Protocol
+          Secured by Dayle system
         </p>
       </main>
 
@@ -503,8 +503,8 @@ export default function InvitePage() {
               className="w-full max-w-sm bg-muted border border-white/10 rounded-2xl p-6 space-y-6"
             >
               <div>
-                <h3 className="text-lg font-bold text-white uppercase tracking-tight">
-                  Decline Invitation
+                <h3 className="text-lg font-bold text-white tracking-tight">
+                  Decline invitation
                 </h3>
                 <p className="text-white/50 text-sm mt-1 font-medium">
                   Please select a reason for declining.
@@ -541,7 +541,7 @@ export default function InvitePage() {
                   onClick={handleDecline}
                   className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold"
                 >
-                  {processing ? <DotLoader size="sm" /> : "Confirm Decline"}
+                  {processing ? <DotLoader size="sm" /> : "Confirm decline"}
                 </Button>
               </div>
             </motion.div>

@@ -115,7 +115,7 @@ export function CreateDisputeForm({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [selectedVaultId, setSelectedVaultId] = useState(initialVaultId || "");
-  const [selectedRequirementId, setSelectedRequirementId] = useState("");
+  const [selectedDeliverableTitle, setSelectedDeliverableTitle] = useState("");
   const [selectedReasonCode, setSelectedReasonCode] = useState("");
   const [description, setDescription] = useState("");
 
@@ -145,24 +145,24 @@ export function CreateDisputeForm({
   }, [selectedVaultId, availableVaults]);
 
   const eligibility = useMemo(() => {
-    return getDisputeEligibility(selectedVault, selectedRequirementId);
-  }, [selectedVault, selectedRequirementId]);
+    return getDisputeEligibility(selectedVault, selectedDeliverableTitle);
+  }, [selectedVault, selectedDeliverableTitle]);
 
-  const selectedRequirement = useMemo(() => {
+  const selectedDeliverable = useMemo(() => {
     return (
-      (selectedVault?.submission?.requirements || []).find(
-        (r: any) => r.reqId === selectedRequirementId,
+      (selectedVault?.deliverables || []).find(
+        (d: any) => d.title === selectedDeliverableTitle,
       ) || null
     );
-  }, [selectedVault, selectedRequirementId]);
+  }, [selectedVault, selectedDeliverableTitle]);
 
   // Determine if the *current* selection requires a requirement reference
-  const requiresRequirementRef = useMemo(() => {
+  const requiresDeliverableRef = useMemo(() => {
     if (!selectedReasonCode || !eligibility?.allowedCodes) return false;
     const codeDef = eligibility.allowedCodes.find(
       (c) => c.code === selectedReasonCode,
     );
-    return Boolean(codeDef?.requiresRequirementRef);
+    return Boolean(codeDef?.requiresDeliverableRef);
   }, [selectedReasonCode, eligibility]);
 
   const step1Complete = Boolean(selectedVaultId && selectedVault);
@@ -172,11 +172,11 @@ export function CreateDisputeForm({
     Boolean(selectedVault) &&
     Boolean(eligibility?.eligible) &&
     Boolean(selectedReasonCode) &&
-    (!requiresRequirementRef || Boolean(selectedRequirementId)) &&
+    (!requiresDeliverableRef || Boolean(selectedDeliverableTitle)) &&
     !isSubmitting;
 
   const resetDownstream = useCallback(() => {
-    setSelectedRequirementId("");
+    setSelectedDeliverableTitle("");
     setSelectedReasonCode("");
     setDescription("");
     setFiles([]);
@@ -185,7 +185,7 @@ export function CreateDisputeForm({
   }, []);
 
   const resetReasonAndBelow = useCallback(() => {
-    setSelectedRequirementId("");
+    setSelectedDeliverableTitle("");
     setSelectedReasonCode("");
     setDescription("");
     setFiles([]);
@@ -252,23 +252,22 @@ export function CreateDisputeForm({
     if (!eligibility?.eligible)
       return setFormError("This vault is not eligible for dispute.");
     if (!selectedReasonCode) return setFormError("Select a reason code.");
-    if (requiresRequirementRef && !selectedRequirementId)
-      return setFormError("This dispute type requires a linked requirement.");
+    if (requiresDeliverableRef && !selectedDeliverableTitle)
+      return setFormError("This dispute type requires a linked deliverable.");
 
     setIsSubmitting(true);
 
     try {
       await api.disputes.create({
         vaultId: selectedVaultId,
-        milestoneId: selectedVaultId,
-        requirementRef: selectedRequirementId || null,
+        deliverableTitle: selectedDeliverableTitle || undefined,
         reasonCode: selectedReasonCode,
         description,
       });
 
       console.log("Submitted dispute", {
         selectedVaultId,
-        selectedRequirementId,
+        selectedDeliverableTitle,
         selectedReasonCode,
         description,
         files,
@@ -415,14 +414,14 @@ export function CreateDisputeForm({
                     <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-xs text-white/50">
                       <div>
                         Status:{" "}
-                        <span className="text-white/70 uppercase font-bold">
+                        <span className="text-white/70 font-bold">
                           {selectedVault.status}
                         </span>
                       </div>
                       <div>
                         Type:{" "}
-                        <span className="text-white/70 uppercase font-bold">
-                          SINGLE RELEASE
+                        <span className="text-white/70 font-bold">
+                          Single release
                         </span>
                       </div>
                     </div>
@@ -464,21 +463,21 @@ export function CreateDisputeForm({
               {/* Requirement (conditional: depends on selected reason code) */}
               {eligibility?.eligible &&
               selectedReasonCode &&
-              requiresRequirementRef ? (
+              requiresDeliverableRef ? (
                 <div className="space-y-2 pt-4 border-t border-white/5 animate-in slide-in-from-top-2 fade-in">
                   <Label className="text-sm font-medium text-white">
                     Related requirement <span className="text-red-400">*</span>
                   </Label>
 
                   <Select
-                    value={selectedRequirementId}
-                    onValueChange={setSelectedRequirementId}
+                    value={selectedDeliverableTitle}
+                    onValueChange={setSelectedDeliverableTitle}
                   >
                     <SelectTrigger className="h-11 w-full border-white/10 bg-black/40 text-white hover:border-white/20 focus:ring-2 focus:ring-amber-500/30">
-                      <SelectValue placeholder="Select requirement...">
-                        {selectedRequirement ? (
+                      <SelectValue placeholder="Select deliverable...">
+                        {selectedDeliverable ? (
                           <span className="block w-full truncate">
-                            {(selectedRequirement as any).reqId}
+                            {selectedDeliverable.title}
                           </span>
                         ) : null}
                       </SelectValue>
@@ -490,20 +489,22 @@ export function CreateDisputeForm({
                         border-white/10 bg-[#141416] text-white
                       "
                     >
-                      {(selectedVault?.submission?.requirements || []).map(
-                        (req: any) => (
+                      {(selectedVault?.deliverables || []).map(
+                        (deliverable: any) => (
                           <SelectItem
-                            key={req.reqId}
-                            value={req.reqId}
+                            key={deliverable.id}
+                            value={deliverable.title}
                             className="focus:bg-white/10 focus:text-white"
                           >
                             <div className="flex flex-col items-start py-1">
                               <span className="text-sm font-medium">
-                                {req.reqId}
+                                {deliverable.title}
                               </span>
-                              <span className="text-xs text-white/40">
-                                {req.label}
-                              </span>
+                              {deliverable.description && (
+                                <span className="text-xs text-white/40">
+                                  {deliverable.description}
+                                </span>
+                              )}
                             </div>
                           </SelectItem>
                         ),
@@ -553,7 +554,7 @@ export function CreateDisputeForm({
                               setSelectedReasonCode(e.target.value);
                               // If switching to a type that doesn't need requirements, clear the selection
                               if (!code.requiresRequirementRef) {
-                                setSelectedRequirementId("");
+                                setSelectedDeliverableTitle("");
                               }
                             }}
                             className="mt-1 h-4 w-4 accent-amber-500"
@@ -564,9 +565,9 @@ export function CreateDisputeForm({
                                 <div className="text-sm font-semibold text-white">
                                   {code.label}
                                 </div>
-                                {code.requiresRequirementRef && (
-                                  <span className="text-[10px] font-bold uppercase tracking-wide text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                                    Needs Proof
+                                {code.requiresDeliverableRef && (
+                                  <span className="text-[10px] font-bold tracking-wide text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                    Needs proof
                                   </span>
                                 )}
                               </div>

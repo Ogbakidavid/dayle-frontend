@@ -64,7 +64,7 @@
   --color-red-700: #b91c1c;
 
   /* Semantic Tokens */
-  --color-background: #0A0A0A;
+  --color-background: #0a0a0a;
   --color-foreground: #ffffff;
   --color-muted: #111111;
   --color-muted-foreground: rgba(255, 255, 255, 0.4);
@@ -76,7 +76,8 @@
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
   /* Border Radius */
   --radius-sm: 0.375rem;
@@ -122,7 +123,7 @@
   h4,
   h5,
   h6 {
-    @apply font-black uppercase tracking-tight text-white;
+    @apply font-semibold tracking-tight text-white;
   }
 
   *:focus-visible {
@@ -130,7 +131,7 @@
   }
 
   .tabular-nums {
-    font-feature-settings: 'tnum';
+    font-feature-settings: "tnum";
     font-variant-numeric: tabular-nums;
   }
 }

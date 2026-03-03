@@ -53,11 +53,11 @@ export default function RoleSelectionPage() {
               <Shield className="w-8 h-8 text-black stroke-[3px]" />
             </div>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">
-            Identify Your <span className="text-emerald-500">Node.</span>
+          <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tighter">
+            Identify your <span className="text-emerald-500">account.</span>
           </h1>
-          <p className="text-white text-xl font-bold max-w-xl mx-auto uppercase tracking-tight">
-            Choose how you will interact with the Dayle protocol to begin setup.
+          <p className="text-white text-xl font-bold max-w-xl mx-auto tracking-tight">
+            Choose how you will interact with the Dayle system to begin setup.
           </p>
         </div>
 
@@ -83,23 +83,23 @@ export default function RoleSelectionPage() {
               <div className="w-16 h-16 rounded-2xl bg-white/3 border border-white/10 flex items-center justify-center mb-8 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all">
                 <Users className="w-8 h-8 text-emerald-500" />
               </div>
-              <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-4">
-                I&apos;m a Client
+              <h3 className="text-3xl font-bold text-white tracking-tight mb-4">
+                I&apos;m a client
               </h3>
 
-              <p className="text-white text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
-                I want to hire contractors, create secure payment vaults, and
+              <p className="text-white text-lg font-bold leading-relaxed mb-10 tracking-tight">
+                I want to hire contractors, create secure payment projects, and
                 release funds only after work is verified.
               </p>
               <Button
                 variant="ghost"
-                className="p-0 text-emerald-500 font-black uppercase tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
+                className="p-0 text-emerald-500 font-bold tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
               >
                 {loading === UserRole.CLIENT ? (
                   <DotLoader size="sm" />
                 ) : (
                   <span className="flex items-center gap-2">
-                    Setup Client Account <ArrowRight className="w-5 h-5" />
+                    Setup client account <ArrowRight className="w-5 h-5" />
                   </span>
                 )}
               </Button>
@@ -126,23 +126,23 @@ export default function RoleSelectionPage() {
               <div className="w-16 h-16 rounded-2xl bg-white/3 border border-white/10 flex items-center justify-center mb-8 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all">
                 <Briefcase className="w-8 h-8 text-emerald-500" />
               </div>
-              <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-4">
-                I&apos;m a Contractor
+              <h3 className="text-3xl font-bold text-white tracking-tight mb-4">
+                I&apos;m a contractor
               </h3>
 
-              <p className="text-white text-lg font-bold leading-relaxed mb-10 uppercase tracking-tight">
+              <p className="text-white text-lg font-bold leading-relaxed mb-10 tracking-tight">
                 I want to work with verified clients and receive guaranteed,
-                vault-based payouts for my projects.
+                escrow-protected payouts for my projects.
               </p>
               <Button
                 variant="ghost"
-                className="p-0 text-emerald-500 font-black uppercase tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
+                className="p-0 text-emerald-500 font-bold tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
               >
                 {loading === UserRole.FREELANCER ? (
                   <DotLoader size="sm" />
                 ) : (
                   <span className="flex items-center gap-2">
-                    Setup Contractor Account <ArrowRight className="w-5 h-5" />
+                    Setup contractor account <ArrowRight className="w-5 h-5" />
                   </span>
                 )}
               </Button>
@@ -152,10 +152,10 @@ export default function RoleSelectionPage() {
 
         {/* Footer Metadata */}
         <div className="mt-20 flex flex-col items-center gap-4">
-          <div className="flex gap-8 text-[11px] font-black text-white uppercase tracking-[0.3em]">
-            <span>Secure Selection</span>
+          <div className="flex gap-8 text-[11px] font-bold text-white tracking-[0.2em]">
+            <span>Secure selection</span>
             <span>•</span>
-            <span>Identity Verification Next</span>
+            <span>Identity verification next</span>
           </div>
         </div>
       </div>

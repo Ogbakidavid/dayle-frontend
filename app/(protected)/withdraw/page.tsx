@@ -303,40 +303,38 @@ export default function FreelancerWithdrawPage() {
               >
                 <Lock className="w-5 h-5 text-black group-hover:rotate-12 transition-transform" />
               </div>
-              <span className="text-white font-black tracking-tighter text-2xl uppercase italic">
+              <span className="text-white font-bold tracking-tighter text-2xl italic">
                 Dayle
               </span>
             </div>
 
             <div className="space-y-10">
               <div className="space-y-3">
-                <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.4em] italic leading-none">
-                  WITHDRAWAL VALUE
+                <p className="text-[10px] font-bold text-white/40 tracking-[0.4em] italic leading-none">
+                  Withdrawal value
                 </p>
-                <h1 className="text-6xl font-black text-white tracking-tighter sm:text-7xl font-mono flex items-baseline gap-2">
-                  <span className="text-emerald-500 font-black text-3xl">
-                    $
-                  </span>
+                <h1 className="text-6xl font-bold text-white tracking-tighter sm:text-7xl font-mono flex items-baseline gap-2">
+                  <span className="text-emerald-500 font-bold text-3xl">$</span>
                   {amount.toLocaleString()}
                 </h1>
               </div>
 
               <div className="space-y-6 pt-10 border-t border-white/5">
                 <SummaryItem
-                  label="Region / Apex"
+                  label="Region / Currency"
                   value={`${selectedCountry} / ${selectedCurrency}`}
                 />
                 <SummaryItem
-                  label="Exchange Protocol"
+                  label="Exchange System"
                   value={`1.00 USD = 1.00 ${selectedCurrency}`}
                 />
                 <SummaryItem
-                  label="Network Node"
+                  label="Transfer Network"
                   value="Partna High-Speed Rails"
                   icon={<Shield className="w-3.5 h-3.5 text-emerald-500" />}
                 />
                 <SummaryItem
-                  label="Signature ID"
+                  label="Transaction ID"
                   value={transactionId}
                   isMono
                 />
@@ -347,12 +345,12 @@ export default function FreelancerWithdrawPage() {
           <div className="p-8 bg-emerald-500/5 border border-emerald-500/10 rounded-3xl relative group overflow-hidden">
             <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mb-3 italic">
-                <Shield className="w-4 h-4" /> SECURE SETTLEMENT V2
+              <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-bold tracking-[0.3em] mb-3 italic">
+                <Shield className="w-4 h-4" /> Secure transfer V2
               </div>
-              <p className="text-xs text-white/40 leading-relaxed font-black uppercase tracking-widest">
+              <p className="text-xs text-white/40 leading-relaxed font-bold tracking-widest">
                 Assets are migrated through high-speed bank-transfer rails with
-                encryption at every node.
+                encryption at every step.
               </p>
             </div>
           </div>
@@ -377,12 +375,12 @@ export default function FreelancerWithdrawPage() {
                         : "method_selection",
                     )
                   }
-                  className="flex items-center gap-3 text-white/30 hover:text-white transition-all text-[10px] font-black uppercase tracking-[0.2em] mb-12 group bg-white/2 border border-white/5 py-3 px-6 rounded-2xl shadow-xl hover:border-white/10"
+                  className="flex items-center gap-3 text-white/30 hover:text-white transition-all text-[10px] font-bold tracking-[0.2em] mb-12 group bg-white/2 border border-white/5 py-3 px-6 rounded-2xl shadow-xl hover:border-white/10"
                 >
                   <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                   {step === "verification"
-                    ? "Node Configuration"
-                    : "Selection Layer"}
+                    ? "Account Configuration"
+                    : "Method Selection"}
                 </motion.button>
               )}
             </AnimatePresence>
@@ -398,17 +396,17 @@ export default function FreelancerWithdrawPage() {
                   className="max-w-xl mx-auto w-full space-y-16 py-12"
                 >
                   <div className="text-center space-y-4">
-                    <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
-                      Withdrawal Layer
+                    <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter italic">
+                      Withdrawal method
                     </h2>
-                    <p className="text-xs font-black text-white/30 uppercase tracking-[0.3em]">
-                      Select your primary liquidation protocol
+                    <p className="text-xs font-bold text-white/30 tracking-[0.3em]">
+                      Select your primary payout method
                     </p>
                   </div>
                   <div className="grid gap-6">
                     <MethodBtn
                       icon={<CreditCard />}
-                      title="Card Push Protocol"
+                      title="Card Payout"
                       desc="Direct to Visa or Mastercard"
                       onClick={() => {
                         setSelectedMethod("card");
@@ -443,17 +441,17 @@ export default function FreelancerWithdrawPage() {
                   <div className="space-y-10 bg-[#0D0D0E] border border-white/5 p-10 rounded-3xl shadow-2xl relative">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/3 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
                     <div className="space-y-3 relative z-10">
-                      <h2 className="text-3xl font-black text-white tracking-tight uppercase italic flex items-center gap-3">
+                      <h2 className="text-3xl font-bold text-white tracking-tight italic flex items-center gap-3">
                         <Zap className="w-6 h-6 text-emerald-500" />
-                        Card Data
+                        Card data
                       </h2>
-                      <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
-                        Pushed via real-time visa/mastercard rails.
+                      <p className="text-[10px] font-bold text-white/30 tracking-[0.2em]">
+                        Pushed via real-time visa/mastercard networks.
                       </p>
                     </div>
                     <div className="space-y-6 relative z-10">
                       <WithdrawInputField
-                        label="Card Signature"
+                        label="Card Number"
                         value={cardDetails.number}
                         error={cardErrors.number}
                         onChange={(e) =>
@@ -462,7 +460,7 @@ export default function FreelancerWithdrawPage() {
                         placeholder="0000 0000 0000 0000"
                       />
                       <WithdrawInputField
-                        label="Registry Name"
+                        label="Account Name"
                         value={cardDetails.name}
                         error={cardErrors.name}
                         onChange={(e) =>
@@ -471,7 +469,7 @@ export default function FreelancerWithdrawPage() {
                             e.target.value.toUpperCase(),
                           )
                         }
-                        placeholder="HOLDER NAME"
+                        placeholder="Holder name"
                       />
                       <div className="grid grid-cols-2 gap-6">
                         <WithdrawInputField
@@ -497,9 +495,9 @@ export default function FreelancerWithdrawPage() {
                     </div>
                     <Button
                       onClick={handleCardSubmit}
-                      className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 group relative z-10"
+                      className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 group relative z-10"
                     >
-                      Proceed to Verification{" "}
+                      Proceed{" "}
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
@@ -520,11 +518,11 @@ export default function FreelancerWithdrawPage() {
                       <Globe className="text-emerald-500 w-8 h-8 group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
-                        Regional Config
+                      <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter italic">
+                        Regional settings
                       </h2>
-                      <p className="text-xs font-black text-white/30 uppercase tracking-[0.3em]">
-                        Configure your payout node and currency mesh
+                      <p className="text-xs font-bold text-white/30 tracking-[0.3em]">
+                        Configure your payout account and currency
                       </p>
                     </div>
                   </div>
@@ -534,8 +532,8 @@ export default function FreelancerWithdrawPage() {
 
                     <div className="space-y-8 relative z-10">
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] block ml-1 italic">
-                          Settlement Country
+                        <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] block ml-1 italic">
+                          Payout country
                         </label>
                         <div className="relative">
                           <select
@@ -555,7 +553,7 @@ export default function FreelancerWithdrawPage() {
                                 setSelectedCurrency(countryObj.currencies[0]);
                               }
                             }}
-                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-black uppercase tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-inner"
+                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-bold tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-inner"
                           >
                             {countries.map((c) => (
                               <option
@@ -572,8 +570,8 @@ export default function FreelancerWithdrawPage() {
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] block ml-1 italic">
-                          Asset Type
+                        <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] block ml-1 italic">
+                          Asset type
                         </label>
                         <div className="relative">
                           <select
@@ -581,7 +579,7 @@ export default function FreelancerWithdrawPage() {
                             onChange={(e) =>
                               setSelectedCurrency(e.target.value)
                             }
-                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-black uppercase tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-inner"
+                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-bold tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-inner"
                           >
                             {currentCountryObj?.currencies.map((curr) => (
                               <option
@@ -600,9 +598,9 @@ export default function FreelancerWithdrawPage() {
 
                     <Button
                       onClick={() => setStep("verification")}
-                      className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase text-xs tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 group relative z-10"
+                      className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 group relative z-10"
                     >
-                      Initialize Payout{" "}
+                      Continue{" "}
                       <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
@@ -623,11 +621,11 @@ export default function FreelancerWithdrawPage() {
                       <Landmark className="text-emerald-500 w-8 h-8 group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
-                        Beneficiary Link
+                      <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter italic">
+                        Recipient details
                       </h2>
-                      <p className="text-xs font-black text-white/30 uppercase tracking-[0.3em]">
-                        Configure final destination for this settlement event
+                      <p className="text-xs font-bold text-white/30 tracking-[0.3em]">
+                        Configure final destination for this transfer
                       </p>
                     </div>
                   </div>
@@ -636,8 +634,8 @@ export default function FreelancerWithdrawPage() {
                     <div className="space-y-10 bg-[#0D0D0E] border border-white/5 p-10 rounded-[32px] shadow-2xl relative">
                       <div className="space-y-8 relative z-10">
                         <div className="space-y-3">
-                          <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] block ml-1 italic">
-                            Bank Authority
+                          <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] block ml-1 italic">
+                            Bank name
                           </label>
                           <div className="relative">
                             <select
@@ -648,7 +646,7 @@ export default function FreelancerWithdrawPage() {
                                   bankName: e.target.value,
                                 })
                               }
-                              className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-black uppercase tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-inner mt-2"
+                              className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-bold tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-inner mt-2"
                             >
                               <option
                                 value=""
@@ -696,8 +694,8 @@ export default function FreelancerWithdrawPage() {
                           </div>
                         </div>
                         <div className="space-y-3">
-                          <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] block ml-1 italic">
-                            Node Address (Acc Num)
+                          <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] block ml-1 italic">
+                            Bank Account Number
                           </label>
                           <input
                             type="text"
@@ -709,7 +707,7 @@ export default function FreelancerWithdrawPage() {
                                 accountNumber: e.target.value,
                               })
                             }
-                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-black uppercase tracking-widest transition-all text-sm shadow-inner mt-2 placeholder:text-white/5"
+                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-bold tracking-widest transition-all text-sm shadow-inner mt-2 placeholder:text-white/5"
                           />
                         </div>
                       </div>
@@ -722,17 +720,17 @@ export default function FreelancerWithdrawPage() {
                           isResolving ||
                           showOtp
                         }
-                        className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 group relative z-10"
+                        className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 group relative z-10"
                       >
                         {isResolving ? (
                           <div className="flex items-center gap-3">
                             <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                            Resolving Node...
+                            Verifying Account...
                           </div>
                         ) : showOtp ? (
-                          "Node Authenticated"
+                          "Account Verified"
                         ) : (
-                          "Authorize Endpoint"
+                          "Verify Account"
                         )}
                       </Button>
                     </div>
@@ -746,14 +744,14 @@ export default function FreelancerWithdrawPage() {
                             className="space-y-8 bg-[#0D0D0E] border border-white/5 p-10 rounded-[32px] shadow-2xl h-full flex flex-col justify-center"
                           >
                             <div className="space-y-3">
-                              <h3 className="text-2xl font-black text-white tracking-tight uppercase italic">
-                                Owner Verification
+                              <h3 className="text-2xl font-bold text-white tracking-tight italic">
+                                Account verification
                               </h3>
                               <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                                <p className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-1 italic">
-                                  RESOLVED IDENTITY
+                                <p className="text-[10px] text-white/30 font-bold tracking-widest mb-1 italic">
+                                  Account owner
                                 </p>
-                                <p className="text-sm text-emerald-500 font-black uppercase tracking-wide italic">
+                                <p className="text-sm text-emerald-500 font-bold tracking-wide italic">
                                   {bankDetails.accountName}
                                 </p>
                               </div>
@@ -770,27 +768,27 @@ export default function FreelancerWithdrawPage() {
                                   onChange={(e) =>
                                     handleOtpChange(index, e.target.value)
                                   }
-                                  className="aspect-square bg-white/2 border border-white/5 rounded-xl text-center text-xl font-black text-white focus:border-emerald-500/30 focus:bg-emerald-500/5 outline-none transition-all shadow-inner"
+                                  className="aspect-square bg-white/2 border border-white/5 rounded-xl text-center text-xl font-bold text-white focus:border-emerald-500/30 focus:bg-emerald-500/5 outline-none transition-all shadow-inner"
                                 />
                               ))}
                             </div>
 
                             <div className="p-5 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-                              <div className="flex items-center gap-2 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-2 italic">
-                                <Info className="w-3.5 h-3.5" /> SECURITY BYPASS
+                              <div className="flex items-center gap-2 text-blue-400 text-[10px] font-bold tracking-widest mb-2 italic">
+                                <Info className="w-3.5 h-3.5" /> Demo helper
                               </div>
-                              <p className="text-[10px] text-blue-400/60 font-black uppercase tracking-widest leading-relaxed">
+                              <p className="text-[10px] text-blue-400/60 font-bold tracking-widest leading-relaxed">
                                 Identity Check: Use code{" "}
                                 <span className="text-white">123456</span> for
-                                sandbox verification.
+                                demo mode.
                               </p>
                             </div>
 
                             <Button
                               onClick={handleVerifyOtp}
-                              className="w-full h-14 bg-white text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/90 transition-all shadow-xl active:scale-95"
+                              className="w-full h-14 bg-white text-black font-bold tracking-widest rounded-2xl hover:bg-white/90 transition-all shadow-xl active:scale-95"
                             >
-                              Confirm Identity Node
+                              Confirm Account
                             </Button>
                           </motion.div>
                         ) : (
@@ -798,8 +796,8 @@ export default function FreelancerWithdrawPage() {
                             <div className="w-20 h-20 bg-white/5 rounded-[2.5rem] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner">
                               <Fingerprint className="w-10 h-10 text-white/20 group-hover:text-white transition-colors" />
                             </div>
-                            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] italic group-hover:text-white/40 transition-colors">
-                              Awaiting Bio-Auth
+                            <p className="text-[10px] font-bold text-white/20 tracking-[0.4em] italic group-hover:text-white/40 transition-colors">
+                              Awaiting bio-auth
                             </p>
                           </div>
                         )}
@@ -823,10 +821,10 @@ export default function FreelancerWithdrawPage() {
                       <Info className="w-10 h-10 text-emerald-500" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
-                        Final Manifest
+                      <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter italic">
+                        Final manifest
                       </h2>
-                      <p className="text-xs font-black text-white/30 uppercase tracking-[0.3em] px-10 leading-relaxed">
+                      <p className="text-xs font-bold text-white/30 tracking-[0.3em] px-10 leading-relaxed">
                         Confirm the settlement event below. Transactions are
                         irreversible once broadcast to the network.
                       </p>
@@ -875,11 +873,11 @@ export default function FreelancerWithdrawPage() {
                       />
                       <div className="p-8 bg-white/2 flex justify-between items-center relative overflow-hidden group">
                         <div className="absolute inset-x-0 bottom-0 h-0.5 bg-emerald-500/20 translate-y-full group-hover:translate-y-0 transition-transform" />
-                        <span className="text-xs font-black uppercase text-white/40 tracking-[0.3em] italic">
-                          NET SETTLEMENT
+                        <span className="text-xs font-bold text-white/40 tracking-[0.3em] italic">
+                          Net settlement
                         </span>
                         <div className="text-right">
-                          <span className="text-4xl font-black text-white tracking-widest font-mono italic">
+                          <span className="text-4xl font-bold text-white tracking-widest font-mono italic">
                             ${amount.toLocaleString()}
                           </span>
                           <p className="text-[10px] text-white/20 font-black tracking-widest mt-1">
@@ -895,13 +893,13 @@ export default function FreelancerWithdrawPage() {
                       <AlertCircle className="w-5 h-5 text-amber-500" />
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1 italic">
-                        RISK ADVISORY
+                      <p className="text-[10px] font-bold tracking-[0.2em] text-amber-500 mb-1 italic">
+                        Risk advisory
                       </p>
-                      <p className="text-[11px] text-amber-500/70 leading-relaxed font-black uppercase tracking-widest italic">
-                        By broadcasting this event, you authorize Dayle to
-                        execute the transfer. Funds typically arrive at the node
-                        in 5-8 minutes.
+                      <p className="text-[11px] text-amber-500/70 leading-relaxed font-bold tracking-widest italic">
+                        By confirming this transfer, you authorize Dayle to
+                        execute the transfer. Funds typically arrive at your
+                        account in 5-8 minutes.
                       </p>
                     </div>
                   </div>
@@ -910,15 +908,15 @@ export default function FreelancerWithdrawPage() {
                     <Button
                       variant="ghost"
                       onClick={() => setStep("verification")}
-                      className="h-16 font-black uppercase text-[10px] tracking-[0.3em] text-white/30 hover:text-white hover:bg-white/5 rounded-2xl transition-all italic"
+                      className="h-16 font-black text-[10px] tracking-[0.3em] text-white/30 hover:text-white hover:bg-white/5 rounded-2xl transition-all italic"
                     >
-                      Modify Vector
+                      Go back
                     </Button>
                     <Button
                       onClick={handleConfirmWithdrawal}
-                      className="h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase text-xs tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 italic"
+                      className="h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 italic"
                     >
-                      Confirm & Execute
+                      Confirm & execute
                     </Button>
                   </div>
                 </motion.div>
@@ -954,10 +952,10 @@ export default function FreelancerWithdrawPage() {
                     />
                   </div>
                   <div className="space-y-4">
-                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase italic leading-none">
+                    <h2 className="text-5xl md:text-7xl font-bold text-white tracking-tighter italic leading-none">
                       Broadcasting!
                     </h2>
-                    <p className="text-xs font-black text-white/30 uppercase tracking-[0.4em] leading-relaxed">
+                    <p className="text-xs font-bold text-white/30 tracking-[0.4em] leading-relaxed">
                       Your settlement event has been authorized and dispatched.
                     </p>
                   </div>
@@ -965,16 +963,16 @@ export default function FreelancerWithdrawPage() {
                   <div className="bg-[#0D0D0E] border border-white/5 rounded-[40px] p-10 space-y-8 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/3 rounded-full -mr-24 -mt-24 blur-3xl" />
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 italic">
-                        Asset Released
+                      <span className="text-[10px] font-bold tracking-[0.3em] text-white/40 italic">
+                        Asset released
                       </span>
-                      <span className="text-3xl font-black text-emerald-500 font-mono italic tracking-tighter">
+                      <span className="text-3xl font-bold text-emerald-500 font-mono italic tracking-tighter">
                         ${amount.toLocaleString()}
                       </span>
                     </div>
                     <div className="pt-8 border-t border-white/5 flex justify-between items-center">
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 italic">
-                        Event Signature
+                      <span className="text-[10px] font-bold tracking-[0.3em] text-white/40 italic">
+                        Event signature
                       </span>
                       <span className="text-xs text-white font-mono tracking-widest">
                         {transactionId}
@@ -984,9 +982,9 @@ export default function FreelancerWithdrawPage() {
 
                   <Button
                     onClick={() => router.push("/freelancer/balance")}
-                    className="w-full h-18 bg-white text-black font-black uppercase text-xs tracking-[0.3em] rounded-4xl hover:bg-white/90 transition-all shadow-2xl active:scale-95 italic"
+                    className="w-full h-18 bg-white text-black font-bold text-xs tracking-[0.3em] rounded-4xl hover:bg-white/90 transition-all shadow-2xl active:scale-95 italic"
                   >
-                    Exit to Overview
+                    Exit to overview
                   </Button>
                 </motion.div>
               )}
@@ -1006,10 +1004,10 @@ export default function FreelancerWithdrawPage() {
                     />
                   </div>
                   <div className="space-y-4">
-                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase italic leading-none">
+                    <h2 className="text-5xl md:text-7xl font-bold text-white tracking-tighter italic leading-none">
                       Rejection
                     </h2>
-                    <p className="text-xs font-black text-white/30 uppercase tracking-[0.4em] leading-relaxed">
+                    <p className="text-xs font-bold text-white/30 tracking-[0.4em] leading-relaxed">
                       The bank network rejected the settlement or connection
                       timed out.
                     </p>
@@ -1017,16 +1015,15 @@ export default function FreelancerWithdrawPage() {
 
                   <div className="p-10 bg-red-500/5 border border-red-500/10 rounded-[40px] text-left space-y-4 relative overflow-hidden">
                     <div className="absolute inset-0 bg-red-500/1 translate-x-10" />
-                    <p className="text-[11px] font-black text-white uppercase tracking-[0.2em] relative z-10 italic">
-                      REJECT CODE:{" "}
+                    <p className="text-[11px] font-bold text-white tracking-[0.2em] relative z-10 italic">
+                      Reject code:{" "}
                       <span className="text-red-500">
                         SET_FAIL_BANK_COMM_ERR_V4
                       </span>
                     </p>
-                    <p className="text-xs text-red-500/60 font-black uppercase tracking-widest leading-relaxed relative z-10 italic">
-                      The destination node did not respond in time. Please
-                      verify endpoints or contact protocol support if error
-                      persists.
+                    <p className="text-xs text-red-500/60 font-bold tracking-widest leading-relaxed relative z-10 italic">
+                      The bank terminal did not respond in time. Please verify
+                      endpoints or contact protocol support if error persists.
                     </p>
                   </div>
 
@@ -1038,15 +1035,15 @@ export default function FreelancerWithdrawPage() {
                         setShowOtp(false);
                         setOtp(["", "", "", "", "", ""]);
                       }}
-                      className="h-16 font-black uppercase text-[10px] tracking-[0.3em] border-white/5 bg-white/2 hover:bg-white/5 rounded-2xl transition-all italic"
+                      className="h-16 font-bold text-[10px] tracking-[0.3em] border-white/5 bg-white/2 hover:bg-white/5 rounded-2xl transition-all italic"
                     >
-                      Retry Vector
+                      Try again
                     </Button>
                     <Button
                       onClick={() => router.push("/freelancer/balance")}
-                      className="h-16 bg-white text-black font-black uppercase text-[10px] tracking-[0.3em] rounded-2xl transition-all shadow-xl active:scale-95 italic text-xs"
+                      className="h-16 bg-white text-black font-bold text-[10px] tracking-[0.3em] rounded-2xl transition-all shadow-xl active:scale-95 italic text-xs"
                     >
-                      Return to Origin
+                      Return to origin
                     </Button>
                   </div>
                 </motion.div>
@@ -1073,7 +1070,7 @@ function SummaryItem({
   isMono?: boolean;
 }) {
   return (
-    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-white">
+    <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-white">
       <span className="text-white/30 italic">{label}</span>
       <div className="flex items-center gap-2">
         {icon}
@@ -1111,10 +1108,10 @@ function MethodBtn({
         {React.cloneElement(icon, { className: "w-8 h-8" } as any)}
       </div>
       <div className="flex-1">
-        <p className="text-white font-black text-xl uppercase tracking-tighter italic group-hover:text-emerald-500 transition-colors">
+        <p className="text-white font-bold text-xl tracking-tighter italic group-hover:text-emerald-500 transition-colors">
           {title}
         </p>
-        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-2 group-hover:text-white/40 transition-colors">
+        <p className="text-[10px] font-bold text-white/20 tracking-[0.2em] mt-2 group-hover:text-white/40 transition-colors">
           {desc}
         </p>
       </div>
@@ -1149,24 +1146,24 @@ function CardPreview({ details }: { details: CardDetails }) {
             )}
             {!details.type && (
               <span className="font-black italic text-xl text-white/20 tracking-[0.2em]">
-                EXTERNAL_AXIS
+                External axis
               </span>
             )}
           </div>
         </div>
         <div className="space-y-8">
-          <p className="text-3xl tracking-[0.15em] font-mono font-black text-white shadow-sm">
+          <p className="text-3xl tracking-[0.15em] font-mono font-bold text-white shadow-sm">
             {details.number || "•••• •••• •••• ••••"}
           </p>
-          <div className="flex justify-between text-[11px] font-black uppercase tracking-[0.3em] italic">
+          <div className="flex justify-between text-[11px] font-bold tracking-[0.3em] italic">
             <div>
-              <p className="text-white/20 mb-2">HOLDER SIGNATURE</p>
+              <p className="text-white/20 mb-2">Holder signature</p>
               <p className="text-white tracking-widest">
                 {details.name || "UNREGISTERED"}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-white/20 mb-2">VALID_THRU</p>
+              <p className="text-white/20 mb-2">Valid thru</p>
               <p className="text-white tracking-widest">
                 {details.expiry || "MM/YY"}
               </p>
@@ -1188,18 +1185,18 @@ function WithdrawInputField({
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className="space-y-3">
-      <label className="text-[10px] font-black uppercase text-white/40 tracking-[0.3em] ml-1 italic">
+      <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] ml-1 italic">
         {label}
       </label>
       <input
         {...props}
         className={cn(
-          "w-full bg-white/2 border h-16 rounded-2xl px-6 text-white focus:border-emerald-500/30 outline-none transition-all font-black uppercase tracking-widest text-xs placeholder:text-white/5 shadow-inner",
+          "w-full bg-white/2 border h-16 rounded-2xl px-6 text-white focus:border-emerald-500/30 outline-none transition-all font-bold tracking-widest text-xs placeholder:text-white/5 shadow-inner",
           error ? "border-red-500/50 bg-red-500/2" : "border-white/5",
         )}
       />
       {error && (
-        <p className="text-[9px] text-red-500 font-black ml-1 uppercase tracking-widest italic">
+        <p className="text-[9px] text-red-500 font-bold ml-1 tracking-widest italic">
           {error}
         </p>
       )}
@@ -1220,20 +1217,20 @@ function ReviewItem({
 }) {
   return (
     <div className="p-8 flex justify-between items-center group hover:bg-white/1 transition-colors">
-      <span className="text-[10px] font-black uppercase text-white/30 tracking-[0.3em] italic">
+      <span className="text-[10px] font-bold text-white/30 tracking-[0.3em] italic">
         {label}
       </span>
       <div className="text-right">
         <p
           className={cn(
-            "font-black text-white text-sm uppercase tracking-widest italic",
+            "font-bold text-white text-sm tracking-widest italic",
             highlight,
           )}
         >
           {value}
         </p>
         {subValue && (
-          <p className="text-[9px] text-white/20 font-black uppercase mt-1.5 tracking-widest italic">
+          <p className="text-[9px] text-white/20 font-bold mt-1.5 tracking-widest italic">
             {subValue}
           </p>
         )}
@@ -1298,11 +1295,11 @@ function ProcessingStatusScreen({
           <Zap className="w-12 h-12 text-emerald-500" />
         </div>
         <div className="space-y-3">
-          <h2 className="text-4xl font-black text-white tracking-tighter uppercase italic">
-            Executing Link
+          <h2 className="text-4xl font-bold text-white tracking-tighter italic">
+            Executing link
           </h2>
-          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] italic">
-            REF_SIG: {transactionId}
+          <p className="text-[10px] font-bold text-white/20 tracking-[0.4em] italic">
+            Ref sig: {transactionId}
           </p>
         </div>
       </div>
@@ -1340,7 +1337,7 @@ function ProcessingStatusScreen({
             <div className="pt-1.5 flex-1">
               <h4
                 className={cn(
-                  "font-black text-sm tracking-[0.2em] uppercase italic transition-colors",
+                  "font-bold text-sm tracking-[0.2em] italic transition-colors",
                   step.status === "pending" ? "text-white/20" : "text-white",
                 )}
               >
@@ -1348,7 +1345,7 @@ function ProcessingStatusScreen({
               </h4>
               <p
                 className={cn(
-                  "text-[9px] font-black uppercase tracking-widest mt-2 transition-colors italic",
+                  "text-[9px] font-bold tracking-widest mt-2 transition-colors italic",
                   step.status === "pending" ? "text-white/5" : "text-white/40",
                 )}
               >
@@ -1378,11 +1375,11 @@ function ProcessingOverlay() {
         />
         <Fingerprint className="w-14 h-14 text-emerald-500 absolute inset-0 m-auto" />
       </div>
-      <h3 className="text-3xl font-black text-white mb-3 uppercase tracking-tighter italic">
-        Authorizing Port
+      <h3 className="text-3xl font-bold text-white mb-3 tracking-tighter italic">
+        Authorizing port
       </h3>
-      <p className="text-[10px] font-black uppercase tracking-[0.6em] text-emerald-500/40 italic">
-        BIO-CRYPT VERIFICATION ACTIVE
+      <p className="text-[10px] font-bold tracking-[0.6em] text-emerald-500/40 italic">
+        Bio-crypt verification active
       </p>
     </motion.div>
   );

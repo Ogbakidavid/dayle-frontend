@@ -60,8 +60,8 @@ export default function RoleGuard({
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center space-y-4">
         <DotLoader size="lg" />
-        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em]">
-          Verifying Permissions
+        <p className="text-[10px] font-bold text-emerald-500 tracking-[0.4em]">
+          Verifying permissions
         </p>
       </div>
     );

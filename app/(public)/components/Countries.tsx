@@ -142,10 +142,10 @@ export default function CoverageByRegion() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-12">
           <div className="max-w-3xl">
-            <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/60">
+            <div className="text-[11px] font-bold tracking-[0.22em] text-white/60">
               Coverage
             </div>
-            <h2 className="mt-3 text-4xl md:text-6xl font-black text-white tracking-tight leading-[0.95]">
+            <h2 className="mt-3 text-4xl md:text-6xl font-bold text-white tracking-tight leading-[0.95]">
               Corridors by region.
               <span className="text-emerald-500 italic">
                 {" "}
@@ -206,10 +206,10 @@ export default function CoverageByRegion() {
                         <span className="text-2xl">{activeCountry.flag}</span>
                       </div>
                       <div>
-                        <div className="text-white font-black tracking-tight text-xl">
+                        <div className="text-white font-bold tracking-tight text-xl">
                           {activeCountry.country}
                         </div>
-                        <div className="text-[11px] text-white/45 font-semibold uppercase tracking-widest">
+                        <div className="text-[11px] text-white/45 font-semibold tracking-widest">
                           {activeCountry.region} • {activeCountry.code}
                         </div>
                       </div>
@@ -217,7 +217,7 @@ export default function CoverageByRegion() {
                   </div>
 
                   <div className="mt-8">
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-white/45">
+                    <div className="text-[10px] font-bold tracking-widest text-white/45">
                       Payout methods
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -281,10 +281,10 @@ function RegionAccordion({
         type="button"
       >
         <div>
-          <div className="text-white font-black tracking-tight text-xl">
+          <div className="text-white font-bold tracking-tight text-xl">
             {region}
           </div>
-          <div className="text-[11px] text-white/45 font-semibold uppercase tracking-widest mt-1">
+          <div className="text-[11px] text-white/45 font-semibold tracking-widest mt-1">
             {countries.length} countries
           </div>
         </div>
@@ -325,7 +325,7 @@ function RegionAccordion({
                         </div>
                       </div>
                       <div
-                        className={`text-[11px] font-black uppercase tracking-widest ${active ? "text-black/60" : "text-white/35"}`}
+                        className={`text-[11px] font-bold tracking-widest ${active ? "text-black/60" : "text-white/35"}`}
                       >
                         {c.code}
                       </div>
@@ -344,10 +344,10 @@ function RegionAccordion({
 function MiniStat({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#070707] px-4 py-3">
-      <div className="text-white text-2xl font-black tracking-tight">
+      <div className="text-white text-2xl font-bold tracking-tight">
         {value}
       </div>
-      <div className="text-[10px] text-white/45 font-bold uppercase tracking-widest mt-1">
+      <div className="text-[10px] text-white/45 font-bold tracking-widest mt-1">
         {label}
       </div>
     </div>
@@ -357,10 +357,10 @@ function MiniStat({ label, value }: { label: string; value: number }) {
 function DetailTile({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-4">
-      <div className="text-[10px] text-white/45 font-bold uppercase tracking-widest">
+      <div className="text-[10px] text-white/45 font-bold tracking-widest">
         {label}
       </div>
-      <div className="mt-1 text-white font-black tracking-tight">{value}</div>
+      <div className="mt-1 text-white font-bold tracking-tight">{value}</div>
     </div>
   );
 }

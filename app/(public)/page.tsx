@@ -63,20 +63,20 @@ export default function LandingPage() {
 
   const faqs: FAQItem[] = [
     {
-      q: "How does the 'Autonomous Vault' actually work?",
-      a: "When a contract is initiated, funds are transferred into a secure escrow vault. These funds are locked and can only be released when pre-defined vault conditions are met or if both parties agree to a refund.",
+      q: "How does the 'Secure Escrow' actually work?",
+      a: "When a contract is initiated, funds are transferred into a secure escrow account. These funds are locked and can only be released when pre-defined project conditions are met or if both parties agree to a refund.",
     },
     {
       q: "What happens if a client refuses to approve the work?",
-      a: "Dayle includes a built-in Dispute Hub. If the vault release is contested, an independent arbitrator reviews the submitted work against the project scope to ensure a fair resolution.",
+      a: "Dayle includes a built-in Dispute Hub. If the payment release is contested, an independent reviewer evaluates the submitted work against the project scope to ensure a fair resolution.",
     },
     {
       q: "Are there any hidden fees for international transfers?",
-      a: "No. We use integrated financial rails to provide real-time mid-market exchange rates. You see exactly what you’ll receive before the vault is even funded.",
+      a: "No. We use integrated financial rails to provide real-time mid-market exchange rates. You see exactly what you’ll receive before the project is even funded.",
     },
     {
       q: "Is my data and capital insured?",
-      a: "Yes. All project capital held in Dayle vaults is covered by our secondary insurance layer, and our infrastructure is SOC-2 Type II compliant with AES-256 encryption.",
+      a: "Yes. All project capital held in Dayle accounts is covered by our secondary insurance layer, and our infrastructure is SOC-2 Type II compliant with AES-256 encryption.",
     },
   ];
 
@@ -103,7 +103,7 @@ export default function LandingPage() {
               <div className="w-9 h-9 md:w-10 md:h-10 bg-emerald-500 rounded-xl flex items-center justify-center">
                 <Shield className="w-5 h-5 md:w-6 md:h-6 text-black stroke-[3px]" />
               </div>
-              <span className="font-black tracking-tighter text-xl md:text-2xl uppercase text-white">
+              <span className="font-bold tracking-tighter text-xl md:text-2xl text-white">
                 Dayle
               </span>
             </div>
@@ -112,15 +112,15 @@ export default function LandingPage() {
               <Link href="/login">
                 <Button
                   variant="ghost"
-                  className="text-xs sm:text-sm font-black uppercase tracking-wide px-3 sm:px-4 text-white/80 hover:text-white hover:bg-white/6 rounded-xl"
+                  className="text-xs sm:text-sm font-bold px-3 sm:px-4 text-white/80 hover:text-white hover:bg-white/6 rounded-xl"
                 >
-                  Sign In
+                  Sign in
                 </Button>
               </Link>
 
               <Link href="/onboarding/role">
-                <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-black rounded-xl px-4 sm:px-6 h-9 sm:h-10 text-xs sm:text-sm uppercase tracking-wide transition-all">
-                  Create a Vault
+                <Button className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl px-4 sm:px-6 h-9 sm:h-10 text-xs sm:text-sm transition-all">
+                  Start a project
                 </Button>
               </Link>
             </div>
@@ -140,16 +140,16 @@ export default function LandingPage() {
             {/* Small signal badge */}
             <motion.div
               variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-white/10 bg-white/3 text-[11px] md:text-xs font-black uppercase tracking-[0.24em] mb-7 md:mb-9 text-white/70"
+              className="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-white/10 bg-white/3 text-[11px] md:text-xs font-bold tracking-wide mb-7 md:mb-9 text-white/70"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Vault-based capital settlement
+              Automated escrow protection
             </motion.div>
 
             {/* Headline */}
             <motion.h1
               variants={fadeInUp}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[88px] font-black tracking-tight leading-[0.95] md:leading-[0.9] mb-6 md:mb-8 text-white"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[88px] font-bold tracking-tight leading-[0.95] md:leading-[0.9] mb-6 md:mb-8 text-white"
             >
               Lock funds.
               <br />
@@ -165,9 +165,9 @@ export default function LandingPage() {
               variants={fadeInUp}
               className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-xl mb-8 md:mb-12 font-semibold leading-relaxed tracking-tight text-white/70"
             >
-              Dayle replaces manual escrow with a vault workflow. Funds are
-              locked upfront, deliverables are verified with proof, and releases
-              happen only when conditions are met.
+              Dayle replaces manual escrow with an automated workflow. Funds are
+              locked upfront, deliverables are reviewed against a clear
+              checklist, and releases happen only when conditions are met.
             </motion.p>
 
             {/* CTAs */}
@@ -182,10 +182,10 @@ export default function LandingPage() {
                 >
                   <Button
                     size="lg"
-                    className="rounded-2xl px-8 md:px-12 h-14 md:h-20 font-black text-base md:text-xl w-full shadow-xl group transition-all bg-white text-black hover:bg-slate-200"
+                    className="rounded-2xl px-8 md:px-12 h-14 md:h-20 font-bold text-base md:text-xl w-full shadow-xl group transition-all bg-white text-black hover:bg-slate-200"
                   >
-                    <span className="hidden sm:inline">Create a Vault</span>
-                    <span className="sm:hidden">Create Vault</span>
+                    <span className="hidden sm:inline">Start a project</span>
+                    <span className="sm:hidden">Start project</span>
                     <ArrowRight className="ml-2 w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </motion.div>
@@ -198,12 +198,12 @@ export default function LandingPage() {
                 >
                   <Button
                     variant="ghost"
-                    className="rounded-2xl px-6 md:px-8 h-14 md:h-20 font-black text-sm md:text-lg w-full sm:w-auto uppercase tracking-tight flex items-center justify-center gap-3 text-white hover:bg-white/5 border border-white/10"
+                    className="rounded-2xl px-6 md:px-8 h-14 md:h-20 font-bold text-sm md:text-lg w-full sm:w-auto tracking-tight flex items-center justify-center gap-3 text-white hover:bg-white/5 border border-white/10"
                   >
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-emerald-500/15 border border-emerald-500/20">
                       <Play className="w-4 h-4 md:w-5 md:h-5 text-emerald-500 fill-emerald-500" />
                     </div>
-                    <span className="hidden sm:inline">Watch the Demo</span>
+                    <span className="hidden sm:inline">Watch the demo</span>
                     <span className="sm:hidden">Demo</span>
                   </Button>
                 </motion.div>
@@ -215,7 +215,7 @@ export default function LandingPage() {
               variants={fadeInUp}
               className="mt-5 text-xs md:text-sm font-semibold text-white/40"
             >
-              Funds only move after vault approval.
+              Funds only move after project approval.
             </motion.p>
           </motion.div>
 
@@ -232,22 +232,22 @@ export default function LandingPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.8 }}
-                className="border p-8 rounded-[32px] transform -rotate-2 hover:rotate-0 transition-all duration-500 bg-[#0a0a0a] border-white/10 shadow-2xl"
+                className="border p-8 rounded-[32px] transform -rotate-2 hover:rotate-0 transition-all duration-500 bg-background border-white/10 shadow-2xl"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-black text-emerald-500 uppercase tracking-wide">
-                    Final Release
+                  <span className="text-sm font-bold text-emerald-500 tracking-wide">
+                    Completed
                   </span>
                   <CheckCircle2 className="w-6 h-6 text-emerald-500" />
                 </div>
-                <h4 className="text-xl font-bold uppercase mb-2 text-white">
-                  Project Architecture
+                <h4 className="text-xl font-bold mb-2 text-white">
+                  E-commerce platform
                 </h4>
                 <div className="flex justify-between items-end">
-                  <p className="text-white text-sm uppercase font-black tracking-wide">
+                  <p className="text-white text-sm font-bold tracking-wide">
                     Status: Released
                   </p>
-                  <p className="text-xl font-black text-white">$4,500.00</p>
+                  <p className="text-xl font-bold text-white">$4,500.00</p>
                 </div>
               </motion.div>
 
@@ -261,12 +261,12 @@ export default function LandingPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <RefreshCcw className="w-4 h-4 animate-spin-slow" />
-                      <span className="text-sm font-black opacity-60 uppercase tracking-wide">
-                        In Progress
+                      <span className="text-sm font-bold opacity-60 tracking-wide">
+                        In progress
                       </span>
                     </div>
-                    <h4 className="text-3xl font-black uppercase leading-none">
-                      Beta Deployment
+                    <h4 className="text-3xl font-bold leading-none">
+                      Mobile app design
                     </h4>
                   </div>
                   <div className="bg-black/10 p-3 rounded-2xl">
@@ -277,10 +277,10 @@ export default function LandingPage() {
                   <div className="bg-black h-full w-2/3"></div>
                 </div>
                 <div className="flex justify-between items-center text-black">
-                  <span className="text-sm font-black opacity-60 uppercase tracking-wide">
-                    Vault Balance
+                  <span className="text-sm font-bold opacity-60 tracking-wide">
+                    Account balance
                   </span>
-                  <span className="text-4xl font-black tracking-tighter">
+                  <span className="text-4xl font-bold tracking-tighter">
                     $12,000.00
                   </span>
                 </div>
@@ -290,22 +290,22 @@ export default function LandingPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 1.2 }}
-                className="border p-8 rounded-[32px] transform rotate-2 transition-all bg-[#0a0a0a] border-white/5 opacity-40 hover:opacity-100 shadow-2xl"
+                className="border p-8 rounded-[32px] transform rotate-2 transition-all bg-background border-white/5 opacity-40 hover:opacity-100 shadow-2xl"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-black text-white uppercase tracking-wide">
-                    Audit Lock
+                  <span className="text-sm font-bold text-white tracking-wide">
+                    Funded
                   </span>
                   <Box className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="text-xl font-bold uppercase mb-2 text-white">
-                  Final Handover
+                <h4 className="text-xl font-bold mb-2 text-white">
+                  Brand identity
                 </h4>
                 <div className="flex justify-between items-end">
-                  <p className="text-white text-sm uppercase font-black tracking-wide">
+                  <p className="text-white text-sm font-bold tracking-wide">
                     Pending
                   </p>
-                  <p className="text-white text-xl font-black">$8,500.00</p>
+                  <p className="text-white text-xl font-bold">$8,500.00</p>
                 </div>
               </motion.div>
             </div>
@@ -326,11 +326,11 @@ export default function LandingPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-24"
           >
-            <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4 text-white">
-              How <span className="text-emerald-500"> Dayle </span> Protects
-              You.
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-white">
+              How <span className="text-emerald-500"> Dayle </span> protects
+              you.
             </h2>
-            <p className="text-white/70 font-semibold uppercase tracking-wide text-sm">
+            <p className="text-white/70 font-semibold tracking-wide text-sm">
               A three-step workflow that creates payment certainty.
             </p>
           </motion.div>
@@ -345,20 +345,20 @@ export default function LandingPage() {
             {[
               {
                 step: "01",
-                title: "Pre-Funded Vault",
+                title: "Secured Funding",
                 desc: "The client locks the project budget upfront before work begins.",
                 icon: Box,
               },
               {
                 step: "02",
                 title: "Proof + Review",
-                desc: "Work is submitted with proof. AI assists review by summarizing and flagging gaps — final approval stays with the client.",
+                desc: "Work is submitted against your deliverables checklist. You see exactly what was promised vs what was delivered — then you approve or request changes.",
                 icon: ShieldCheck,
               },
               {
                 step: "03",
                 title: "Controlled Release",
-                desc: "Once approved, funds are released from the vault to the contractor’s payout method.",
+                desc: "Once approved, funds are released from escrow to the contractor’s payout method.",
                 icon: Zap,
               },
             ].map((item, i) => (
@@ -367,7 +367,7 @@ export default function LandingPage() {
                 variants={fadeInUp}
                 className="p-6 md:p-10 lg:p-12 border rounded-3xl md:rounded-[48px] relative group transition-all bg-white/2 border-white/5 hover:bg-white/4"
               >
-                <div className="absolute -top-4 md:-top-6 left-6 md:left-12 w-12 h-12 md:w-14 md:h-14 bg-emerald-500 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-lg md:text-xl text-black shadow-lg">
+                <div className="absolute -top-4 md:-top-6 left-6 md:left-12 w-12 h-12 md:w-14 md:h-14 bg-emerald-500 rounded-xl md:rounded-2xl flex items-center justify-center font-bold text-lg md:text-xl text-black shadow-lg">
                   {item.step}
                 </div>
 
@@ -375,7 +375,7 @@ export default function LandingPage() {
                   <item.icon className="w-10 h-10 md:w-12 md:h-12 text-emerald-500" />
                 </div>
 
-                <h4 className="text-xl md:text-2xl font-black uppercase tracking-tighter mb-4 md:mb-6 text-white">
+                <h4 className="text-xl md:text-2xl font-bold tracking-tighter mb-4 md:mb-6 text-white">
                   {item.title}
                 </h4>
 
@@ -388,9 +388,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* AI Layer */}
+      {/* Clear Expectations Section */}
       <section
-        id="ai"
+        id="clarity"
         className="py-20 md:py-24 px-4 md:px-6 border-t border-white/5 bg-[#060606]"
       >
         <div className="max-w-7xl mx-auto">
@@ -399,28 +399,26 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.45, ease: "easeOut" }}
-            className="rounded-3xl border border-white/10 bg-white/2 p-6 md:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8"
+            className="rounded-3xl border border-white/10 bg-white/2 p-6 md:p-10"
           >
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-black/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-[11px] md:text-xs font-black uppercase tracking-[0.28em] text-white/70">
-                  AI-assisted verification
-                </span>
-              </div>
-
-              <h2 className="mt-5 text-2xl md:text-4xl font-black tracking-tight text-white">
-                Dayle uses AI to assist deliverable verification and reduce
-                manual back-and-forth. Final approval remains with the client.
-              </h2>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-[11px] md:text-xs font-bold uppercase tracking-[0.22em] text-white/50">
-                Human approval required
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-black/20 mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="text-[11px] md:text-xs font-bold tracking-wide text-white/70">
+                Clear expectations
               </span>
             </div>
+
+            <h2 className="text-2xl md:text-4xl font-bold tracking-tight text-white max-w-4xl">
+              Every project starts with a{" "}
+              <span className="text-emerald-500">deliverables checklist.</span>{" "}
+              You define what "done" looks like before work begins.
+            </h2>
+
+            <p className="mt-6 text-white/60 text-sm md:text-base max-w-2xl">
+              No ambiguity. No back-and-forth about what was promised. Just a
+              clear list that both sides agree to before the first line of code
+              or design file.
+            </p>
           </motion.div>
         </div>
       </section>
@@ -442,12 +440,12 @@ export default function LandingPage() {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/3">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-[11px] md:text-xs font-black uppercase tracking-[0.28em] text-white/70">
+                <span className="text-[11px] md:text-xs font-bold tracking-wide text-white/70">
                   Fit
                 </span>
               </div>
 
-              <h2 className="mt-5 text-3xl md:text-5xl font-black tracking-tight text-white">
+              <h2 className="mt-5 text-3xl md:text-5xl font-bold tracking-tight text-white">
                 Built for teams{" "}
                 <span className="text-emerald-500"> that pay by outcome.</span>
               </h2>
@@ -461,7 +459,7 @@ export default function LandingPage() {
 
             {/* Right-side micro-proof */}
             <div className="rounded-2xl border border-white/10 bg-white/2 px-5 py-4 self-start lg:self-end">
-              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/55">
+              <div className="text-[11px] font-bold tracking-wide text-white/55">
                 Best for
               </div>
               <div className="mt-2 text-sm font-semibold text-white/70">
@@ -503,8 +501,8 @@ export default function LandingPage() {
                 title: "Platforms (API)",
                 icon: Blocks,
                 bullets: [
-                  "Embed vault logic",
-                  "Program vault releases",
+                  "Embed escrow logic",
+                  "Automated payouts",
                   "Audit trail by default",
                 ],
                 line: "Offer settlement controls inside your marketplace or workflow.",
@@ -524,12 +522,12 @@ export default function LandingPage() {
                       <c.icon className="w-6 h-6 text-emerald-400" />
                     </div>
 
-                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/35">
+                    <div className="text-[10px] font-bold tracking-wide text-white/35">
                       0{i + 1}
                     </div>
                   </div>
 
-                  <h3 className="mt-6 text-xl md:text-2xl font-black tracking-tight text-white">
+                  <h3 className="mt-6 text-xl md:text-2xl font-bold tracking-tight text-white">
                     {c.title}
                   </h3>
 
@@ -573,19 +571,19 @@ export default function LandingPage() {
             className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14 md:mb-20"
           >
             <div className="max-w-2xl">
-              <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight leading-none mb-5 text-white">
-                Programmable <br />
-                <span className="text-emerald-500"> Trust Infrastructure.</span>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-none mb-5 text-white">
+                Escrow that works <br />
+                <span className="text-emerald-500"> the way you expect.</span>
               </h2>
               <p className="text-white/70 text-sm md:text-base font-medium leading-relaxed">
                 Dayle turns contractor payments into a deterministic workflow —
-                lock funds, verify work, approve deliverables, release.
+                lock funds, verify work, approve deliverables, payout.
               </p>
             </div>
 
             <div className="md:text-right">
-              <div className="text-xs font-black text-emerald-500 uppercase tracking-wide mb-2">
-                Core Capabilities
+              <div className="text-xs font-bold text-emerald-500 tracking-wide mb-2">
+                Core capabilities
               </div>
               <div className="h-[2px] w-28 bg-emerald-500 md:ml-auto opacity-80"></div>
             </div>
@@ -600,12 +598,12 @@ export default function LandingPage() {
           >
             {[
               {
-                title: "Pre-Funded Vault",
+                title: "Secured Funding",
                 desc: "Lock funds upfront so work starts with payment certainty.",
                 icon: Layers,
               },
               {
-                title: "Vault Controls",
+                title: "Escrow Controls",
                 desc: "Release capital only after objective proof and client approval.",
                 icon: ListChecks,
               },
@@ -623,18 +621,18 @@ export default function LandingPage() {
               <motion.div
                 key={i}
                 variants={fadeInUp}
-                className="group p-6 md:p-8 border rounded-2xl md:rounded-3xl bg-[#0a0a0a] border-white/10 hover:border-emerald-500/40 transition-colors"
+                className="group p-6 md:p-8 border rounded-2xl md:rounded-3xl bg-background border-white/10 hover:border-emerald-500/40 transition-colors"
               >
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center bg-white/3 border border-white/10 group-hover:border-emerald-500/30 transition-colors">
                     <f.icon className="w-5 h-5 md:w-6 md:h-6 text-emerald-500" />
                   </div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                  <div className="text-[10px] font-bold tracking-widest text-white/40">
                     Capability
                   </div>
                 </div>
 
-                <h4 className="text-white font-black uppercase tracking-wide text-lg md:text-xl mb-3">
+                <h4 className="text-white font-bold tracking-wide text-lg md:text-xl mb-3">
                   {f.title}
                 </h4>
                 <p className="text-white/60 text-sm leading-relaxed">
@@ -658,16 +656,16 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Left */}
             <div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-6">
                 Security,
                 <br />
-                <span className="text-emerald-500">Engineered.</span>
+                <span className="text-emerald-500">engineered.</span>
               </h2>
 
               <p className="text-white/70 text-sm font-medium leading-relaxed max-w-xl mb-10">
-                Dayle is built with isolated vaults, strict approval controls,
-                and audit-ready logging — ensuring funds only move when work is
-                verified.
+                Dayle is built with isolated project accounts, strict approval
+                controls, and audit-ready logging — ensuring funds only move
+                when work is verified.
               </p>
 
               <div className="space-y-4">
@@ -702,7 +700,7 @@ export default function LandingPage() {
             <div className="space-y-4">
               {[
                 {
-                  title: "Vault-Locked Settlement",
+                  title: "Escrow-Locked Settlement",
                   icon: Layers,
                   desc: "Funds remain isolated until predefined approval conditions are met.",
                 },
@@ -729,7 +727,7 @@ export default function LandingPage() {
                     <div className="flex items-start gap-4">
                       <item.icon className="w-6 h-6 text-emerald-500 mt-1 shrink-0" />
                       <div>
-                        <h4 className="text-white font-bold text-sm uppercase tracking-wide">
+                        <h4 className="text-white font-bold text-sm tracking-wide">
                           {item.title}
                         </h4>
                         <p className="text-white/60 text-sm mt-1 leading-relaxed">
@@ -761,15 +759,15 @@ export default function LandingPage() {
           >
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
               <div>
-                <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/55">
+                <div className="text-[11px] font-bold tracking-wide text-white/55">
                   FAQ
                 </div>
-                <h2 className="mt-3 text-3xl md:text-5xl font-black tracking-tight text-white">
+                <h2 className="mt-3 text-3xl md:text-5xl font-bold tracking-tight text-white">
                   Common <span className="text-emerald-500">questions.</span>
                 </h2>
                 <p className="mt-3 text-white/60 text-sm md:text-base leading-relaxed max-w-2xl">
-                  Everything you need to know about how Dayle’s vault workflow
-                  works — funding, approvals, releases, and disputes.
+                  Everything you need to know about how Dayle’s escrow workflow
+                  works — funding, approvals, payouts, and disputes.
                 </p>
               </div>
 
@@ -841,7 +839,7 @@ export default function LandingPage() {
               <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
                 <Shield className="w-6 h-6 md:w-7 md:h-7 text-black stroke-[3px]" />
               </div>
-              <span className="font-black tracking-tighter uppercase text-2xl md:text-3xl text-white">
+              <span className="font-bold tracking-tighter text-2xl md:text-3xl text-white">
                 Dayle
               </span>
             </div>
@@ -854,7 +852,7 @@ export default function LandingPage() {
 
           {/* Product */}
           <div>
-            <h4 className="text-xs md:text-sm font-black uppercase tracking-wide mb-6 md:mb-10 text-white">
+            <h4 className="text-xs md:text-sm font-bold tracking-wide mb-6 md:mb-10 text-white">
               Product
             </h4>
             <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-white/70 font-semibold">
@@ -887,7 +885,7 @@ export default function LandingPage() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-xs md:text-sm font-black uppercase tracking-wide mb-6 md:mb-10 text-white">
+            <h4 className="text-xs md:text-sm font-bold tracking-wide mb-6 md:mb-10 text-white">
               Contact
             </h4>
             <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-white/70 font-semibold">

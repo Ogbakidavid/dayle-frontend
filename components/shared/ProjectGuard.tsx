@@ -48,8 +48,8 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center space-y-4">
         <DotLoader size="lg" />
-        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em]">
-          Validating Project Access
+        <p className="text-[10px] font-bold text-emerald-500 tracking-[0.2em]">
+          Validating project access
         </p>
       </div>
     );
@@ -61,8 +61,8 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
         <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
           <ShieldAlert className="w-10 h-10 text-red-500" />
         </div>
-        <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">
-          Access Denied
+        <h2 className="text-2xl font-bold text-white tracking-tight mb-2">
+          Access denied
         </h2>
         <p className="text-zinc-400 text-sm max-w-md mb-8">
           You do not have permission to access this project. If you believe this
@@ -70,9 +70,9 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
         </p>
         <Button
           onClick={() => router.back()}
-          className="bg-white text-black font-black uppercase tracking-widest text-xs px-8 h-12 rounded-xl"
+          className="bg-white text-black font-bold tracking-wide text-xs px-8 h-12 rounded-xl"
         >
-          Go Back
+          Go back
         </Button>
       </div>
     );

@@ -97,7 +97,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               <Shield className="w-5 h-5 text-black" strokeWidth={2.5} />
             </div>
             <div>
-              <h1 className="text-2xl text-white tracking-widest font-black uppercase italic">
+              <h1 className="text-2xl text-white tracking-widest font-bold italic">
                 Dayle
               </h1>
             </div>
@@ -115,8 +115,8 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                   className={cn(
                     "flex items-center justify-between px-3 py-3 rounded-xl text-xs transition-all group border border-transparent",
                     isActive
-                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-black uppercase tracking-[0.15em] shadow-lg shadow-emerald-500/5"
-                      : "text-white/40 hover:bg-white/5 hover:text-white font-black uppercase tracking-[0.15em]",
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold tracking-[0.15em] shadow-lg shadow-emerald-500/5"
+                      : "text-white/40 hover:bg-white/5 hover:text-white font-bold tracking-[0.15em]",
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -133,7 +133,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                   {item.badge && (
                     <span
                       className={cn(
-                        "text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter",
+                        "text-[10px] px-2 py-0.5 rounded-full font-bold tracking-tighter",
                         isActive
                           ? "bg-emerald-500/20 text-emerald-400"
                           : "bg-white/5 text-white/40",
@@ -150,11 +150,11 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
 
         {/* Status Indicator (Activated) */}
         <div className="px-6 py-4 mx-4 mb-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl group hover:bg-emerald-500/10 transition-colors">
-          <div className="flex items-center gap-2 text-emerald-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+          <div className="flex items-center gap-2 text-emerald-500 text-[10px] font-bold tracking-[0.2em] mb-1">
             <CheckCircle className="w-3 h-3" /> Activated
           </div>
-          <p className="text-[11px] text-white/80 font-bold uppercase tracking-wide leading-relaxed">
-            Approved for Active Vault Access
+          <p className="text-[11px] text-white/80 font-bold tracking-wide leading-relaxed">
+            Approved for active project access
           </p>
         </div>
 
@@ -165,7 +165,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                 identifier={user?.id || user?.email || "guest"}
                 src={user?.profileImage}
                 size={36}
-                className="font-bold uppercase text-sm border-2 border-white/10 group-hover:border-emerald-500/50 transition-colors"
+                className="font-bold text-sm border-2 border-white/10 group-hover:border-emerald-500/50 transition-colors"
               />
               {user?.kycStatus === "VERIFIED" && (
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-muted flex items-center justify-center shadow-lg">
@@ -174,10 +174,10 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-black uppercase tracking-widest text-white truncate">
+              <p className="text-xs font-bold tracking-widest text-white truncate">
                 {user?.name || "Freelancer"}
               </p>
-              <p className="text-[9px] font-bold uppercase tracking-tighter text-white/30 truncate">
+              <p className="text-[9px] font-bold tracking-tighter text-white/30 truncate">
                 {user?.email}
               </p>
             </div>
@@ -189,7 +189,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-10 w-full text-[10px] font-black uppercase tracking-widest border-white/5 bg-white/2 hover:bg-white/5 hover:border-white/10 text-white/60 hover:text-white transition-all"
+                className="h-10 w-full text-[10px] font-bold tracking-widest border-white/5 bg-white/2 hover:bg-white/5 hover:border-white/10 text-white/60 hover:text-white transition-all"
               >
                 <Settings className="w-3.5 h-3.5 mr-2 opacity-50" />
                 Settings
@@ -206,7 +206,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               variant="outline"
               size="sm"
               onClick={logout}
-              className="h-10 text-[10px] font-black uppercase tracking-widest border-red-500/10 bg-red-500/5 hover:bg-red-500/10 hover:border-red-500/20 text-red-500 transition-all"
+              className="h-10 text-[10px] font-bold tracking-widest border-red-500/10 bg-red-500/5 hover:bg-red-500/10 hover:border-red-500/20 text-red-500 transition-all"
             >
               <LogOut className="w-3.5 h-3.5 mr-2" />
               Sign out
@@ -227,9 +227,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
           >
             <Menu className="w-5 h-5" />
           </Button>
-          <h1 className="text-lg font-black uppercase italic tracking-widest">
-            Dayle
-          </h1>
+          <h1 className="text-lg font-bold italic tracking-widest">Dayle</h1>
           <div className="w-9" /> {/* Spacer for centering */}
         </div>
 

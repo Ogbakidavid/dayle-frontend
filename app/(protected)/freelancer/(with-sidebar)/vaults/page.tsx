@@ -89,11 +89,11 @@ export default function FreelancerVaultsPage() {
         {/* 1. TOP NAVIGATION / HEADER */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <motion.div variants={itemVariants} className="space-y-2">
-            <h1 className="text-4xl font-black tracking-tighter text-white uppercase italic">
-              Your Vaults
+            <h1 className="text-4xl font-bold tracking-tighter text-white italic">
+              Your projects
             </h1>
-            <p className="text-[10px] text-white/50 font-black uppercase tracking-[0.2em]">
-              Manage your active contracts and payment vaults
+            <p className="text-[10px] text-white/50 font-bold tracking-[0.2em]">
+              Manage your active contracts and project accounts
             </p>
           </motion.div>
           <motion.div
@@ -102,7 +102,7 @@ export default function FreelancerVaultsPage() {
           >
             <Button
               variant="outline"
-              className="bg-white/2 border border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all font-bold uppercase tracking-widest text-[10px]"
+              className="bg-white/2 border border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all font-bold tracking-widest text-[10px]"
             >
               <Filter className="w-4 h-4 mr-2 text-emerald-500" />
               Filters
@@ -128,14 +128,14 @@ export default function FreelancerVaultsPage() {
                 >
                   <stat.icon className="w-5 h-5" />
                 </div>
-                <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full uppercase tracking-wider border border-emerald-500/20">
+                <span className="text-[9px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full tracking-wider border border-emerald-500/20">
                   {stat.change}
                 </span>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2 group-hover:text-white/50 transition-colors">
+              <p className="text-[10px] font-bold tracking-[0.2em] text-white/30 mb-2 group-hover:text-white/50 transition-colors">
                 {stat.label}
               </p>
-              <h2 className="text-3xl font-black text-white tracking-widest font-mono">
+              <h2 className="text-3xl font-bold text-white tracking-widest font-mono">
                 {stat.value}
               </h2>
             </motion.div>
@@ -147,10 +147,10 @@ export default function FreelancerVaultsPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-emerald-500 transition-colors" />
           <input
             type="search"
-            placeholder="Search vaults or clients..."
+            placeholder="Search projects or clients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-5 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/30 text-white placeholder:text-white/10 transition-all shadow-xl font-bold uppercase tracking-wide text-xs"
+            className="w-full pl-12 pr-4 py-5 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/30 text-white placeholder:text-white/10 transition-all shadow-xl font-bold tracking-wide text-xs"
           />
         </motion.div>
 
@@ -163,16 +163,16 @@ export default function FreelancerVaultsPage() {
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-white/5 bg-white/1">
-                  <th className="px-6 py-5 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
-                    Vault Detail
+                  <th className="px-6 py-5 text-[10px] font-bold text-white/30 tracking-[0.2em]">
+                    Project detail
                   </th>
-                  <th className="hidden lg:table-cell px-6 py-5 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
+                  <th className="hidden lg:table-cell px-6 py-5 text-[10px] font-bold text-white/30 tracking-[0.2em]">
                     Client
                   </th>
-                  <th className="hidden sm:table-cell px-6 py-5 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
+                  <th className="hidden sm:table-cell px-6 py-5 text-[10px] font-bold text-white/30 tracking-[0.2em]">
                     Status
                   </th>
-                  <th className="px-6 py-5 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] text-right">
+                  <th className="px-6 py-5 text-[10px] font-bold text-white/30 tracking-[0.2em] text-right">
                     Value
                   </th>
                   <th className="px-6 py-5"></th>
@@ -193,11 +193,11 @@ export default function FreelancerVaultsPage() {
                           <FileText className="w-5 h-5" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-black text-white group-hover:text-emerald-400 transition-all uppercase tracking-tight truncate max-w-xs md:max-w-md">
+                          <p className="text-sm font-bold text-white group-hover:text-emerald-400 transition-all tracking-tight truncate max-w-xs md:max-w-md">
                             {vault.title}
                           </p>
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2">
-                            <p className="text-[9px] text-white/30 font-black uppercase tracking-widest whitespace-nowrap">
+                            <p className="text-[9px] text-white/30 font-bold tracking-widest whitespace-nowrap">
                               {vault.createdAt
                                 ? new Date(vault.createdAt).toLocaleDateString(
                                     "en-US",
@@ -210,37 +210,37 @@ export default function FreelancerVaultsPage() {
                                 : "Pending..."}
                             </p>
 
-                            <span className="sm:hidden text-[8px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full border border-emerald-500/20 font-black uppercase tracking-widest whitespace-nowrap">
-                              {(vault.status || "Pending").toUpperCase()}
+                            <span className="sm:hidden text-[8px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold tracking-widest whitespace-nowrap">
+                              {(vault.status || "Pending").toLowerCase()}
                             </span>
                           </div>
-                          <p className="lg:hidden text-[9px] text-white/20 font-black uppercase tracking-widest mt-2 truncate">
+                          <p className="lg:hidden text-[9px] text-white/20 font-bold tracking-widest mt-2 truncate">
                             Client:{" "}
                             {vault.clientEmail ||
                               vault.client?.email ||
-                              "Unknown Client"}
+                              "Unknown client"}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="hidden lg:table-cell px-6 py-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[10px] font-black text-emerald-500 shadow-inner">
+                        <div className="w-7 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-emerald-500 shadow-inner">
                           {(vault.clientEmail ||
                             vault.client?.email ||
                             "C")[0].toUpperCase()}
                         </div>
-                        <span className="text-[11px] text-white/50 font-bold tracking-wide truncate max-w-[200px] uppercase">
+                        <span className="text-[11px] text-white/50 font-bold tracking-wide truncate max-w-[200px]">
                           {vault.clientEmail ||
                             vault.client?.email ||
-                            "Unknown Client"}
+                            "Unknown client"}
                         </span>
                       </div>
                     </td>
                     <td className="hidden sm:table-cell px-6 py-6">
                       <div
                         className={cn(
-                          "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-[0.15em] shadow-sm",
+                          "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[9px] font-bold tracking-[0.15em] shadow-sm",
                           vault.status === "active" || vault.status === "FUNDED"
                             ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500"
                             : vault.status === "completed" ||
@@ -261,14 +261,14 @@ export default function FreelancerVaultsPage() {
                                 : "bg-white/20 shadow-none",
                           )}
                         />
-                        {vault.status || "PENDING"}
+                        {(vault.status || "Pending").toLowerCase()}
                       </div>
                     </td>
                     <td className="px-6 py-6 text-right">
-                      <p className="text-base font-black text-white tracking-widest font-mono">
+                      <p className="text-base font-bold text-white tracking-widest font-mono">
                         ${(vault.totalAmount || vault.amount).toLocaleString()}
                       </p>
-                      <p className="text-[9px] text-white/20 font-black uppercase tracking-[0.2em] mt-1 italic">
+                      <p className="text-[9px] text-white/20 font-bold tracking-[0.2em] mt-1 italic">
                         Secured
                       </p>
                     </td>
@@ -297,10 +297,10 @@ export default function FreelancerVaultsPage() {
 
         {/* 5. FOOTER SUMMARY / PAGINATION */}
         <footer className="flex flex-col sm:flex-row items-center justify-between gap-6 py-10 border-t border-white/5">
-          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] italic">
+          <p className="text-[10px] font-bold text-white/20 tracking-[0.2em] italic">
             Securing{" "}
             <span className="text-white/40">{paginatedVaults.length}</span> /{" "}
-            {filteredVaults.length} Escrow Contracts
+            {filteredVaults.length} Escrow Projects
           </p>
           <div className="flex items-center gap-3">
             <Button
@@ -311,7 +311,7 @@ export default function FreelancerVaultsPage() {
                 setCurrentPage((prev) => Math.max(1, prev - 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-11 px-6 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 hover:text-white transition-all font-black uppercase tracking-widest disabled:opacity-20"
+              className="h-11 px-6 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 hover:text-white transition-all font-bold tracking-widest disabled:opacity-20"
             >
               Previous
             </Button>
@@ -324,7 +324,7 @@ export default function FreelancerVaultsPage() {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   className={cn(
-                    "w-9 h-9 rounded-xl text-[10px] font-black transition-all shadow-lg",
+                    "w-9 h-9 rounded-xl text-[10px] font-bold transition-all shadow-lg",
                     p === currentPage
                       ? "bg-white text-black scale-110 shadow-white/10"
                       : "bg-white/5 text-white/20 hover:bg-white/10 hover:text-white/60",
@@ -342,7 +342,7 @@ export default function FreelancerVaultsPage() {
                 setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-11 px-6 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 hover:text-white transition-all font-black uppercase tracking-widest disabled:opacity-20"
+              className="h-11 px-6 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 hover:text-white transition-all font-bold tracking-widest disabled:opacity-20"
             >
               Next
             </Button>

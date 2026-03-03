@@ -6,9 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mail, UserPlus } from "lucide-react";
-import { toast } from "sonner";
-import { api } from "@/lib/api-client";
 import {
   ArrowLeft,
   CheckCircle,
@@ -28,7 +25,14 @@ import {
   AlertCircle,
   ShieldCheck,
   Copy,
+  Mail,
+  UserPlus,
+  ListChecks,
+  Square,
+  CheckSquare,
 } from "lucide-react";
+import { toast } from "sonner";
+import { api } from "@/lib/api-client";
 import {
   Card,
   CardContent,
@@ -56,6 +60,14 @@ import {
 } from "@/components/ui/sheet";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useVault } from "@/lib/store/vault-context";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { EvidencePanel } from "@/components/shared/EvidencePanel";
 import { getDisputeEligibility } from "@/lib/rules/disputes";
@@ -66,6 +78,7 @@ import {
   getVaultDerivedLabel,
 } from "@/lib/domain/enums";
 import { useUser } from "@/lib/store/user-context";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ClientVaultDetailPage() {
   const params = useParams();
@@ -83,6 +96,7 @@ export default function ClientVaultDetailPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [latestInvite, setLatestInvite] = useState<any>(null);
   const [reassigning, setReassigning] = useState(false);
+  const [reassigningLoading, setReassigningLoading] = useState(false);
   const [requestingRefund, setRequestingRefund] = useState(false);
 
   // Refund Form State
@@ -128,7 +142,7 @@ export default function ClientVaultDetailPage() {
     if (user?.kycStatus !== KycStatus.VERIFIED) {
       toast.error("KYC Verification Required", {
         description:
-          "You must complete KYC verification before you can fund vaults.",
+          "You must complete KYC verification before you can fund projects.",
       });
       return;
     }
@@ -140,7 +154,7 @@ export default function ClientVaultDetailPage() {
         idempotencyKey: crypto.randomUUID(),
       });
       await refreshVaults();
-      toast.success("Vault successfully funded!");
+      toast.success("Project successfully funded!");
     } catch (err: any) {
       console.error("Funding failed:", err);
       toast.error(err.message || "Failed to fund vault.");
@@ -174,50 +188,42 @@ export default function ClientVaultDetailPage() {
       toast.error("Please enter a valid email address");
       return;
     }
-    setReassigning(true);
+    setReassigningLoading(true);
     try {
       await api.vaults.updateFreelancer(vault.id, {
         freelancerEmail: email,
       });
-      toast.success(`Vault reassigned to ${email}`);
+      toast.success(`Project reassigned to ${email}`);
       setInviteEmail("");
+      setReassigning(false);
       await refreshVaults();
     } catch (err: any) {
       console.error("Reassignment failed:", err);
-      toast.error(err.message || "Failed to reassign vault.");
+      toast.error(err.message || "Failed to reassign project.");
     } finally {
-      setReassigning(false);
+      setReassigningLoading(false);
     }
   };
+  const [expandedSubmissions, setExpandedSubmissions] = useState<string[]>([]);
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<
+    string | null
+  >(null);
+  const [showApproveDialog, setShowApproveDialog] = useState(false);
 
-  // Check if eligible for dispute
-  const anyEligibleForDispute = useMemo(() => {
-    return (
-      vault?.status === VaultStatus.FUNDED ||
-      vault?.status === VaultStatus.DISPUTED
+  // Auto-select latest submission on load
+  useEffect(() => {
+    if (vault?.submissions?.length > 0 && !selectedSubmissionId) {
+      setSelectedSubmissionId(vault.submissions[0].id);
+      setExpandedSubmissions([vault.submissions[0].id]);
+    }
+  }, [vault, selectedSubmissionId]);
+
+  const toggleSubmission = (id: string) => {
+    setSelectedSubmissionId(id);
+    setExpandedSubmissions((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
-  }, [vault]);
-
-  // Aggregate all submitted deliverables for the "Contract Documents" section
-  const submittedDeliverables = useMemo(() => {
-    return [];
-  }, []);
-
-  if (vaultsLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-white">
-        Loading Vault...
-      </div>
-    );
-  }
-
-  if (!vault) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-white">
-        Vault Not Found
-      </div>
-    );
-  }
+  };
 
   return (
     <>
@@ -228,393 +234,580 @@ export default function ClientVaultDetailPage() {
             <div className="fixed top-8 right-8 z-50 animate-in slide-in-from-right-10 fade-in duration-300">
               <Alert className="bg-emerald-500 border-emerald-600 text-white w-auto min-w-[300px] shadow-2xl">
                 <CheckCircle className="h-4 w-4 text-white" />
-                <AlertTitle>Success</AlertTitle>
+                <AlertTitle className="text-sm font-bold">Success</AlertTitle>
                 <AlertDescription>
-                  Vault approved and funds released.
+                  Project approved and funds released.
                 </AlertDescription>
               </Alert>
             </div>
           )}
 
-          {/* HEADER */}
+          {/* SECTION A: HEADER */}
           <header className="pt-8">
             <button
               onClick={() => router.back()}
-              className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-6 font-bold uppercase tracking-wide bg-transparent border-none p-0 cursor-pointer"
+              className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-6 font-bold tracking-wide bg-transparent border-none p-0 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              Back to dashboard
             </button>
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold text-white uppercase tracking-tighter">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-4xl font-bold text-white tracking-tighter italic">
                     {vault.title}
                   </h1>
                   <Badge
                     variant="outline"
-                    className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 uppercase tracking-widest text-[10px]"
+                    className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 tracking-wide text-[10px] h-6 px-3 rounded-full font-bold"
                   >
                     {getVaultDerivedLabel(vault.status)}
                   </Badge>
-                  {vault.vaultAddress && (
-                    <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 animate-in fade-in zoom-in-95 duration-500">
-                      <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                      <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">
-                        On-chain Escrow Verified
-                      </span>
-                      <button
-                        onClick={() => {
-                          if (vault.vaultAddress) {
-                            navigator.clipboard.writeText(vault.vaultAddress);
-                            toast.success("Vault Reference ID copied");
-                          }
-                        }}
-                        className="hover:text-white transition-colors"
-                      >
-                        <Copy className="w-2.5 h-2.5" />
-                      </button>
-                    </div>
-                  )}
-                  {vault.status === VaultStatus.DRAFT && (
-                    <Button
-                      size="sm"
-                      className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-[10px] h-7 px-3 transition-all disabled:opacity-50 disabled:grayscale"
-                      onClick={() => router.push(`/checkout/${vaultId}`)}
-                      disabled={vault.isFrozen}
-                    >
-                      <CreditCard className="w-3.5 h-3.5 mr-1.5" />
-                      Fund Vault
-                    </Button>
-                  )}
                 </div>
-                <p className="text-gray-400 font-bold uppercase tracking-wide">
-                  Vault ID:{" "}
-                  <span className="text-gray-400 font-mono">{vault.id}</span>
-                </p>
+
+                <div className="flex flex-wrap items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
+                      <Users className="w-4 h-4 text-white/40" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] text-white/30 font-bold tracking-widest">
+                        Freelancer
+                      </p>
+                      <p className="text-xs text-white font-bold">
+                        {vault.freelancerName || "Unassigned"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-emerald-500/50" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] text-white/30 font-bold tracking-widest">
+                        Created
+                      </p>
+                      <p className="text-xs text-white font-bold">
+                        {new Date(vault.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">
-                  Total Value
+
+              <div className="text-right p-6 rounded-2xl bg-white/2 border border-white/5 shadow-xl min-w-[240px]">
+                <p className="text-xs text-white/30 font-bold tracking-wide mb-1">
+                  Total secured value
                 </p>
-                <p className="text-3xl font-bold uppercase text-white tracking-tight font-mono">
-                  ${(vault.totalAmount || vault.amount).toLocaleString()}
+                <p className="text-4xl font-bold text-white tracking-widest font-mono">
+                  ${(vault.totalAmount || vault.amount || 0).toLocaleString()}
                 </p>
-                <p className="text-xs text-emerald-500 font-bold uppercase tracking-tight mt-1">
-                  ${(vault.paidAmount || 0).toLocaleString()} Released
-                </p>
+                <div className="mt-2 flex items-center justify-end gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <p className="text-[10px] text-emerald-500 font-bold tracking-wide">
+                    Funds secured in escrow
+                  </p>
+                </div>
               </div>
             </div>
           </header>
 
-          {/* FROZEN VAULT BANNER */}
-          {vault.isFrozen && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center gap-6 animate-in fade-in slide-in-from-top-4">
-              <div className="p-3 bg-red-500/10 rounded-full shrink-0">
-                <ShieldAlert className="w-8 h-8 text-red-500" />
-              </div>
-              <div className="space-y-1 grow">
-                <h3 className="text-lg font-black text-red-500 uppercase tracking-wide">
-                  Security Freeze Active
-                </h3>
-                <p className="text-sm font-medium text-white/80 leading-relaxed">
-                  This vault has been automatically frozen due to a detected
-                  discrepancy. All actions (funding, submissions, reviews) are
-                  temporarily paused.
-                </p>
-                {vault.frozenReason && (
-                  <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-red-500/20 text-xs font-mono text-red-400">
-                    <AlertCircle className="w-3 h-3" />
-                    REASON: {vault.frozenReason}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* LEFT COLUMN: SECTIONS B & C */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* SECTION B: DELIVERABLES CHECKLIST */}
+              <Card className="bg-[#0D0D0E] border-white/5 shadow-2xl overflow-hidden">
+                <CardHeader className="border-b border-white/5 pb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <ListChecks className="w-5 h-5 text-emerald-500" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-white font-bold tracking-wide text-lg italic">
+                        What was promised
+                      </CardTitle>
+                      <CardDescription className="text-white/30 font-bold tracking-wide text-[10px] mt-1">
+                        Review the specific items the freelancer committed to
+                        delivering
+                      </CardDescription>
+                    </div>
                   </div>
-                )}
-              </div>
-              <Button
-                variant="outline"
-                className="border-red-500/30 text-red-500 hover:bg-red-500 hover:text-white font-bold uppercase tracking-widest text-[10px]"
-                asChild
-              >
-                <a href="mailto:support@dayle.com?subject=Frozen Vault Appeal">
-                  Contact Support
-                </a>
-              </Button>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-black!">
-            {/* LEFT COLUMN: VAULT OVERVIEW */}
-            <div className="lg:col-span-2 space-y-6">
-              <Card className="bg-[#0D0D0E] border-white/5">
-                <CardHeader>
-                  <CardTitle className="text-white font-bold uppercase tracking-wide">
-                    Vault Overview
-                  </CardTitle>
-                  <CardDescription className="text-gray-400 font-bold uppercase tracking-wide pb-3">
-                    Single-release escrow contract details and actions.
-                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="group relative border border-white/5 rounded-xl p-5 bg-white/2">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                      <div className="flex items-start gap-4 min-w-0">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-bold text-white uppercase tracking-wide truncate">
-                            {vault.title}
-                          </h3>
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            <div
-                              className={cn(
-                                "flex items-center gap-1.5 px-2 py-0.5 rounded border transition-all",
-                                vault.status === VaultStatus.RELEASED
-                                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
-                                  : vault.status === VaultStatus.REFUNDED
-                                    ? "bg-neutral-500/10 border-neutral-500/20 text-neutral-400"
-                                    : vault.status === VaultStatus.DISPUTED
-                                      ? "bg-red-500/10 border-red-500/20 text-red-500"
-                                      : "bg-amber-500/10 border-amber-500/20 text-amber-500",
-                              )}
-                            >
-                              <span className="uppercase tracking-widest text-[9px] font-bold">
-                                Status: {getVaultDerivedLabel(vault.status)}
-                              </span>
+                <CardContent className="p-0">
+                  {!vault.deliverables || vault.deliverables.length === 0 ? (
+                    <div className="p-12 text-center space-y-4">
+                      <AlertCircle className="w-12 h-12 text-red-500/50 mx-auto" />
+                      <p className="text-red-500 font-bold tracking-wide text-xs">
+                        Error: no deliverables defined for this project
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-white/5">
+                      {vault.deliverables.map((item: any, idx: number) => {
+                        const activeSubmission = vault.submissions?.find(
+                          (s: any) => s.id === selectedSubmissionId,
+                        );
+
+                        const deliverableStatus =
+                          activeSubmission?.deliverableStatus?.find(
+                            (d: any) =>
+                              d.deliverableTitle === item.title ||
+                              d.deliverableId === item.id,
+                          );
+
+                        const isIncluded = deliverableStatus?.included;
+
+                        return (
+                          <div
+                            key={item.id || idx}
+                            className={cn(
+                              "p-6 transition-colors group",
+                              isIncluded
+                                ? "bg-emerald-500/3"
+                                : "hover:bg-white/2",
+                            )}
+                          >
+                            <div className="flex items-start gap-4">
+                              <div className="mt-1">
+                                {isIncluded ? (
+                                  <CheckSquare className="w-5 h-5 text-emerald-500" />
+                                ) : (
+                                  <Square className="w-5 h-5 text-white/10 group-hover:text-white/20" />
+                                )}
+                              </div>
+                              <div className="flex-1 space-y-3">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <h4 className="text-sm font-bold text-white tracking-tight italic">
+                                      {item.title}
+                                    </h4>
+                                    {isIncluded && (
+                                      <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[8px] font-bold px-2 py-0">
+                                        Included
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  {item.description && (
+                                    <p className="text-xs text-white/40 leading-relaxed max-w-2xl mt-1">
+                                      {item.description}
+                                    </p>
+                                  )}
+                                </div>
+
+                                {isIncluded && (
+                                  <div className="space-y-3 pt-1">
+                                    {deliverableStatus.notes && (
+                                      <div className="bg-black/40 p-3 rounded-xl border border-white/5">
+                                        <p className="text-[9px] text-white/30 font-bold tracking-wide mb-1.5 flex items-center gap-1.5">
+                                          <FileText className="w-3 h-3" />{" "}
+                                          Freelancer notes
+                                        </p>
+                                        <p className="text-xs text-white/60 italic leading-relaxed">
+                                          &quot;{deliverableStatus.notes}&quot;
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    {deliverableStatus.files?.length > 0 && (
+                                      <div className="flex flex-wrap gap-2">
+                                        {deliverableStatus.files.map(
+                                          (file: any, fIdx: number) => (
+                                            <a
+                                              key={fIdx}
+                                              href={file.url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="inline-flex items-center gap-2 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg group/file transition-all"
+                                            >
+                                              <Download className="w-3 h-3 text-emerald-500" />
+                                              <span className="text-[10px] text-white/70 font-bold group-hover/file:text-white">
+                                                {file.filename ||
+                                                  `File ${fIdx + 1}`}
+                                              </span>
+                                            </a>
+                                          ),
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {!isIncluded && activeSubmission && (
+                                  <div className="flex items-center gap-2 opacity-30">
+                                    <AlertCircle className="w-3 h-3 text-amber-500" />
+                                    <span className="text-[9px] font-bold tracking-widest text-amber-500">
+                                      Missing from this submission
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
-                      <div className="flex flex-col items-end gap-2 shrink-0">
-                        <div className="text-right">
-                          <p className="text-lg font-black text-white font-mono">
-                            $
-                            {(
-                              vault.totalAmount || vault.amount
-                            ).toLocaleString()}
-                          </p>
-                        </div>
+              {/* SECTION C: SUBMISSION HISTORY */}
+              <Card className="bg-[#0D0D0E] border-white/5 shadow-2xl overflow-hidden">
+                <CardHeader className="border-b border-white/5 pb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <Zap className="w-5 h-5 text-emerald-500" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-white font-bold tracking-wide text-lg italic">
+                        What was delivered
+                      </CardTitle>
+                      <CardDescription className="text-white/30 font-bold tracking-wide text-[10px] mt-1">
+                        Timeline of work submitted by the freelancer
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  {!vault.submissions || vault.submissions.length === 0 ? (
+                    <div className="py-12 text-center">
+                      <p className="text-white/20 font-bold tracking-wide text-[10px]">
+                        No work submitted yet
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {vault.submissions.map((sub: any, idx: number) => {
+                        const isSelected = selectedSubmissionId === sub.id;
+                        const isExpanded = expandedSubmissions.includes(sub.id);
 
-                        <div className="flex flex-col gap-2 mt-4">
-                          {vault.status === VaultStatus.FUNDED &&
-                            vault.freelancerId && (
-                              <Button
-                                size="sm"
-                                onClick={handleApprove}
-                                disabled={vault.isFrozen}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wide text-[11px] h-8 transition-all disabled:opacity-50 disabled:grayscale w-full"
+                        return (
+                          <div
+                            key={sub.id}
+                            onClick={() => toggleSubmission(sub.id)}
+                            className={cn(
+                              "relative p-6 rounded-2xl border transition-all duration-500 cursor-pointer group overflow-hidden",
+                              isSelected
+                                ? "bg-emerald-500/5 border-emerald-500/20 ring-1 ring-emerald-500/20"
+                                : "bg-white/1 border-white/5 hover:border-white/10 hover:bg-white/2",
+                            )}
+                          >
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className={cn(
+                                    "p-2 rounded-xl transition-colors",
+                                    isSelected
+                                      ? "bg-emerald-500/10 text-emerald-500"
+                                      : "bg-white/5 text-white/40 group-hover:bg-white/10 group-hover:text-white/60",
+                                  )}
+                                >
+                                  <Clock className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-bold tracking-wide text-white/30 mb-0.5">
+                                    {isSelected
+                                      ? "Current review"
+                                      : "Previous submission"}
+                                  </p>
+                                  <p className="text-sm font-bold text-white italic">
+                                    {new Date(
+                                      sub.submittedAt,
+                                    ).toLocaleDateString("en-US", {
+                                      month: "long",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })}
+                                  </p>
+                                </div>
+                              </div>
+                              <Badge
+                                variant="outline"
+                                className={cn(
+                                  "text-[9px] font-bold px-3 border-none",
+                                  isSelected
+                                    ? "bg-emerald-500 text-black"
+                                    : "bg-emerald-500/5 text-emerald-500",
+                                )}
                               >
-                                <Check className="w-4 h-4 mr-1" /> Approve &
-                                Release
-                              </Button>
+                                {sub.deliverableStatus?.filter(
+                                  (d: any) => d.included,
+                                ).length ||
+                                  sub.deliverableIds?.length ||
+                                  0}{" "}
+                                of {vault.deliverables?.length || 0} claimed
+                              </Badge>
+                            </div>
+
+                            {sub.notes && (
+                              <p className="text-xs text-white/50 bg-black/40 p-4 rounded-xl border border-white/5 italic mb-4">
+                                &quot;{sub.notes}&quot;
+                              </p>
                             )}
 
-                          {/* Refund Button: Shown if not released AND (no freelancer OR disputed) */}
-                          {vault.status !== VaultStatus.RELEASED &&
-                            (!vault.freelancerId ||
-                              vault.status === VaultStatus.DISPUTED) && (
-                              <Button
-                                size="sm"
-                                onClick={handleRefund}
-                                className="bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-400 font-bold uppercase tracking-wide text-[11px] h-8 border border-red-500/20 transition-all font-['Poppins',sans-serif] w-full"
-                              >
-                                <RefreshCcw className="w-3 h-3 mr-1" /> Request
-                                Refund
-                              </Button>
-                            )}
+                            <AnimatePresence>
+                              {isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  className="overflow-hidden space-y-4"
+                                >
+                                  <div className="pt-4 border-t border-white/5 space-y-3">
+                                    <p className="text-[9px] font-bold tracking-wide text-white/20">
+                                      Included deliverables:
+                                    </p>
+                                    <div className="space-y-2">
+                                      {(sub.deliverableStatus || []).map(
+                                        (d: any, dIdx: number) => (
+                                          <div
+                                            key={dIdx}
+                                            className={cn(
+                                              "p-3 rounded-lg border flex flex-col gap-2 transition-all duration-300",
+                                              d.included
+                                                ? "bg-emerald-500/5 border-emerald-500/10"
+                                                : "bg-white/2 border-white/5 opacity-40",
+                                            )}
+                                          >
+                                            <div className="flex items-center gap-2">
+                                              {d.included ? (
+                                                <CheckSquare className="w-3.5 h-3.5 text-emerald-500" />
+                                              ) : (
+                                                <Square className="w-3.5 h-3.5 text-white/10" />
+                                              )}
+                                              <span className="text-[10px] font-bold italic text-white/90">
+                                                {d.deliverableTitle}
+                                              </span>
+                                            </div>
+                                            {d.included && d.notes && (
+                                              <p className="text-[10px] text-white/40 italic ml-5">
+                                                - {d.notes}
+                                              </p>
+                                            )}
+                                          </div>
+                                        ),
+                                      )}
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+
+                            <div className="mt-4 flex items-center justify-end text-[10px] font-bold text-emerald-500 tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
+                              {isExpanded
+                                ? "Click to collapse"
+                                : "Click to expand details"}
+                              <ChevronRight
+                                className={cn(
+                                  "w-3 h-3 ml-1 transition-transform",
+                                  isExpanded && "rotate-90",
+                                )}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* RIGHT COLUMN: ACTION BUTTONS & SUMMARY */}
+            <div className="space-y-6">
+              {/* STATUS & ACTIONS */}
+              <Card className="bg-[#0D0D0E] border-white/5 shadow-2xl relative overflow-hidden group">
+                <CardHeader>
+                  <CardTitle className="text-white text-base font-bold tracking-wide italic flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                    Project controls
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-col gap-3">
+                    <Dialog
+                      open={showApproveDialog}
+                      onOpenChange={setShowApproveDialog}
+                    >
+                      <Button
+                        asChild
+                        disabled={
+                          vault.status !== VaultStatus.FUNDED ||
+                          !vault.submissions?.length ||
+                          vault.isFrozen
+                        }
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-bold h-12 rounded-xl shadow-lg shadow-emerald-500/10 active:scale-95 transition-all text-xs italic"
+                      >
+                        <button onClick={() => setShowApproveDialog(true)}>
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Approve & release
+                        </button>
+                      </Button>
+                      <DialogContent className="bg-[#0D0D0E] border-white/5 text-white">
+                        <DialogHeader>
+                          <DialogTitle className="text-xl font-bold tracking-tight italic flex items-center gap-2">
+                            <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                            Confirm release
+                          </DialogTitle>
+                          <DialogDescription className="text-white/40 text-sm leading-relaxed pt-2">
+                            You are about to release{" "}
+                            <span className="text-white font-bold">
+                              $
+                              {(
+                                vault.totalAmount ||
+                                vault.amount ||
+                                0
+                              ).toLocaleString()}
+                            </span>{" "}
+                            to the freelancer. This action is{" "}
+                            <span className="text-emerald-500 font-bold tracking-widest text-[10px]">
+                              irreversible
+                            </span>{" "}
+                            and marks the project as completed.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-6 space-y-4">
+                          <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl space-y-2">
+                            <p className="text-[10px] font-bold tracking-wide text-emerald-500/50">
+                              Selected submission
+                            </p>
+                            <p className="text-sm font-bold text-white">
+                              {new Date(
+                                vault.submissions?.find(
+                                  (s: any) => s.id === selectedSubmissionId,
+                                )?.submittedAt || Date.now(),
+                              ).toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                        <DialogFooter className="gap-3 sm:gap-0">
+                          <Button
+                            variant="ghost"
+                            onClick={() => setShowApproveDialog(false)}
+                            className="hover:bg-white/5 text-white/40 hover:text-white"
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setShowApproveDialog(false);
+                              handleApprove();
+                            }}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-black font-black"
+                          >
+                            Yes, Release Funds
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+
+                    <Button
+                      variant="outline"
+                      className="w-full border-white/5 bg-white/5 hover:bg-white/10 text-white font-bold h-12 rounded-xl active:scale-95 transition-all text-xs italic"
+                      onClick={() =>
+                        toast.info("Request Changes feature is coming soon!", {
+                          description:
+                            "Please use the chat or external communication to provide feedback for now.",
+                        })
+                      }
+                    >
+                      <RefreshCcw className="w-4 h-4 mr-2" />
+                      Request changes
+                    </Button>
+
+                    <Link
+                      href={`/client/disputes/create?vaultId=${vaultId}`}
+                      className="w-full"
+                    >
+                      <Button
+                        variant="outline"
+                        className="w-full border-white/5 bg-white/2 hover:bg-white/5 text-white font-bold text-[10px] h-12 rounded-xl transition-all shadow-lg active:scale-95"
+                      >
+                        <Gavel className="w-4 h-4 mr-2 text-amber-500" />
+                        Initiate dispute
+                      </Button>
+                    </Link>
+
+                    {!vault.freelancerId && (
+                      <Button
+                        variant="outline"
+                        onClick={() => setReassigning(true)}
+                        className="w-full border-white/5 bg-white/2 hover:bg-white/5 text-white font-bold text-[10px] h-12 rounded-xl transition-all shadow-lg active:scale-95"
+                      >
+                        <UserPlus className="w-4 h-4 mr-2 text-emerald-500" />
+                        Reassign freelancer
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="pt-4 border-t border-white/5 mt-4">
+                    <div className="flex justify-between items-center text-[10px] bg-white/2 p-4 rounded-xl border border-white/5">
+                      <span className="text-white/40 font-bold tracking-wide">
+                        Project logic:
+                      </span>
+                      <span className="text-emerald-500 font-bold tracking-wide italic">
+                        Standard escrow
+                      </span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            </div>
 
-            {/* RIGHT COLUMN: SUMMARY & ACTIONS */}
-            <div className="lg:col-span-1 space-y-6">
-              {/* Dispute CTA */}
-              <Card
-                className={cn(
-                  "border-white/5 bg-[#0D0D0E]",
-                  !anyEligibleForDispute && "opacity-70",
-                )}
-              >
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-white font-bold uppercase tracking-normal">
-                    <Gavel className="w-5 h-5 text-amber-500" />
-                    Case Files
-                  </CardTitle>
-                  <CardDescription className="font-semibold text-gray-400 uppercase tracking-normal mb-2">
-                    {anyEligibleForDispute
-                      ? "Open a formal case file if work does not meet requirements."
-                      : "No eligible case files for this vault right now. Case files are only allowed for specific reason codes."}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    variant="outline"
-                    className="w-full border-white/10 hover:bg-white/5 text-white font-bold uppercase tracking-widest text-[10px] transition-all"
-                    disabled={!anyEligibleForDispute}
-                    asChild={anyEligibleForDispute}
+              {/* REASSIGNMENT PANEL - Shown when reassigning is true */}
+              <AnimatePresence>
+                {reassigning && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
                   >
-                    {
-                      (anyEligibleForDispute ? (
-                        <Link
-                          href={`/client/disputes/create?vaultId=${vaultId}`}
+                    <Card className="bg-[#0D0D0E] border-emerald-500/20 shadow-2xl">
+                      <CardHeader className="pb-4 flex flex-row items-center justify-between">
+                        <CardTitle className="text-white text-xs font-bold tracking-wide italic">
+                          New assignment
+                        </CardTitle>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setReassigning(false)}
+                          className="h-6 w-6 p-0 hover:bg-white/5"
                         >
-                          Open a Case
-                        </Link>
-                      ) : (
-                        <Link href="/client/disputes">Go to disputes</Link>
-                      )) as any
-                    }
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <div className="bg-[#0D0D0E] border border-white/5 rounded-xl p-6 space-y-4">
-                {vault.status === VaultStatus.FUNDED && (
-                  <div className="mb-6">
-                    <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4">
-                      Freelancer Assignment
-                    </h4>
-                    <Card
-                      className={cn(
-                        "bg-white/2 border-white/10 transition-colors",
-                        latestInvite?.status === "DECLINED" &&
-                          "border-red-500/30 bg-red-500/5",
-                      )}
-                    >
-                      <CardContent className="p-4 space-y-4">
-                        <div className="flex items-start gap-3">
-                          <div
-                            className={cn(
-                              "p-2 rounded-lg",
-                              latestInvite?.status === "DECLINED"
-                                ? "bg-red-500/10"
-                                : "bg-amber-500/10",
-                            )}
-                          >
-                            <UserPlus
-                              className={cn(
-                                "w-5 h-5",
-                                latestInvite?.status === "DECLINED"
-                                  ? "text-red-500"
-                                  : "text-amber-500",
-                              )}
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-[9px] font-bold tracking-wide text-white/30">
+                            Freelancer email
+                          </Label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                            <input
+                              type="email"
+                              value={inviteEmail}
+                              onChange={(e) => setInviteEmail(e.target.value)}
+                              placeholder="freelancer@example.com"
+                              className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-2 text-xs text-white placeholder:text-white/10 focus:border-emerald-500/50 outline-none transition-all"
                             />
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <p className="text-sm font-bold text-white uppercase tracking-tighter">
-                                {latestInvite?.status === "DECLINED"
-                                  ? "Freelancer Declined Invitation"
-                                  : !vault.freelancerId
-                                    ? "Awaiting Freelancer Assignment"
-                                    : "Reassign Freelancer"}
-                              </p>
-                              {latestInvite?.status === "DECLINED" && (
-                                <Badge
-                                  variant="destructive"
-                                  className="text-[10px] uppercase h-4 px-1"
-                                >
-                                  Declined
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-xs text-gray-400 font-bold uppercase tracking-normal">
-                              {latestInvite?.status === "DECLINED" ? (
-                                <>
-                                  The previous freelancer{" "}
-                                  <span className="text-white">
-                                    ({latestInvite.email})
-                                  </span>{" "}
-                                  declined this invitation.
-                                </>
-                              ) : !vault.freelancerId ? (
-                                "Enter a freelancer's email address to send them an invitation to this vault."
-                              ) : (
-                                "Assign this project to someone else? This will update the secure escrow account to the new freelancer once they accept."
-                              )}
-                            </p>
-                          </div>
                         </div>
-
-                        <div className="space-y-3 pt-2">
-                          <div>
-                            <Label
-                              htmlFor="invite-email"
-                              className="text-white! text-[10px] font-bold uppercase tracking-widest mb-2 block opacity-50"
-                            >
-                              REASSIGN FREELANCER
-                            </Label>
-                            <div className="relative">
-                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <input
-                                id="invite-email"
-                                type="email"
-                                value={inviteEmail}
-                                onChange={(e) => setInviteEmail(e.target.value)}
-                                placeholder="freelancer@example.com"
-                                className="w-full bg-black/60 border border-white/10 rounded-lg px-10 py-2.5 text-white text-sm placeholder:text-gray-400 focus:border-emerald-500/50 focus:outline-none transition-all font-bold"
-                              />
-                            </div>
-                          </div>
-
-                          <Button
-                            onClick={() => handleUpdateFreelancer(inviteEmail)}
-                            disabled={reassigning || !inviteEmail}
-                            className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide text-xs h-10 transition-all font-['Poppins',sans-serif]"
-                          >
-                            {reassigning
-                              ? "Updating..."
-                              : !vault.freelancerId
-                                ? "Send Invitation"
-                                : "Reassign Project"}
-                          </Button>
-                        </div>
+                        <Button
+                          onClick={() => handleUpdateFreelancer(inviteEmail)}
+                          disabled={!inviteEmail || reassigningLoading}
+                          className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold tracking-wide text-[10px] h-10 rounded-lg"
+                        >
+                          Confirm reassignment
+                        </Button>
                       </CardContent>
                     </Card>
-                  </div>
+                  </motion.div>
                 )}
-
-                <div className="relative">
-                  <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4">
-                    Contract Deliverables
-                  </h4>
-                  <div className="space-y-2">
-                    {submittedDeliverables.length > 0 ? (
-                      submittedDeliverables.map((doc: any) => (
-                        <Button
-                          key={doc.id}
-                          variant="ghost"
-                          onClick={() => {
-                            toast.info(`Opening ${doc.name}`);
-                          }}
-                          className="w-full justify-between items-center text-gray-500 hover:text-white h-auto py-3 px-4 border border-white/5 bg-white/2 hover:bg-white/5 transition-all group font-['Poppins',sans-serif]"
-                        >
-                          <div className="flex items-center min-w-0 mr-3">
-                            {doc.type === "link" ? (
-                              <ExternalLink className="w-4 h-4 mr-3 shrink-0 text-emerald-500/70" />
-                            ) : (
-                              <Download className="w-4 h-4 mr-3 shrink-0" />
-                            )}
-                            <div className="text-left min-w-0">
-                              <span className="block text-[11px] font-bold text-white uppercase truncate">
-                                {doc.name}
-                              </span>
-                            </div>
-                          </div>
-                          <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                        </Button>
-                      ))
-                    ) : (
-                      <div className="p-4 border border-dashed border-white/5 rounded-lg text-center">
-                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">
-                          No deliverables submitted yet
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -627,25 +820,25 @@ export default function ClientVaultDetailPage() {
           className="bg-[#0D0D0E] border-white/5 text-white w-[400px] sm:w-[540px]"
         >
           <SheetHeader>
-            <SheetTitle className="text-2xl font-black uppercase tracking-tighter text-white">
-              Request Refund
+            <SheetTitle className="text-2xl font-bold tracking-tighter text-white">
+              Request refund
             </SheetTitle>
-            <SheetDescription className="text-gray-400 font-bold uppercase tracking-wide">
+            <SheetDescription className="text-gray-400 font-bold tracking-wide">
               Since you don&apos;t have a payment account, refunds are processed
               manually by our team. Please provide your payout details.
             </SheetDescription>
           </SheetHeader>
           <div className="mt-8 space-y-6">
             <div className="space-y-3">
-              <Label className="text-xs font-bold uppercase tracking-widest opacity-50">
-                Payout Method
+              <Label className="text-xs font-bold tracking-widest opacity-50">
+                Payout method
               </Label>
               <Select
                 value={payoutMethod}
                 onValueChange={(v: any) => setPayoutMethod(v)}
               >
-                <SelectTrigger className="bg-white/5 border-white/10 text-white font-bold uppercase">
-                  <SelectValue placeholder="Select Method" />
+                <SelectTrigger className="bg-white/5 border-white/10 text-white font-bold">
+                  <SelectValue placeholder="Select method" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#161618] border-white/10 text-white">
                   <SelectItem value="bank">Bank Transfer</SelectItem>
@@ -657,8 +850,8 @@ export default function ClientVaultDetailPage() {
             {payoutMethod === "bank" && (
               <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest opacity-50">
-                    Bank Name
+                  <Label className="text-[10px] font-bold tracking-widest opacity-50">
+                    Bank name
                   </Label>
                   <input
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-emerald-500/50 focus:outline-none transition-all"
@@ -673,8 +866,8 @@ export default function ClientVaultDetailPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest opacity-50">
-                    Account Number / IBAN
+                  <Label className="text-[10px] font-bold tracking-widest opacity-50">
+                    Account number / IBAN
                   </Label>
                   <input
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-emerald-500/50 focus:outline-none transition-all"
@@ -688,8 +881,8 @@ export default function ClientVaultDetailPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest opacity-50">
-                    Account Holder Name
+                  <Label className="text-[10px] font-bold tracking-widest opacity-50">
+                    Account holder name
                   </Label>
                   <input
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-emerald-500/50 focus:outline-none transition-all"
@@ -708,17 +901,15 @@ export default function ClientVaultDetailPage() {
             <div className="pt-4 space-y-3">
               <Alert className="bg-amber-500/10 border-amber-500/20 text-amber-500">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle className="text-[10px] font-black uppercase">
-                  Note
-                </AlertTitle>
-                <AlertDescription className="text-[10px] font-bold uppercase">
+                <AlertTitle className="text-[10px] font-black">Note</AlertTitle>
+                <AlertDescription className="text-[10px] font-bold">
                   Our team will process this within 1-3 business days. Funds
                   will be returned minus any platform processing fees.
                 </AlertDescription>
               </Alert>
 
               <Button
-                className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-black uppercase tracking-widest"
+                className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold tracking-widest"
                 onClick={submitRefundRequest}
                 disabled={requestingRefund}
               >

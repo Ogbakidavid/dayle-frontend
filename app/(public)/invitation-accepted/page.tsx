@@ -38,7 +38,7 @@ export default function InvitationAcceptedPage() {
         const data = (await api.vaults.getById(vaultId)) as Vault;
         setVault(data);
       } catch (err) {
-        console.error("Failed to load vault:", err);
+        console.error("Failed to load project:", err);
       } finally {
         setLoading(false);
       }
@@ -59,7 +59,7 @@ export default function InvitationAcceptedPage() {
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <p className="text-white">Vault not found</p>
+          <p className="text-white">Project not found</p>
         </div>
       </div>
     );
@@ -73,8 +73,8 @@ export default function InvitationAcceptedPage() {
         </div>
 
         <div>
-          <h1 className="text-4xl font-black text-white uppercase tracking-tighter mb-4">
-            Invitation Accepted
+          <h1 className="text-4xl font-bold text-white tracking-tighter mb-4">
+            Invitation accepted
           </h1>
           <p className="text-xl text-gray-400 max-w-lg mx-auto">
             You have successfully accepted the invitation for{" "}
@@ -85,7 +85,7 @@ export default function InvitationAcceptedPage() {
         <Card className="bg-[#0D0D0E] border-white/5 max-w-xl mx-auto text-left">
           <CardContent className="p-6 space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-white/5">
-              <span className="text-gray-400 text-sm uppercase tracking-wide">
+              <span className="text-gray-400 text-sm tracking-wide">
                 Status
               </span>
               <Badge
@@ -96,7 +96,7 @@ export default function InvitationAcceptedPage() {
               </Badge>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-white/5">
-              <span className="text-gray-400 text-sm uppercase tracking-wide">
+              <span className="text-gray-400 text-sm tracking-wide">
                 Client
               </span>
               <span className="text-white font-bold">
@@ -104,7 +104,7 @@ export default function InvitationAcceptedPage() {
               </span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="text-gray-400 text-sm uppercase tracking-wide">
+              <span className="text-gray-400 text-sm tracking-wide">
                 Total Value
               </span>
               <span className="text-white font-bold">
@@ -117,9 +117,9 @@ export default function InvitationAcceptedPage() {
         <div className="pt-8">
           <Button
             onClick={() => router.push(`/freelancer/vault/${vault.id}`)}
-            className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold uppercase tracking-wide px-8"
+            className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold tracking-wide px-8"
           >
-            View Vault
+            View project
           </Button>
         </div>
       </div>

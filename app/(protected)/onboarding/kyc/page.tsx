@@ -36,7 +36,7 @@ function KYCPageContent() {
         <div className="flex items-center gap-4 w-full">
           <div className="w-10 h-10"></div>
           <div className="flex-1 text-center font-semibold text-[17px] tracking-tight text-white">
-            Identity Verification
+            Identity verification
           </div>
           <div className="w-10 h-10 flex items-center justify-center font-mono text-xs text-white/40"></div>
         </div>
@@ -52,7 +52,7 @@ function KYCPageContent() {
 
           <div className="space-y-4 text-center mb-10">
             <h1 className="text-3xl font-bold tracking-tight">
-              Verify Your Identity
+              Verify your identity
             </h1>
             <p className="text-sm text-zinc-400">
               We&apos;ve partnered with Didit to provide bank-grade identity
@@ -94,7 +94,7 @@ function KYCPageContent() {
               </p>
             </div>
             <p className="text-[10px] text-zinc-700">
-              Powered by the Didit Protocol
+              Powered by the Didit protocol
             </p>
           </div>
         </div>

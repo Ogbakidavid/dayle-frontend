@@ -49,7 +49,7 @@ export default function CheckoutSelectionPage() {
   }, [vaults, vaultId, contextLoading, fetchVault]);
 
   const vault = localVault;
-  const amount = vault?.totalAmount || 0;
+  const amount = Number(vault?.totalAmount || 0);
 
   const [isDepositing, setIsDepositing] = React.useState(false);
 
@@ -102,14 +102,14 @@ export default function CheckoutSelectionPage() {
   if (!vault)
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-white font-['Poppins',sans-serif] gap-6">
-        <p className="text-xl font-black uppercase tracking-widest text-white/40">
-          Vault Not Found
+        <p className="text-xl font-bold tracking-widest text-white/40">
+          Project not found
         </p>
         <button
           onClick={() => router.push("/client")}
-          className="px-8 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+          className="px-8 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-bold tracking-widest hover:bg-white/10 transition-all"
         >
-          Return to Dashboard
+          Return to dashboard
         </button>
       </div>
     );
@@ -131,33 +131,31 @@ export default function CheckoutSelectionPage() {
               >
                 <Lock className="w-5 h-5 text-black" />
               </div>
-              <span className="text-white font-black tracking-tighter text-2xl uppercase italic">
+              <span className="text-white font-bold tracking-tighter text-2xl italic">
                 Dayle
               </span>
             </div>
 
             <div className="space-y-10">
               <div className="space-y-3">
-                <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.4em] italic leading-none">
-                  TOTAL SETTLEMENT
+                <p className="text-[10px] font-bold text-white/40 tracking-[0.4em] italic leading-none">
+                  Total settlement
                 </p>
-                <h1 className="text-6xl font-black text-white tracking-tighter sm:text-7xl font-mono flex items-baseline gap-2">
-                  <span className="text-emerald-500 font-black text-3xl">
-                    $
-                  </span>
+                <h1 className="text-6xl font-bold text-white tracking-tighter sm:text-7xl font-mono flex items-baseline gap-2">
+                  <span className="text-emerald-500 font-bold text-3xl">$</span>
                   {amount.toLocaleString()}
                 </h1>
               </div>
 
               <div className="pt-10 border-t border-white/5 space-y-6">
-                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                  <span className="text-white/30 italic">Vault Contract</span>
+                <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-white">
+                  <span className="text-white/30 italic">Project account</span>
                   <span className="text-emerald-500 italic font-mono tracking-normal text-[9px]">
                     {vault?.vaultAddress || "Deployment Pending"}
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                  <span className="text-white/30 italic">Network Fee</span>
+                <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-white">
+                  <span className="text-white/30 italic">Network fee</span>
                   <span className="text-emerald-500 italic">Sponsored</span>
                 </div>
               </div>
@@ -167,12 +165,11 @@ export default function CheckoutSelectionPage() {
           <div className="p-8 bg-emerald-500/5 border border-emerald-500/10 rounded-3xl relative group overflow-hidden">
             <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mb-3 italic">
-                <CreditCard className="w-4 h-4" /> SECURE CHECKOUT
+              <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-bold tracking-[0.3em] mb-3 italic">
+                <CreditCard className="w-4 h-4" /> Secure checkout
               </div>
-              <p className="text-[10px] text-white/40 leading-relaxed font-black uppercase tracking-widest mt-2">
-                Approving this transaction securely deposits your funds into the
-                Web3 vault.
+              <p className="text-[10px] text-white/40 leading-relaxed font-bold tracking-widest mt-2">
+                securely deposits your funds into the secure escrow account.
               </p>
             </div>
           </div>
@@ -187,11 +184,11 @@ export default function CheckoutSelectionPage() {
               className="space-y-16"
             >
               <div className="text-center space-y-4">
-                <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
-                  Authorize Deposit
+                <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter italic">
+                  Authorize deposit
                 </h2>
-                <p className="text-xs font-black text-white/30 uppercase tracking-[0.3em]">
-                  Complete Checkout via Partna / Paycrest
+                <p className="text-xs font-bold text-white/30 tracking-[0.3em]">
+                  Complete checkout via Partna / Paycrest
                 </p>
               </div>
 
@@ -206,13 +203,13 @@ export default function CheckoutSelectionPage() {
                     <Building2 className="w-8 h-8" />
                   </div>
                   <div>
-                    <p className="text-blue-500 font-black text-2xl uppercase tracking-tighter italic group-hover:text-blue-400 transition-colors">
+                    <p className="text-blue-500 font-bold text-2xl tracking-tighter italic group-hover:text-blue-400 transition-colors">
                       {isDepositing
-                        ? "Processing Payment..."
-                        : "Simulate Fiat Payment"}
+                        ? "Processing payment..."
+                        : "Simulate fiat payment"}
                     </p>
-                    <p className="text-[10px] font-black text-blue-500/50 uppercase tracking-[0.2em] mt-2 group-hover:text-blue-500/80 transition-colors">
-                      PAY WITH CREDIT CARD OR BANK TRANSFER
+                    <p className="text-[10px] font-bold text-blue-500/50 tracking-[0.2em] mt-2 group-hover:text-blue-500/80 transition-colors">
+                      Pay with credit card or bank transfer
                     </p>
                   </div>
                 </button>

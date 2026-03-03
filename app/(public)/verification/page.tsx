@@ -57,8 +57,8 @@ function VerificationStatusContent() {
           <Shield className="w-8 h-8 text-emerald-500 stroke-[2.5px] relative z-10" />
         </div>
         <div className="flex flex-col items-center gap-2">
-          <p className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500">
-            Querying Network
+          <p className="text-sm font-bold tracking-[0.3em] text-emerald-500">
+            Querying network
           </p>
           <div className="h-0.5 w-24 bg-white/5 rounded-full overflow-hidden">
             <div className="h-full bg-emerald-500 w-1/3 rounded-full animate-[loading_1.5s_infinite_ease-in-out]"></div>
@@ -72,18 +72,18 @@ function VerificationStatusContent() {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
         <AlertCircle className="w-16 h-16 text-red-500/50 mb-6" />
-        <h1 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">
-          Verification Link Invalid
+        <h1 className="text-3xl font-bold text-white tracking-tighter mb-4">
+          Verification link invalid
         </h1>
-        <p className="text-white max-w-sm font-bold uppercase tracking-wide text-sm mb-12">
-          The specific vault node could not be located on the Dayle protocol.
+        <p className="text-white max-w-sm font-bold tracking-wide text-sm mb-12">
+          The specific project account could not be located on the Dayle system.
         </p>
         <Button
           onClick={() => router.push("/")}
           variant="ghost"
-          className="text-emerald-500 font-black uppercase tracking-wide text-sm gap-2"
+          className="text-emerald-500 font-bold tracking-wide text-sm gap-2"
         >
-          <ArrowLeft className="w-4 h-4" /> Return to Protocol
+          <ArrowLeft className="w-4 h-4" /> Return to dashboard
         </Button>
       </div>
     );
@@ -122,7 +122,7 @@ function VerificationStatusContent() {
               </div>
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tighter mb-4">
             {isVerified ? (
               <>
                 Capital{" "}
@@ -135,12 +135,12 @@ function VerificationStatusContent() {
               </>
             ) : (
               <>
-                Vault <span className="text-white italic">Awaits.</span>
+                Project <span className="text-white italic">Protected.</span>
               </>
             )}
           </h1>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-black uppercase tracking-wide text-white">
-            <Lock className="w-3 h-3 text-emerald-500" /> Node ID: {vault.id}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-bold tracking-wide text-white">
+            <Lock className="w-3 h-3 text-emerald-500" /> Account ID: {vault.id}
           </div>
         </div>
 
@@ -150,21 +150,21 @@ function VerificationStatusContent() {
 
           <div className="space-y-8 relative z-10">
             <div className="space-y-2">
-              <p className="text-sm font-black text-white uppercase tracking-wide">
-                Active Project
+              <p className="text-sm font-bold text-white tracking-wide">
+                Active project
               </p>
-              <h3 className="text-2xl font-black text-white uppercase tracking-tight leading-tight">
+              <h3 className="text-2xl font-bold text-white tracking-tight leading-tight">
                 {vault.title}
               </h3>
             </div>
 
             <div className="py-8 border-y border-white/5 grid grid-cols-2 gap-8">
               <div>
-                <p className="text-sm font-black text-white uppercase tracking-wide mb-1">
+                <p className="text-sm font-bold text-white tracking-wide mb-1">
                   Status
                 </p>
                 <p
-                  className={`text-sm font-black uppercase tracking-wide ${
+                  className={`text-sm font-bold tracking-wide ${
                     isVerified
                       ? "text-emerald-500"
                       : isReview
@@ -176,10 +176,10 @@ function VerificationStatusContent() {
                 </p>
               </div>
               <div>
-                <p className="text-sm font-black text-white uppercase tracking-wide mb-1">
+                <p className="text-sm font-bold text-white tracking-wide mb-1">
                   Identity
                 </p>
-                <p className="text-sm font-black text-white uppercase tracking-wide truncate">
+                <p className="text-sm font-bold text-white tracking-wide truncate">
                   {vault.clientName || "Dayle Native Client"}
                 </p>
               </div>
@@ -187,30 +187,30 @@ function VerificationStatusContent() {
 
             {isVerified ? (
               <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center">
-                <p className="text-sm font-black text-emerald-500 uppercase tracking-wide mb-2">
-                  Financial Finality Reached
+                <p className="text-sm font-bold text-emerald-500 tracking-wide mb-2">
+                  Final settlement reached
                 </p>
-                <p className="text-sm font-bold text-white uppercase tracking-wide leading-relaxed font-['Poppins',sans-serif]">
+                <p className="text-sm font-bold text-white tracking-wide leading-relaxed font-['Poppins',sans-serif]">
                   The objective requirements have been validated. Funds have
-                  been distributed to the recipient node.
+                  been distributed to the recipient account.
                 </p>
               </div>
             ) : isReview ? (
               <div className="p-6 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-center">
-                <p className="text-sm font-black text-blue-500 uppercase tracking-wide mb-2">
-                  Computational Review
+                <p className="text-sm font-bold text-blue-500 tracking-wide mb-2">
+                  System review
                 </p>
-                <p className="text-sm font-bold text-white uppercase tracking-wide leading-relaxed font-['Poppins',sans-serif]">
-                  Our protocol is currently verifying the submitted evidence
-                  against the vault requirements.
+                <p className="text-sm font-bold text-white tracking-wide leading-relaxed font-['Poppins',sans-serif]">
+                  Our system is currently verifying the submitted evidence
+                  against the project requirements.
                 </p>
               </div>
             ) : (
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
-                <p className="text-sm font-black text-white uppercase tracking-wide mb-2">
-                  Waiting for Submission
+                <p className="text-sm font-bold text-white tracking-wide mb-2">
+                  Waiting for submission
                 </p>
-                <p className="text-sm font-bold text-white uppercase tracking-wide leading-relaxed font-['Poppins',sans-serif]">
+                <p className="text-sm font-bold text-white tracking-wide leading-relaxed font-['Poppins',sans-serif]">
                   Payment is locked and secured. Recipient has not yet submitted
                   work for verification.
                 </p>
@@ -219,9 +219,9 @@ function VerificationStatusContent() {
 
             <Button
               onClick={() => router.push("/")}
-              className="w-full h-16 bg-white/3 border border-white/10 hover:bg-white/5 text-white font-black uppercase tracking-wide text-sm rounded-2xl transition-all"
+              className="w-full h-16 bg-white/3 border border-white/10 hover:bg-white/5 text-white font-bold tracking-wide text-sm rounded-2xl transition-all"
             >
-              Close Transmission
+              Close transmission
             </Button>
           </div>
         </div>
@@ -230,13 +230,13 @@ function VerificationStatusContent() {
         <div className="mt-12 flex justify-center gap-8 opacity-40">
           <div className="flex items-center gap-2">
             <Globe className="w-3 h-3 text-white" />
-            <span className="text-sm font-black uppercase tracking-wide text-white">
+            <span className="text-sm font-bold tracking-wide text-white">
               Global Settlement
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Lock className="w-3 h-3 text-white" />
-            <span className="text-sm font-black uppercase tracking-wide text-white">
+            <span className="text-sm font-bold tracking-wide text-white">
               Audit-Proof Ledger
             </span>
           </div>

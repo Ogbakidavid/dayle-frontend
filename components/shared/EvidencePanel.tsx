@@ -77,11 +77,11 @@ function SectionHeader({ icon: Icon, title, subtitle }: SectionHeaderProps) {
           <Icon className="h-4 w-4 text-emerald-300" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-bold uppercase tracking-normal text-white">
+          <p className="text-sm font-bold tracking-normal text-white">
             {title}
           </p>
           {subtitle ? (
-            <p className="mt-0.5 text-xs text-white/50 font-bold uppercase tracking-normal">
+            <p className="mt-0.5 text-xs text-white/50 font-bold tracking-normal">
               {subtitle}
             </p>
           ) : null}
@@ -112,10 +112,10 @@ function EmptyState({ title, description }: EmptyStateProps) {
           <Info className="h-4 w-4 text-white/60" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-bold uppercase tracking-normal text-white">
+          <p className="text-sm font-bold tracking-normal text-white">
             {title}
           </p>
-          <p className="mt-1 text-sm text-white/55 font-bold uppercase tracking-normal">
+          <p className="mt-1 text-sm text-white/55 font-bold tracking-normal">
             {description}
           </p>
         </div>
@@ -150,12 +150,12 @@ function EvidenceItem({
             {topRight ? <div className="ml-auto">{topRight}</div> : null}
           </div>
           {title ? (
-            <p className="mt-2 text-[15px] font-bold uppercase tracking-normal leading-snug text-white">
+            <p className="mt-2 text-[15px] font-bold tracking-normal leading-snug text-white">
               {title}
             </p>
           ) : null}
           {body ? (
-            <p className="mt-2 text-sm leading-relaxed text-white/60 font-bold uppercase tracking-normal">
+            <p className="mt-2 text-sm leading-relaxed text-white/60 font-bold tracking-normal">
               {body}
             </p>
           ) : null}
@@ -193,7 +193,7 @@ export function EvidencePanel({ vault, evidence }: EvidencePanelProps) {
     return (
       <Card className="border-white/10 bg-[#0B0B0C]">
         <CardHeader className="border-b border-white/5">
-          <CardTitle className="text-white text-lg font-bold uppercase tracking-normal">
+          <CardTitle className="text-white text-lg font-bold tracking-normal">
             Evidence
           </CardTitle>
         </CardHeader>
@@ -211,10 +211,10 @@ export function EvidencePanel({ vault, evidence }: EvidencePanelProps) {
     <Card className="border-white/10 bg-[#0B0B0C]">
       <CardHeader className="border-b border-white/5">
         <div className="space-y-1">
-          <CardTitle className="text-white text-lg font-bold uppercase tracking-normal">
+          <CardTitle className="text-white text-lg font-bold tracking-normal">
             Evidence
           </CardTitle>
-          <p className="text-sm text-white/60 font-bold uppercase tracking-normal mb-3">
+          <p className="text-sm text-white/60 font-bold tracking-normal mb-3">
             {vault.title}
           </p>
         </div>
@@ -252,12 +252,12 @@ export function EvidencePanel({ vault, evidence }: EvidencePanelProps) {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 flex items-center gap-1">
-                <Cpu className="h-3 w-3" /> AI Verification Engine
+              <span className="text-[10px] font-bold tracking-widest text-white/50 flex items-center gap-1">
+                <Cpu className="h-3 w-3" /> AI verification engine
               </span>
               <span
                 className={cx(
-                  "ml-auto px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                  "ml-auto px-2 py-0.5 rounded text-[10px] font-bold",
                   vault.verification?.result === "FAIL"
                     ? "bg-red-500 text-white"
                     : vault.verification?.result === "FLAGGED"
@@ -275,7 +275,7 @@ export function EvidencePanel({ vault, evidence }: EvidencePanelProps) {
                   ? "Manual Review Recommended"
                   : "Automated Compliance Passed"}
             </p>
-            <p className="text-xs text-white/60 leading-relaxed font-bold uppercase tracking-normal">
+            <p className="text-xs text-white/60 leading-relaxed font-bold tracking-normal">
               {vault.verification?.result === "FAIL"
                 ? "Critical discrepancies found in submitted deliverables vs contract requirements."
                 : vault.verification?.result === "FLAGGED"

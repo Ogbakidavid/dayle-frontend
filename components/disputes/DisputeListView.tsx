@@ -110,7 +110,7 @@ function StatusPill({ status }: StatusPillProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide",
+        "inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide",
         cfg.pill,
       )}
     >
@@ -169,14 +169,14 @@ function StatCard({
         <CardContent className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
+              <p className="text-xs font-semibold tracking-wider text-white/45">
                 {title}
               </p>
               <p className="mt-2 text-3xl font-semibold tracking-tight text-white">
                 {value}
               </p>
               {hint ? (
-                <p className="mt-1 text-[10px] text-white/45 font-bold uppercase tracking-widest">
+                <p className="mt-1 text-[10px] text-white/45 font-bold tracking-wide">
                   {hint}
                 </p>
               ) : null}
@@ -305,10 +305,10 @@ export function DisputeListView({ role }: DisputeListViewProps) {
               <Gavel className="h-5 w-5 text-amber-300" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white uppercase tracking-tighter">
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tighter">
                 Disputes
               </h1>
-              <p className="text-xs md:text-sm text-white/50 font-bold uppercase tracking-wide">
+              <p className="text-xs md:text-sm text-white/50 font-bold tracking-wide">
                 {role === "client"
                   ? "Review and manage disputes tied to your vaults."
                   : "Open and track disputes for fair vault resolution."}
@@ -319,7 +319,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
         <motion.div variants={itemVariants}>
           <Link href={`/${role}/disputes/create`} className="w-full sm:w-auto">
-            <Button className="h-11 w-full sm:w-auto bg-amber-500 px-5 font-black text-black hover:bg-amber-400 uppercase tracking-wide shadow-lg shadow-amber-500/20">
+            <Button className="h-11 w-full sm:w-auto bg-amber-500 px-5 font-bold text-black hover:bg-amber-400 tracking-wide shadow-lg shadow-amber-500/20">
               <Plus className="mr-2 h-5 w-5" />
               Open dispute
             </Button>
@@ -395,7 +395,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-11 w-full sm:w-auto border-white/10 bg-white/3 text-white/70 hover:bg-white/6 hover:text-white font-bold uppercase tracking-wide transition-all"
+                  className="h-11 w-full sm:w-auto border-white/10 bg-white/3 text-white/70 hover:bg-white/6 hover:text-white font-bold tracking-wide transition-all"
                   onClick={() =>
                     setSortKey((s) => (s === "newest" ? "oldest" : "newest"))
                   }
@@ -416,7 +416,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                     type="button"
                     onClick={() => setStatusFilter(t.key)}
                     className={cn(
-                      "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all",
+                      "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-[11px] font-bold tracking-wide transition-all",
                       active
                         ? "border-amber-500/30 bg-amber-500/10 text-amber-200 shadow-inner"
                         : "border-white/10 bg-white/3 text-white/60 hover:bg-white/6 hover:text-white",
@@ -454,10 +454,8 @@ export function DisputeListView({ role }: DisputeListViewProps) {
             <CardTitle className="flex items-center justify-between gap-3 text-white">
               <div className="flex items-center gap-2">
                 <Gavel className="h-5 w-5 text-amber-300" />
-                <span className="text-lg font-bold tracking-wider uppercase">
-                  Cases
-                </span>
-                <span className="text-sm font-normal uppercase text-white/40 font-mono">
+                <span className="text-lg font-bold tracking-wide">Cases</span>
+                <span className="text-sm font-normal text-white/40 font-mono">
                   ({filtered.length})
                 </span>
               </div>
@@ -468,7 +466,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
             {loading ? (
               <div className="p-20 text-center">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-amber-500/20 border-t-amber-500" />
-                <p className="mt-4 text-sm font-bold uppercase tracking-widest text-white/30">
+                <p className="mt-4 text-sm font-bold tracking-wide text-white/30">
                   Syncing ledger...
                 </p>
               </div>
@@ -478,15 +476,15 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                   <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-black/30 shadow-xl">
                     <Gavel className="h-7 w-7 text-white/20" />
                   </div>
-                  <p className="text-lg font-bold uppercase tracking-wide text-white">
+                  <p className="text-lg font-bold tracking-wide text-white">
                     No records found
                   </p>
-                  <p className="mt-2 text-sm uppercase tracking-widest text-white/30 max-w-xs mx-auto leading-relaxed">
+                  <p className="mt-2 text-sm tracking-wide text-white/30 max-w-xs mx-auto leading-relaxed">
                     Try adjusting filters or open a new dispute for resolution.
                   </p>
                   <div className="mt-8 flex justify-center">
                     <Link href={`/${role}/disputes/create`}>
-                      <Button className="h-11 bg-amber-500 px-8 font-black text-black hover:bg-amber-400 uppercase tracking-widest shadow-lg shadow-amber-500/20">
+                      <Button className="h-11 bg-amber-500 px-8 font-bold text-black hover:bg-amber-400 tracking-wide shadow-lg shadow-amber-500/20">
                         <Plus className="mr-2 h-5 w-5" />
                         Open dispute
                       </Button>
@@ -509,7 +507,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
                           <div className="min-w-0 space-y-2">
                             {/* Primary line: Vault title */}
-                            <p className="truncate text-lg font-black uppercase tracking-tight leading-none text-white group-hover:text-amber-300 transition-colors">
+                            <p className="truncate text-lg font-bold tracking-tight leading-none text-white group-hover:text-amber-300 transition-colors">
                               {dispute.vaultTitle}
                             </p>
 
@@ -522,9 +520,11 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                             </div>
 
                             {/* Metadata */}
-                            <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-white/30">
+                            <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-bold tracking-wide text-white/30">
                               <span className="flex items-center gap-1.5">
-                                <span className="text-white/20">Vault:</span>
+                                <span className="text-white/20 font-bold tracking-wide">
+                                  Vault:
+                                </span>
                                 <span className="text-white/60">
                                   {dispute.vaultId}
                                 </span>
@@ -532,7 +532,9 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
                               {dispute.requirementRef ? (
                                 <span className="flex items-center gap-1.5">
-                                  <span className="text-white/20">Target:</span>
+                                  <span className="text-white/20 font-bold tracking-wide">
+                                    Target:
+                                  </span>
                                   <span className="text-emerald-400/70">
                                     {dispute.requirementRef}
                                   </span>
@@ -540,7 +542,9 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                               ) : null}
 
                               <span className="flex items-center gap-1.5">
-                                <span className="text-white/20">Opened:</span>
+                                <span className="text-white/20 font-bold tracking-wide">
+                                  Opened:
+                                </span>
                                 <span className="text-white/60">
                                   {formatDate(dispute.openedAt)}
                                 </span>
@@ -554,7 +558,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                               </p>
                             ) : (
                               <div className="mt-4 inline-block px-3 py-1 rounded-full border border-white/5 bg-white/5">
-                                <span className="text-[10px] text-white/20 font-bold uppercase tracking-widest">
+                                <span className="text-[10px] text-white/20 font-bold tracking-wide">
                                   No description file
                                 </span>
                               </div>
@@ -572,12 +576,12 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                               variant="outline"
                               className="
                                 h-11 w-full lg:w-auto border-white/10 bg-white/3
-                                text-white font-bold uppercase tracking-widest
+                                text-white font-bold tracking-wide
                                 hover:bg-white/10 hover:border-white/20
                                 transition-all px-6 text-xs
                               "
                             >
-                              View Docket
+                              View docket
                               <ArrowUpRight className="ml-2 h-4 w-4" />
                             </Button>
                           </Link>

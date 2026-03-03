@@ -28,7 +28,7 @@ export default function CardPaymentPage() {
   const vaultId = params.vaultId as string;
 
   const vault = (vaults || []).find((v) => v.id === vaultId);
-  const amount = vault?.totalAmount || 0;
+  const amount = Number(vault?.totalAmount || 0);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
@@ -97,16 +97,16 @@ export default function CardPaymentPage() {
     const newErrors: Record<string, string> = {};
 
     if (!validateCardNumber(cleanNum)) {
-      newErrors.number = "Invalid card sequence";
+      newErrors.number = "Invalid card number";
     }
     if (!cardDetails.name.trim()) {
       newErrors.name = "Required field";
     }
     if (!cardDetails.expiry || cardDetails.expiry.length < 5) {
-      newErrors.expiry = "Invalid temporal limit";
+      newErrors.expiry = "Invalid expiry date";
     }
     if (!cardDetails.cvc || cardDetails.cvc.length < 3) {
-      newErrors.cvc = "Invalid CVC sequence";
+      newErrors.cvc = "Invalid CVC";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -116,7 +116,7 @@ export default function CardPaymentPage() {
 
     if (!isKycVerified) {
       setPaymentError(
-        "Identity verification (KYC) required to initialize deposit stream.",
+        "Identity verification (KYC) required to process payment.",
       );
       return;
     }
@@ -142,7 +142,7 @@ export default function CardPaymentPage() {
       setStep("success");
     } catch (err: any) {
       setIsProcessing(false);
-      setPaymentError(err.message || "Transaction failed. Protocol rejected.");
+      setPaymentError(err.message || "Transaction failed. Payment rejected.");
     }
   };
 
@@ -169,10 +169,10 @@ export default function CardPaymentPage() {
             {step === "form" && (
               <button
                 onClick={() => router.push(`/checkout/${vaultId}`)}
-                className="flex items-center gap-3 text-white/40 hover:text-emerald-500 transition-all text-[10px] font-black uppercase tracking-[0.3em] mb-12 group bg-white/2 border border-white/5 py-4 px-6 rounded-2xl italic"
+                className="flex items-center gap-3 text-white/40 hover:text-emerald-500 transition-all text-[10px] font-bold tracking-[0.3em] mb-12 group bg-white/2 border border-white/5 py-4 px-6 rounded-2xl italic"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                Reroute Payment Vector
+                Modify payment method
               </button>
             )}
 
@@ -195,7 +195,7 @@ export default function CardPaymentPage() {
                           <div className="w-10 h-6 bg-linear-to-r from-amber-400 to-amber-600 rounded-sm opacity-60" />
                         </div>
                         {cardDetails.type === "visa" && (
-                          <div className="italic font-black text-2xl tracking-tighter opacity-80">
+                          <div className="italic font-bold text-2xl tracking-tighter opacity-80">
                             VISA
                           </div>
                         )}
@@ -206,8 +206,8 @@ export default function CardPaymentPage() {
                           </div>
                         )}
                         {!cardDetails.type && (
-                          <div className="font-black italic text-xl opacity-20 tracking-widest uppercase">
-                            Terminal Card
+                          <div className="font-bold italic text-xl opacity-20 tracking-widest">
+                            Payment card
                           </div>
                         )}
                       </div>
@@ -217,18 +217,18 @@ export default function CardPaymentPage() {
                         </p>
                         <div className="flex justify-between items-end">
                           <div className="space-y-2">
-                            <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em] italic">
-                              Auth Holder
+                            <p className="text-[10px] text-white/30 font-bold tracking-[0.2em] italic">
+                              Cardholder name
                             </p>
-                            <p className="text-sm font-black uppercase tracking-widest italic truncate max-w-[180px]">
-                              {cardDetails.name || "UNIDENTIFIED ID"}
+                            <p className="text-sm font-bold tracking-widest italic truncate max-w-[180px]">
+                              {cardDetails.name || "Name on card"}
                             </p>
                           </div>
                           <div className="text-right space-y-2">
-                            <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em] italic">
-                              Exp Limit
+                            <p className="text-[10px] text-white/30 font-bold tracking-[0.2em] italic">
+                              Expiry date
                             </p>
-                            <p className="text-sm font-black tracking-widest italic font-mono">
+                            <p className="text-sm font-bold tracking-widest italic font-mono">
                               {cardDetails.expiry || "MM/YY"}
                             </p>
                           </div>
@@ -240,16 +240,16 @@ export default function CardPaymentPage() {
                   {/* CARD FORM */}
                   <div className="space-y-8">
                     <div className="text-left space-y-2 mb-8">
-                      <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter">
-                        Liquid Input
+                      <h2 className="text-3xl font-bold text-white italic tracking-tighter">
+                        Card details
                       </h2>
-                      <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.3em] italic">
+                      <p className="text-[10px] text-white/30 font-bold tracking-[0.3em] italic">
                         Enter secure card details
                       </p>
                     </div>
                     <div className="space-y-6">
                       <InputField
-                        label="Card Sequence"
+                        label="Card Number"
                         value={cardDetails.number}
                         error={errors.number}
                         onChange={(e) =>
@@ -258,7 +258,7 @@ export default function CardPaymentPage() {
                         placeholder="0000 0000 0000 0000"
                       />
                       <InputField
-                        label="Identity Authorization"
+                        label="Cardholder Name"
                         value={cardDetails.name}
                         error={errors.name}
                         onChange={(e) =>
@@ -271,7 +271,7 @@ export default function CardPaymentPage() {
                       />
                       <div className="grid grid-cols-2 gap-6">
                         <InputField
-                          label="Temporal Limit"
+                          label="Expiry Date"
                           value={cardDetails.expiry}
                           error={errors.expiry}
                           onChange={(e) =>
@@ -294,11 +294,9 @@ export default function CardPaymentPage() {
                     <button
                       onClick={handleCardSubmit}
                       disabled={!isKycVerified}
-                      className={`w-full h-20 ${isKycVerified ? "bg-emerald-500 hover:bg-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.2)]" : "bg-white/5 text-white/20 cursor-not-allowed"} text-black font-black uppercase tracking-[0.2em] text-xs rounded-4xl transition-all active:scale-[0.98]`}
+                      className={`w-full h-20 ${isKycVerified ? "bg-emerald-500 hover:bg-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.2)]" : "bg-white/5 text-white/20 cursor-not-allowed"} text-black font-bold text-xs rounded-4xl transition-all active:scale-[0.98]`}
                     >
-                      {isKycVerified
-                        ? "Initialize Deposit stream"
-                        : "KYC Required"}
+                      {isKycVerified ? "Pay safely" : "KYC Required"}
                     </button>
                   </div>
                 </motion.div>
@@ -333,17 +331,17 @@ function Sidebar({ amount }: SidebarProps) {
           >
             <Lock className="w-5 h-5 text-black" />
           </div>
-          <span className="text-white font-black tracking-tighter text-2xl uppercase italic">
+          <span className="text-white font-bold tracking-tighter text-2xl italic">
             Dayle
           </span>
         </div>
         <div className="space-y-10">
           <div className="space-y-3">
-            <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.4em] italic leading-none">
-              TOTAL SETTLEMENT
+            <p className="text-[10px] font-bold text-white/40 tracking-[0.4em] italic leading-none">
+              Total settlement
             </p>
-            <h1 className="text-6xl font-black text-white tracking-tighter font-mono flex items-baseline gap-2">
-              <span className="text-emerald-500 font-black text-3xl">$</span>
+            <h1 className="text-6xl font-bold text-white tracking-tighter font-mono flex items-baseline gap-2">
+              <span className="text-emerald-500 font-bold text-3xl">$</span>
               {amount.toLocaleString()}
             </h1>
           </div>
@@ -352,12 +350,12 @@ function Sidebar({ amount }: SidebarProps) {
       <div className="p-8 bg-emerald-500/5 border border-emerald-500/10 rounded-[2.5rem] relative group overflow-hidden">
         <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
         <div className="relative z-10">
-          <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 italic">
-            <Lock className="w-4 h-4" /> SECURE ESCROW
+          <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-bold tracking-[0.3em] mb-4 italic">
+            <Lock className="w-4 h-4" /> Secure escrow
           </div>
-          <p className="text-xs text-white/40 leading-relaxed font-black uppercase tracking-widest italic">
-            Assets are held in a high-integrity multi-sig vault terminal.
-            Settlement follows approval.
+          <p className="text-xs text-white/40 leading-relaxed font-bold tracking-widest italic">
+            Assets are held in a secure escrow account. Funds are released upon
+            your approval.
           </p>
         </div>
       </div>
@@ -373,18 +371,18 @@ interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 function InputField({ label, error, ...props }: InputFieldProps) {
   return (
     <div className="space-y-3">
-      <label className="text-[10px] font-black uppercase text-white/40 tracking-[0.3em] italic ml-1">
+      <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] italic ml-1">
         {label}
       </label>
       <input
         {...props}
-        className={`w-full bg-white/2 border ${error ? "border-red-500" : "border-white/5"} h-16 rounded-2xl px-6 text-white focus:border-emerald-500/30 outline-none transition-all placeholder:text-white/10 font-bold uppercase tracking-widest text-xs italic shadow-inner`}
+        className={`w-full bg-white/2 border ${error ? "border-red-500" : "border-white/5"} h-16 rounded-2xl px-6 text-white focus:border-emerald-500/30 outline-none transition-all placeholder:text-white/10 font-bold tracking-widest text-xs italic shadow-inner`}
       />
       {error && (
         <motion.p
           initial={{ opacity: 0, x: -5 }}
           animate={{ opacity: 1, x: 0 }}
-          className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-1 italic"
+          className="text-[9px] text-red-500 font-bold tracking-widest ml-1 italic"
         >
           {error}
         </motion.p>
@@ -397,7 +395,7 @@ function ProcessingOverlay({ amount }: { amount: number }) {
   const messages = [
     "Encrypting details...",
     "Authorizing with bank...",
-    "Locking vault deposit...",
+    "Securing escrow funds...",
   ];
   const [msgIdx, setMsgIdx] = useState(0);
 
@@ -420,10 +418,10 @@ function ProcessingOverlay({ amount }: { amount: number }) {
         />
         <Fingerprint className="w-12 h-12 text-emerald-500 absolute inset-0 m-auto animate-pulse" />
       </div>
-      <h3 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-4">
-        Securing Sum: ${amount}
+      <h3 className="text-3xl font-bold text-white italic tracking-tighter mb-4">
+        Total amount: ${amount}
       </h3>
-      <p className="text-[10px] font-black uppercase tracking-[0.5em] text-emerald-500/40 italic">
+      <p className="text-[10px] font-bold tracking-[0.5em] text-emerald-500/40 italic">
         {messages[msgIdx]}
       </p>
     </motion.div>
@@ -448,17 +446,17 @@ function FailureModal({
         <div className="w-20 h-20 bg-red-500/5 border border-red-500/10 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
           <XCircle className="w-10 h-10 text-red-500" />
         </div>
-        <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-3">
-          Interruption
+        <h3 className="text-2xl font-bold text-white italic tracking-tighter mb-3">
+          Payment failed
         </h3>
-        <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.2em] mb-10 leading-relaxed italic">
+        <p className="text-white/30 text-[10px] font-bold tracking-[0.2em] mb-10 leading-relaxed italic">
           {message}
         </p>
         <button
           onClick={onClose}
-          className="w-full bg-white text-black h-16 rounded-2xl font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:bg-slate-200 transition-all shadow-xl"
+          className="w-full bg-white text-black h-16 rounded-2xl font-bold tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:bg-slate-200 transition-all shadow-xl"
         >
-          <RefreshCcw className="w-4 h-4" /> Synchronize Retry
+          <RefreshCcw className="w-4 h-4" /> Try again
         </button>
       </div>
     </motion.div>
@@ -478,18 +476,18 @@ function SuccessScreen({ onContinue }: { onContinue: () => void }) {
         <CreditCard className="w-16 h-16 text-black relative z-10" />
       </div>
       <div className="space-y-4">
-        <h2 className="text-5xl font-black text-white tracking-tighter uppercase italic">
-          Deposit Locked
+        <h2 className="text-5xl font-bold text-white tracking-tighter italic">
+          Project funded
         </h2>
-        <p className="text-[10px] text-emerald-500 font-black uppercase tracking-[0.5em] italic">
-          Project Node is now fully liquified. Assets in Dayle Escrow.
+        <p className="text-[10px] text-emerald-500 font-bold tracking-[0.5em] italic">
+          Project account is now funded. Assets are protected in escrow.
         </p>
       </div>
       <button
         onClick={onContinue}
-        className="w-full h-20 bg-white text-black font-black uppercase tracking-[0.2em] text-sm rounded-4xl hover:bg-slate-200 transition-all shadow-2xl active:scale-[0.98]"
+        className="w-full h-20 bg-white text-black font-bold tracking-[0.2em] text-sm rounded-4xl hover:bg-slate-200 transition-all shadow-2xl active:scale-[0.98]"
       >
-        Procedural Dashboard
+        Go to dashboard
       </button>
     </motion.div>
   );

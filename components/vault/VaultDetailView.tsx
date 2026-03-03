@@ -30,7 +30,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
       setVault(data);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Failed to load vault");
+      setError(err.message || "Failed to load project details");
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-white/50 gap-4">
         <DotLoader size="lg" />
-        <p className="font-bold uppercase tracking-widest text-xs">
+        <p className="font-bold tracking-widest text-xs">
           Securing data link...
         </p>
       </div>
@@ -69,7 +69,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
   if (error || !vault) {
     return (
       <div className="text-white/70 py-10 text-center border border-white/10 rounded-lg bg-muted">
-        <p className="font-bold uppercase mb-2">{error || "Vault not found"}</p>
+        <p className="font-bold mb-2">{error || "Project not found"}</p>
         <Link href={`/${role}/vaults`}>
           <Button variant="outline" size="sm">
             Back to list
@@ -84,9 +84,9 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
   return (
     <div className="space-y-8">
       <header className="flex flex-col gap-4">
-        <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-wide text-emerald-400">
+        <div className="flex items-center gap-3 text-sm font-bold tracking-wide text-emerald-400">
           <ShieldCheck className="w-4 h-4" />
-          Vault Detail
+          Project details
         </div>
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2">
@@ -94,7 +94,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
             <p className="text-sm text-white/60 max-w-2xl">
               {vault.description}
             </p>
-            <div className="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-wide text-white">
+            <div className="flex flex-wrap items-center gap-4 text-xs font-bold tracking-wide text-white">
               <span>Client: {vault.clientName}</span>
               <span>
                 Freelancer:{" "}
@@ -113,7 +113,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
             <div className="text-3xl font-bold text-white">
               ${totalAmount.toLocaleString()}
             </div>
-            <span className="text-xs font-bold uppercase tracking-wide text-white">
+            <span className="text-xs font-bold tracking-wide text-white">
               Total locked
             </span>
           </div>
@@ -132,7 +132,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
             <CardHeader className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <CardTitle className="text-white text-lg">
-                  Vault Requirements
+                  Project requirements
                 </CardTitle>
               </div>
             </CardHeader>

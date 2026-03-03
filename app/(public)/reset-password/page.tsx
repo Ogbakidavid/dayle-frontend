@@ -59,14 +59,14 @@ export default function ResetPasswordPage() {
             <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-emerald-500/20 text-black">
               <Shield className="w-7 h-7 stroke-[3px]" />
             </div>
-            <span className="font-black tracking-tighter text-white text-3xl uppercase">
+            <span className="font-bold tracking-tighter text-white text-3xl">
               Dayle
             </span>
           </Link>
 
-          <h1 className="text-6xl lg:text-7xl font-black text-white leading-[0.95] uppercase tracking-tighter mb-12">
+          <h1 className="text-6xl lg:text-7xl font-bold text-white leading-[0.95] tracking-tighter mb-12">
             Secure <br />
-            <span className="text-emerald-500 italic">Access.</span>
+            <span className="text-emerald-500 italic">access.</span>
           </h1>
 
           <div className="space-y-8">
@@ -89,7 +89,7 @@ export default function ResetPasswordPage() {
                   <CheckCircle2 className="w-6 h-6 text-emerald-500 transition-transform group-hover:scale-110" />
                 </div>
                 <div>
-                  <h4 className="text-white font-black uppercase text-sm tracking-wide mb-1">
+                  <h4 className="text-white font-bold text-sm tracking-wide mb-1">
                     {item.title}
                   </h4>
                   <p className="text-white font-bold text-lg leading-snug">
@@ -111,10 +111,10 @@ export default function ResetPasswordPage() {
           {!submitted ? (
             <>
               <div className="mb-12">
-                <h2 className="text-4xl font-black text-white tracking-tight uppercase leading-none">
-                  Reset Password
+                <h2 className="text-4xl font-bold text-white tracking-tight leading-none">
+                  Reset password
                 </h2>
-                <p className="text-white mt-4 text-sm font-bold uppercase tracking-wide leading-relaxed">
+                <p className="text-white mt-4 text-sm font-bold tracking-wide leading-relaxed">
                   Create a strong new password for your account.
                 </p>
               </div>
@@ -123,9 +123,9 @@ export default function ResetPasswordPage() {
                 <div className="space-y-3">
                   <Label
                     htmlFor="password"
-                    className="text-sm font-black uppercase tracking-wide text-white ml-1"
+                    className="text-sm font-bold tracking-wide text-white ml-1"
                   >
-                    New Password
+                    New password
                   </Label>
                   <div className="relative group">
                     <PasswordInput
@@ -141,9 +141,9 @@ export default function ResetPasswordPage() {
                 <div className="space-y-3">
                   <Label
                     htmlFor="confirmPassword"
-                    className="text-sm font-black uppercase tracking-wide text-white ml-1"
+                    className="text-sm font-bold tracking-wide text-white ml-1"
                   >
-                    Confirm New Password
+                    Confirm new password
                   </Label>
                   <div className="relative group">
                     <PasswordInput
@@ -158,7 +158,7 @@ export default function ResetPasswordPage() {
 
                 {error && (
                   <div className="flex items-center gap-3 text-red-400 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <p className="text-sm font-bold uppercase tracking-wide leading-relaxed">
+                    <p className="text-sm font-bold tracking-wide leading-relaxed">
                       {error}
                     </p>
                   </div>
@@ -167,7 +167,7 @@ export default function ResetPasswordPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-16 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-black text-base uppercase tracking-wide transition-all shadow-xl active:scale-[0.98]"
+                  className="w-full h-16 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-bold text-base transition-all shadow-xl active:scale-[0.98]"
                 >
                   {loading ? (
                     <div className="flex items-center gap-3">
@@ -188,19 +188,19 @@ export default function ResetPasswordPage() {
                 <CheckCircle2 className="w-8 h-8 text-black" />
               </div>
               <div>
-                <h3 className="text-2xl font-black text-white uppercase tracking-tight">
-                  Password Reset!
+                <h3 className="text-2xl font-bold text-white tracking-tight">
+                  Password reset!
                 </h3>
-                <p className="text-white/70 text-sm font-bold uppercase tracking-wide mt-2 leading-relaxed">
+                <p className="text-white/70 text-sm font-bold tracking-wide mt-2 leading-relaxed">
                   Your password has been successfully updated. You can now login
                   with your new credentials.
                 </p>
               </div>
               <Button
                 onClick={() => router.push("/login")}
-                className="w-full h-14 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-xl font-black text-sm uppercase tracking-wide transition-all shadow-xl"
+                className="w-full h-14 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-xl font-bold text-sm transition-all shadow-xl"
               >
-                Go to Login
+                Go to login
               </Button>
             </div>
           )}

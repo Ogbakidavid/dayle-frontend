@@ -133,8 +133,8 @@ export default function InteractiveCard({
                   </svg>
                 )}
                 {!["visa", "mastercard"].includes(cardType) && (
-                  <span className="text-white font-bold tracking-wide italic opacity-80 uppercase">
-                    {cardType || "CARD"}
+                  <span className="text-white font-bold tracking-wide italic opacity-80">
+                    {cardType || "Card"}
                   </span>
                 )}
               </div>
@@ -154,15 +154,15 @@ export default function InteractiveCard({
 
               <div className="flex justify-between items-end">
                 <div className="space-y-1">
-                  <span className="text-sm text-white-400 uppercase tracking-wide block">
-                    Card Holder
+                  <span className="text-sm text-white-400 tracking-wide block">
+                    Card holder
                   </span>
-                  <p className="text-sm text-white font-medium uppercase tracking-wide truncate max-w-[200px]">
-                    {cardHolder || "YOUR NAME"}
+                  <p className="text-sm text-white font-medium tracking-wide truncate max-w-[200px]">
+                    {cardHolder || "Your name"}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-sm text-white-400 uppercase tracking-wide block text-right">
+                  <span className="text-sm text-white-400 tracking-wide block text-right">
                     Expires
                   </span>
                   <p className="text-sm text-white font-medium tracking-wide">
@@ -187,8 +187,8 @@ export default function InteractiveCard({
           <div className="mt-6 px-6">
             <div className="space-y-1">
               <div className="flex items-center justify-end">
-                <span className="text-sm text-white-400 mr-2 uppercase">
-                  Security Code
+                <span className="text-sm text-white-400 mr-2">
+                  Security code
                 </span>
               </div>
               <div className="h-10 bg-white flex items-center justify-end px-3 rounded-sm">

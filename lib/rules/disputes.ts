@@ -8,7 +8,7 @@ export const DISPUTE_REASON_CODES = [
     description: "Objective verification was applied incorrectly.",
     verificationResults: ["FAIL", "FLAGGED"],
     statuses: [VaultStatus.FUNDED], // Assuming FUNDED is the state where review happens
-    requiresRequirementRef: true,
+    requiresDeliverableRef: true,
   },
   {
     code: "REQUIREMENT_MISMATCH",
@@ -16,7 +16,7 @@ export const DISPUTE_REASON_CODES = [
     description: "Deliverable meets requirement but was flagged.",
     verificationResults: ["FAIL", "FLAGGED"],
     statuses: [VaultStatus.FUNDED],
-    requiresRequirementRef: true,
+    requiresDeliverableRef: true,
   },
   // Process & Security (any verification result)
   {
@@ -25,7 +25,7 @@ export const DISPUTE_REASON_CODES = [
     description: "System process was circumvented.",
     verificationResults: ["PASS", "FAIL", "FLAGGED", "HUMAN_REVIEW"],
     statuses: [VaultStatus.FUNDED, VaultStatus.DISPUTED],
-    requiresRequirementRef: false,
+    requiresDeliverableRef: false,
   },
   {
     code: "FRAUD",
@@ -33,7 +33,7 @@ export const DISPUTE_REASON_CODES = [
     description: "Evidence of fake data or bad faith.",
     verificationResults: ["PASS", "FAIL", "FLAGGED", "HUMAN_REVIEW"],
     statuses: [VaultStatus.FUNDED, VaultStatus.DISPUTED],
-    requiresRequirementRef: false,
+    requiresDeliverableRef: false,
   },
   {
     code: "SECURITY",
@@ -41,7 +41,7 @@ export const DISPUTE_REASON_CODES = [
     description: "Malicious code or security risk detected.",
     verificationResults: ["PASS", "FAIL", "FLAGGED", "HUMAN_REVIEW"],
     statuses: [VaultStatus.FUNDED, VaultStatus.DISPUTED],
-    requiresRequirementRef: false,
+    requiresDeliverableRef: false,
   },
   // Client Approval Disputes (when AI passed but client rejected)
   {
@@ -50,7 +50,7 @@ export const DISPUTE_REASON_CODES = [
     description: "Client rejected valid work repeatedly/maliciously.",
     verificationResults: ["PASS"],
     statuses: [VaultStatus.FUNDED],
-    requiresRequirementRef: false,
+    requiresDeliverableRef: false,
   },
   {
     code: "SCOPE_CHANGE",
@@ -58,11 +58,11 @@ export const DISPUTE_REASON_CODES = [
     description: "Rejection due to requirements not in original scope.",
     verificationResults: ["PASS"],
     statuses: [VaultStatus.FUNDED],
-    requiresRequirementRef: false,
+    requiresDeliverableRef: false,
   },
 ];
 
-export function getDisputeEligibility(vault: any, requirementId?: string | null) {
+export function getDisputeEligibility(vault: any, deliverableTitle?: string | null) {
   if (!vault) {
     return {
       eligible: false,

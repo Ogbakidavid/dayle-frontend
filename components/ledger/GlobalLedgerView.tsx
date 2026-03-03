@@ -82,20 +82,20 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
       <header className="space-y-3">
         <motion.div
           variants={itemVariants}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 italic"
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-[10px] font-bold tracking-wide text-emerald-400 italic"
         >
           <ShieldCheck className="w-3.5 h-3.5" />
-          Financial Activity Protocol
+          Financial activity protocol
         </motion.div>
         <motion.h1
           variants={itemVariants}
-          className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase italic"
+          className="text-3xl md:text-5xl font-bold text-white tracking-tighter italic"
         >
-          {role === "client" ? "Ledger Management" : "Earning History"}
+          {role === "client" ? "Ledger management" : "Earning history"}
         </motion.h1>
         <motion.p
           variants={itemVariants}
-          className="text-[10px] md:text-xs font-black text-white/40 uppercase tracking-[0.2em] max-w-2xl leading-relaxed"
+          className="text-[10px] md:text-xs font-bold text-white/40 tracking-wide max-w-2xl leading-relaxed"
         >
           Synchronized transaction log reflecting all capital movements.
         </motion.p>
@@ -142,12 +142,12 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                 )}
               />
               <CardContent className="py-8 relative z-10">
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 group-hover:text-white/50 transition-colors italic">
+                <p className="text-[9px] font-bold tracking-wide text-white/30 mb-2 group-hover:text-white/50 transition-colors italic">
                   {stat.label}
                 </p>
                 <p
                   className={cn(
-                    "text-4xl font-black tracking-tighter font-mono",
+                    "text-4xl font-bold tracking-tighter font-mono",
                     stat.color,
                   )}
                 >
@@ -169,11 +169,11 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search ledger entries..."
-            className="w-full pl-12 pr-4 py-4 bg-[#0D0D0E] font-black uppercase tracking-widest border border-white/5 rounded-2xl text-xs text-white placeholder:text-white/5 focus:outline-none focus:border-emerald-500/30 shadow-xl transition-all"
+            className="w-full pl-12 pr-4 py-4 bg-[#0D0D0E] font-bold tracking-wide border border-white/5 rounded-2xl text-xs text-white placeholder:text-white/5 focus:outline-none focus:border-emerald-500/30 shadow-xl transition-all"
           />
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-[9px] font-black text-white/30 uppercase tracking-widest hidden sm:block italic">
+          <div className="text-[9px] font-bold text-white/30 tracking-wide hidden sm:block italic">
             Real-time verification active
           </div>
         </div>
@@ -187,16 +187,16 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-white/5 bg-white/1">
-                    <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 italic">
-                      Transaction Node
+                    <th className="px-6 py-5 text-[10px] font-bold tracking-wide text-white/20 italic">
+                      Transaction node
                     </th>
-                    <th className="hidden md:table-cell px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 italic">
-                      Project Axis
+                    <th className="hidden md:table-cell px-6 py-5 text-[10px] font-bold tracking-wide text-white/20 italic">
+                      Project axis
                     </th>
-                    <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 italic">
+                    <th className="px-6 py-5 text-[10px] font-bold tracking-wide text-white/20 italic">
                       State
                     </th>
-                    <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 italic text-right">
+                    <th className="px-6 py-5 text-[10px] font-bold tracking-wide text-white/20 italic text-right">
                       Value (USD)
                     </th>
                   </tr>
@@ -207,8 +207,8 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                       <td colSpan={4} className="py-20 text-center">
                         <div className="flex flex-col items-center justify-center gap-4">
                           <div className="w-8 h-8 border-2 border-white/5 border-t-emerald-500 rounded-full animate-spin" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-white/20">
-                            Syncing Node History
+                          <span className="text-[10px] font-bold tracking-wide text-white/20">
+                            Syncing node history
                           </span>
                         </div>
                       </td>
@@ -220,7 +220,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                           <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/5 group">
                             <Search className="w-6 h-6 text-white/10 group-hover:text-white/20 transition-all" />
                           </div>
-                          <span className="text-[10px] font-black uppercase tracking-widest text-white/20">
+                          <span className="text-[10px] font-bold tracking-wide text-white/20">
                             No matching records detected
                           </span>
                         </div>
@@ -258,14 +258,14 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                                 )}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-sm text-white font-black uppercase tracking-tight truncate group-hover:text-emerald-400 transition-colors italic">
+                                <p className="text-sm text-white font-bold tracking-tight truncate group-hover:text-emerald-400 transition-colors italic">
                                   {entry.description || entry.id}
                                 </p>
-                                <p className="text-[9px] uppercase font-black tracking-widest text-white/20 mt-1">
-                                  SIG: {entry.id}
+                                <p className="text-[9px] font-bold tracking-wide text-white/20 mt-1">
+                                  Sig: {entry.id}
                                 </p>
                                 <div className="md:hidden mt-2 flex items-center gap-2">
-                                  <span className="text-[9px] text-white/40 font-black uppercase tracking-widest truncate max-w-[120px]">
+                                  <span className="text-[9px] text-white/40 font-bold tracking-wide truncate max-w-[120px]">
                                     {vault?.title || "Vault"}
                                   </span>
                                   <span className="w-1 h-1 rounded-full bg-white/20" />
@@ -279,10 +279,10 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             </div>
                           </td>
                           <td className="hidden md:table-cell px-6 py-6 font-['Poppins',sans-serif]">
-                            <p className="text-xs text-white/70 font-black uppercase tracking-tight italic truncate max-w-[200px]">
-                              {vault?.title || "Independent Transaction"}
+                            <p className="text-xs text-white/70 font-bold tracking-tight italic truncate max-w-[200px]">
+                              {vault?.title || "Independent transaction"}
                             </p>
-                            <p className="text-[9px] text-white/20 font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5 font-mono">
+                            <p className="text-[9px] text-white/20 font-bold tracking-wide mt-1.5 flex items-center gap-1.5 font-mono">
                               <Clock className="w-3 h-3" />
                               {new Date(entry.createdAt).toLocaleDateString(
                                 "en-US",
@@ -298,20 +298,21 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             <div className="flex justify-center sm:justify-start">
                               <span
                                 className={cn(
-                                  "px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border shadow-sm italic transition-all",
+                                  "px-3 py-1.5 text-[9px] font-bold tracking-wide rounded-full border shadow-sm italic transition-all",
                                   statusStyles[entry.status] ||
                                     "bg-white/5 border-white/10 text-white/40",
                                 )}
                               >
-                                {entry.status}
+                                {entry.status.charAt(0) +
+                                  entry.status.slice(1).toLowerCase()}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-6 text-right">
-                            <p className="text-base font-black text-white font-mono tracking-widest leading-none">
+                            <p className="text-base font-bold text-white font-mono tracking-widest leading-none">
                               ${Math.abs(entry.amount).toLocaleString()}
                             </p>
-                            <p className="text-[9px] text-white/20 font-black uppercase tracking-widest mt-1 italic">
+                            <p className="text-[9px] text-white/20 font-bold tracking-wide mt-1 italic">
                               {entry.amount < 0 ? "Debit" : "Credit"}
                             </p>
                           </td>

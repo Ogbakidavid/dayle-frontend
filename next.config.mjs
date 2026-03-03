@@ -15,8 +15,8 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: https: blob:",
               // Allow connections to Privy, your backend, and blockchain RPCs
-              "connect-src 'self' https://auth.privy.io https://*.privy.io https://celo-mainnet.infura.io https://forno.celo.org http://localhost:* ws://localhost:* wss://*.privy.io https://*.walletconnect.com wss://*.walletconnect.org https://api.pwnedpasswords.com https://public.pimlico.io data: blob:",
-              "frame-src 'self' https://auth.privy.io https://*.privy.io https://*.walletconnect.com https://*.walletconnect.org data:",
+              "connect-src 'self' https://auth.privy.io https://*.privy.io https://celo-mainnet.infura.io https://forno.celo.org http://localhost:* ws://localhost:* wss://*.privy.io https://*.walletconnect.com wss://*.walletconnect.org https://api.pwnedpasswords.com https://public.pimlico.io https://*.didit.me data: blob:",
+              "frame-src 'self' https://auth.privy.io https://*.privy.io https://*.walletconnect.com https://*.walletconnect.org https://verify.didit.me https://*.didit.me data:",
               "worker-src 'self' blob:",
               "child-src 'self' blob:",
             ].join('; '),

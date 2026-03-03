@@ -84,7 +84,7 @@ export default function VaultsPage() {
       color: "text-emerald-500",
     },
     {
-      label: "Active Vaults",
+      label: "Active Projects",
       value: activeCount.toString(),
       change: "+0",
       icon: Zap,
@@ -110,11 +110,11 @@ export default function VaultsPage() {
         {/* 1. TOP NAVIGATION / HEADER */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
           <motion.div variants={itemVariants} className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase">
-              Financial Vaults
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-white">
+              Secured projects
             </h1>
-            <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-wide">
-              Overview of your secured financial vaults
+            <p className="text-xs md:text-sm text-gray-400 font-bold">
+              Overview of your secured project accounts
             </p>
           </motion.div>
           <motion.div
@@ -123,15 +123,15 @@ export default function VaultsPage() {
           >
             <Button
               variant="outline"
-              className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all font-bold uppercase tracking-wide"
+              className="bg-transparent border-white/10 hover:bg-white/5 text-white h-11 px-5 rounded-xl transition-all font-bold tracking-wide"
             >
               <Filter className="w-4 h-4 mr-2 text-gray-400" />
               Filters
             </Button>
             <Link href="/client/create-vault" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto bg-white text-black hover:bg-emerald-400 hover:text-black h-11 px-6 rounded-xl font-black uppercase tracking-wide shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all">
+              <Button className="w-full sm:w-auto bg-white text-black hover:bg-emerald-400 hover:text-black h-11 px-6 rounded-xl font-bold tracking-wide shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all">
                 <Plus className="w-4 h-4 mr-2" strokeWidth={3} />
-                New Vault
+                New project
               </Button>
             </Link>
           </motion.div>
@@ -155,14 +155,14 @@ export default function VaultsPage() {
                 >
                   <stat.icon className="w-5 h-5" />
                 </div>
-                <span className="text-sm font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full uppercase tracking-wide">
+                <span className="text-sm font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full tracking-wide">
                   {stat.change}
                 </span>
               </div>
-              <p className="text-sm font-black uppercase tracking-wide text-gray-400 mb-2">
+              <p className="text-sm font-bold tracking-wide text-gray-400 mb-2">
                 {stat.label}
               </p>
-              <h2 className="text-3xl font-black text-white tracking-tighter">
+              <h2 className="text-3xl font-bold text-white tracking-tighter">
                 {stat.value}
               </h2>
             </motion.div>
@@ -174,10 +174,10 @@ export default function VaultsPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
           <input
             type="search"
-            placeholder="Search vaults..."
+            placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 md:py-4 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner font-bold uppercase tracking-wide text-sm md:text-base"
+            className="w-full pl-12 pr-4 py-3 md:py-4 bg-[#0D0D0E] border border-white/5 rounded-2xl focus:outline-none focus:border-emerald-500/50 text-white placeholder-slate-600 transition-all shadow-inner font-bold tracking-wide text-sm md:text-base"
           />
         </motion.div>
 
@@ -190,16 +190,16 @@ export default function VaultsPage() {
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-white/5 bg-white/1">
-                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide">
-                    Vault Detail
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-gray-400 tracking-wide">
+                    Project detail
                   </th>
-                  <th className="hidden lg:table-cell px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide">
+                  <th className="hidden lg:table-cell px-6 py-4 text-[11px] font-bold text-gray-400 tracking-wide">
                     Counterparty
                   </th>
-                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide">
+                  <th className="hidden sm:table-cell px-6 py-4 text-[11px] font-bold text-gray-400 tracking-wide">
                     Status
                   </th>
-                  <th className="px-4 md:px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-wide text-right">
+                  <th className="px-4 md:px-6 py-4 text-[11px] font-bold text-gray-400 tracking-wide text-right">
                     Value
                   </th>
                   <th className="px-4 md:px-6 py-4"></th>
@@ -210,18 +210,18 @@ export default function VaultsPage() {
                   <tr>
                     <td
                       colSpan={5}
-                      className="px-6 py-10 text-center text-gray-500 font-bold uppercase tracking-wide"
+                      className="px-6 py-10 text-center text-gray-500 font-bold tracking-wide"
                     >
-                      Loading vaults...
+                      Loading projects...
                     </td>
                   </tr>
                 ) : paginatedVaults.length === 0 ? (
                   <tr>
                     <td
                       colSpan={5}
-                      className="px-6 py-10 text-center text-gray-500 font-bold uppercase tracking-wide"
+                      className="px-6 py-10 text-center text-gray-500 font-bold tracking-wide"
                     >
-                      No vaults found.
+                      No projects found.
                     </td>
                   </tr>
                 ) : (
@@ -239,22 +239,22 @@ export default function VaultsPage() {
                             <FileText className="w-5 h-5" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-black text-white uppercase tracking-wide group-hover:text-emerald-400 transition-colors truncate">
+                            <p className="text-sm font-bold text-white tracking-wide group-hover:text-emerald-400 transition-colors truncate">
                               {vault.title}
                             </p>
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
-                              <p className="text-[10px] md:text-sm text-gray-400 font-bold uppercase tracking-wide">
+                              <p className="text-[10px] md:text-sm text-gray-400 font-bold tracking-wide">
                                 {vault.createdAt
                                   ? new Date(
                                       vault.createdAt,
                                     ).toLocaleDateString()
                                   : "Pending"}
                               </p>
-                              <span className="sm:hidden text-[10px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded-sm border border-emerald-500/20 font-black uppercase tracking-wide">
+                              <span className="sm:hidden text-[10px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded-sm border border-emerald-500/20 font-bold tracking-wide">
                                 {vault.status}
                               </span>
                             </div>
-                            <p className="lg:hidden text-[10px] text-gray-400 font-bold uppercase tracking-wide mt-1 truncate">
+                            <p className="lg:hidden text-[10px] text-gray-400 font-bold tracking-wide mt-1 truncate">
                               {vault.freelancerName ||
                                 vault.freelancerEmail ||
                                 vault.freelancer?.email ||
@@ -271,7 +271,7 @@ export default function VaultsPage() {
                               vault.freelancer?.email ||
                               "U")[0].toUpperCase()}
                           </div>
-                          <span className="text-sm text-gray-400 font-bold uppercase tracking-wide truncate max-w-[150px]">
+                          <span className="text-sm text-gray-400 font-bold tracking-wide truncate max-w-[150px]">
                             {vault.freelancerName ||
                               vault.freelancerEmail ||
                               vault.freelancer?.email ||
@@ -282,7 +282,7 @@ export default function VaultsPage() {
                       <td className="hidden sm:table-cell px-6 py-5">
                         <div
                           className={cn(
-                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[11px] md:text-sm font-bold uppercase tracking-wide",
+                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[11px] md:text-sm font-bold tracking-wide",
                             vault.status === "active"
                               ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500"
                               : vault.status === "completed"
@@ -308,7 +308,7 @@ export default function VaultsPage() {
                           $
                           {(vault.totalAmount || vault.amount).toLocaleString()}
                         </p>
-                        <p className="text-[10px] md:text-sm text-gray-400 font-bold uppercase tracking-wide">
+                        <p className="text-[10px] md:text-sm text-gray-400 font-bold tracking-wide">
                           USD
                         </p>
                       </td>
@@ -339,9 +339,9 @@ export default function VaultsPage() {
         {/* 5. FOOTER SUMMARY */}
         {!loading && filteredVaults.length > 0 && (
           <footer className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-white/5 font-['Poppins',sans-serif]">
-            <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wide text-center sm:text-left">
+            <p className="text-xs md:text-sm font-bold text-gray-400 tracking-wide text-center sm:text-left">
               Displaying {paginatedVaults.length} of {filteredVaults.length}{" "}
-              escrow vaults
+              escrow projects
             </p>
             <div className="flex gap-2">
               <Button
@@ -352,7 +352,7 @@ export default function VaultsPage() {
                   setCurrentPage((prev) => Math.max(1, prev - 1));
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white transition-all font-bold uppercase tracking-wide"
+                className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white transition-all font-bold tracking-wide"
               >
                 Previous
               </Button>
@@ -388,7 +388,7 @@ export default function VaultsPage() {
                   setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white transition-all font-bold uppercase tracking-wide"
+                className="h-9 px-4 text-sm border-white/10 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white transition-all font-bold tracking-wide"
               >
                 Next
               </Button>

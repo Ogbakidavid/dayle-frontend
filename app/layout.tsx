@@ -13,7 +13,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Dayle - Work with Certainty",
-  description: "Bank-grade infrastructure for vault-based escrow payments.",
+  description: "Bank-grade infrastructure for secure escrow payments.",
 };
 
 export interface RootLayoutProps {
