@@ -79,7 +79,7 @@ export default function BankTransferPage() {
       }
     };
     fetchBankDetails();
-  }, [vaultId, router]);
+  }, [vaultId, router, currency]);
 
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);

@@ -411,7 +411,7 @@ export default function LandingPage() {
             <h2 className="text-2xl md:text-4xl font-bold tracking-tight text-slate-900 max-w-4xl">
               Every project starts with a{" "}
               <span className="text-emerald-500">deliverables checklist.</span>{" "}
-              You define what "done" looks like before work begins.
+              You define what &quot;done&quot; looks like before work begins.
             </h2>
 
             <p className="mt-6 text-slate-600 text-sm md:text-base max-w-2xl">

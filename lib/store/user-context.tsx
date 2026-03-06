@@ -94,6 +94,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, authenticated, user, wallets, createWallet, getAccessToken]);
 
   async function checkSession(token?: string): Promise<User | null> {

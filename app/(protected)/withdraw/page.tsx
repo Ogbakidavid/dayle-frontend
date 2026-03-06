@@ -285,7 +285,7 @@ export default function FreelancerWithdrawPage() {
       };
       updateStatus();
     }
-  }, [step, amount, bankDetails]);
+  }, [step, amount, bankDetails, selectedCurrency]);
 
   return (
     <div className="min-h-screen bg-white text-slate-600 font-['Poppins',sans-serif] antialiased overflow-hidden">
@@ -314,7 +314,7 @@ export default function FreelancerWithdrawPage() {
                 <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em] italic leading-none uppercase">
                   Withdrawal value
                 </p>
-                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-7xl italic flex items-baseline gap-2 italic">
+                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-7xl italic flex items-baseline gap-2">
                   <span className="text-emerald-600 font-bold text-3xl">$</span>
                   {amount.toLocaleString()}
                 </h1>
@@ -878,7 +878,7 @@ export default function FreelancerWithdrawPage() {
                           Net settlement
                         </span>
                         <div className="text-right">
-                          <span className="text-4xl font-bold text-slate-900 tracking-widest italic italic">
+                          <span className="text-4xl font-bold text-slate-900 tracking-widest italic">
                             ${amount.toLocaleString()}
                           </span>
                           <p className="text-[10px] text-slate-600 font-black tracking-widest mt-1">
@@ -967,7 +967,7 @@ export default function FreelancerWithdrawPage() {
                       <span className="text-[10px] font-bold tracking-[0.3em] text-slate-600 uppercase italic">
                         Asset released
                       </span>
-                      <span className="text-3xl font-bold text-emerald-600 italic italic tracking-tighter">
+                      <span className="text-3xl font-bold text-emerald-600 italic tracking-tighter">
                         ${amount.toLocaleString()}
                       </span>
                     </div>
