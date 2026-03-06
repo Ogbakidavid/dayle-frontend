@@ -69,7 +69,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
 
         {vault && policy.requiresRequirementId && (
           <div className="space-y-2">
-            <p className="text-[10px] font-bold tracking-widest text-white/40">
+            <p className="text-[10px] font-bold tracking-widest text-slate-900">
               Requirement scope
             </p>
             <select
@@ -88,7 +88,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
         )}
 
         <div className="space-y-3">
-          <p className="text-[10px] font-bold tracking-widest text-white/40">
+          <p className="text-[10px] font-bold tracking-widest text-slate-900">
             Reason codes
           </p>
           <div className="grid gap-2">

@@ -88,7 +88,7 @@ export default function SupportPage() {
             </p>
 
             <div className="mt-6">
-              <span className="text-xs font-bold tracking-[0.22em] text-white/40">
+              <span className="text-xs font-bold tracking-[0.22em] text-slate-900">
                 Coming soon
               </span>
             </div>

@@ -135,7 +135,7 @@ export default function FreelancerVaultsPage() {
               <p className="text-[10px] font-bold tracking-[0.2em] text-white/30 mb-2 group-hover:text-white/50 transition-colors">
                 {stat.label}
               </p>
-              <h2 className="text-3xl font-bold text-white tracking-widest font-mono">
+              <h2 className="text-3xl font-bold text-white tracking-widest italic">
                 {stat.value}
               </h2>
             </motion.div>
@@ -246,7 +246,7 @@ export default function FreelancerVaultsPage() {
                             : vault.status === "completed" ||
                                 vault.status === "CLOSED"
                               ? "bg-blue-500/5 border-blue-500/20 text-blue-500"
-                              : "bg-white/5 border-white/10 text-white/40",
+                              : "bg-white/5 border-white/10 text-slate-900",
                         )}
                       >
                         <div
@@ -265,7 +265,7 @@ export default function FreelancerVaultsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-6 text-right">
-                      <p className="text-base font-bold text-white tracking-widest font-mono">
+                      <p className="text-base font-bold text-white tracking-widest italic">
                         ${(vault.totalAmount || vault.amount).toLocaleString()}
                       </p>
                       <p className="text-[9px] text-white/20 font-bold tracking-[0.2em] mt-1 italic">
@@ -299,7 +299,7 @@ export default function FreelancerVaultsPage() {
         <footer className="flex flex-col sm:flex-row items-center justify-between gap-6 py-10 border-t border-white/5">
           <p className="text-[10px] font-bold text-white/20 tracking-[0.2em] italic">
             Securing{" "}
-            <span className="text-white/40">{paginatedVaults.length}</span> /{" "}
+            <span className="text-slate-900">{paginatedVaults.length}</span> /{" "}
             {filteredVaults.length} Escrow Projects
           </p>
           <div className="flex items-center gap-3">
@@ -311,7 +311,7 @@ export default function FreelancerVaultsPage() {
                 setCurrentPage((prev) => Math.max(1, prev - 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-11 px-6 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 hover:text-white transition-all font-bold tracking-widest disabled:opacity-20"
+              className="h-11 px-6 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-slate-900 hover:text-white transition-all font-bold tracking-widest disabled:opacity-20"
             >
               Previous
             </Button>
@@ -342,7 +342,7 @@ export default function FreelancerVaultsPage() {
                 setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-11 px-6 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 hover:text-white transition-all font-bold tracking-widest disabled:opacity-20"
+              className="h-11 px-6 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-slate-900 hover:text-white transition-all font-bold tracking-widest disabled:opacity-20"
             >
               Next
             </Button>

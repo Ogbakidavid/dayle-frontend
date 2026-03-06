@@ -142,11 +142,16 @@ export const api = {
       return await request("/ledger/balance");
     },
 
-    withdraw: async (amount: number, bankDetails: any, opts: any = {}): Promise<any> => {
+    withdraw: async (
+      amount: number,
+      currency: string,
+      bankDetails: any,
+      opts: any = {},
+    ): Promise<any> => {
       const { idempotencyKey } = opts;
       return await request("/ledger/withdraw", {
         method: "POST",
-        body: { amount, bankDetails, idempotencyKey },
+        body: { amount, currency, bankDetails, idempotencyKey },
       });
     },
 

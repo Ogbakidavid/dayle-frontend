@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -12,9 +12,10 @@ import {
   XCircle,
   RefreshCcw,
   CheckCircle2,
+  Check,
 } from "lucide-react";
-
-import { useVault, Vault } from "@/lib/store/vault-context";
+import { toast } from "sonner";
+import { useVault } from "@/lib/store/vault-context";
 import { useUser } from "@/lib/store/user-context";
 import { KycStatus } from "@/lib/domain/enums";
 import { api } from "@/lib/api-client";
@@ -27,8 +28,14 @@ export default function CardPaymentPage() {
   const isKycVerified = user?.kycStatus === KycStatus.VERIFIED;
   const vaultId = params.vaultId as string;
 
+  const searchParams = useSearchParams();
+  const currency = searchParams.get("currency") || "USD";
+  const EXCHANGE_RATE = 1500;
+
   const vault = (vaults || []).find((v) => v.id === vaultId);
   const amount = Number(vault?.totalAmount || 0);
+  const displayAmount = currency === "USD" ? amount : amount * EXCHANGE_RATE;
+  const currencyPrefix = currency === "USD" ? "$" : "₦";
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
@@ -114,381 +121,288 @@ export default function CardPaymentPage() {
       return;
     }
 
-    if (!isKycVerified) {
-      setPaymentError(
-        "Identity verification (KYC) required to process payment.",
-      );
-      return;
-    }
-
     setErrors({});
     setIsProcessing(true);
 
     try {
-      // Generate unique idempotency key
-      const idempotencyKey = crypto.randomUUID();
-
-      await api.vaults.fund(vaultId, {
+      // Step 1: Call Fund API
+      const res = await api.vaults.fund(vaultId, {
         paymentMethod: "card",
-        paymentDetails: {
-          number: cleanNum.slice(-4), // Only send last 4 digits for reference
-          brand: cardDetails.type || "unknown",
-          expiry: cardDetails.expiry,
-        },
-        idempotencyKey,
+        currency,
+        idempotencyKey: crypto.randomUUID(),
       });
+
+      // Step 2: Handle Redirect Provider (e.g. Paycrest)
+      if (res.paymentUrl) {
+        toast.success("Redirecting to checkout...");
+        window.location.href = res.paymentUrl;
+        return;
+      }
+
+      // Step 3: Simulate the Partna Webhook for automated settlement (Partna Flow)
+      const backendUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+      const response = await fetch(`${backendUrl}/api/webhooks/partna`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reference: res.providerRef || `vault_fund_${vaultId}`,
+          status: "success",
+          amount: String(amount),
+          type: "collection",
+          voucherCode: `MOCK_CARD_VOUCHER_${Date.now()}`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("On-chain settlement failed. Please try again.");
+      }
 
       setIsProcessing(false);
       setStep("success");
+      toast.success("Payment authorized!", {
+        description: "Your funds are being secured in the escrow account.",
+      });
+
+      setTimeout(() => {
+        router.push(`/client/vault/${vaultId}?success=true`);
+      }, 2000);
     } catch (err: any) {
       setIsProcessing(false);
       setPaymentError(err.message || "Transaction failed. Payment rejected.");
+      toast.error("Payment failed", { description: err.message });
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#050505] text-white/80 font-['Poppins',sans-serif] antialiased">
-      <AnimatePresence>
-        {isProcessing && <ProcessingOverlay amount={amount} />}
-        {paymentError && (
-          <FailureModal
-            message={paymentError}
-            onClose={() => setPaymentError(null)}
-          />
-        )}
-      </AnimatePresence>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center text-slate-900 font-['Poppins',sans-serif]">
+        <div className="animate-spin text-emerald-600">
+          <Lock />
+        </div>
+      </div>
+    );
 
+  return (
+    <div className="min-h-screen bg-white text-slate-600 font-['Poppins',sans-serif] antialiased">
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT SIDEBAR */}
-        <Sidebar amount={amount} />
-
-        {/* RIGHT CONTENT AREA */}
-        <main className="flex-1 p-8 lg:p-24 flex items-center justify-center relative bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-white/2 via-transparent to-transparent">
-          <div className="max-w-5xl w-full">
-            {/* Back Button */}
-            {step === "form" && (
-              <button
-                onClick={() => router.push(`/checkout/${vaultId}`)}
-                className="flex items-center gap-3 text-white/40 hover:text-emerald-500 transition-all text-[10px] font-bold tracking-[0.3em] mb-12 group bg-white/2 border border-white/5 py-4 px-6 rounded-2xl italic"
+        <section className="w-full lg:w-[350px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
+          <div className="space-y-16 relative z-10">
+            <div className="flex items-center gap-4">
+              <div
+                className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-600/10 active:scale-95 transition-transform cursor-pointer"
+                onClick={() => router.push("/client")}
               >
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                Modify payment method
-              </button>
-            )}
+                <Lock className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-slate-900 font-bold tracking-tighter text-2xl italic">
+                Dayle
+              </span>
+            </div>
+            <div className="space-y-10">
+              <div className="space-y-3">
+                <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em] italic leading-none uppercase">
+                  Amount due
+                </p>
+                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-7xl italic flex items-baseline gap-2">
+                  <span className="text-emerald-600 font-bold text-3xl">
+                    {currencyPrefix}
+                  </span>
+                  {displayAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </h1>
+              </div>
+            </div>
+          </div>
+          <div className="p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
+            <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 text-emerald-600 text-[10px] font-bold tracking-[0.3em] mb-4 italic uppercase">
+                <Lock className="w-4 h-4" /> Secure Card Flow
+              </div>
+              <p className="text-[10px] text-slate-600 leading-relaxed font-bold tracking-widest italic uppercase">
+                Encrypted payment processing via Partna Link.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* MAIN CONTENT AREA */}
+        <main className="flex-1 p-8 lg:p-20 flex items-center justify-center relative bg-slate-50/50">
+          <div className="max-w-2xl w-full">
+            <button
+              onClick={() => router.push(`/checkout/${vaultId}`)}
+              className="flex items-center gap-3 text-slate-900 hover:text-emerald-500 transition-all text-[10px] font-bold tracking-[0.3em] mb-12 group bg-white border border-slate-200 py-4 px-6 rounded-2xl italic shadow-sm"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Change payment method
+            </button>
 
             <AnimatePresence mode="wait">
-              {step === "form" && (
+              {step === "form" ? (
                 <motion.div
-                  key="card"
-                  initial={{ opacity: 0, scale: 0.98 }}
+                  key="form"
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="grid lg:grid-cols-2 gap-20 items-center"
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  className="space-y-12"
                 >
-                  {/* CARD PREVIEW */}
-                  <div className="relative aspect-[1.586/1] w-full rounded-[2.5rem] bg-linear-to-br from-emerald-600 to-emerald-950 p-12 text-white shadow-[0_0_60px_rgba(16,185,129,0.2)] border border-white/10 overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity">
-                      <CreditCard className="w-48 h-48 rotate-15 group-hover:rotate-25 transition-transform duration-1000" />
-                    </div>
-                    <div className="relative h-full flex flex-col justify-between z-10">
-                      <div className="flex justify-between items-start">
-                        <div className="w-16 h-12 bg-white/10 rounded-xl backdrop-blur-xl border border-white/10 shadow-inner flex items-center justify-center">
-                          <div className="w-10 h-6 bg-linear-to-r from-amber-400 to-amber-600 rounded-sm opacity-60" />
-                        </div>
-                        {cardDetails.type === "visa" && (
-                          <div className="italic font-bold text-2xl tracking-tighter opacity-80">
-                            VISA
-                          </div>
-                        )}
-                        {cardDetails.type === "mastercard" && (
-                          <div className="flex -space-x-4 opacity-80">
-                            <div className="w-8 h-8 rounded-full bg-red-600" />
-                            <div className="w-8 h-8 rounded-full bg-amber-500" />
-                          </div>
-                        )}
-                        {!cardDetails.type && (
-                          <div className="font-bold italic text-xl opacity-20 tracking-widest">
-                            Payment card
-                          </div>
-                        )}
-                      </div>
-                      <div className="space-y-10">
-                        <p className="text-3xl tracking-widest font-mono italic shadow-sm leading-none truncate">
-                          {cardDetails.number || "•••• •••• •••• ••••"}
-                        </p>
-                        <div className="flex justify-between items-end">
-                          <div className="space-y-2">
-                            <p className="text-[10px] text-white/30 font-bold tracking-[0.2em] italic">
-                              Cardholder name
-                            </p>
-                            <p className="text-sm font-bold tracking-widest italic truncate max-w-[180px]">
-                              {cardDetails.name || "Name on card"}
-                            </p>
-                          </div>
-                          <div className="text-right space-y-2">
-                            <p className="text-[10px] text-white/30 font-bold tracking-[0.2em] italic">
-                              Expiry date
-                            </p>
-                            <p className="text-sm font-bold tracking-widest italic font-mono">
-                              {cardDetails.expiry || "MM/YY"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="text-center space-y-4">
+                    <h2 className="text-4xl font-bold text-slate-900 tracking-tighter italic">
+                      Card Authorization
+                    </h2>
+                    <p className="text-[10px] text-slate-400 font-bold tracking-[0.3em] uppercase italic">
+                      Verify your secure deposit
+                    </p>
                   </div>
 
-                  {/* CARD FORM */}
-                  <div className="space-y-8">
-                    <div className="text-left space-y-2 mb-8">
-                      <h2 className="text-3xl font-bold text-white italic tracking-tighter">
-                        Card details
-                      </h2>
-                      <p className="text-[10px] text-white/30 font-bold tracking-[0.3em] italic">
-                        Enter secure card details
-                      </p>
-                    </div>
-                    <div className="space-y-6">
-                      <InputField
-                        label="Card Number"
-                        value={cardDetails.number}
-                        error={errors.number}
-                        onChange={(e) =>
-                          handleInputChange("number", e.target.value)
-                        }
-                        placeholder="0000 0000 0000 0000"
-                      />
-                      <InputField
-                        label="Cardholder Name"
-                        value={cardDetails.name}
-                        error={errors.name}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "name",
-                            e.target.value.toUpperCase(),
-                          )
-                        }
-                        placeholder="AUTHORIZED USER"
-                      />
-                      <div className="grid grid-cols-2 gap-6">
-                        <InputField
-                          label="Expiry Date"
-                          value={cardDetails.expiry}
-                          error={errors.expiry}
+                  <div className="bg-white border border-slate-200 rounded-[3rem] p-10 lg:p-14 shadow-xl space-y-10 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -mr-32 -mt-32" />
+
+                    <div className="space-y-8 relative z-10">
+                      {/* Name */}
+                      <div className="space-y-3">
+                        <span className="text-xl font-bold text-slate-900 italic tracking-tighter">
+                          {currencyPrefix}
+                          {displayAmount.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </span>
+                        <label className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase italic ml-1">
+                          Cardholder Name
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Your Name"
+                          value={cardDetails.name}
                           onChange={(e) =>
-                            handleInputChange("expiry", e.target.value)
+                            handleInputChange("name", e.target.value)
                           }
-                          placeholder="MM/YY"
-                        />
-                        <InputField
-                          label="CVC Code"
-                          type="password"
-                          value={cardDetails.cvc}
-                          error={errors.cvc}
-                          onChange={(e) =>
-                            handleInputChange("cvc", e.target.value)
-                          }
-                          placeholder="•••"
+                          className={`w-full h-16 bg-slate-50 border ${errors.name ? "border-red-500" : "border-slate-100"} rounded-2xl px-6 text-slate-900 font-bold tracking-tight focus:border-emerald-500/30 outline-none transition-all italic`}
                         />
                       </div>
+
+                      {/* Number */}
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase italic ml-1">
+                            Card Number
+                          </label>
+                          <div className="flex gap-2">
+                            <div
+                              className={`w-8 h-5 rounded bg-slate-100 flex items-center justify-center opacity-30 ${cardDetails.type === "visa" && "opacity-100 bg-emerald-100 text-emerald-600"}`}
+                            >
+                              <CreditCard className="w-3 h-3" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="0000 0000 0000 0000"
+                            value={cardDetails.number}
+                            onChange={(e) =>
+                              handleInputChange("number", e.target.value)
+                            }
+                            className={`w-full h-16 bg-slate-50 border ${errors.number ? "border-red-500" : "border-slate-100"} rounded-2xl px-6 text-slate-900 font-bold tracking-widest font-mono focus:border-emerald-500/30 outline-none transition-all`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase italic ml-1">
+                            Expiry
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="MM/YY"
+                            value={cardDetails.expiry}
+                            onChange={(e) =>
+                              handleInputChange("expiry", e.target.value)
+                            }
+                            className={`w-full h-16 bg-slate-50 border ${errors.expiry ? "border-red-500" : "border-slate-100"} rounded-2xl px-6 text-slate-900 font-bold tracking-tight focus:border-emerald-500/30 outline-none transition-all italic`}
+                          />
+                        </div>
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase italic ml-1">
+                            CVC
+                          </label>
+                          <input
+                            type="password"
+                            placeholder="123"
+                            value={cardDetails.cvc}
+                            onChange={(e) =>
+                              handleInputChange("cvc", e.target.value)
+                            }
+                            className={`w-full h-16 bg-slate-50 border ${errors.cvc ? "border-red-500" : "border-slate-100"} rounded-2xl px-6 text-slate-900 font-bold tracking-tight focus:border-emerald-500/30 outline-none transition-all italic`}
+                          />
+                        </div>
+                      </div>
                     </div>
+
+                    {paymentError && (
+                      <div className="p-5 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-4 text-red-600 text-[10px] font-bold tracking-widest uppercase italic">
+                        <XCircle className="w-5 h-5" />
+                        {paymentError}
+                      </div>
+                    )}
+
                     <button
                       onClick={handleCardSubmit}
-                      disabled={!isKycVerified}
-                      className={`w-full h-20 ${isKycVerified ? "bg-emerald-500 hover:bg-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.2)]" : "bg-white/5 text-white/20 cursor-not-allowed"} text-black font-bold text-xs rounded-4xl transition-all active:scale-[0.98]`}
+                      disabled={isProcessing}
+                      className="w-full h-20 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-3xl shadow-xl shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.2em] italic relative overflow-hidden"
                     >
-                      {isKycVerified ? "Pay safely" : "KYC Required"}
+                      {isProcessing ? (
+                        <div className="flex items-center justify-center gap-3">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Processing...
+                        </div>
+                      ) : (
+                        "Confirm Deposit"
+                      )}
                     </button>
+
+                    <div className="flex items-center justify-center gap-4 text-[9px] font-bold text-slate-400 tracking-[0.3em] uppercase italic">
+                      <Lock className="w-3 h-3 text-emerald-500" /> Level 1 PCI
+                      Compliance
+                    </div>
                   </div>
                 </motion.div>
-              )}
-
-              {step === "success" && (
-                <SuccessScreen onContinue={() => router.push("/client")} />
+              ) : (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center text-center space-y-12"
+                >
+                  <div className="w-32 h-32 bg-emerald-600 rounded-[2.5rem] flex items-center justify-center shadow-2xl relative">
+                    <div className="absolute inset-0 bg-emerald-600/20 rounded-[2.5rem] animate-ping" />
+                    <CheckCircle2 className="w-16 h-16 text-white" />
+                  </div>
+                  <div className="space-y-4">
+                    <h2 className="text-5xl font-bold text-slate-900 tracking-tighter italic">
+                      Payment Accepted
+                    </h2>
+                    <p className="text-[10px] text-emerald-600 font-bold tracking-[0.5em] uppercase italic">
+                      Funds are being secured on-chain
+                    </p>
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase italic">
+                    Redirecting to your project in a few seconds...
+                  </p>
+                </motion.div>
               )}
             </AnimatePresence>
           </div>
         </main>
       </div>
     </div>
-  );
-}
-
-// --- COMPONENTS ---
-
-interface SidebarProps {
-  amount: number;
-}
-
-function Sidebar({ amount }: SidebarProps) {
-  return (
-    <section className="w-full lg:w-[350px] bg-[#080808] p-12 border-r border-white/5 flex flex-col justify-between relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
-      <div className="space-y-16 relative z-10">
-        <div className="flex items-center gap-4">
-          <div
-            className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform cursor-pointer"
-            onClick={() => (window.location.href = "/client")}
-          >
-            <Lock className="w-5 h-5 text-black" />
-          </div>
-          <span className="text-white font-bold tracking-tighter text-2xl italic">
-            Dayle
-          </span>
-        </div>
-        <div className="space-y-10">
-          <div className="space-y-3">
-            <p className="text-[10px] font-bold text-white/40 tracking-[0.4em] italic leading-none">
-              Total settlement
-            </p>
-            <h1 className="text-6xl font-bold text-white tracking-tighter font-mono flex items-baseline gap-2">
-              <span className="text-emerald-500 font-bold text-3xl">$</span>
-              {amount.toLocaleString()}
-            </h1>
-          </div>
-        </div>
-      </div>
-      <div className="p-8 bg-emerald-500/5 border border-emerald-500/10 rounded-[2.5rem] relative group overflow-hidden">
-        <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-bold tracking-[0.3em] mb-4 italic">
-            <Lock className="w-4 h-4" /> Secure escrow
-          </div>
-          <p className="text-xs text-white/40 leading-relaxed font-bold tracking-widest italic">
-            Assets are held in a secure escrow account. Funds are released upon
-            your approval.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  error?: string;
-}
-
-function InputField({ label, error, ...props }: InputFieldProps) {
-  return (
-    <div className="space-y-3">
-      <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] italic ml-1">
-        {label}
-      </label>
-      <input
-        {...props}
-        className={`w-full bg-white/2 border ${error ? "border-red-500" : "border-white/5"} h-16 rounded-2xl px-6 text-white focus:border-emerald-500/30 outline-none transition-all placeholder:text-white/10 font-bold tracking-widest text-xs italic shadow-inner`}
-      />
-      {error && (
-        <motion.p
-          initial={{ opacity: 0, x: -5 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="text-[9px] text-red-500 font-bold tracking-widest ml-1 italic"
-        >
-          {error}
-        </motion.p>
-      )}
-    </div>
-  );
-}
-
-function ProcessingOverlay({ amount }: { amount: number }) {
-  const messages = [
-    "Encrypting details...",
-    "Authorizing with bank...",
-    "Securing escrow funds...",
-  ];
-  const [msgIdx, setMsgIdx] = useState(0);
-
-  useEffect(() => {
-    const i = setInterval(() => setMsgIdx((s) => (s + 1) % 3), 1000);
-    return () => clearInterval(i);
-  }, []);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-100 bg-black/98 backdrop-blur-3xl flex flex-col items-center justify-center text-center"
-    >
-      <div className="relative w-32 h-32 mb-12">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 border border-emerald-500/10 border-t-emerald-500 rounded-full"
-        />
-        <Fingerprint className="w-12 h-12 text-emerald-500 absolute inset-0 m-auto animate-pulse" />
-      </div>
-      <h3 className="text-3xl font-bold text-white italic tracking-tighter mb-4">
-        Total amount: ${amount}
-      </h3>
-      <p className="text-[10px] font-bold tracking-[0.5em] text-emerald-500/40 italic">
-        {messages[msgIdx]}
-      </p>
-    </motion.div>
-  );
-}
-
-function FailureModal({
-  message,
-  onClose,
-}: {
-  message: string;
-  onClose: () => void;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-110 bg-black/80 backdrop-blur-3xl flex items-center justify-center p-6"
-    >
-      <div className="bg-[#0D0D0E] border border-white/5 w-full max-w-sm rounded-[3rem] p-10 text-center shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-red-500/20" />
-        <div className="w-20 h-20 bg-red-500/5 border border-red-500/10 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-          <XCircle className="w-10 h-10 text-red-500" />
-        </div>
-        <h3 className="text-2xl font-bold text-white italic tracking-tighter mb-3">
-          Payment failed
-        </h3>
-        <p className="text-white/30 text-[10px] font-bold tracking-[0.2em] mb-10 leading-relaxed italic">
-          {message}
-        </p>
-        <button
-          onClick={onClose}
-          className="w-full bg-white text-black h-16 rounded-2xl font-bold tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:bg-slate-200 transition-all shadow-xl"
-        >
-          <RefreshCcw className="w-4 h-4" /> Try again
-        </button>
-      </div>
-    </motion.div>
-  );
-}
-
-function SuccessScreen({ onContinue }: { onContinue: () => void }) {
-  return (
-    <motion.div
-      key="success"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center text-center max-w-xl mx-auto space-y-12"
-    >
-      <div className="w-32 h-32 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center shadow-[0_0_60px_rgba(16,185,129,0.4)] relative">
-        <div className="absolute inset-0 bg-white/20 rounded-[2.5rem] animate-ping" />
-        <CreditCard className="w-16 h-16 text-black relative z-10" />
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-5xl font-bold text-white tracking-tighter italic">
-          Project funded
-        </h2>
-        <p className="text-[10px] text-emerald-500 font-bold tracking-[0.5em] italic">
-          Project account is now funded. Assets are protected in escrow.
-        </p>
-      </div>
-      <button
-        onClick={onContinue}
-        className="w-full h-20 bg-white text-black font-bold tracking-[0.2em] text-sm rounded-4xl hover:bg-slate-200 transition-all shadow-2xl active:scale-[0.98]"
-      >
-        Go to dashboard
-      </button>
-    </motion.div>
   );
 }

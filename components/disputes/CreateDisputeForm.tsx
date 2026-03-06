@@ -296,7 +296,7 @@ export function CreateDisputeForm({
           Back
         </Button>
 
-        <div className="flex items-center gap-2 text-xs text-white/40">
+        <div className="flex items-center gap-2 text-xs text-slate-900">
           <span
             className={cn(
               "h-2 w-2 rounded-full",
@@ -389,7 +389,7 @@ export function CreateDisputeForm({
                       >
                         <div className="flex w-full items-center justify-between gap-3">
                           <span className="truncate">{vault.title}</span>
-                          <span className="shrink-0 text-[11px] text-white/40">
+                          <span className="shrink-0 text-[11px] text-slate-900">
                             {vault.id}
                           </span>
                         </div>
@@ -397,7 +397,7 @@ export function CreateDisputeForm({
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-slate-900">
                   This determines the dispute jurisdiction and parties.
                 </p>
               </div>
@@ -501,7 +501,7 @@ export function CreateDisputeForm({
                                 {deliverable.title}
                               </span>
                               {deliverable.description && (
-                                <span className="text-xs text-white/40">
+                                <span className="text-xs text-slate-900">
                                   {deliverable.description}
                                 </span>
                               )}
@@ -512,7 +512,7 @@ export function CreateDisputeForm({
                     </SelectContent>
                   </Select>
 
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-slate-900">
                     This dispute type must specifically reference which
                     verification requirement was handled incorrectly.
                   </p>
@@ -526,7 +526,7 @@ export function CreateDisputeForm({
                     <Label className="text-sm font-medium text-white">
                       Reason code *
                     </Label>
-                    <div className="text-xs text-white/40">
+                    <div className="text-xs text-slate-900">
                       Choose one. Make it defensible.
                     </div>
                   </div>
@@ -605,11 +605,11 @@ export function CreateDisputeForm({
                     <div className="flex items-end justify-between gap-3">
                       <Label className="text-sm font-medium text-white">
                         Description{" "}
-                        <span className="text-xs font-normal text-white/40">
+                        <span className="text-xs font-normal text-slate-900">
                           (optional)
                         </span>
                       </Label>
-                      <div className="text-xs text-white/40">
+                      <div className="text-xs text-slate-900">
                         {description.length}/600
                       </div>
                     </div>
@@ -622,7 +622,7 @@ export function CreateDisputeForm({
                       placeholder="State facts. Timeline. What you delivered vs what was agreed. Avoid emotions."
                       className="min-h-[140px] resize-none border-white/10 bg-black/40 text-white hover:border-white/20 focus:ring-2 focus:ring-amber-500/30"
                     />
-                    <p className="text-xs text-white/40">
+                    <p className="text-xs text-slate-900">
                       Good disputes read like a report: facts, dates, evidence.
                       No drama.
                     </p>

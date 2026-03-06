@@ -28,6 +28,7 @@ import { motion, AnimatePresence, Variants, Reorder } from "framer-motion";
 import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 import { api } from "@/lib/api-client";
 import { useVault } from "@/lib/store/vault-context";
+import { SUPPORTED_TOKENS, CONTRACTS } from "@/lib/contracts";
 
 const variants: Variants = {
   enter: (direction: number) => ({
@@ -67,6 +68,7 @@ export default function CreateVaultPage() {
   const [budgetAmount, setBudgetAmount] = useState("");
   const [freelancerEmail, setFreelancerEmail] = useState("");
   const [freelancerName, setFreelancerName] = useState("");
+  // Default to USDC
   const [deliverables, setDeliverables] = useState<
     { title: string; description: string; id: string }[]
   >([{ title: "", description: "", id: crypto.randomUUID() }]);
@@ -139,6 +141,11 @@ export default function CreateVaultPage() {
         type: vaultPurpose,
         description: vaultDescription,
         totalAmount: budget,
+        // Defaulting to USDC for Fiat abstraction under the hood
+        tokenAddress: CONTRACTS.usdcToken,
+        tokenSymbol: "USDC",
+        tokenDecimals: 6, // USDC uses 6 decimals
+        chainId: 11142220, // Celo Sepolia
         idempotencyKey,
         deliverables: deliverables.map(({ title, description }) => ({
           title,
@@ -184,7 +191,7 @@ export default function CreateVaultPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold tracking-[0.2em] mb-4">
               <Lock className="w-3 h-3" /> Secure project account
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter italic">
               New <span className="text-emerald-500">project</span>
             </h1>
           </div>
@@ -194,7 +201,7 @@ export default function CreateVaultPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white/40 hover:text-white text-[10px] font-bold tracking-widest transition-all"
+                className="text-slate-900 hover:text-emerald-500 text-sm font-bold tracking-widest transition-all"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to dashboard
@@ -210,7 +217,7 @@ export default function CreateVaultPage() {
                     "flex items-center gap-2 px-4 py-2 rounded-xl transition-all",
                     step === s.id
                       ? "bg-white text-black font-bold"
-                      : "text-white/40",
+                      : "text-slate-900",
                   )}
                 >
                   <s.icon className="w-4 h-4" />
@@ -241,7 +248,7 @@ export default function CreateVaultPage() {
                   {step === 1 && (
                     <div className="space-y-8">
                       <div className="space-y-4">
-                        <Label className="text-[10px] tracking-[0.2em] text-white/40 font-bold">
+                        <Label className="text-xs md:text-sm tracking-wider text-slate-900 font-bold">
                           1. Select project type
                         </Label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -257,7 +264,7 @@ export default function CreateVaultPage() {
                                     "group relative flex flex-col items-center gap-3 p-4 rounded-2xl border transition-all duration-300",
                                     isActive
                                       ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
-                                      : "bg-white/2 border-white/5 hover:border-white/20",
+                                      : "bg-white/2 border-slate-900/5 hover:border-slate-900/20",
                                   )}
                                 >
                                   <Icon
@@ -265,13 +272,15 @@ export default function CreateVaultPage() {
                                       "w-6 h-6 transition-transform group-hover:scale-110",
                                       isActive
                                         ? "text-emerald-500"
-                                        : "text-white/30",
+                                        : "text-slate-900",
                                     )}
                                   />
                                   <span
                                     className={cn(
-                                      "text-[10px] font-bold tracking-widest",
-                                      isActive ? "text-white" : "text-white/40",
+                                      "text-xs md:text-sm font-bold tracking-widest",
+                                      isActive
+                                        ? "text-slate-900"
+                                        : "text-slate-900",
                                     )}
                                   >
                                     {value.label}
@@ -285,20 +294,20 @@ export default function CreateVaultPage() {
 
                       <div className="grid grid-cols-1 gap-6">
                         <div className="space-y-2">
-                          <Label className="text-[10px] tracking-[0.2em] text-white/40 font-bold">
+                          <Label className="text-xs md:text-sm tracking-wider text-slate-900 font-bold">
                             2. Project identity
                           </Label>
                           <Input
                             value={vaultTitle}
                             onChange={(e) => setVaultTitle(e.target.value)}
                             placeholder="Project title"
-                            className="bg-muted! border-white/10! h-14 text-lg font-bold placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-emerald-500/20 rounded-xl"
+                            className="bg-muted! border-white/10! h-14 text-lg text-slate-900 font-medium placeholder:text-slate-600 focus:border-emerald-500/50 focus:ring-emerald-500/20 rounded-xl"
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-[10px] tracking-[0.2em] text-white/40 font-bold">
-                            3. Total allocation
+                          <Label className="text-xs md:text-sm tracking-wider text-slate-900 font-bold">
+                            4. Total allocation (USD)
                           </Label>
                           <div className="relative group">
                             <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500 group-focus-within:animate-pulse" />
@@ -307,14 +316,14 @@ export default function CreateVaultPage() {
                               value={budgetAmount}
                               onChange={(e) => setBudgetAmount(e.target.value)}
                               placeholder="0.00"
-                              className="bg-muted! border-white/10! h-14 pl-12 text-xl font-mono focus:border-emerald-500/50 rounded-xl"
+                              className="bg-muted! border-white/10! h-14 pl-12 text-xl italic text-slate-900 font-medium focus:border-emerald-500/50 rounded-xl"
                             />
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-[10px] tracking-[0.2em] text-white/40 font-bold">
-                            4. Brief description
+                          <Label className="text-xs md:text-sm tracking-wider text-slate-900 font-bold">
+                            5. Brief description
                           </Label>
                           <Textarea
                             value={vaultDescription}
@@ -322,7 +331,7 @@ export default function CreateVaultPage() {
                               setVaultDescription(e.target.value)
                             }
                             placeholder="Describe the overall scope..."
-                            className="bg-muted! border-white/10! min-h-[120px] focus:border-emerald-500/50 rounded-xl text-white/80"
+                            className="bg-muted! border-white/10! min-h-[120px] focus:border-emerald-500/50 rounded-xl text-slate-900 placeholder:text-slate-600 font-medium"
                           />
                         </div>
 
@@ -330,10 +339,10 @@ export default function CreateVaultPage() {
                         <div className="space-y-4 pt-4 border-t border-white/5">
                           <div className="flex items-center justify-between">
                             <div className="space-y-1">
-                              <Label className="text-[10px] tracking-[0.2em] text-emerald-500 font-bold">
+                              <Label className="text-xs md:text-sm tracking-wider text-emerald-500 font-bold">
                                 Deliverables checklist (Required)
                               </Label>
-                              <p className="text-[10px] text-white/40 font-bold tracking-widest leading-relaxed max-w-sm">
+                              <p className="text-xs text-slate-900 font-bold tracking-wider leading-relaxed max-w-sm">
                                 Add the specific items the freelancer will
                                 deliver. This prevents disputes by making
                                 expectations clear.
@@ -382,11 +391,11 @@ export default function CreateVaultPage() {
                                   <div className="flex items-start gap-3">
                                     <div className="flex flex-col items-center gap-1 shrink-0">
                                       <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                        <span className="text-[10px] font-bold text-emerald-500 font-mono">
+                                        <span className="text-[10px] font-bold text-emerald-500 italic">
                                           {String(index + 1).padStart(2, "0")}
                                         </span>
                                       </div>
-                                      <GripVertical className="w-3 h-3 text-white/10 group-hover:text-white/30 transition-colors" />
+                                      <GripVertical className="w-3 h-3 text-slate-900 group-hover:text-slate-900/30 transition-colors" />
                                     </div>
                                     <div className="flex-1 space-y-3">
                                       <Input
@@ -400,7 +409,7 @@ export default function CreateVaultPage() {
                                         }
                                         maxLength={100}
                                         placeholder="Deliverable Title (e.g. Frontend UI Components)"
-                                        className="bg-transparent! border-none! h-6 p-0 text-sm font-bold tracking-widest placeholder:text-white/10 focus:ring-0! rounded-none"
+                                        className="bg-transparent! border-none! h-8 p-2 text-slate-900 text-sm font-medium tracking-widest placeholder:text-slate-600/40 focus:ring-0! rounded-none"
                                       />
                                       <Textarea
                                         value={deliverable.description}
@@ -413,7 +422,7 @@ export default function CreateVaultPage() {
                                         }
                                         maxLength={500}
                                         placeholder="Brief description of requirements... (Optional)"
-                                        className="bg-transparent! border-white/5! min-h-[60px] p-3 text-xs text-white/40 focus:border-emerald-500/30 rounded-xl leading-relaxed transition-all"
+                                        className="bg-transparent! border-white/5! min-h-[60px] p-3 text-xs text-slate-900 focus:border-emerald-500/30 rounded-xl leading-relaxed transition-all placeholder:text-slate-600/40"
                                       />
                                     </div>
                                   </div>
@@ -436,7 +445,7 @@ export default function CreateVaultPage() {
                         <h2 className="text-2xl font-bold italic tracking-tighter">
                           Assign freelancer
                         </h2>
-                        <p className="text-white/40 text-xs font-bold tracking-widest">
+                        <p className="text-slate-900 text-xs font-bold tracking-widest">
                           Identify the project freelancer
                         </p>
                       </div>
@@ -446,17 +455,17 @@ export default function CreateVaultPage() {
                           value={freelancerEmail}
                           onChange={(e) => setFreelancerEmail(e.target.value)}
                           placeholder="Freelancer email"
-                          className="bg-muted! border-white/10! h-14 rounded-xl text-center font-bold tracking-widest placeholder:text-gray-400"
+                          className="bg-muted! border-white/10! text-slate-900 h-14 rounded-xl text-center font-bold tracking-widest placeholder:text-slate-600"
                         />
                         <Input
                           value={freelancerName}
                           onChange={(e) => setFreelancerName(e.target.value)}
                           placeholder="Full name (optional)"
-                          className="bg-muted! border-white/10! h-14 rounded-xl text-center font-bold tracking-widest placeholder:text-gray-400"
+                          className="bg-muted! border-white/10! text-slate-900 h-14 rounded-xl text-center font-bold tracking-widest placeholder:text-slate-600"
                         />
                         <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 flex gap-3 items-center">
-                          <ShieldCheck className="w-5 h-5 text-blue-500 shrink-0" />
-                          <p className="text-[10px] text-blue-200/60 leading-relaxed font-bold">
+                          <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0" />
+                          <p className="text-[10px] text-slate-600 leading-relaxed font-bold">
                             Project system will verify user identity upon
                             acceptance.
                           </p>
@@ -482,27 +491,27 @@ export default function CreateVaultPage() {
                       {/* Header Summary */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="p-5 bg-white/3 border border-white/5 rounded-2xl">
-                          <Label className="text-[12px] font-bold text-white/30 tracking-widest block mb-1">
+                          <Label className="text-[12px] font-bold text-slate-900 tracking-widest block mb-1">
                             Total value
                           </Label>
-                          <p className="text-2xl font-bold text-emerald-500 font-mono">
+                          <p className="text-2xl font-bold text-emerald-500 italic">
                             ${budget.toLocaleString()}
                           </p>
                         </div>
                         <div className="p-5 bg-white/3 border border-white/5 rounded-2xl">
-                          <Label className="text-[12px] font-bold text-white/30 tracking-widest block mb-1">
+                          <Label className="text-[12px] font-bold text-slate-900 tracking-widest block mb-1">
                             Beneficiary
                           </Label>
-                          <p className="text-sm font-bold truncate text-white tracking-wider">
+                          <p className="text-sm font-bold truncate text-slate-600 tracking-wider">
                             {freelancerEmail}
                           </p>
                         </div>
                       </div>
 
                       {/* Single Deliverable Info */}
-                      <div className="bg-black/40 border border-white/3 p-4 rounded-xl flex items-center justify-between group">
+                      <div className="bg-black/80 border border-white/5 p-4 rounded-xl flex items-center justify-between group">
                         <div className="flex items-center gap-4">
-                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] text-white/40 font-mono border border-white/5">
+                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-sm text-white italic border border-white/5">
                             01
                           </div>
                           <div>
@@ -519,15 +528,15 @@ export default function CreateVaultPage() {
                       </div>
 
                       {/* Final Security Disclaimer */}
-                      <div className="bg-emerald-500/5 border border-emerald-500/10 p-5 rounded-2xl flex gap-4">
-                        <div className="p-2 bg-emerald-500/20 rounded-xl h-fit">
-                          <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                      <div className="bg-emerald-500/80 border border-emerald-500/10 p-5 rounded-2xl flex gap-4">
+                        <div className="p-2 bg-slate-900/30 rounded-lg h-fit">
+                          <ShieldCheck className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="text-[10px] font-bold text-emerald-500 tracking-widest">
+                          <h4 className="text-sm font-bold text-white tracking-widest">
                             Escrow verification system
                           </h4>
-                          <p className="text-[10px] text-white/50 mt-1 leading-relaxed font-bold">
+                          <p className="text-xs text-slate-900 mt-1 leading-relaxed font-bold">
                             Funds are locked in a secure project account.
                             Release requires{" "}
                             <span className="text-white">
@@ -549,7 +558,7 @@ export default function CreateVaultPage() {
                 variant="ghost"
                 onClick={() => paginate(-1)}
                 disabled={step === 1 || isDeploying}
-                className="text-white/40 hover:text-white text-[10px] font-bold tracking-widest w-full sm:w-auto transition-all"
+                className="text-slate-900 hover:text-white text-[10px] font-bold tracking-widest w-full sm:w-auto transition-all"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back
               </Button>
@@ -604,15 +613,15 @@ export default function CreateVaultPage() {
           {/* Sidebar Info */}
           <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-12">
             <div className="bg-white/2 border border-white/5 rounded-3xl p-6">
-              <h3 className="text-[10px] font-bold tracking-[0.2em] text-white/40 mb-6 italic">
+              <h3 className="text-sm font-bold tracking-[0.2em] text-slate-900 mb-6 italic">
                 Project configuration
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <span className="text-[10px] text-white/20 font-bold">
+                  <span className="text-sm text-slate-900 font-bold">
                     Total value
                   </span>
-                  <span className="text-2xl font-bold font-mono">
+                  <span className="text-2xl font-bold italic">
                     ${budget.toLocaleString()}
                   </span>
                 </div>
@@ -622,9 +631,9 @@ export default function CreateVaultPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-12 flex items-center justify-center gap-3 text-white/20">
+        <div className="mt-12 flex items-center justify-center gap-3 text-slate-900">
           <Lock className="w-3 h-3" />
-          <span className="text-[10px] tracking-[0.3em] font-bold">
+          <span className="text-xs tracking-[0.3em] font-bold">
             Secured by Dayle escrow system
           </span>
         </div>

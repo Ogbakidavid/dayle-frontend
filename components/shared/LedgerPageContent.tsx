@@ -97,20 +97,20 @@ export default function LedgerPageContent() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen bg-background pb-20 text-white"
+      className="min-h-screen pb-20 text-slate-900"
     >
       {/* Header */}
       <header className="mb-6 md:mb-10 px-4 md:px-0">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <motion.div variants={itemVariants} className="space-y-1">
-            <div className="flex items-center gap-2 text-[10px] md:text-sm font-bold text-emerald-500 tracking-[0.2em] md:tracking-[0.2em] mb-2">
+            <div className="flex items-center gap-2 text-sm md:text-sm font-bold text-emerald-500 tracking-[0.2em] md:tracking-[0.2em] mb-2 italic">
               <Lock className="w-3.5 h-3.5 shrink-0" />
               Secured Settlement Account
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter italic flex items-center gap-3">
               Financial Center
             </h1>
-            <p className="text-xs md:text-sm text-white/50 font-bold tracking-wide">
+            <p className="text-xs md:text-sm font-bold text-slate-600 tracking-wide">
               Manage your vault earnings and global settlements
             </p>
           </motion.div>
@@ -120,7 +120,7 @@ export default function LedgerPageContent() {
           >
             <Button
               variant="outline"
-              className="w-full md:w-auto gap-2 font-bold h-11 px-6 border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80 shrink-0 tracking-wide"
+              className="w-full md:w-auto gap-2 font-bold h-11 px-6 border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-600 shrink-0 tracking-wide shadow-sm"
             >
               <Download size={16} />
               Export Ledger
@@ -133,7 +133,7 @@ export default function LedgerPageContent() {
         {/* Balance Visualization */}
         <motion.div
           variants={itemVariants}
-          className="bg-muted border border-gray-900 rounded-sm p-1"
+          className="bg-white border border-slate-200 rounded-sm p-1 shadow-sm"
         >
           <LedgerBalance balance={balance} role="freelancer" />
         </motion.div>
@@ -142,20 +142,20 @@ export default function LedgerPageContent() {
           {/* Withdrawal Interface */}
           <div className="lg:col-span-1">
             <motion.div variants={itemVariants}>
-              <Card className="bg-muted border-gray-900 overflow-hidden sticky top-32 rounded-sm shadow-2xl">
-                <div className="bg-emerald-600/10 border-b border-emerald-500/10 py-4 px-6">
-                  <h3 className="text-emerald-500 font-bold tracking-wide text-sm">
+              <Card className="bg-white border-slate-200 overflow-hidden sticky top-32 rounded-sm shadow-xl">
+                <div className="bg-emerald-50 border-b border-emerald-100 py-4 px-6">
+                  <h3 className="text-emerald-700 font-bold tracking-wide text-sm">
                     Instant withdrawal
                   </h3>
                 </div>
                 <CardContent className="p-8 space-y-8">
                   <form onSubmit={handleWithdraw} className="space-y-8">
                     <div>
-                      <label className="text-sm font-bold text-white tracking-wide mb-4 block">
+                      <label className="text-sm font-bold text-slate-900 tracking-wide mb-4 block">
                         Amount (USD)
                       </label>
                       <div className="relative group">
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-bold text-white group-focus-within:text-emerald-500 transition-colors">
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-bold text-slate-900 group-focus-within:text-emerald-600 transition-colors">
                           $
                         </span>
                         <input
@@ -163,27 +163,27 @@ export default function LedgerPageContent() {
                           value={withdrawAmount}
                           onChange={(e) => setWithdrawAmount(e.target.value)}
                           placeholder="0.00"
-                          className="w-full text-4xl font-bold tabular-nums bg-transparent border-b border-white/10 focus:border-emerald-500 outline-none py-4 pl-8 transition-all text-white placeholder:text-white"
+                          className="w-full text-4xl font-bold tabular-nums bg-transparent border-b border-slate-200 focus:border-emerald-600 outline-none py-4 pl-8 transition-all text-slate-900 placeholder:text-slate-900 italic"
                           min="1"
                           step="0.01"
                         />
                       </div>
                       <div className="mt-4 flex items-center justify-between text-sm font-bold tracking-wide">
-                        <span className="text-white">Available Limit</span>
-                        <span className="text-emerald-400">
+                        <span className="text-slate-600">Available Limit</span>
+                        <span className="text-emerald-600">
                           ${balance?.available?.toLocaleString() || "0.00"}
                         </span>
                       </div>
                     </div>
 
-                    <div className="bg-emerald-500/5 rounded-sm p-4 border border-emerald-500/10">
+                    <div className="bg-emerald-50 rounded-sm p-4 border border-emerald-100">
                       <div className="flex gap-4">
-                        <Zap className="w-5 h-5 text-emerald-500 shrink-0" />
+                        <Zap className="w-5 h-5 text-emerald-600 shrink-0" />
                         <div>
-                          <p className="text-sm font-bold text-emerald-500 tracking-wide mb-1">
+                          <p className="text-sm font-bold text-emerald-700 tracking-wide mb-1">
                             Turbo settlement
                           </p>
-                          <p className="text-sm font-bold text-white leading-relaxed">
+                          <p className="text-sm font-bold text-slate-600 leading-relaxed">
                             Withdrawals are processed instantly via private
                             settlement rails.
                           </p>
@@ -193,7 +193,7 @@ export default function LedgerPageContent() {
 
                     <Button
                       type="submit"
-                      className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-black font-bold text-sm tracking-wide rounded-sm transition-all shadow-lg shadow-emerald-600/10 active:scale-[0.98]"
+                      className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm tracking-wide rounded-sm transition-all shadow-md shadow-emerald-600/10 active:scale-[0.98]"
                       disabled={
                         !withdrawAmount ||
                         isWithdrawing ||
@@ -214,38 +214,38 @@ export default function LedgerPageContent() {
             className="lg:col-span-2 space-y-6"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white flex items-center gap-3 tracking-tight">
-                <History className="w-5 h-5 text-emerald-500" />
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3 tracking-tight">
+                <History className="w-5 h-5 text-emerald-600" />
                 Settlement Ledger
               </h2>
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <Search className="w-4 h-4 text-white absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-slate-900 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="Search ledger..."
-                    className="pl-10 pr-4 py-2 bg-muted border border-white/5 rounded-sm text-sm font-medium outline-none focus:border-emerald-500/50 transition-all text-white w-64 placeholder:text-white"
+                    className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-sm text-sm font-medium outline-none focus:border-emerald-500 transition-all text-slate-900 w-64 placeholder:text-slate-900 shadow-sm"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-muted border border-gray-900 rounded-sm overflow-hidden shadow-2xl">
+            <div className="bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm">
               <table className="w-full border-collapse">
-                <thead className="bg-black/20 border-b border-white/5">
+                <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="px-4 md:px-6 py-5 text-left text-[11px] font-bold text-white/30 tracking-wide">
+                    <th className="px-4 md:px-6 py-5 text-left text-[11px] font-bold text-slate-600 tracking-wide uppercase">
                       Transaction
                     </th>
-                    <th className="hidden sm:table-cell px-6 py-5 text-left text-[11px] font-bold text-white/30 tracking-wide">
+                    <th className="hidden sm:table-cell px-6 py-5 text-left text-[11px] font-bold text-slate-600 tracking-wide uppercase">
                       Status
                     </th>
-                    <th className="px-4 md:px-6 py-5 text-right text-[11px] font-bold text-white/30 tracking-wide">
+                    <th className="px-4 md:px-6 py-5 text-right text-[11px] font-bold text-slate-600 tracking-wide uppercase">
                       Amount
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-slate-100">
                   {loading ? (
                     <tr>
                       <td colSpan={3} className="py-20 text-center">
@@ -256,7 +256,7 @@ export default function LedgerPageContent() {
                     <tr>
                       <td
                         colSpan={3}
-                        className="py-20 text-center text-white text-sm font-bold tracking-[0.2em]"
+                        className="py-20 text-center text-slate-600 text-sm font-bold tracking-[0.2em]"
                       >
                         No transactions found in ledger
                       </td>
@@ -265,15 +265,15 @@ export default function LedgerPageContent() {
                     paginatedTransactions.map((tx: Transaction) => (
                       <tr
                         key={tx.id}
-                        className="hover:bg-white/2 transition-colors group"
+                        className="hover:bg-slate-50 transition-colors group"
                       >
                         <td className="px-4 md:px-6 py-6">
                           <div className="flex items-center gap-3 md:gap-5">
                             <div
                               className={`hidden xs:flex w-10 h-10 md:w-11 md:h-11 rounded-sm items-center justify-center shrink-0 border transition-colors ${
                                 tx.amount < 0
-                                  ? "bg-amber-500/5 border-amber-500/20 text-amber-500"
-                                  : "bg-emerald-500/5 border-emerald-500/20 text-emerald-500"
+                                  ? "bg-amber-50 border-amber-100 text-amber-600"
+                                  : "bg-emerald-50 border-emerald-100 text-emerald-600"
                               }`}
                             >
                               {tx.amount < 0 ? (
@@ -283,16 +283,16 @@ export default function LedgerPageContent() {
                               )}
                             </div>
                             <div className="min-w-0">
-                              <div className="font-bold text-white text-sm tracking-wide group-hover:text-emerald-400 transition-colors truncate">
+                              <div className="font-bold text-slate-900 text-sm tracking-wide group-hover:text-emerald-700 transition-colors truncate">
                                 {tx.description}
                               </div>
-                              <div className="text-[10px] md:text-sm text-white/30 font-bold tracking-wide mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                              <div className="text-[10px] md:text-sm text-slate-600 font-bold tracking-wide mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                                 {new Date(tx.date).toLocaleDateString()}
-                                <span className="hidden md:block w-1 h-1 rounded-full bg-white/10" />
+                                <span className="hidden md:block w-1 h-1 rounded-full bg-slate-200" />
                                 <span className="truncate">
                                   Ref: {formatRef(tx.id)}
                                 </span>
-                                <span className="sm:hidden px-1.5 py-0.5 rounded-sm bg-white/5 border border-white/10 text-[9px]">
+                                <span className="sm:hidden px-1.5 py-0.5 rounded-sm bg-slate-50 border border-slate-200 text-[9px] text-slate-600">
                                   {tx.status}
                                 </span>
                               </div>
@@ -304,10 +304,10 @@ export default function LedgerPageContent() {
                             className={cn(
                               "px-2.5 py-1 text-[11px] font-bold tracking-wide rounded-sm border",
                               tx.status === TransactionStatus.CONFIRMED
-                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                 : tx.status === TransactionStatus.PENDING
-                                  ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                                  : "bg-white/5 text-white border-white/10",
+                                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                                  : "bg-slate-50 text-slate-600 border-slate-200",
                             )}
                           >
                             {tx.status}
@@ -317,7 +317,9 @@ export default function LedgerPageContent() {
                           <div
                             className={cn(
                               "text-base md:text-lg font-bold tracking-tight",
-                              tx.amount < 0 ? "text-white" : "text-emerald-500",
+                              tx.amount < 0
+                                ? "text-slate-900"
+                                : "text-emerald-600",
                             )}
                           >
                             {tx.amount < 0 ? "-" : "+"}$
@@ -332,8 +334,8 @@ export default function LedgerPageContent() {
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="px-6 py-4 border-t border-white/5 flex items-center justify-between bg-black/10">
-                  <div className="text-sm font-bold text-white tracking-wide">
+                <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                  <div className="text-sm font-bold text-slate-600 tracking-wide">
                     Page {currentPage} of {totalPages}
                   </div>
                   <div className="flex items-center gap-2">
@@ -344,7 +346,7 @@ export default function LedgerPageContent() {
                         setCurrentPage((prev) => Math.max(1, prev - 1))
                       }
                       disabled={currentPage === 1}
-                      className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/10 text-white disabled:opacity-30"
+                      className="h-8 px-3 text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 disabled:opacity-30"
                     >
                       Previous
                     </Button>
@@ -355,7 +357,7 @@ export default function LedgerPageContent() {
                         setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                       }
                       disabled={currentPage === totalPages}
-                      className="h-8 px-3 text-sm border-white/10 bg-transparent hover:bg-white/10 text-white disabled:opacity-30"
+                      className="h-8 px-3 text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 disabled:opacity-30"
                     >
                       Next
                     </Button>

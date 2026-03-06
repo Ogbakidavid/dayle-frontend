@@ -76,7 +76,7 @@ export default function ClientLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-white flex">
+    <div className="min-h-screen bg-background text-foreground flex">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
@@ -91,7 +91,7 @@ export default function ClientLayout({
         animate="visible"
         variants={sidebarVariants}
         className={cn(
-          "w-[280px] border-r border-gray-900 bg-muted flex flex-col h-screen transition-transform duration-300 ease-in-out",
+          "w-[280px] border-r border-slate-200 bg-slate-50 flex flex-col h-screen transition-transform duration-300 ease-in-out",
           "fixed lg:sticky top-0 z-50 lg:z-auto",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
@@ -102,11 +102,11 @@ export default function ClientLayout({
             href="/client"
             className="flex items-center gap-3 group font-['Poppins',sans-serif]"
           >
-            <div className="w-8 h-8 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-emerald-500/20">
-              <Shield className="w-5 h-5 text-black" strokeWidth={2.5} />
+            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/10">
+              <Shield className="w-5 h-5 text-white" strokeWidth={2.5} />
             </div>
             <div>
-              <h1 className="text-2xl text-white tracking-tight font-bold">
+              <h1 className="text-2xl text-slate-900 tracking-tight font-bold">
                 Dayle
               </h1>
             </div>
@@ -124,8 +124,8 @@ export default function ClientLayout({
                   className={cn(
                     "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                     isActive
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold tracking-wide"
-                      : "text-white/60 hover:bg-white/5 hover:text-white font-bold tracking-wide",
+                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold tracking-wide"
+                      : "text-slate-900 hover:bg-slate-100 hover:text-slate-900 font-bold tracking-wide",
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -133,8 +133,8 @@ export default function ClientLayout({
                       className={cn(
                         "w-4 h-4 transition-colors font-bold",
                         isActive
-                          ? "text-emerald-400"
-                          : "text-white group-hover:text-white/80 font-bold",
+                          ? "text-emerald-600"
+                          : "text-slate-900 group-hover:text-slate-900 font-bold",
                       )}
                     />
                     <span>{item.name}</span>
@@ -144,8 +144,8 @@ export default function ClientLayout({
                       className={cn(
                         "text-sm px-2 py-0.5 rounded-full font-medium",
                         isActive
-                          ? "bg-emerald-500/20 text-emerald-400 font-bold"
-                          : "bg-white/5 text-white font-bold",
+                          ? "bg-emerald-500/20 text-emerald-700 font-bold"
+                          : "bg-slate-100 text-slate-600 font-bold",
                       )}
                     >
                       {item.badge}
@@ -157,14 +157,14 @@ export default function ClientLayout({
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-900 mt-auto font-['Poppins',sans-serif]">
+        <div className="p-4 border-t border-slate-200 mt-auto font-['Poppins',sans-serif]">
           <div className="flex items-center gap-3 p-3 rounded-lg">
             <div className="relative group">
               <UserAvatar
                 identifier={user?.id || user?.email || "guest"}
                 src={user?.profileImage}
                 size={36}
-                className="font-medium text-sm border border-gray-700"
+                className="font-medium text-sm border border-slate-200"
               />
               {user?.kycStatus === "VERIFIED" && (
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-muted flex items-center justify-center">
@@ -173,7 +173,7 @@ export default function ClientLayout({
               )}
             </div>
             <div>
-              <p className="text-sm font-bold tracking-wide text-white">
+              <p className="text-sm font-bold tracking-wide text-slate-900">
                 {user?.name}
               </p>
             </div>
@@ -185,7 +185,7 @@ export default function ClientLayout({
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 w-full text-sm font-bold tracking-wide border-white/10 bg-black/30 hover:bg-white/10 hover:border-white/20 text-white/80 transition-all font-['Poppins',sans-serif]"
+                className="h-9 w-full text-sm font-bold tracking-wide border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-['Poppins',sans-serif] shadow-sm"
               >
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
@@ -202,7 +202,7 @@ export default function ClientLayout({
               variant="outline"
               size="sm"
               onClick={logout}
-              className="h-9 text-sm font-bold tracking-wide border-white/10 bg-black/30 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 transition-all font-['Poppins',sans-serif]"
+              className="h-9 text-sm font-bold tracking-wide border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-['Poppins',sans-serif] shadow-sm"
             >
               <LogOut className="w-3.5 h-3.5 mr-2" />
               Sign out
@@ -214,12 +214,12 @@ export default function ClientLayout({
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header */}
-        <div className="lg:hidden sticky top-0 z-30 bg-muted border-b border-gray-900 p-4 flex items-center justify-between">
+        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 p-4 flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setSidebarOpen(true)}
-            className="text-white hover:bg-white/10"
+            className="text-slate-900 hover:bg-slate-100"
           >
             <Menu className="w-5 h-5" />
           </Button>

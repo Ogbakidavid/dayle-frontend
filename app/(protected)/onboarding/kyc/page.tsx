@@ -30,52 +30,52 @@ function KYCPageContent() {
   };
 
   return (
-    <div className="min-h-dvh bg-black text-white flex flex-col font-['Inter',sans-serif] selection:bg-emerald-500/30 overflow-hidden">
+    <div className="min-h-dvh bg-white text-slate-900 flex flex-col font-['Inter',sans-serif] selection:bg-emerald-500/30 overflow-hidden">
       {/* Top Navigation Bar - Mobile App Style */}
-      <header className="fixed top-0 inset-x-0 h-16 bg-black z-50 flex items-center justify-between px-6">
+      <header className="fixed top-0 inset-x-0 h-16 bg-white z-50 flex items-center justify-between px-6 border-b border-slate-100 shadow-sm">
         <div className="flex items-center gap-4 w-full">
           <div className="w-10 h-10"></div>
-          <div className="flex-1 text-center font-semibold text-[17px] tracking-tight text-white">
+          <div className="flex-1 text-center font-semibold text-[17px] tracking-tight text-slate-900">
             Identity verification
           </div>
-          <div className="w-10 h-10 flex items-center justify-center font-mono text-xs text-white/40"></div>
+          <div className="w-10 h-10 flex items-center justify-center italic text-xs text-slate-600"></div>
         </div>
       </header>
 
       {/* Main Content Area - Full Bleed */}
       <main className="flex-1 overflow-y-auto w-full pt-20 pb-32 flex flex-col justify-center">
         <div className="max-w-md mx-auto w-full px-6 py-6 flex flex-col items-center">
-          <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mb-8 relative">
+          <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-8 relative border border-emerald-100 shadow-sm">
             <div className="absolute inset-0 border border-emerald-500/20 rounded-full animate-ping opacity-20"></div>
-            <ScanFace className="w-12 h-12 text-emerald-500" />
+            <ScanFace className="w-12 h-12 text-emerald-600" />
           </div>
 
           <div className="space-y-4 text-center mb-10">
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 italic">
               Verify your identity
             </h1>
-            <p className="text-sm text-zinc-400">
+            <p className="text-sm text-slate-600 font-medium">
               We&apos;ve partnered with Didit to provide bank-grade identity
               verification. Unlock full access to funding and withdrawals in
               under 60 seconds.
             </p>
           </div>
 
-          <div className="w-full bg-white/5 border border-white/10 rounded-3xl p-6 mb-8 space-y-4 shadow-xl">
+          <div className="w-full bg-slate-50 border border-slate-200 rounded-3xl p-6 mb-8 space-y-4 shadow-sm">
             <div className="flex items-center gap-4">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 font-bold text-sm">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-sm">
                 1
               </div>
-              <p className="font-semibold tracking-tight">
+              <p className="font-semibold tracking-tight text-slate-900 italic">
                 Have your ID card handy
               </p>
             </div>
-            <div className="w-px h-6 bg-white/10 ml-4"></div>
+            <div className="w-px h-6 bg-slate-200 ml-4"></div>
             <div className="flex items-center gap-4">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 font-bold text-sm">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-sm">
                 2
               </div>
-              <p className="font-semibold tracking-tight">
+              <p className="font-semibold tracking-tight text-slate-900 italic">
                 Take a quick selfie
               </p>
             </div>
@@ -83,17 +83,17 @@ function KYCPageContent() {
 
           <DiditVerificationBtn
             onSuccess={handleSuccess}
-            className="w-full h-14 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-[15px] rounded-3xl transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+            className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[15px] rounded-3xl transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/10 italic"
           />
 
-          <div className="flex justify-center flex-col items-center gap-2 mt-8 text-zinc-600">
+          <div className="flex justify-center flex-col items-center gap-2 mt-8 text-slate-600">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
-              <p className="text-[11px] font-medium tracking-tight">
+              <p className="text-[11px] font-bold tracking-[0.05em] uppercase italic">
                 Secured by AES-256. Bank-grade SOC2 Type II.
               </p>
             </div>
-            <p className="text-[10px] text-zinc-700">
+            <p className="text-[10px] text-slate-300 font-medium uppercase tracking-widest">
               Powered by the Didit protocol
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function KYCPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="min-h-screen bg-white flex items-center justify-center">
           <DotLoader size="lg" />
         </div>
       }

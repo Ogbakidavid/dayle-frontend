@@ -79,7 +79,7 @@ export default function DiditVerificationBtn({
       disabled={loading}
       className={
         className ||
-        "w-full h-14 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-[15px] rounded-3xl transition-all disabled:opacity-50"
+        "w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[15px] rounded-3xl transition-all disabled:opacity-50 italic shadow-lg shadow-emerald-500/10"
       }
     >
       {loading ? (

@@ -7,7 +7,7 @@ export function useDepositVault(vaultAddress: string) {
   const { wallets } = useWallets();
   const [isDepositing, setIsDepositing] = useState(false);
 
-  const deposit = async (amount: string) => {
+  const deposit = async (amount: string, tokenAddress: string, tokenDecimals: number = 18) => {
     try {
       setIsDepositing(true);
       
@@ -21,8 +21,8 @@ export function useDepositVault(vaultAddress: string) {
       const provider = new ethers.BrowserProvider(ethereumProvider);
       const signer = await provider.getSigner();
 
-      const cUSD = new ethers.Contract(
-        CONTRACTS.cUSDToken,
+      const tokenContract = new ethers.Contract(
+        tokenAddress,
         ERC20ABI,
         signer
       );
@@ -33,10 +33,10 @@ export function useDepositVault(vaultAddress: string) {
         signer
       );
 
-      const amountWei = ethers.parseUnits(amount, 18);
+      const amountWei = ethers.parseUnits(amount, tokenDecimals);
 
-      // 1. Approve vault to spend cUSD
-      const approveTx = await cUSD.approve(vaultAddress, amountWei);
+      // 1. Approve vault to spend token
+      const approveTx = await tokenContract.approve(vaultAddress, amountWei);
       await approveTx.wait();
 
       // 2. Deposit to vault

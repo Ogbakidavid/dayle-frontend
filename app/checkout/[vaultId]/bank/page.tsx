@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -34,249 +34,259 @@ export default function BankTransferPage() {
   const { vaults, loading: vaultsLoading } = useVault();
   const vaultId = params.vaultId as string;
 
+  const searchParams = useSearchParams();
+  const currency = searchParams.get("currency") || "USD";
+  const EXCHANGE_RATE = 1500;
+
   const vault = (vaults || []).find((v) => v.id === vaultId);
   const amount = Number(vault?.totalAmount || 0);
+  const displayAmount = currency === "USD" ? amount : amount * EXCHANGE_RATE;
+  const currencyPrefix = currency === "USD" ? "$" : "₦";
 
-  // Flow states: verification → instructions → processing → success/failure
-  const [step, setStep] = useState<any>("verification"); // verification, instructions, processing, success, failure
+  const [bankDetails, setBankDetails] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [otpError, setOtpError] = useState("");
-  const [requiresVerification, setRequiresVerification] = useState(true); // Toggle for testing
-  const [transactionId] = useState(() => `TXN-${Date.now()}`);
-  const [processingStatus, setProcessingStatus] = useState<any>("pending"); // pending, processing, completed
   const [copied, setCopied] = useState("");
-  const [timeRemaining, setTimeRemaining] = useState(24 * 60 * 60); // 24 hours in seconds
 
-  // Skip verification if not required
+  // Fetch bank details on mount
   useEffect(() => {
-    if (!requiresVerification) {
-      const timer = setTimeout(() => setStep("instructions"), 0);
-      return () => clearTimeout(timer);
-    }
-  }, [requiresVerification]);
+    const fetchBankDetails = async () => {
+      setIsProcessing(true);
+      try {
+        const res = await api.vaults.fund(vaultId, {
+          paymentMethod: "bank",
+          currency,
+          idempotencyKey: crypto.randomUUID(),
+        });
 
-  // Countdown timer for payment window
-  useEffect(() => {
-    if (step === "instructions" && timeRemaining > 0) {
-      const timer = setInterval(() => {
-        setTimeRemaining((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [step, timeRemaining]);
-
-  // Simulate status updates during processing
-  useEffect(() => {
-    if (step === "processing") {
-      const processTransaction = async () => {
-        try {
-          setProcessingStatus("processing");
-
-          // Call Backend to fund vault
-          const idempotencyKey = crypto.randomUUID();
-          const result = await api.vaults.fund(vaultId, {
-            paymentMethod: "bank",
-            paymentDetails: {
-              refCode: transactionId,
-              sender: "Client Bank Account",
-            },
-            idempotencyKey,
-          });
-
-          if (result.paymentUrl) {
-            setProcessingStatus("completed");
-            toast.success("Redirecting to secure payment terminal...");
-            setTimeout(() => {
-              window.location.href = result.paymentUrl;
-            }, 1000);
-            return;
-          }
-
-          setProcessingStatus("completed");
-          setTimeout(() => setStep("success"), 1000);
-        } catch (error) {
-          console.error("Fund error:", error);
-          setStep("failure");
+        if (res.paymentUrl) {
+          toast.success("Redirecting to payment provider...");
+          window.location.href = res.paymentUrl;
+          return;
         }
-      };
 
-      processTransaction();
-    }
-  }, [step, vaultId, transactionId]);
-
-  const handleOtpChange = (index: number, value: string) => {
-    if (value.length > 1) value = value[0];
-    if (!/^\d*$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    setOtpError("");
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      document.getElementById(`otp-${index + 1}`)?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace") {
-      if (otp[index]) {
-        // If current box has value, clear it
-        const newOtp = [...otp];
-        newOtp[index] = "";
-        setOtp(newOtp);
-      } else if (index > 0) {
-        // If current box is empty, move to previous and clear it
-        const newOtp = [...otp];
-        newOtp[index - 1] = "";
-        setOtp(newOtp);
-        document.getElementById(`otp-${index - 1}`)?.focus();
+        if (res.bankDetails) {
+          setBankDetails(res.bankDetails);
+        } else {
+          toast.error("Failed to generate bank details");
+          router.push(`/checkout/${vaultId}`);
+        }
+      } catch (err) {
+        console.error("Fetch bank details failed", err);
+        toast.error("Error generating bank details");
+        router.push(`/checkout/${vaultId}`);
+      } finally {
+        setIsProcessing(false);
       }
-      e.preventDefault();
-    } else if (e.key === "Delete") {
-      // Delete key clears current box
-      const newOtp = [...otp];
-      newOtp[index] = "";
-      setOtp(newOtp);
-      e.preventDefault();
-    }
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData("text");
-    const cleaned = pastedData.replace(/\D/g, "").slice(0, 6);
-
-    if (cleaned.length === 6) {
-      const newOtp = cleaned.split("");
-      setOtp(newOtp);
-      setOtpError("");
-      // Focus the last input
-      document.getElementById("otp-5")?.focus();
-    }
-  };
-
-  const isKycVerified = user?.kycStatus === KycStatus.VERIFIED;
-
-  const handleVerifyOtp = () => {
-    if (!isKycVerified) {
-      setOtpError(
-        "Identity verification (KYC) required to authorize bank transfers.",
-      );
-      return;
-    }
-    const otpValue = otp.join("");
-    if (otpValue.length !== 6) {
-      setOtpError("Please enter complete 6-digit code");
-      return;
-    }
-
-    setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      if (otpValue === "123456") {
-        setStep("instructions");
-      } else {
-        setOtpError("Invalid OTP. Try 123456 for demo.");
-      }
-    }, 1500);
-  };
+    };
+    fetchBankDetails();
+  }, [vaultId, router]);
 
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopied(field);
+    toast.success(`${field} copied to clipboard`);
     setTimeout(() => setCopied(""), 2000);
   };
 
-  const handlePaymentConfirmed = () => {
-    setStep("processing");
+  const handleConfirmTransfer = async () => {
+    setIsProcessing(true);
+    try {
+      // Simulate the Partna Webhook for automated settlement
+      const backendUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+      const response = await fetch(`${backendUrl}/api/webhooks/partna`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reference: bankDetails?.providerRef || `vault_fund_${vaultId}`,
+          status: "success",
+          amount: String(amount),
+          type: "collection",
+          voucherCode: `MOCK_VOUCHER_${Date.now()}`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("On-chain settlement failed. Please try again.");
+      }
+
+      toast.success("Payment detected!", {
+        description: "Your funds are being secured in the escrow account.",
+      });
+
+      router.push(`/client/vault/${vaultId}?success=true`);
+    } catch (err: any) {
+      console.error("Confirmation failed", err);
+      toast.error("Confirmation Failed", {
+        description: err.message || "Failed to process on-chain deposit.",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
-  };
+  if (vaultsLoading || !bankDetails)
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center text-slate-900 font-['Poppins',sans-serif]">
+        <div className="animate-spin text-emerald-600">
+          <Lock />
+        </div>
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white/80 font-['Poppins',sans-serif] antialiased">
-      <AnimatePresence>{isProcessing && <ProcessingOverlay />}</AnimatePresence>
-
+    <div className="min-h-screen bg-white text-slate-600 font-['Poppins',sans-serif] antialiased">
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT SIDEBAR */}
-        <Sidebar amount={amount} transactionId={transactionId} step={step} />
-
-        {/* RIGHT CONTENT AREA */}
-        <main className="flex-1 p-8 lg:p-20 flex items-center justify-center relative bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-white/2 via-transparent to-transparent">
-          <div className="max-w-5xl w-full">
-            {/* Back Button */}
-            {(step === "verification" || step === "instructions") && (
-              <button
-                onClick={() => router.push(`/checkout/${vaultId}`)}
-                className="flex items-center gap-3 text-white/40 hover:text-emerald-500 transition-all text-[10px] font-bold tracking-[0.3em] mb-12 group bg-white/2 border border-white/5 py-4 px-6 rounded-2xl italic"
+        <section className="w-full lg:w-[350px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
+          <div className="space-y-16 relative z-10">
+            <div className="flex items-center gap-4">
+              <div
+                className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-600/10 active:scale-95 transition-transform cursor-pointer"
+                onClick={() => router.push("/client")}
               >
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                Back to selection
-              </button>
-            )}
+                <Lock className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-slate-900 font-bold tracking-tighter text-2xl italic">
+                Dayle
+              </span>
+            </div>
+            <div className="space-y-10">
+              <div className="space-y-3">
+                <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em] italic leading-none uppercase">
+                  Total transfer
+                </p>
+                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-7xl italic flex items-baseline gap-2">
+                  <span className="text-emerald-600 font-bold text-3xl">
+                    {currencyPrefix}
+                  </span>
+                  {displayAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </h1>
+              </div>
+              <div className="pt-10 border-t border-slate-200 space-y-6">
+                <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-slate-900 uppercase">
+                  <span className="text-slate-600 italic">Project account</span>
+                  <span className="text-emerald-600 italic tracking-normal text-[9px]">
+                    {vault?.vaultAddress || "Deployment Pending"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
+            <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 text-emerald-600 text-[10px] font-bold tracking-[0.3em] mb-4 italic uppercase">
+                <Shield className="w-4 h-4" /> Secure Funding
+              </div>
+              <p className="text-[10px] text-slate-600 leading-relaxed font-bold tracking-widest italic uppercase">
+                Bank-verified secure funding. Assets are protected in escrow via
+                Partna.
+              </p>
+            </div>
+          </div>
+        </section>
 
-            <AnimatePresence mode="wait">
-              {/* VERIFICATION SCREEN */}
-              {step === "verification" && (
-                <VerificationScreen
-                  otp={otp}
-                  otpError={otpError}
-                  onOtpChange={handleOtpChange}
-                  onOtpKeyDown={handleOtpKeyDown}
-                  onOtpPaste={handleOtpPaste}
-                  onVerify={handleVerifyOtp}
-                  onResend={() => setOtpError("")}
-                  isKycVerified={isKycVerified}
-                />
-              )}
+        {/* MAIN CONTENT AREA */}
+        <main className="flex-1 p-8 lg:p-20 flex items-center justify-center relative bg-slate-50/50">
+          <div className="max-w-4xl w-full">
+            {/* Back Button */}
+            <button
+              onClick={() => router.push(`/checkout/${vaultId}`)}
+              className="flex items-center gap-3 text-slate-900 hover:text-emerald-500 transition-all text-[10px] font-bold tracking-[0.3em] mb-12 group bg-white border border-slate-200 py-4 px-6 rounded-2xl italic shadow-sm"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Change payment method
+            </button>
 
-              {/* PAYMENT INSTRUCTIONS SCREEN */}
-              {step === "instructions" && (
-                <PaymentInstructionsScreen
-                  amount={amount}
-                  transactionId={transactionId}
-                  timeRemaining={timeRemaining}
-                  formatTime={formatTime}
-                  onCopy={handleCopy}
-                  copied={copied}
-                  onConfirm={handlePaymentConfirmed}
-                  isKycVerified={isKycVerified}
-                />
-              )}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid lg:grid-cols-2 gap-16 items-start"
+            >
+              {/* INFO CARD */}
+              <div className="p-10 bg-white border border-slate-200 rounded-[2.5rem] space-y-10 relative overflow-hidden shadow-xl">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -mr-32 -mt-32" />
+                <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-4xl flex items-center justify-center shadow-inner group">
+                  <Building2 className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
+                </div>
+                <div className="space-y-4">
+                  <h4 className="text-3xl font-bold text-slate-900 italic tracking-tighter">
+                    Transfer instructions
+                  </h4>
+                  <p className="text-[11px] text-slate-600 leading-relaxed font-bold tracking-widest italic">
+                    Please transfer the exact amount to the virtual bank account
+                    below. Your funds will be automatically detected and secured
+                    in the escrow contract upon bank confirmation.
+                  </p>
+                </div>
 
-              {/* PROCESSING/STATUS SCREEN */}
-              {step === "processing" && (
-                <ProcessingStatusScreen
-                  status={processingStatus}
-                  transactionId={transactionId}
-                  amount={amount}
-                />
-              )}
+                <div className="pt-10 border-t border-slate-100 space-y-6">
+                  <div className="flex items-center gap-4 text-[10px] font-bold text-slate-600 tracking-[0.3em] italic uppercase">
+                    <Globe className="w-4 h-4 text-emerald-600" /> Partna Direct
+                    Settlement
+                  </div>
+                  <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 flex gap-4">
+                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 shrink-0">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <p className="text-[11px] text-amber-700 leading-relaxed font-bold tracking-wide italic">
+                      Account expires in{" "}
+                      <span className="text-amber-900 font-extrabold">
+                        24 hours
+                      </span>
+                      . Please complete your transfer before then.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-              {/* SUCCESS SCREEN */}
-              {step === "success" && (
-                <SuccessScreen
-                  amount={amount}
-                  transactionId={transactionId}
-                  onContinue={() => router.push("/client")}
-                />
-              )}
+              {/* BANK DETAILS */}
+              <div className="space-y-8 flex flex-col">
+                <div className="bg-white border border-slate-200 rounded-[2.5rem] divide-y divide-slate-50 overflow-hidden shadow-xl">
+                  <BankInfo label="Bank Name" value={bankDetails.bankName} />
+                  <BankInfo
+                    label="Account Number"
+                    value={bankDetails.accountNumber}
+                    copy
+                    onCopy={() =>
+                      handleCopy(bankDetails.accountNumber, "Account Number")
+                    }
+                    copied={copied === "Account Number"}
+                  />
+                  <BankInfo
+                    label="Account Name"
+                    value={bankDetails.accountName}
+                  />
+                  <BankInfo
+                    label="Amount to Transfer"
+                    value={`${currencyPrefix}${Number(bankDetails.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                    highlight
+                  />
+                </div>
 
-              {/* FAILURE SCREEN */}
-              {step === "failure" && (
-                <FailureScreen
-                  onRetry={() => setStep("instructions")}
-                  onExit={() => router.push(`/checkout/${vaultId}`)}
-                />
-              )}
-            </AnimatePresence>
+                <div className="p-8 bg-white border border-slate-200 rounded-3xl flex flex-col items-center gap-6 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <p className="text-[10px] font-bold text-slate-500 tracking-widest uppercase italic">
+                      Awaiting confirmation from bank...
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleConfirmTransfer}
+                    disabled={isProcessing}
+                    className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-3xl shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.2em] italic disabled:opacity-50"
+                  >
+                    {isProcessing ? "Processing..." : "I've sent the transfer"}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </main>
       </div>
@@ -284,693 +294,17 @@ export default function BankTransferPage() {
   );
 }
 
-// --- COMPONENTS ---
-
-interface SidebarProps {
-  amount: number;
-  transactionId: string;
-  step: string;
-}
-
-function Sidebar({ amount, transactionId, step }: SidebarProps) {
+function BankInfo({ label, value, copy, onCopy, copied, highlight }: any) {
   return (
-    <section className="w-full lg:w-[350px] bg-[#080808] p-12 border-r border-white/5 flex flex-col justify-between relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
-      <div className="space-y-16 relative z-10">
-        <div className="flex items-center gap-4">
-          <div
-            className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform cursor-pointer"
-            onClick={() => (window.location.href = "/client")}
-          >
-            <Lock className="w-5 h-5 text-black" />
-          </div>
-          <span className="text-white font-bold tracking-tighter text-2xl italic">
-            Dayle
-          </span>
-        </div>
-        <div className="space-y-10">
-          <div className="space-y-3">
-            <p className="text-[10px] font-bold text-white/40 tracking-[0.4em] italic leading-none">
-              Total transfer
-            </p>
-            <h1 className="text-6xl font-bold text-white tracking-tighter font-mono flex items-baseline gap-2">
-              <span className="text-emerald-500 font-bold text-3xl">$</span>
-              {amount.toLocaleString()}
-            </h1>
-          </div>
-          {step !== "verification" && (
-            <div className="pt-10 border-t border-white/5 space-y-2">
-              <p className="text-sm text-white/60 font-mono tracking-tight bg-white/2 p-4 rounded-xl border border-white/5 truncate">
-                {transactionId}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="p-8 bg-emerald-500/5 border border-emerald-500/10 rounded-[2.5rem] relative group overflow-hidden">
-        <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-bold tracking-[0.3em] mb-4 italic">
-            <Shield className="w-4 h-4" /> Secure Funding
-          </div>
-          <p className="text-xs text-white/40 leading-relaxed font-bold tracking-widest italic">
-            Bank-verified secure funding. Assets are protected in escrow.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-interface VerificationScreenProps {
-  otp: string[];
-  otpError: string;
-  onOtpChange: (index: number, value: string) => void;
-  onOtpKeyDown: (index: number, e: React.KeyboardEvent) => void;
-  onOtpPaste: (e: React.ClipboardEvent) => void;
-  onVerify: () => void;
-  onResend: () => void;
-  isKycVerified: boolean;
-}
-
-function VerificationScreen({
-  otp,
-  otpError,
-  onOtpChange,
-  onOtpKeyDown,
-  onOtpPaste,
-  onVerify,
-  onResend,
-  isKycVerified,
-}: VerificationScreenProps) {
-  return (
-    <motion.div
-      key="verification"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="max-w-md mx-auto space-y-12"
+    <div
+      className={`p-8 flex justify-between items-center group transition-colors hover:bg-slate-50 ${highlight ? "bg-emerald-50/30" : ""}`}
     >
-      <div className="text-center space-y-4">
-        <div className="w-20 h-20 bg-emerald-500/10 rounded-4xl flex items-center justify-center mx-auto border border-emerald-500/10 shadow-[0_0_40px_rgba(16,185,129,0.1)]">
-          <Shield className="w-10 h-10 text-emerald-500" />
-        </div>
-        <h2 className="text-4xl font-bold text-white tracking-tighter italic">
-          Identity verification
-        </h2>
-        <p className="text-[10px] text-white/30 font-bold tracking-[0.3em] italic">
-          Enter the security code
-        </p>
-      </div>
-
-      <div className="space-y-10">
-        <div className="flex gap-4 justify-center">
-          {otp.map((digit, index) => (
-            <input
-              key={index}
-              id={`otp-${index}`}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              value={digit}
-              onChange={(e) => onOtpChange(index, e.target.value)}
-              onKeyDown={(e) => onOtpKeyDown(index, e)}
-              onPaste={index === 0 ? onOtpPaste : undefined}
-              className={`w-14 h-14 bg-white/2 border ${otpError ? "border-red-500" : "border-white/5"} rounded-2xl text-center text-2xl font-bold text-white focus:border-emerald-500/30 outline-none transition-all shadow-inner font-mono italic`}
-            />
-          ))}
-        </div>
-        {otpError && (
-          <motion.div
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 text-red-500 text-[10px] font-bold tracking-widest justify-center italic bg-red-500/5 p-4 rounded-xl border border-red-500/10"
-          >
-            <AlertCircle className="w-4 h-4" />
-            {otpError}
-          </motion.div>
-        )}
-
-        <button
-          onClick={onVerify}
-          disabled={!isKycVerified}
-          className={`w-full h-16 ${isKycVerified ? "bg-emerald-500 hover:bg-emerald-400" : "bg-white/5 text-white/20 cursor-not-allowed"} text-black font-bold text-xs rounded-3xl shadow-[0_0_30px_rgba(16,185,129,0.2)] transition-all active:scale-[0.98]`}
-        >
-          {isKycVerified ? "Verify & Continue" : "KYC Required"}
-        </button>
-
-        <button
-          onClick={onResend}
-          className="w-full text-white/30 hover:text-white transition-all text-[10px] font-bold tracking-[0.3em] italic"
-        >
-          Didn't receive code?{" "}
-          <span className="text-emerald-500 underline decoration-emerald-500/30 underline-offset-4">
-            Resend code
-          </span>
-        </button>
-      </div>
-
-      <div className="p-6 bg-white/1 border border-white/5 rounded-2xl">
-        <p className="text-[9px] text-white/20 text-center font-bold tracking-[0.3em] italic leading-loose">
-          💡 Demo Mode: Use bypass sequence{" "}
-          <span className="text-emerald-500 font-mono">123456</span>
-        </p>
-      </div>
-    </motion.div>
-  );
-}
-
-interface PaymentInstructionsScreenProps {
-  amount: number;
-  transactionId: string;
-  timeRemaining: number;
-  formatTime: (s: number) => string;
-  onCopy: (t: string, f: string) => void;
-  copied: string;
-  onConfirm: () => void;
-  isKycVerified: boolean;
-}
-
-function PaymentInstructionsScreen({
-  amount,
-  transactionId,
-  timeRemaining,
-  formatTime,
-  onCopy,
-  copied,
-  onConfirm,
-  isKycVerified,
-}: PaymentInstructionsScreenProps) {
-  return (
-    <motion.div
-      key="instructions"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="grid lg:grid-cols-2 gap-20 items-stretch"
-    >
-      {/* INFO CARD */}
-      <div className="p-12 bg-[#0D0D0E] border border-white/5 rounded-[3rem] space-y-10 relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/2 rounded-full blur-3xl -mr-32 -mt-32" />
-        <div className="w-16 h-16 bg-emerald-500/10 rounded-4xl flex items-center justify-center border border-emerald-500/10 shadow-inner group">
-          <Building2 className="text-emerald-500 w-8 h-8 group-hover:scale-110 transition-transform" />
-        </div>
-        <div className="space-y-4">
-          <h4 className="text-3xl font-bold text-white italic">
-            Transfer instructions
-          </h4>
-          <p className="text-xs text-white/40 leading-relaxed font-bold tracking-[0.2em] italic">
-            Please transfer the funds to the account below. Including the
-            reference code is required for automated confirmation.
-          </p>
-        </div>
-
-        <div className="pt-10 border-t border-white/5 space-y-6">
-          <div className="flex items-center gap-4 text-[10px] font-bold text-white/60 tracking-[0.3em] italic">
-            <Globe className="w-4 h-4 text-emerald-500" /> Global ACH / Swift
-            network
-          </div>
-          <div className="flex items-center gap-4 text-[10px] font-bold text-amber-500 tracking-[0.3em] italic bg-amber-500/5 p-4 rounded-xl border border-amber-500/10">
-            <Clock className="w-4 h-4" /> {formatTime(timeRemaining)} remaining
-          </div>
-        </div>
-      </div>
-
-      {/* BANK DETAILS */}
-      <div className="space-y-8 flex flex-col">
-        <div className="bg-[#0D0D0E] border border-white/5 rounded-[2.5rem] divide-y divide-white/5 overflow-hidden shadow-2xl">
-          <BankInfo label="Bank Name" value="Dayle Trust Terminal" />
-          <BankInfo
-            label="Account Number"
-            value="9920 1120 4452"
-            copy
-            onCopy={() => onCopy("9920 1120 4452", "account")}
-            copied={copied === "account"}
-          />
-          <BankInfo
-            label="Routing Number"
-            value="121000358"
-            copy
-            onCopy={() => onCopy("121000358", "routing")}
-            copied={copied === "routing"}
-          />
-          <BankInfo
-            label="Transfer Sum"
-            value={`$${amount.toLocaleString()}`}
-            highlight
-          />
-          <BankInfo
-            label="Ref Code"
-            value={transactionId}
-            copy
-            onCopy={() => onCopy(transactionId, "reference")}
-            copied={copied === "reference"}
-            highlight
-          />
-        </div>
-
-        <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl relative overflow-hidden group">
-          <div className="flex items-start gap-4 relative z-10">
-            <AlertCircle className="w-6 h-6 text-amber-500 shrink-0 mt-0.5" />
-            <p className="text-[10px] text-amber-500/80 leading-relaxed font-bold tracking-widest italic">
-              <span className="text-white">Critical:</span> You must attach the
-              reference code to ensure automated confirmation. Transfers without
-              a reference code may take longer to process.
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={onConfirm}
-          disabled={!isKycVerified}
-          className={`w-full h-16 ${isKycVerified ? "bg-emerald-500 hover:bg-emerald-400" : "bg-white/5 text-white/20 cursor-not-allowed"} text-black font-bold text-xs rounded-3xl shadow-[0_0_40px_rgba(16,185,129,0.2)] transition-all active:scale-[0.98] mt-auto`}
-        >
-          {isKycVerified ? "I've sent the transfer" : "KYC Required"}
-        </button>
-      </div>
-    </motion.div>
-  );
-}
-
-interface ProcessingStatusScreenProps {
-  status: string;
-  transactionId: string;
-  amount: number;
-}
-
-function ProcessingStatusScreen({
-  status,
-  transactionId,
-  amount,
-}: ProcessingStatusScreenProps) {
-  const [currentTime] = useState(new Date());
-
-  const getStatusMessage = () => {
-    switch (status) {
-      case "pending":
-        return "Connecting to bank...";
-      case "processing":
-        return "Verifying payment...";
-      case "completed":
-        return "Finalizing project funding...";
-      default:
-        return "Confirming payment...";
-    }
-  };
-
-  const getProgressPercentage = () => {
-    switch (status) {
-      case "pending":
-        return 25;
-      case "processing":
-        return 65;
-      case "completed":
-        return 95;
-      default:
-        return 0;
-    }
-  };
-
-  const formatTimestamp = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    });
-  };
-
-  const steps = [
-    {
-      id: "created",
-      label: "Transfer Initiated",
-      description: "Transfer request logged",
-      timestamp: formatTimestamp(currentTime),
-      status: "completed",
-    },
-    {
-      id: "initiated",
-      label: "Network Verification",
-      description: "Verifying transfer parameters",
-      timestamp:
-        status !== "pending"
-          ? formatTimestamp(new Date(currentTime.getTime() + 2000))
-          : null,
-      status: status === "pending" ? "current" : "completed",
-    },
-    {
-      id: "received",
-      label: "Funds Secured",
-      description: "Assets confirmed in transit",
-      timestamp:
-        status === "completed"
-          ? formatTimestamp(new Date(currentTime.getTime() + 5000))
-          : null,
-      status:
-        status === "processing"
-          ? "current"
-          : status === "completed"
-            ? "completed"
-            : "pending",
-    },
-    {
-      id: "credited",
-      label: "Final Settlement",
-      description: "Funding project account",
-      timestamp: null,
-      status: status === "completed" ? "current" : "pending",
-    },
-  ];
-
-  return (
-    <motion.div
-      key="processing"
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="max-w-3xl mx-auto space-y-12"
-    >
-      {/* HEADER */}
-      <div className="text-center space-y-6">
-        <div className="inline-flex items-center justify-center w-24 h-24 bg-emerald-500/5 rounded-full border border-emerald-500/20 relative shadow-2xl">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 border border-transparent border-t-emerald-500/40 rounded-full"
-          />
-          <Zap className="w-10 h-10 text-emerald-500 animate-pulse" />
-        </div>
-        <div className="space-y-3">
-          <h2 className="text-4xl font-bold text-white tracking-tighter italic">
-            Processing transfer
-          </h2>
-          <p className="text-[10px] text-emerald-500 font-bold tracking-[0.4em] max-w-md mx-auto italic leading-relaxed">
-            {getStatusMessage()}
-          </p>
-        </div>
-      </div>
-
-      {/* PROGRESS BAR */}
-      <div className="bg-[#0D0D0E] border border-white/5 rounded-4xl p-10 space-y-6 shadow-2xl relative overflow-hidden">
-        <div className="flex items-center justify-between text-[10px] font-bold tracking-[0.4em] italic leading-none">
-          <span className="text-white/30">Processing</span>
-          <span className="text-emerald-500">{getProgressPercentage()}%</span>
-        </div>
-        <div className="relative h-2.5 bg-white/5 rounded-full overflow-hidden shadow-inner">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${getProgressPercentage()}%` }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-y-0 left-0 bg-linear-to-r from-emerald-600 via-emerald-400 to-emerald-500 rounded-full"
-          />
-        </div>
-      </div>
-
-      {/* TIMELINE */}
-      <div className="bg-[#0D0D0E] border border-white/5 rounded-[3rem] p-12 shadow-2xl">
-        <h3 className="text-[10px] font-bold text-white/30 tracking-[0.5em] mb-12 italic">
-          Payment status
-        </h3>
-        <div className="space-y-10">
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="flex items-start gap-8"
-            >
-              {/* ICON */}
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500 ${
-                    step.status === "completed"
-                      ? "bg-emerald-500 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                      : step.status === "current"
-                        ? "bg-emerald-500/10 border-emerald-500/20 shadow-inner"
-                        : "bg-white/2 border-white/5"
-                  }`}
-                >
-                  {step.status === "completed" ? (
-                    <Check className="w-6 h-6 text-black" />
-                  ) : step.status === "current" ? (
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="w-4 h-4 bg-emerald-500 rounded-full"
-                    />
-                  ) : (
-                    <div className="w-3 h-3 bg-white/10 rounded-full" />
-                  )}
-                </div>
-                {index < steps.length - 1 && (
-                  <div
-                    className={`w-0.5 h-16 mt-3 transition-all duration-700 ${
-                      step.status === "completed"
-                        ? "bg-emerald-500"
-                        : "bg-white/5"
-                    }`}
-                  />
-                )}
-              </div>
-
-              {/* CONTENT */}
-              <div className="flex-1 pt-2">
-                <div className="flex items-start justify-between gap-6 mb-2">
-                  <h4
-                    className={`font-bold text-xl tracking-tighter italic transition-colors ${
-                      step.status === "completed" || step.status === "current"
-                        ? "text-white"
-                        : "text-white/20"
-                    }`}
-                  >
-                    {step.label}
-                  </h4>
-                  {step.timestamp && (
-                    <span className="text-[10px] text-white/20 whitespace-nowrap font-bold tracking-[0.2em] italic bg-white/2 p-2 rounded-lg border border-white/5">
-                      {step.timestamp}
-                    </span>
-                  )}
-                </div>
-                <p
-                  className={`text-xs font-bold tracking-widest italic transition-colors ${
-                    step.status === "completed" || step.status === "current"
-                      ? "text-white/40"
-                      : "text-white/10"
-                  }`}
-                >
-                  {step.description}
-                </p>
-                {step.status === "current" && (
-                  <div className="mt-4 flex items-center gap-3">
-                    <div className="flex gap-1.5">
-                      {[0, 0.2, 0.4].map((delay, i) => (
-                        <motion.div
-                          key={i}
-                          animate={{
-                            opacity: [0.2, 1, 0.2],
-                            scale: [0.8, 1, 0.8],
-                          }}
-                          transition={{
-                            duration: 1.5,
-                            repeat: Infinity,
-                            delay,
-                          }}
-                          className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
-                        />
-                      ))}
-                    </div>
-                    <span className="text-[9px] text-emerald-500 font-bold tracking-[0.4em] italic">
-                      Finalizing secure transfer
-                    </span>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* FOOTER INFO */}
-      <div className="flex items-center justify-center gap-3 text-[10px] font-bold tracking-[0.3em] italic text-white/20">
-        <Clock className="w-4 h-4" />
-        Estimated consolidation:{" "}
-        <span className="text-white/60 font-mono">2 - 5 cycles</span>
-      </div>
-
-      {/* HELP TEXT */}
-      <div className="text-center">
-        <p className="text-[10px] font-bold text-white/10 tracking-[0.3em] italic max-w-md mx-auto leading-relaxed border-t border-white/5 pt-8">
-          Node stability confirmed. You may terminate this connection session;
-          autonomous notification will manifest upon settlement.
-        </p>
-      </div>
-    </motion.div>
-  );
-}
-
-interface SuccessScreenProps {
-  amount: number;
-  transactionId: string;
-  onContinue: () => void;
-}
-
-function SuccessScreen({
-  amount,
-  transactionId,
-  onContinue,
-}: SuccessScreenProps) {
-  return (
-    <motion.div
-      key="success"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center text-center max-w-xl mx-auto space-y-12"
-    >
-      <div className="w-32 h-32 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center shadow-[0_0_60px_rgba(16,185,129,0.4)] relative">
-        <div className="absolute inset-0 bg-white/20 rounded-[2.5rem] animate-ping" />
-        <CheckCircle2 className="w-16 h-16 text-black relative z-10" />
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-5xl font-bold text-white tracking-tighter italic">
-          Protocol complete
-        </h2>
-        <p className="text-[10px] text-emerald-500 font-bold tracking-[0.5em] italic">
-          Liquidity successfully consolidated into vault
-        </p>
-      </div>
-
-      <div className="w-full bg-[#0D0D0E] border border-white/5 rounded-[3rem] p-10 space-y-8 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-2xl" />
-        <div className="flex justify-between items-center relative z-10">
-          <span className="text-[10px] text-white/30 font-bold tracking-[0.3em] italic">
-            Asset settlement
-          </span>
-          <span className="text-4xl font-bold text-white italic tracking-widest font-mono">
-            ${amount.toLocaleString()}
-          </span>
-        </div>
-        <div className="pt-8 border-t border-white/5 relative z-10">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] text-white/30 font-bold tracking-[0.3em] italic">
-              Ledger reference
-            </span>
-            <span className="text-[10px] text-white/70 font-mono tracking-normal border-b border-white/10 pb-1">
-              {transactionId}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <button
-        onClick={onContinue}
-        className="w-full h-20 bg-white text-black font-bold tracking-[0.3em] text-sm rounded-4xl hover:bg-slate-200 transition-all shadow-2xl active:scale-[0.98]"
-      >
-        Return to origin terminal
-      </button>
-    </motion.div>
-  );
-}
-
-interface FailureScreenProps {
-  onRetry: () => void;
-  onExit: () => void;
-}
-
-function FailureScreen({ onRetry, onExit }: FailureScreenProps) {
-  return (
-    <motion.div
-      key="failure"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center text-center max-w-xl mx-auto space-y-12"
-    >
-      <div className="w-24 h-24 bg-red-500/10 rounded-4xl flex items-center justify-center border border-red-500/20 shadow-[0_0_40px_rgba(239,68,68,0.1)]">
-        <XCircle className="w-12 h-12 text-red-500" />
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-4xl font-bold text-white tracking-tighter italic">
-          Protocol interrupted
-        </h2>
-        <p className="text-[10px] text-red-500 font-bold tracking-[0.4em] italic">
-          Liquidity stream failed to manifest
-        </p>
-      </div>
-
-      <div className="w-full bg-[#0D0D0E] border border-red-500/10 rounded-[2.5rem] p-10 space-y-6 shadow-2xl">
-        <div className="flex items-start gap-4">
-          <AlertCircle className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
-          <div className="text-left space-y-4">
-            <p className="text-[10px] font-bold text-white/50 tracking-[0.3em] italic">
-              Deviation parameters:
-            </p>
-            <ul className="text-[10px] text-white/40 font-bold tracking-widest space-y-3 list-none italic">
-              <li className="flex items-center gap-3">
-                <span className="w-1 h-1 bg-red-500/30 rounded-full" /> Temporal
-                timeout (24h Window Expired)
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="w-1 h-1 bg-red-500/30 rounded-full" />{" "}
-                Reference Code Mismatch
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="w-1 h-1 bg-red-500/30 rounded-full" /> Source
-                Liquidity Insufficiency
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="w-1 h-1 bg-red-500/30 rounded-full" /> Terminal
-                Handshake Rejected
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full space-y-4">
-        <button
-          onClick={onRetry}
-          className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs rounded-3xl shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-        >
-          <RefreshCcw className="w-5 h-5" />
-          Reset protocol
-        </button>
-        <button
-          onClick={onExit}
-          className="w-full h-16 border border-white/5 bg-white/2 text-white/30 hover:text-white font-bold text-xs rounded-3xl transition-all"
-        >
-          Re-route payment vector
-        </button>
-      </div>
-
-      <button className="text-[10px] text-white/20 hover:text-emerald-500 font-bold tracking-[0.4em] italic transition-all border-b border-white/5 pb-2">
-        Request tech-support intervention →
-      </button>
-    </motion.div>
-  );
-}
-
-interface BankInfoProps {
-  label: string;
-  value: string;
-  copy?: boolean;
-  onCopy?: () => void;
-  copied?: boolean;
-  highlight?: boolean;
-}
-
-function BankInfo({
-  label,
-  value,
-  copy,
-  onCopy,
-  copied,
-  highlight,
-}: BankInfoProps) {
-  return (
-    <div className="p-8 flex justify-between items-center group/info">
-      <div className="space-y-2">
-        <p className="text-[10px] font-bold text-white/20 tracking-[0.3em] italic group-hover/info:text-white/40 transition-colors">
+      <div className="space-y-1">
+        <p className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase italic">
           {label}
         </p>
         <p
-          className={`text-sm font-bold tracking-widest italic ${highlight ? "text-emerald-500 shadow-sm" : "text-white"}`}
+          className={`text-xl font-bold tracking-tight italic ${highlight ? "text-emerald-700" : "text-slate-900"}`}
         >
           {value}
         </p>
@@ -978,40 +312,15 @@ function BankInfo({
       {copy && (
         <button
           onClick={onCopy}
-          className="group/copy relative w-10 h-10 rounded-xl bg-white/2 border border-white/5 flex items-center justify-center hover:bg-emerald-500 transition-all"
+          className={`p-3 rounded-xl transition-all ${copied ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-400 group-hover:bg-white group-hover:text-emerald-600 group-hover:shadow-sm"}`}
         >
           {copied ? (
-            <Check className="w-5 h-5 text-black" />
+            <Check className="w-5 h-5" />
           ) : (
-            <Copy className="w-5 h-5 text-white/20 group-hover/copy:text-black transition-all" />
+            <Copy className="w-5 h-5" />
           )}
         </button>
       )}
     </div>
-  );
-}
-
-function ProcessingOverlay() {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-100 bg-black/98 backdrop-blur-3xl flex flex-col items-center justify-center text-center"
-    >
-      <div className="relative w-32 h-32 mb-12">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 border border-emerald-500/10 border-t-emerald-500 rounded-full"
-        />
-        <Fingerprint className="w-12 h-12 text-emerald-500 absolute inset-0 m-auto animate-pulse" />
-      </div>
-      <h3 className="text-3xl font-bold text-white italic tracking-tighter mb-4">
-        Authenticating...
-      </h3>
-      <p className="text-[10px] font-bold tracking-[0.5em] text-emerald-500/40 italic">
-        Biometric handshake in progress
-      </p>
-    </motion.div>
   );
 }

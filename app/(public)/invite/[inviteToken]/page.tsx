@@ -292,13 +292,13 @@ export default function InvitePage() {
             </div>
 
             <div className="relative z-10">
-              <h3 className="text-xs font-bold tracking-wide text-white/40 mb-6">
+              <h3 className="text-xs font-bold tracking-wide text-slate-900 mb-6">
                 Safe project summary
               </h3>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-white/40 text-xs font-bold tracking-wide mb-1">
+                  <p className="text-slate-900 text-xs font-bold tracking-wide mb-1">
                     Total value
                   </p>
                   <div className="text-3xl font-bold text-white tracking-tight flex items-baseline gap-1">
@@ -327,7 +327,7 @@ export default function InvitePage() {
                         ? "Funds verified & secured"
                         : "Awaiting client funding"}
                     </p>
-                    <p className="text-white/40 text-xs font-medium mt-0.5">
+                    <p className="text-slate-900 text-xs font-medium mt-0.5">
                       {vault.isFunded
                         ? "Capital is held in a secure escrow account."
                         : "Funds must be secured before work begins."}
@@ -344,7 +344,7 @@ export default function InvitePage() {
                       <p className="text-emerald-400 font-bold text-[10px] tracking-wide">
                         Securely verified escrow
                       </p>
-                      <p className="text-white/30 text-[10px] font-mono mt-0.5 break-all">
+                      <p className="text-white/30 text-[10px] italic mt-0.5 break-all">
                         {vault.vaultAddress}
                       </p>
                     </div>

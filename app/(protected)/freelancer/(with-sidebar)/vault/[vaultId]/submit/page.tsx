@@ -146,7 +146,7 @@ export default function SubmissionPage() {
         <header className="pt-8">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-xs text-white/40 hover:text-white transition-all mb-8 font-bold tracking-[0.2em] bg-white/2 border border-white/5 py-2 px-4 rounded-xl cursor-pointer group shadow-lg"
+            className="inline-flex items-center text-xs text-slate-900 hover:text-white transition-all mb-8 font-bold tracking-[0.2em] bg-white/2 border border-white/5 py-2 px-4 rounded-xl cursor-pointer group shadow-lg"
           >
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to project
@@ -154,7 +154,7 @@ export default function SubmissionPage() {
           <h1 className="text-3xl md:text-5xl font-bold text-white italic tracking-tighter leading-none mb-3">
             Submit work
           </h1>
-          <p className="text-[10px] md:text-xs text-white/40 font-bold tracking-[0.2em]">
+          <p className="text-[10px] md:text-xs text-slate-900 font-bold tracking-[0.2em]">
             Detailed delivery checklist for your client.
           </p>
         </header>
@@ -202,7 +202,7 @@ export default function SubmissionPage() {
                     {item.included && (
                       <div className="p-6 border-t border-white/5 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="space-y-3">
-                          <Label className="text-[10px] font-bold tracking-widest text-white/40">
+                          <Label className="text-[10px] font-bold tracking-widest text-slate-900">
                             Notes about this deliverable (optional)
                           </Label>
                           <Textarea
@@ -217,7 +217,7 @@ export default function SubmissionPage() {
                         </div>
 
                         <div className="space-y-3">
-                          <Label className="text-[10px] font-bold tracking-widest text-white/40">
+                          <Label className="text-[10px] font-bold tracking-widest text-slate-900">
                             Deliverable files (optional)
                           </Label>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -231,7 +231,7 @@ export default function SubmissionPage() {
                               />
                               <div className="flex flex-col items-center gap-2">
                                 <Upload className="w-5 h-5 text-white/20 group-hover:text-emerald-500 transition-colors" />
-                                <p className="text-[9px] font-bold text-white/40 tracking-widest">
+                                <p className="text-[9px] font-bold text-slate-900 tracking-widest">
                                   Attach assets
                                 </p>
                               </div>
@@ -297,7 +297,7 @@ export default function SubmissionPage() {
                 variant="ghost"
                 type="button"
                 onClick={() => router.back()}
-                className="flex-1 sm:flex-none h-14 px-8 text-[10px] font-bold tracking-widest text-white/40 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
+                className="flex-1 sm:flex-none h-14 px-8 text-[10px] font-bold tracking-widest text-slate-900 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
               >
                 Cancel
               </Button>

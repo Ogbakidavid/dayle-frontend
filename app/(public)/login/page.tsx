@@ -163,9 +163,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col md:flex-row selection:bg-emerald-500/30 font-[Poppins,sans-serif]">
+    <div className="min-h-screen bg-white flex flex-col md:flex-row selection:bg-emerald-500/30 font-[Poppins,sans-serif]">
       {/* LEFT SIDE: Branding & Features (Visual Anchor) */}
-      <div className="hidden md:flex md:w-[45%] bg-[#080808] relative justify-center p-20 border-r border-white/5 overflow-hidden">
+      <div className="hidden md:flex md:w-[45%] bg-slate-50 relative justify-center p-20 border-r border-slate-200 overflow-hidden">
         {/* Grid Background */}
         <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size:[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
 
@@ -177,14 +177,14 @@ export default function LoginPage() {
             <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-emerald-500/20 text-black">
               <Shield className="w-7 h-7 stroke-[3px]" />
             </div>
-            <span className="font-bold tracking-tighter text-white text-3xl">
+            <span className="font-bold tracking-tighter text-slate-900 text-3xl">
               Dayle
             </span>
           </Link>
 
-          <h1 className="text-6xl lg:text-7xl font-bold text-white leading-[0.95] tracking-tighter mb-12">
+          <h1 className="text-6xl lg:text-7xl font-bold text-slate-900 leading-[0.95] tracking-tighter mb-12">
             Secure <br />
-            <span className="text-emerald-500 italic">payments.</span>
+            <span className="text-emerald-600 italic">payments.</span>
           </h1>
 
           <div className="space-y-8">
@@ -204,13 +204,13 @@ export default function LoginPage() {
             ].map((item, i) => (
               <div key={i} className="flex gap-5 group">
                 <div className="mt-1">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-500 transition-transform group-hover:scale-110" />
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600 transition-transform group-hover:scale-110" />
                 </div>
                 <div>
-                  <h4 className="text-white font-bold text-sm tracking-wide mb-1">
+                  <h4 className="text-slate-900 font-bold text-sm tracking-wide mb-1">
                     {item.title}
                   </h4>
-                  <p className="text-white font-bold text-lg leading-snug">
+                  <p className="text-slate-600 font-bold text-lg leading-snug">
                     {item.text}
                   </p>
                 </div>
@@ -221,16 +221,16 @@ export default function LoginPage() {
       </div>
 
       {/* RIGHT SIDE: Form (The Action) */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-24 bg-[#050505] relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-24 bg-white relative overflow-hidden">
         {/* Subtle Form Background Detail */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/2 blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="w-full max-w-[440px] relative z-10">
           <div className="mb-12">
-            <h2 className="text-4xl font-bold text-white tracking-tight leading-none">
+            <h2 className="text-4xl font-bold text-slate-900 tracking-tight leading-none">
               Sign in
             </h2>
-            <p className="text-white mt-4 text-sm font-bold tracking-wide leading-relaxed">
+            <p className="text-slate-600 mt-4 text-sm font-bold tracking-wide leading-relaxed">
               Access your secure financial workspace.
             </p>
           </div>
@@ -244,7 +244,7 @@ export default function LoginPage() {
               <div className="space-y-3">
                 <Label
                   htmlFor="email"
-                  className="text-sm font-bold tracking-wide text-white ml-1"
+                  className="text-sm font-bold tracking-wide text-slate-700 ml-1"
                 >
                   Email address
                 </Label>
@@ -256,9 +256,9 @@ export default function LoginPage() {
                     placeholder="name@company.com"
                     required
                     defaultValue=""
-                    className="bg-muted! border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white/5! focus:ring-0 transition-all text-white text-lg placeholder:text-white/50 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+                    className="bg-slate-50! border-slate-200 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-600"
                   />
-                  <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                  <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                 </div>
               </div>
 
@@ -273,7 +273,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={loading || (authenticated && !loginFailed)}
-                className="w-full h-16 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-bold text-base transition-all shadow-xl active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full h-16 bg-emerald-600 text-white hover:bg-emerald-700 rounded-2xl font-bold text-base transition-all shadow-xl active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading || (authenticated && !loginFailed) ? (
                   <div className="flex items-center gap-3">
@@ -291,10 +291,10 @@ export default function LoginPage() {
 
               <div className="relative pt-2">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-white/10" />
+                  <span className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-[10px]">
-                  <span className="bg-[#050505] px-2 text-white/30 font-bold tracking-wide">
+                  <span className="bg-white px-2 text-slate-600 font-bold tracking-wide">
                     Or continue with
                   </span>
                 </div>
@@ -306,7 +306,7 @@ export default function LoginPage() {
                   variant="outline"
                   onClick={() => handlePrivyLogin("google")}
                   disabled={!ready || (authenticated && !loginFailed)}
-                  className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
+                  className="h-14 border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 transition-all rounded-2xl group px-0 shadow-sm"
                 >
                   <svg
                     className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform"
@@ -329,7 +329,7 @@ export default function LoginPage() {
                       fill="#EA4335"
                     />
                   </svg>
-                  <span className="text-white/60 font-bold text-[10px] tracking-widest group-hover:text-white transition-colors">
+                  <span className="text-slate-900 font-bold text-[10px] tracking-widest group-hover:text-slate-900 transition-colors">
                     Google
                   </span>
                 </Button>
@@ -339,15 +339,15 @@ export default function LoginPage() {
                   variant="outline"
                   onClick={() => handlePrivyLogin("github")}
                   disabled={!ready || (authenticated && !loginFailed)}
-                  className="h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-2xl group px-0"
+                  className="h-14 border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 transition-all rounded-2xl group px-0 shadow-sm"
                 >
                   <svg
-                    className="w-5 h-5 mr-2 fill-white/60 group-hover:fill-white transition-colors group-hover:scale-110"
+                    className="w-5 h-5 mr-2 fill-slate-500 group-hover:fill-slate-900 transition-colors group-hover:scale-110"
                     viewBox="0 0 24 24"
                   >
                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                   </svg>
-                  <span className="text-white/60 font-bold text-[10px] tracking-widest group-hover:text-white transition-colors">
+                  <span className="text-slate-900 font-bold text-[10px] tracking-widest group-hover:text-slate-900 transition-colors">
                     GitHub
                   </span>
                 </Button>
@@ -379,9 +379,9 @@ export default function LoginPage() {
                     onChange={(e) =>
                       setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
                     }
-                    className="bg-muted! border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white/5! focus:ring-0 transition-all text-white text-lg placeholder:text-white/50 tracking-[0.5em] text-center font-mono"
+                    className="bg-slate-50! border-slate-200 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-600 tracking-[0.5em] text-center italic shadow-sm"
                   />
-                  <KeyRound className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                  <KeyRound className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                 </div>
                 <p className="text-xs text-white/50 font-bold tracking-wide ml-1">
                   Enter the 6-digit code sent to your email
@@ -399,7 +399,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-16 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-bold text-base transition-all shadow-xl active:scale-[0.98]"
+                className="w-full h-16 bg-emerald-600 text-white hover:bg-emerald-700 rounded-2xl font-bold text-base transition-all shadow-xl active:scale-[0.98]"
               >
                 {loading ? (
                   <div className="flex items-center gap-3">
@@ -415,7 +415,7 @@ export default function LoginPage() {
             </form>
           )}
 
-          <p className="mt-12 text-center text-white text-sm font-bold tracking-wide">
+          <p className="mt-12 text-center text-slate-900 text-sm font-bold tracking-wide">
             Don&apos;t have an account?{" "}
             <Link
               href={
@@ -423,7 +423,7 @@ export default function LoginPage() {
                   ? `/onboarding/role?returnTo=${encodeURIComponent(returnTo)}`
                   : "/onboarding/role"
               }
-              className="text-white hover:text-emerald-500 font-bold transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-emerald-500/50"
+              className="text-slate-900 hover:text-emerald-600 font-bold transition-colors underline underline-offset-8 decoration-slate-200 hover:decoration-emerald-500/50"
             >
               Create account
             </Link>

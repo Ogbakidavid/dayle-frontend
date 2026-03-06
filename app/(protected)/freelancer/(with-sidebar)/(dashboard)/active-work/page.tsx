@@ -4,10 +4,21 @@ import * as React from "react";
 import { useVault } from "@/lib/store/vault-context";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowUpRight, Activity } from "lucide-react";
+import {
+  ArrowUpRight,
+  Activity,
+  Zap,
+  ShieldCheck,
+  Users,
+  Clock,
+  ChevronRight,
+} from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { VaultStatus } from "@/lib/domain/enums";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,8 +39,6 @@ const itemVariants = {
     transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as any },
   },
 };
-
-import { VaultStatus } from "@/lib/domain/enums";
 
 export default function ActiveWorkPage() {
   const { vaults, loading } = useVault();
@@ -52,163 +61,180 @@ export default function ActiveWorkPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-12 max-w-6xl mx-auto font-['Poppins',sans-serif] px-6 lg:px-8 py-8"
+      className="min-h-screen bg-slate-50 pb-20 font-['Poppins',sans-serif]"
     >
-      {/* Breadcrumbs / Header */}
-      <div className="space-y-6">
-        <motion.div
-          variants={itemVariants}
-          className="flex items-center gap-3 text-[10px] font-bold text-white/20 tracking-[0.3em] italic"
-        >
-          <Link
-            href="/freelancer"
-            className="hover:text-emerald-500 transition-colors"
-          >
-            Origin
-          </Link>
-          <span className="text-white/5">/</span>
-          <span className="text-emerald-500">Active Node</span>
-        </motion.div>
-
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-white/5 pb-10">
-          <motion.div variants={itemVariants} className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-white italic leading-none">
-              Active assignments
-            </h1>
-            <p className="text-[10px] md:text-xs text-white/30 font-bold tracking-[0.4em] italic">
-              Authorized project streams and deliverable pipelines
-            </p>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Content Section */}
-      <div className="space-y-8">
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-32 bg-white/2 border border-white/5 animate-pulse rounded-4xl"
-              />
-            ))}
-          </div>
-        ) : activeVaults.length === 0 ? (
-          <motion.div
-            variants={itemVariants}
-            className="py-24 text-center bg-white/1 border border-dashed border-white/5 rounded-[3rem] shadow-inner"
-          >
-            <div className="w-20 h-20 bg-white/5 rounded-4xl flex items-center justify-center mx-auto mb-6">
-              <Activity className="w-10 h-10 text-white/10" />
+      <div className="max-w-6xl mx-auto px-6 space-y-12">
+        {/* HEADER */}
+        <header className="pt-8 md:pt-12 space-y-4">
+          {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold tracking-wide text-emerald-700 italic">
+            <Zap className="w-3.5 h-3.5" />
+            Active Node: Workspace
+          </div> */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <div className="space-y-2">
+              <h1 className="text-3xl md:text-5xl font-bold text-slate-900 italic tracking-tighter leading-none">
+                Active assignments
+              </h1>
+              <p className="text-[10px] md:text-xs font-bold text-slate-600 tracking-widest leading-relaxed">
+                A verified stream of your current contractual obligations and
+                deliverable milestones.
+              </p>
             </div>
-            <h3 className="text-2xl font-bold text-white italic tracking-tighter mb-2">
-              Zero active signals
-            </h3>
-            <p className="text-xs text-white/30 font-bold tracking-[0.3em] max-w-sm mx-auto italic">
-              No ongoing assignments detected in the current scope. New project
-              links will materialize here.
-            </p>
-          </motion.div>
-        ) : (
-          <div className="space-y-6">
-            <div className="grid gap-5">
+            <div className="text-right hidden md:block">
+              <p className="text-[9px] font-bold text-slate-600 tracking-widest mb-1 italic">
+                Live throughput
+              </p>
+              <div className="flex items-center gap-2 justify-end">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-xs font-bold text-slate-900 tracking-wide">
+                  {activeVaults.length} Active Node
+                  {activeVaults.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Content Section */}
+        <div className="space-y-8">
+          {loading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-32 bg-white border border-slate-200 animate-pulse rounded-2xl"
+                />
+              ))}
+            </div>
+          ) : activeVaults.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center justify-center py-32 space-y-8 bg-white border border-slate-200 rounded-2xl shadow-sm"
+            >
+              <div className="w-20 h-20 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <ShieldCheck className="w-10 h-10 text-slate-200" />
+              </div>
+              <div className="text-center space-y-2">
+                <p className="text-xl font-bold text-slate-900 tracking-tighter italic">
+                  Clean slate
+                </p>
+                <p className="text-xs font-bold text-slate-600 tracking-widest leading-relaxed max-w-xs mx-auto">
+                  No active assignments detected in your workspace stream.
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <div className="space-y-6">
               {paginatedVaults.map((vault: any) => (
                 <motion.div key={vault.id} variants={itemVariants}>
-                  <Link
-                    href={`/freelancer/vault/${vault.id}`}
-                    className="group flex flex-col lg:flex-row lg:items-center justify-between p-8 bg-[#0D0D0E] border border-white/5 rounded-[2.5rem] hover:border-emerald-500/30 transition-all gap-8 shadow-2xl relative overflow-hidden"
-                  >
-                    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="space-y-3 min-w-0 relative z-10">
-                      <div className="flex flex-wrap items-center gap-4">
-                        <h4 className="text-xl md:text-2xl font-bold text-white italic tracking-tighter group-hover:text-emerald-500 transition-colors truncate">
-                          {vault.title}
-                        </h4>
-                        <span className="px-4 py-1.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold tracking-[0.2em] rounded-full border border-emerald-500/10 whitespace-nowrap shadow-sm">
-                          {vault.status.toLowerCase()}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[10px] text-white/20 font-bold tracking-[0.2em] italic">
-                        <p className="flex items-center gap-2">
-                          Partner node:{" "}
-                          <span className="text-white/40 truncate max-w-[150px]">
-                            {vault.clientName || "Authenticated Client"}
-                          </span>
-                        </p>
-                        <span className="hidden xs:block w-1 h-1 rounded-full bg-white/5" />
-                        <p className="whitespace-nowrap">
-                          Initialized{" "}
-                          <span className="text-white/40">
-                            {vault.createdAt
-                              ? new Date(vault.createdAt).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  },
-                                )
-                              : "Recently"}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
+                  <Link href={`/freelancer/vault/${vault.id}`}>
+                    <Card className="bg-white border border-slate-200 shadow-sm hover:border-emerald-500/20 group transition-all duration-500 cursor-pointer overflow-hidden relative">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500/40 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CardContent className="p-8">
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                          <div className="space-y-4 flex-1 min-w-0">
+                            <div className="flex items-center gap-3">
+                              <h3 className="text-xl md:text-2xl font-bold text-slate-900 italic tracking-tight group-hover:text-emerald-700 transition-colors">
+                                {vault.title}
+                              </h3>
+                            </div>
+                            <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 max-w-2xl font-bold tracking-wide italic">
+                              {vault.description ||
+                                "Standard contractual engagement through the Dayle escrow protocol."}
+                            </p>
+                          </div>
 
-                    <div className="flex items-center justify-between lg:justify-end gap-10 border-t lg:border-t-0 border-white/5 pt-8 lg:pt-0 relative z-10">
-                      <div className="text-left lg:text-right">
-                        <p className="text-[10px] font-bold text-white/20 tracking-[0.3em] mb-2 italic">
-                          Protocol value
-                        </p>
-                        <p className="text-3xl font-bold text-white tracking-widest font-mono italic">
-                          $
-                          {(vault.totalAmount || vault.amount).toLocaleString()}
-                        </p>
-                      </div>
-                      <div className="w-14 h-14 rounded-2xl bg-white/2 border border-white/5 flex items-center justify-center group-hover:bg-emerald-500 group-hover:border-emerald-500 transition-all shadow-xl shrink-0 group-hover:shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-                        <ArrowUpRight className="w-6 h-6 text-white/10 group-hover:text-black transition-colors" />
-                      </div>
-                    </div>
+                          <div className="text-left md:text-right shrink-0">
+                            <p className="text-[9px] font-bold text-slate-600 tracking-widest mb-1 italic">
+                              Contract Value
+                            </p>
+                            <p className="text-2xl md:text-4xl font-bold text-slate-900 tracking-widest italic group-hover:scale-105 transition-transform origin-right">
+                              ${(vault.totalAmount || 0).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="pt-8 mt-8 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6">
+                          <div>
+                            <p className="text-[8px] font-bold text-slate-600 tracking-widest mb-2 italic">
+                              COUNTERPARTY
+                            </p>
+                            <p className="text-[10px] font-bold text-slate-900 tracking-wide flex items-center gap-2">
+                              <Users className="w-3 h-3 text-emerald-600" />
+                              {vault.clientName || "Dayle Client Agent"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[8px] font-bold text-slate-600 tracking-widest mb-2 italic">
+                              TIMESTAMP
+                            </p>
+                            <p className="text-[10px] font-bold text-slate-900 tracking-wide flex items-center gap-2">
+                              <Clock className="w-3 h-3 text-emerald-600" />
+                              {new Date(vault.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[8px] font-bold text-slate-600 tracking-widest mb-2 italic">
+                              VERIFICATION
+                            </p>
+                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100 transition-colors text-[9px] font-bold px-3 py-0.5 rounded-full italic">
+                              Protocol Secured
+                            </Badge>
+                          </div>
+                          <div className="flex justify-end items-center">
+                            <Button
+                              variant="ghost"
+                              className="text-[9px] font-bold tracking-[0.2em] text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 px-4 group/btn"
+                            >
+                              {/* OPEN WORKSPACE */}
+                              <ChevronRight className="w-3 h-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </Link>
                 </motion.div>
               ))}
             </div>
+          )}
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <motion.div
-                variants={itemVariants}
-                className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-white/5 pt-10"
-              >
-                <p className="text-[10px] font-bold text-white/20 tracking-[0.3em] italic">
-                  Displaying {paginatedVaults.length} of {activeVaults.length}{" "}
-                  active assignments
-                </p>
-                <div className="flex gap-4">
-                  <Button
-                    variant="outline"
-                    disabled={currentPage === 1}
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(1, prev - 1))
-                    }
-                    className="h-12 px-8 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 font-bold tracking-[0.3em] hover:text-white transition-all rounded-xl disabled:opacity-20"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={currentPage === totalPages}
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                    }
-                    className="h-12 px-8 text-[10px] border-white/5 bg-white/2 hover:bg-white/5 text-white/40 font-bold tracking-[0.3em] hover:text-white transition-all rounded-xl disabled:opacity-20"
-                  >
-                    Next
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-          </div>
-        )}
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <motion.div
+              variants={itemVariants}
+              className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-slate-200 pt-10"
+            >
+              <p className="text-[10px] font-bold text-slate-600 tracking-widest italic">
+                Displaying {paginatedVaults.length} of {activeVaults.length}{" "}
+                active assignments
+              </p>
+              <div className="flex gap-4">
+                <Button
+                  variant="outline"
+                  disabled={currentPage === 1}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(1, prev - 1))
+                  }
+                  className="h-12 px-8 text-[10px] border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-[0.3em] hover:text-slate-900 transition-all rounded-xl disabled:opacity-30"
+                >
+                  Back
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                  }
+                  className="h-12 px-8 text-[10px] border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-[0.3em] hover:text-slate-900 transition-all rounded-xl disabled:opacity-30"
+                >
+                  Next
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </div>
       </div>
     </motion.div>
   );

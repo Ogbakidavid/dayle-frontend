@@ -35,9 +35,9 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col md:flex-row selection:bg-emerald-500/30 font-['Poppins',sans-serif]">
+    <div className="min-h-screen bg-white flex flex-col md:flex-row selection:bg-emerald-500/30 font-['Poppins',sans-serif]">
       {/* LEFT SIDE: Branding & Features */}
-      <div className="hidden md:flex md:w-[45%] bg-[#080808] relative justify-center p-20 border-r border-white/5 overflow-hidden">
+      <div className="hidden md:flex md:w-[45%] bg-slate-50 relative justify-center p-20 border-r border-slate-200 overflow-hidden">
         {/* Grid Background */}
         <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
 
@@ -49,14 +49,14 @@ export default function ForgotPasswordPage() {
             <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-emerald-500/20 text-black">
               <Shield className="w-7 h-7 stroke-[3px]" />
             </div>
-            <span className="font-bold tracking-tighter text-white text-3xl">
+            <span className="font-bold tracking-tighter text-slate-900 text-3xl">
               Dayle
             </span>
           </Link>
 
-          <h1 className="text-6xl lg:text-7xl font-bold text-white leading-[0.95] tracking-tighter mb-12">
+          <h1 className="text-6xl lg:text-7xl font-bold text-slate-900 leading-[0.95] tracking-tighter mb-12">
             Recover <br />
-            <span className="text-emerald-500 italic">access.</span>
+            <span className="text-emerald-600 italic">access.</span>
           </h1>
 
           <div className="space-y-8">
@@ -76,13 +76,13 @@ export default function ForgotPasswordPage() {
             ].map((item, i) => (
               <div key={i} className="flex gap-5 group">
                 <div className="mt-1">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-500 transition-transform group-hover:scale-110" />
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600 transition-transform group-hover:scale-110" />
                 </div>
                 <div>
-                  <h4 className="text-white font-bold text-sm tracking-wide mb-1">
+                  <h4 className="text-slate-900 font-bold text-sm tracking-wide mb-1">
                     {item.title}
                   </h4>
-                  <p className="text-white font-bold text-lg leading-snug">
+                  <p className="text-slate-600 font-bold text-lg leading-snug">
                     {item.text}
                   </p>
                 </div>
@@ -93,24 +93,24 @@ export default function ForgotPasswordPage() {
       </div>
 
       {/* RIGHT SIDE: Form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-24 bg-[#050505] relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-24 bg-white relative overflow-hidden">
         {/* Subtle Form Background Detail */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/2 blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="w-full max-w-[440px] relative z-10">
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 text-white/50 hover:text-emerald-500 mb-8 font-bold tracking-wide text-xs transition-colors group"
+            className="inline-flex items-center gap-2 text-slate-600 hover:text-emerald-600 mb-8 font-bold tracking-wide text-xs transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />{" "}
             Back to login
           </Link>
 
           <div className="mb-12">
-            <h2 className="text-4xl font-bold text-white tracking-tight leading-none">
+            <h2 className="text-4xl font-bold text-slate-900 tracking-tight leading-none">
               Forgot password
             </h2>
-            <p className="text-white mt-4 text-sm font-bold tracking-wide leading-relaxed">
+            <p className="text-slate-600 mt-4 text-sm font-bold tracking-wide leading-relaxed">
               Enter your email to receive a password reset link.
             </p>
           </div>
@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
               <div className="space-y-3">
                 <Label
                   htmlFor="email"
-                  className="text-sm font-bold tracking-wide text-white ml-1"
+                  className="text-sm font-bold tracking-wide text-slate-700 ml-1"
                 >
                   Email address
                 </Label>
@@ -131,9 +131,9 @@ export default function ForgotPasswordPage() {
                     type="email"
                     placeholder="name@company.com"
                     required
-                    className="bg-muted! border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white/8! focus:ring-0 transition-all text-white! text-lg placeholder:text-gray-400 autofill:shadow-[0_0_0_1000px_#0a0a0a_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+                    className="bg-slate-50! border-slate-200 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900! text-lg placeholder:text-slate-600"
                   />
-                  <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                  <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                 </div>
               </div>
 
@@ -148,7 +148,7 @@ export default function ForgotPasswordPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-16 bg-white text-black hover:bg-emerald-500 hover:text-black rounded-2xl font-bold text-base transition-all shadow-xl active:scale-[0.98]"
+                className="w-full h-16 bg-emerald-600 text-white hover:bg-emerald-700 rounded-2xl font-bold text-base transition-all shadow-xl active:scale-[0.98]"
               >
                 {loading ? (
                   <div className="flex items-center gap-3">
@@ -163,22 +163,22 @@ export default function ForgotPasswordPage() {
               </Button>
             </form>
           ) : (
-            <div className="bg-muted border border-white/10 p-8 rounded-3xl text-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            <div className="bg-slate-50 border border-slate-200 p-8 rounded-3xl text-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
               <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
-                <CheckCircle2 className="w-8 h-8 text-black" />
+                <CheckCircle2 className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-white tracking-tight">
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
                   Link sent!
                 </h3>
-                <p className="text-white/70 text-sm font-bold tracking-wide mt-2 leading-relaxed">
+                <p className="text-slate-600 text-sm font-bold tracking-wide mt-2 leading-relaxed">
                   We&apos;ve sent a password reset link to your email address.
                   Please check your inbox.
                 </p>
               </div>
               <Button
                 onClick={() => router.push("/reset-password")} // Simulate clicking logic for demo
-                className="w-full h-14 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl font-bold text-sm transition-all"
+                className="w-full h-14 bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 rounded-xl font-bold text-sm transition-all shadow-sm"
               >
                 Open email app
               </Button>
@@ -187,7 +187,7 @@ export default function ForgotPasswordPage() {
               <div className="pt-4 border-t border-white/5">
                 <Link
                   href="/reset-password"
-                  className="text-emerald-500 text-xs font-bold tracking-wide hover:underline"
+                  className="text-emerald-600 text-xs font-bold tracking-wide hover:underline"
                 >
                   (Demo: go to reset password page)
                 </Link>

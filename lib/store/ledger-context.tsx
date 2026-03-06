@@ -31,7 +31,12 @@ interface LedgerContextType {
   transactions: Transaction[];
   loading: boolean;
   refreshLedger: () => Promise<void>;
-  withdraw: (amount: number) => Promise<Transaction>;
+  withdraw: (
+    amount: number,
+    currency: string,
+    bankDetails: any,
+    opts?: any,
+  ) => Promise<Transaction>;
 }
 
 const LedgerContext = createContext<LedgerContextType | undefined>(undefined);
@@ -70,7 +75,12 @@ export function LedgerProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function withdraw(amount: number): Promise<Transaction> {
+  async function withdraw(
+    amount: number,
+    currency: string,
+    bankDetails: any,
+    opts?: any,
+  ): Promise<Transaction> {
     if (user?.kycStatus !== KycStatus.VERIFIED) {
       toast.error("KYC Verification Required", {
         description:
@@ -82,7 +92,10 @@ export function LedgerProvider({ children }: { children: ReactNode }) {
     const idempotencyKey = crypto.randomUUID();
 
     try {
-      const tx = await api.ledger.withdraw(amount, { idempotencyKey });
+      const tx = await api.ledger.withdraw(amount, currency, bankDetails, {
+        idempotencyKey,
+        ...opts,
+      });
 
       // RECONCILIATION TRUTH MODEL:
       // API already moved funds from available -> pending

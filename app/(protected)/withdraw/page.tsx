@@ -263,11 +263,12 @@ export default function FreelancerWithdrawPage() {
                 const idempotencyKey = crypto.randomUUID();
                 await api.ledger.withdraw(
                   amount,
+                  selectedCurrency,
                   {
                     bankName: bankDetails.bankName,
                     accountNumber: bankDetails.accountNumber,
                     accountName: bankDetails.accountName,
-                    routingNumber: "121000358", // Mock routing for now or capture from UI
+                    routingNumber: "121000358", // Mock routing for now
                   },
                   { idempotencyKey },
                 );
@@ -287,39 +288,39 @@ export default function FreelancerWithdrawPage() {
   }, [step, amount, bankDetails]);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white/80 font-['Poppins',sans-serif] antialiased overflow-hidden">
+    <div className="min-h-screen bg-white text-slate-600 font-['Poppins',sans-serif] antialiased overflow-hidden">
       <AnimatePresence>{isProcessing && <ProcessingOverlay />}</AnimatePresence>
 
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT SIDEBAR - Summary */}
-        <aside className="w-full lg:w-[400px] bg-[#080808] p-12 border-r border-white/5 flex flex-col justify-between relative overflow-hidden">
+        <aside className="w-full lg:w-[400px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
           <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
 
           <div className="space-y-16 relative z-10">
             <div className="flex items-center gap-4">
               <div
-                className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] active:scale-95 transition-all cursor-pointer group"
+                className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(5,150,105,0.2)] active:scale-95 transition-all cursor-pointer group"
                 onClick={() => router.push("/freelancer/balance")}
               >
-                <Lock className="w-5 h-5 text-black group-hover:rotate-12 transition-transform" />
+                <Lock className="w-5 h-5 text-white group-hover:rotate-12 transition-transform" />
               </div>
-              <span className="text-white font-bold tracking-tighter text-2xl italic">
+              <span className="text-slate-900 font-bold tracking-tighter text-2xl italic">
                 Dayle
               </span>
             </div>
 
             <div className="space-y-10">
               <div className="space-y-3">
-                <p className="text-[10px] font-bold text-white/40 tracking-[0.4em] italic leading-none">
+                <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em] italic leading-none uppercase">
                   Withdrawal value
                 </p>
-                <h1 className="text-6xl font-bold text-white tracking-tighter sm:text-7xl font-mono flex items-baseline gap-2">
-                  <span className="text-emerald-500 font-bold text-3xl">$</span>
+                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-7xl italic flex items-baseline gap-2 italic">
+                  <span className="text-emerald-600 font-bold text-3xl">$</span>
                   {amount.toLocaleString()}
                 </h1>
               </div>
 
-              <div className="space-y-6 pt-10 border-t border-white/5">
+              <div className="space-y-6 pt-10 border-t border-slate-100">
                 <SummaryItem
                   label="Region / Currency"
                   value={`${selectedCountry} / ${selectedCurrency}`}
@@ -342,13 +343,13 @@ export default function FreelancerWithdrawPage() {
             </div>
           </div>
 
-          <div className="p-8 bg-emerald-500/5 border border-emerald-500/10 rounded-3xl relative group overflow-hidden">
+          <div className="p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
             <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="flex items-center gap-3 text-emerald-500 text-[10px] font-bold tracking-[0.3em] mb-3 italic">
+              <div className="flex items-center gap-3 text-emerald-600 text-[10px] font-bold tracking-[0.3em] mb-3 italic uppercase">
                 <Shield className="w-4 h-4" /> Secure transfer V2
               </div>
-              <p className="text-xs text-white/40 leading-relaxed font-bold tracking-widest">
+              <p className="text-xs text-slate-600 leading-relaxed font-bold tracking-widest italic">
                 Assets are migrated through high-speed bank-transfer rails with
                 encryption at every step.
               </p>
@@ -357,7 +358,7 @@ export default function FreelancerWithdrawPage() {
         </aside>
 
         {/* MAIN CONTENT AREA */}
-        <main className="flex-1 p-8 lg:p-24 relative overflow-y-auto bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-white/2 via-transparent to-transparent">
+        <main className="flex-1 p-8 lg:p-24 relative overflow-y-auto bg-slate-50/30">
           <div className="max-w-4xl mx-auto w-full">
             {/* Navigation */}
             <AnimatePresence mode="wait">
@@ -375,7 +376,7 @@ export default function FreelancerWithdrawPage() {
                         : "method_selection",
                     )
                   }
-                  className="flex items-center gap-3 text-white/30 hover:text-white transition-all text-[10px] font-bold tracking-[0.2em] mb-12 group bg-white/2 border border-white/5 py-3 px-6 rounded-2xl shadow-xl hover:border-white/10"
+                  className="flex items-center gap-3 text-slate-600 hover:text-slate-900 transition-all text-[10px] font-bold tracking-[0.2em] mb-12 group bg-white border border-slate-200 py-3 px-6 rounded-2xl shadow-sm hover:border-slate-300 italic uppercase"
                 >
                   <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                   {step === "verification"
@@ -396,10 +397,10 @@ export default function FreelancerWithdrawPage() {
                   className="max-w-xl mx-auto w-full space-y-16 py-12"
                 >
                   <div className="text-center space-y-4">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter italic">
+                    <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter italic">
                       Withdrawal method
                     </h2>
-                    <p className="text-xs font-bold text-white/30 tracking-[0.3em]">
+                    <p className="text-xs font-bold text-slate-600 tracking-[0.3em] uppercase">
                       Select your primary payout method
                     </p>
                   </div>
@@ -438,14 +439,14 @@ export default function FreelancerWithdrawPage() {
                     <CardPreview details={cardDetails} />
                   </div>
 
-                  <div className="space-y-10 bg-[#0D0D0E] border border-white/5 p-10 rounded-3xl shadow-2xl relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/3 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
+                  <div className="space-y-10 bg-white border border-slate-200 p-10 rounded-3xl shadow-xl relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
                     <div className="space-y-3 relative z-10">
-                      <h2 className="text-3xl font-bold text-white tracking-tight italic flex items-center gap-3">
-                        <Zap className="w-6 h-6 text-emerald-500" />
+                      <h2 className="text-3xl font-bold text-slate-900 tracking-tight italic flex items-center gap-3">
+                        <Zap className="w-6 h-6 text-emerald-600" />
                         Card data
                       </h2>
-                      <p className="text-[10px] font-bold text-white/30 tracking-[0.2em]">
+                      <p className="text-[10px] font-bold text-slate-600 tracking-[0.2em] uppercase">
                         Pushed via real-time visa/mastercard networks.
                       </p>
                     </div>
@@ -495,7 +496,7 @@ export default function FreelancerWithdrawPage() {
                     </div>
                     <Button
                       onClick={handleCardSubmit}
-                      className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 group relative z-10"
+                      className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 italic"
                     >
                       Proceed{" "}
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -514,25 +515,25 @@ export default function FreelancerWithdrawPage() {
                   className="space-y-16 flex flex-col items-center py-12"
                 >
                   <div className="space-y-5 flex flex-col items-center text-center">
-                    <div className="w-20 h-20 bg-emerald-500/5 rounded-3xl flex items-center justify-center border border-white/5 mb-4 shadow-inner group">
-                      <Globe className="text-emerald-500 w-8 h-8 group-hover:scale-110 transition-transform" />
+                    <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center border border-emerald-100 mb-4 shadow-sm group">
+                      <Globe className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter italic">
+                      <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter italic">
                         Regional settings
                       </h2>
-                      <p className="text-xs font-bold text-white/30 tracking-[0.3em]">
+                      <p className="text-xs font-bold text-slate-600 tracking-[0.3em] uppercase">
                         Configure your payout account and currency
                       </p>
                     </div>
                   </div>
 
-                  <div className="w-full max-w-lg space-y-10 bg-[#0D0D0E] border border-white/5 p-12 rounded-[40px] shadow-2xl relative">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/2 rounded-full -mr-24 -mt-24 blur-3xl" />
+                  <div className="w-full max-w-lg space-y-10 bg-white border border-slate-200 p-12 rounded-[40px] shadow-xl relative">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
 
                     <div className="space-y-8 relative z-10">
                       <div className="space-y-3">
-                        <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] block ml-1 italic">
+                        <label className="text-[10px] font-bold text-slate-600 tracking-[0.3em] block ml-1 italic uppercase">
                           Payout country
                         </label>
                         <div className="relative">
@@ -553,7 +554,7 @@ export default function FreelancerWithdrawPage() {
                                 setSelectedCurrency(countryObj.currencies[0]);
                               }
                             }}
-                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-bold tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-inner"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-sm italic"
                           >
                             {countries.map((c) => (
                               <option
@@ -570,7 +571,7 @@ export default function FreelancerWithdrawPage() {
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] block ml-1 italic">
+                        <label className="text-[10px] font-bold text-slate-600 tracking-[0.3em] block ml-1 italic uppercase">
                           Asset type
                         </label>
                         <div className="relative">
@@ -579,26 +580,26 @@ export default function FreelancerWithdrawPage() {
                             onChange={(e) =>
                               setSelectedCurrency(e.target.value)
                             }
-                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-bold tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-inner"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-sm italic"
                           >
                             {currentCountryObj?.currencies.map((curr) => (
                               <option
                                 key={curr}
                                 value={curr}
-                                className="bg-[#0D0D0E] font-sans"
+                                className="bg-white font-sans text-slate-900"
                               >
                                 {curr}
                               </option>
                             ))}
                           </select>
-                          <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 pointer-events-none" />
+                          <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none" />
                         </div>
                       </div>
                     </div>
 
                     <Button
                       onClick={() => setStep("verification")}
-                      className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 group relative z-10"
+                      className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 italic"
                     >
                       Continue{" "}
                       <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
@@ -617,24 +618,24 @@ export default function FreelancerWithdrawPage() {
                   className="space-y-16 flex flex-col items-center py-12"
                 >
                   <div className="space-y-5 flex flex-col items-center text-center">
-                    <div className="w-20 h-20 bg-emerald-500/5 rounded-3xl flex items-center justify-center border border-white/5 mb-4 shadow-inner group">
-                      <Landmark className="text-emerald-500 w-8 h-8 group-hover:scale-110 transition-transform" />
+                    <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center border border-emerald-100 mb-4 shadow-sm group">
+                      <Landmark className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter italic">
+                      <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter italic">
                         Recipient details
                       </h2>
-                      <p className="text-xs font-bold text-white/30 tracking-[0.3em]">
+                      <p className="text-xs font-bold text-slate-600 tracking-[0.3em] uppercase">
                         Configure final destination for this transfer
                       </p>
                     </div>
                   </div>
 
                   <div className="grid lg:grid-cols-2 gap-12 w-full max-w-5xl">
-                    <div className="space-y-10 bg-[#0D0D0E] border border-white/5 p-10 rounded-[32px] shadow-2xl relative">
+                    <div className="space-y-10 bg-white border border-slate-200 p-10 rounded-[32px] shadow-xl relative">
                       <div className="space-y-8 relative z-10">
                         <div className="space-y-3">
-                          <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] block ml-1 italic">
+                          <label className="text-[10px] font-bold text-slate-600 tracking-[0.3em] block ml-1 italic uppercase">
                             Bank name
                           </label>
                           <div className="relative">
@@ -646,7 +647,7 @@ export default function FreelancerWithdrawPage() {
                                   bankName: e.target.value,
                                 })
                               }
-                              className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-bold tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-inner mt-2"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold tracking-widest transition-all appearance-none cursor-pointer text-sm shadow-sm mt-2 italic"
                             >
                               <option
                                 value=""
@@ -694,7 +695,7 @@ export default function FreelancerWithdrawPage() {
                           </div>
                         </div>
                         <div className="space-y-3">
-                          <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] block ml-1 italic">
+                          <label className="text-[10px] font-bold text-slate-600 tracking-[0.3em] block ml-1 italic uppercase">
                             Bank Account Number
                           </label>
                           <input
@@ -707,7 +708,7 @@ export default function FreelancerWithdrawPage() {
                                 accountNumber: e.target.value,
                               })
                             }
-                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-white font-bold tracking-widest transition-all text-sm shadow-inner mt-2 placeholder:text-white/5"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold tracking-widest transition-all text-sm shadow-sm mt-2 placeholder:text-slate-300 italic"
                           />
                         </div>
                       </div>
@@ -720,11 +721,11 @@ export default function FreelancerWithdrawPage() {
                           isResolving ||
                           showOtp
                         }
-                        className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 group relative z-10"
+                        className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 italic"
                       >
                         {isResolving ? (
                           <div className="flex items-center gap-3">
-                            <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                             Verifying Account...
                           </div>
                         ) : showOtp ? (
@@ -741,17 +742,17 @@ export default function FreelancerWithdrawPage() {
                           <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            className="space-y-8 bg-[#0D0D0E] border border-white/5 p-10 rounded-[32px] shadow-2xl h-full flex flex-col justify-center"
+                            className="space-y-8 bg-white border border-slate-200 p-10 rounded-[32px] shadow-xl h-full flex flex-col justify-center"
                           >
                             <div className="space-y-3">
-                              <h3 className="text-2xl font-bold text-white tracking-tight italic">
+                              <h3 className="text-2xl font-bold text-slate-900 tracking-tight italic">
                                 Account verification
                               </h3>
-                              <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                                <p className="text-[10px] text-white/30 font-bold tracking-widest mb-1 italic">
+                              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 shadow-sm">
+                                <p className="text-[10px] text-slate-600 font-bold tracking-widest mb-1 italic uppercase">
                                   Account owner
                                 </p>
-                                <p className="text-sm text-emerald-500 font-bold tracking-wide italic">
+                                <p className="text-sm text-emerald-700 font-bold tracking-wide italic">
                                   {bankDetails.accountName}
                                 </p>
                               </div>
@@ -768,35 +769,35 @@ export default function FreelancerWithdrawPage() {
                                   onChange={(e) =>
                                     handleOtpChange(index, e.target.value)
                                   }
-                                  className="aspect-square bg-white/2 border border-white/5 rounded-xl text-center text-xl font-bold text-white focus:border-emerald-500/30 focus:bg-emerald-500/5 outline-none transition-all shadow-inner"
+                                  className="aspect-square bg-slate-50 border border-slate-200 rounded-xl text-center text-xl font-bold text-slate-900 focus:border-emerald-500/30 focus:bg-emerald-50 outline-none transition-all shadow-sm"
                                 />
                               ))}
                             </div>
 
-                            <div className="p-5 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-                              <div className="flex items-center gap-2 text-blue-400 text-[10px] font-bold tracking-widest mb-2 italic">
+                            <div className="p-5 bg-blue-50 border border-blue-100 rounded-2xl shadow-sm">
+                              <div className="flex items-center gap-2 text-blue-600 text-[10px] font-bold tracking-widest mb-2 italic uppercase">
                                 <Info className="w-3.5 h-3.5" /> Demo helper
                               </div>
-                              <p className="text-[10px] text-blue-400/60 font-bold tracking-widest leading-relaxed">
+                              <p className="text-[10px] text-blue-500/60 font-bold tracking-widest leading-relaxed italic">
                                 Identity Check: Use code{" "}
-                                <span className="text-white">123456</span> for
-                                demo mode.
+                                <span className="text-slate-900">123456</span>{" "}
+                                for demo mode.
                               </p>
                             </div>
 
                             <Button
                               onClick={handleVerifyOtp}
-                              className="w-full h-14 bg-white text-black font-bold tracking-widest rounded-2xl hover:bg-white/90 transition-all shadow-xl active:scale-95"
+                              className="w-full h-14 bg-slate-900 text-white font-bold tracking-widest rounded-2xl hover:bg-slate-800 transition-all shadow-xl active:scale-95 italic"
                             >
                               Confirm Account
                             </Button>
                           </motion.div>
                         ) : (
-                          <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-white/1 border border-dashed border-white/5 rounded-[32px] group hover:border-white/10 transition-colors">
-                            <div className="w-20 h-20 bg-white/5 rounded-[2.5rem] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner">
-                              <Fingerprint className="w-10 h-10 text-white/20 group-hover:text-white transition-colors" />
+                          <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-slate-50 border border-dashed border-slate-200 rounded-[32px] group hover:border-slate-300 transition-colors">
+                            <div className="w-20 h-20 bg-white rounded-[2.5rem] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
+                              <Fingerprint className="w-10 h-10 text-slate-300 group-hover:text-slate-600 transition-colors" />
                             </div>
-                            <p className="text-[10px] font-bold text-white/20 tracking-[0.4em] italic group-hover:text-white/40 transition-colors">
+                            <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em] italic group-hover:text-slate-600 transition-colors uppercase">
                               Awaiting bio-auth
                             </p>
                           </div>
@@ -817,23 +818,23 @@ export default function FreelancerWithdrawPage() {
                   className="max-w-2xl mx-auto space-y-12 py-12"
                 >
                   <div className="text-center space-y-5">
-                    <div className="w-20 h-20 bg-emerald-500/5 rounded-[2.5rem] flex items-center justify-center mx-auto border border-emerald-500/10 shadow-inner">
-                      <Info className="w-10 h-10 text-emerald-500" />
+                    <div className="w-20 h-20 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center mx-auto border border-emerald-100 shadow-sm">
+                      <Info className="w-10 h-10 text-emerald-600" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter italic">
+                      <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter italic">
                         Final manifest
                       </h2>
-                      <p className="text-xs font-bold text-white/30 tracking-[0.3em] px-10 leading-relaxed">
+                      <p className="text-xs font-bold text-slate-600 tracking-[0.3em] px-10 leading-relaxed uppercase">
                         Confirm the settlement event below. Transactions are
                         irreversible once broadcast to the network.
                       </p>
                     </div>
                   </div>
 
-                  <div className="bg-[#0D0D0E] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl relative">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
-                    <div className="divide-y divide-white/5">
+                  <div className="bg-white border border-slate-200 rounded-[40px] overflow-hidden shadow-xl relative">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-600 to-emerald-500/0 opacity-20" />
+                    <div className="divide-y divide-slate-100">
                       {selectedMethod === "bank" ? (
                         <>
                           <ReviewItem
@@ -869,18 +870,18 @@ export default function FreelancerWithdrawPage() {
                         label="Gas / Network Fee"
                         value="$0.00"
                         subValue="Dayle Pro active"
-                        highlight="text-emerald-500"
+                        highlight="text-emerald-600"
                       />
-                      <div className="p-8 bg-white/2 flex justify-between items-center relative overflow-hidden group">
+                      <div className="p-8 bg-slate-50 flex justify-between items-center relative overflow-hidden group">
                         <div className="absolute inset-x-0 bottom-0 h-0.5 bg-emerald-500/20 translate-y-full group-hover:translate-y-0 transition-transform" />
-                        <span className="text-xs font-bold text-white/40 tracking-[0.3em] italic">
+                        <span className="text-xs font-bold text-slate-600 tracking-[0.3em] italic uppercase">
                           Net settlement
                         </span>
                         <div className="text-right">
-                          <span className="text-4xl font-bold text-white tracking-widest font-mono italic">
+                          <span className="text-4xl font-bold text-slate-900 tracking-widest italic italic">
                             ${amount.toLocaleString()}
                           </span>
-                          <p className="text-[10px] text-white/20 font-black tracking-widest mt-1">
+                          <p className="text-[10px] text-slate-600 font-black tracking-widest mt-1">
                             {selectedCurrency}
                           </p>
                         </div>
@@ -908,13 +909,13 @@ export default function FreelancerWithdrawPage() {
                     <Button
                       variant="ghost"
                       onClick={() => setStep("verification")}
-                      className="h-16 font-black text-[10px] tracking-[0.3em] text-white/30 hover:text-white hover:bg-white/5 rounded-2xl transition-all italic"
+                      className="h-16 font-black text-[10px] tracking-[0.3em] text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-2xl transition-all italic uppercase"
                     >
                       Go back
                     </Button>
                     <Button
                       onClick={handleConfirmWithdrawal}
-                      className="h-16 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 italic"
+                      className="h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 italic uppercase"
                     >
                       Confirm & execute
                     </Button>
@@ -945,36 +946,36 @@ export default function FreelancerWithdrawPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="max-w-xl mx-auto text-center space-y-12 py-12"
                 >
-                  <div className="w-32 h-32 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(16,185,129,0.4)] animate-in zoom-in-0 duration-700">
+                  <div className="w-32 h-32 bg-emerald-600 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(5,150,105,0.3)] animate-in zoom-in-0 duration-700">
                     <CheckCircle2
-                      className="w-16 h-16 text-black"
+                      className="w-16 h-16 text-white"
                       strokeWidth={3}
                     />
                   </div>
                   <div className="space-y-4">
-                    <h2 className="text-5xl md:text-7xl font-bold text-white tracking-tighter italic leading-none">
+                    <h2 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tighter italic leading-none">
                       Broadcasting!
                     </h2>
-                    <p className="text-xs font-bold text-white/30 tracking-[0.4em] leading-relaxed">
+                    <p className="text-xs font-bold text-slate-600 tracking-[0.4em] leading-relaxed uppercase">
                       Your settlement event has been authorized and dispatched.
                     </p>
                   </div>
 
-                  <div className="bg-[#0D0D0E] border border-white/5 rounded-[40px] p-10 space-y-8 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/3 rounded-full -mr-24 -mt-24 blur-3xl" />
+                  <div className="bg-white border border-slate-200 rounded-[40px] p-10 space-y-8 relative overflow-hidden group shadow-xl">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold tracking-[0.3em] text-white/40 italic">
+                      <span className="text-[10px] font-bold tracking-[0.3em] text-slate-600 uppercase italic">
                         Asset released
                       </span>
-                      <span className="text-3xl font-bold text-emerald-500 font-mono italic tracking-tighter">
+                      <span className="text-3xl font-bold text-emerald-600 italic italic tracking-tighter">
                         ${amount.toLocaleString()}
                       </span>
                     </div>
-                    <div className="pt-8 border-t border-white/5 flex justify-between items-center">
-                      <span className="text-[10px] font-bold tracking-[0.3em] text-white/40 italic">
+                    <div className="pt-8 border-t border-slate-100 flex justify-between items-center">
+                      <span className="text-[10px] font-bold tracking-[0.3em] text-slate-600 uppercase italic">
                         Event signature
                       </span>
-                      <span className="text-xs text-white font-mono tracking-widest">
+                      <span className="text-xs text-slate-900 italic tracking-widest">
                         {transactionId}
                       </span>
                     </div>
@@ -982,7 +983,7 @@ export default function FreelancerWithdrawPage() {
 
                   <Button
                     onClick={() => router.push("/freelancer/balance")}
-                    className="w-full h-18 bg-white text-black font-bold text-xs tracking-[0.3em] rounded-4xl hover:bg-white/90 transition-all shadow-2xl active:scale-95 italic"
+                    className="w-full h-18 bg-slate-900 text-white font-bold text-xs tracking-[0.3em] rounded-4xl hover:bg-slate-800 transition-all shadow-xl active:scale-95 italic uppercase"
                   >
                     Exit to overview
                   </Button>
@@ -997,31 +998,31 @@ export default function FreelancerWithdrawPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="max-w-xl mx-auto text-center space-y-12 py-12"
                 >
-                  <div className="w-32 h-32 bg-red-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto border-2 border-red-500/20 shadow-xl group">
+                  <div className="w-32 h-32 bg-red-50 rounded-[2.5rem] flex items-center justify-center mx-auto border border-red-100 shadow-sm group">
                     <XCircle
                       className="w-16 h-16 text-red-500 group-hover:rotate-90 transition-transform duration-500"
                       strokeWidth={3}
                     />
                   </div>
                   <div className="space-y-4">
-                    <h2 className="text-5xl md:text-7xl font-bold text-white tracking-tighter italic leading-none">
+                    <h2 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tighter italic leading-none">
                       Rejection
                     </h2>
-                    <p className="text-xs font-bold text-white/30 tracking-[0.4em] leading-relaxed">
+                    <p className="text-xs font-bold text-slate-600 tracking-[0.4em] leading-relaxed uppercase">
                       The bank network rejected the settlement or connection
                       timed out.
                     </p>
                   </div>
 
-                  <div className="p-10 bg-red-500/5 border border-red-500/10 rounded-[40px] text-left space-y-4 relative overflow-hidden">
+                  <div className="p-10 bg-red-50 border border-red-100 rounded-[40px] text-left space-y-4 relative overflow-hidden shadow-sm">
                     <div className="absolute inset-0 bg-red-500/1 translate-x-10" />
-                    <p className="text-[11px] font-bold text-white tracking-[0.2em] relative z-10 italic">
+                    <p className="text-[11px] font-bold text-slate-900 tracking-[0.2em] relative z-10 italic uppercase">
                       Reject code:{" "}
-                      <span className="text-red-500">
+                      <span className="text-red-600 italic">
                         SET_FAIL_BANK_COMM_ERR_V4
                       </span>
                     </p>
-                    <p className="text-xs text-red-500/60 font-bold tracking-widest leading-relaxed relative z-10 italic">
+                    <p className="text-xs text-red-500/70 font-bold tracking-widest leading-relaxed relative z-10 italic uppercase">
                       The bank terminal did not respond in time. Please verify
                       endpoints or contact protocol support if error persists.
                     </p>
@@ -1035,13 +1036,13 @@ export default function FreelancerWithdrawPage() {
                         setShowOtp(false);
                         setOtp(["", "", "", "", "", ""]);
                       }}
-                      className="h-16 font-bold text-[10px] tracking-[0.3em] border-white/5 bg-white/2 hover:bg-white/5 rounded-2xl transition-all italic"
+                      className="h-16 font-bold text-[10px] tracking-[0.3em] border-slate-200 bg-white hover:bg-slate-50 rounded-2xl transition-all italic uppercase text-slate-600"
                     >
                       Try again
                     </Button>
                     <Button
                       onClick={() => router.push("/freelancer/balance")}
-                      className="h-16 bg-white text-black font-bold text-[10px] tracking-[0.3em] rounded-2xl transition-all shadow-xl active:scale-95 italic text-xs"
+                      className="h-16 bg-slate-900 text-white font-bold text-[10px] tracking-[0.3em] rounded-2xl transition-all shadow-xl active:scale-95 italic text-xs uppercase"
                     >
                       Return to origin
                     </Button>
@@ -1070,14 +1071,14 @@ function SummaryItem({
   isMono?: boolean;
 }) {
   return (
-    <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-white">
-      <span className="text-white/30 italic">{label}</span>
+    <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-slate-900 uppercase">
+      <span className="text-slate-600 italic">{label}</span>
       <div className="flex items-center gap-2">
         {icon}
         <span
           className={cn(
-            "text-white/70 italic",
-            isMono && "font-mono tracking-normal",
+            "text-slate-600 italic",
+            isMono && "italic tracking-normal",
           )}
         >
           {value}
@@ -1101,22 +1102,22 @@ function MethodBtn({
   return (
     <button
       onClick={onClick}
-      className="w-full p-8 bg-white/2 border border-white/5 rounded-[2.5rem] flex items-center gap-8 group hover:bg-emerald-500/3 hover:border-emerald-500/30 transition-all text-left shadow-2xl relative overflow-hidden"
+      className="w-full p-8 bg-white border border-slate-200 rounded-[2.5rem] flex items-center gap-8 group hover:bg-emerald-50/50 hover:border-emerald-500/30 transition-all text-left shadow-lg relative overflow-hidden"
     >
-      <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-white/40 group-hover:bg-emerald-500 group-hover:text-black transition-all shadow-inner">
+      <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-600 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
         {React.cloneElement(icon, { className: "w-8 h-8" } as any)}
       </div>
       <div className="flex-1">
-        <p className="text-white font-bold text-xl tracking-tighter italic group-hover:text-emerald-500 transition-colors">
+        <p className="text-slate-900 font-bold text-xl tracking-tighter italic group-hover:text-emerald-700 transition-colors">
           {title}
         </p>
-        <p className="text-[10px] font-bold text-white/20 tracking-[0.2em] mt-2 group-hover:text-white/40 transition-colors">
+        <p className="text-[10px] font-bold text-slate-600 tracking-[0.2em] mt-2 group-hover:text-slate-600 transition-colors uppercase">
           {desc}
         </p>
       </div>
-      <div className="w-12 h-12 rounded-xl bg-white/2 border border-white/5 flex items-center justify-center group-hover:border-emerald-500/20 transition-all">
-        <ArrowRight className="w-5 h-5 text-white/10 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+      <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:border-emerald-500/20 transition-all shadow-sm">
+        <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
       </div>
     </button>
   );
@@ -1152,7 +1153,7 @@ function CardPreview({ details }: { details: CardDetails }) {
           </div>
         </div>
         <div className="space-y-8">
-          <p className="text-3xl tracking-[0.15em] font-mono font-bold text-white shadow-sm">
+          <p className="text-3xl tracking-[0.15em] italic font-bold text-white shadow-sm">
             {details.number || "•••• •••• •••• ••••"}
           </p>
           <div className="flex justify-between text-[11px] font-bold tracking-[0.3em] italic">
@@ -1185,18 +1186,18 @@ function WithdrawInputField({
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className="space-y-3">
-      <label className="text-[10px] font-bold text-white/40 tracking-[0.3em] ml-1 italic">
+      <label className="text-[10px] font-bold text-slate-600 tracking-[0.3em] ml-1 italic uppercase">
         {label}
       </label>
       <input
         {...props}
         className={cn(
-          "w-full bg-white/2 border h-16 rounded-2xl px-6 text-white focus:border-emerald-500/30 outline-none transition-all font-bold tracking-widest text-xs placeholder:text-white/5 shadow-inner",
-          error ? "border-red-500/50 bg-red-500/2" : "border-white/5",
+          "w-full bg-slate-50 border h-16 rounded-2xl px-6 text-slate-900 focus:border-emerald-500/30 outline-none transition-all font-bold tracking-widest text-xs placeholder:text-slate-300 shadow-sm italic",
+          error ? "border-red-500/50 bg-red-50" : "border-slate-200",
         )}
       />
       {error && (
-        <p className="text-[9px] text-red-500 font-bold ml-1 tracking-widest italic">
+        <p className="text-[9px] text-red-500 font-bold ml-1 tracking-widest italic uppercase">
           {error}
         </p>
       )}
@@ -1216,21 +1217,21 @@ function ReviewItem({
   highlight?: string;
 }) {
   return (
-    <div className="p-8 flex justify-between items-center group hover:bg-white/1 transition-colors">
-      <span className="text-[10px] font-bold text-white/30 tracking-[0.3em] italic">
+    <div className="p-8 flex justify-between items-center group hover:bg-slate-50 transition-colors">
+      <span className="text-[10px] font-bold text-slate-600 tracking-[0.3em] italic uppercase">
         {label}
       </span>
       <div className="text-right">
         <p
           className={cn(
-            "font-bold text-white text-sm tracking-widest italic",
+            "font-bold text-slate-900 text-sm tracking-widest italic",
             highlight,
           )}
         >
           {value}
         </p>
         {subValue && (
-          <p className="text-[9px] text-white/20 font-bold mt-1.5 tracking-widest italic">
+          <p className="text-[9px] text-slate-600 font-bold mt-1.5 tracking-widest italic uppercase">
             {subValue}
           </p>
         )}
@@ -1290,22 +1291,22 @@ function ProcessingStatusScreen({
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 border-4 border-emerald-500/5 border-t-emerald-500 rounded-full shadow-[0_0_30px_rgba(16,185,129,0.2)]"
+            className="absolute inset-0 border-4 border-emerald-50 border-t-emerald-600 rounded-full shadow-sm"
           />
-          <Zap className="w-12 h-12 text-emerald-500" />
+          <Zap className="w-12 h-12 text-emerald-600" />
         </div>
         <div className="space-y-3">
-          <h2 className="text-4xl font-bold text-white tracking-tighter italic">
+          <h2 className="text-4xl font-bold text-slate-900 tracking-tighter italic">
             Executing link
           </h2>
-          <p className="text-[10px] font-bold text-white/20 tracking-[0.4em] italic">
+          <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em] italic uppercase">
             Ref sig: {transactionId}
           </p>
         </div>
       </div>
 
-      <div className="bg-[#0D0D0E] border border-white/5 rounded-[40px] p-12 space-y-12 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/1 rounded-full -mr-32 -mt-32 blur-3xl" />
+      <div className="bg-white border border-slate-200 rounded-[40px] p-12 space-y-12 shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
         {steps.map((step, idx) => (
           <div key={idx} className="flex gap-8 relative group">
             {idx < steps.length - 1 && (
@@ -1313,8 +1314,8 @@ function ProcessingStatusScreen({
                 className={cn(
                   "absolute left-[19px] top-12 w-0.5 h-12 transition-all duration-700",
                   step.status === "completed"
-                    ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                    : "bg-white/5",
+                    ? "bg-emerald-600 shadow-sm"
+                    : "bg-slate-100",
                 )}
               />
             )}
@@ -1322,10 +1323,10 @@ function ProcessingStatusScreen({
               className={cn(
                 "w-10 h-10 rounded-xl flex items-center justify-center border-2 z-10 transition-all duration-500",
                 step.status === "completed"
-                  ? "bg-emerald-500 border-emerald-500 text-black shadow-lg shadow-emerald-500/20"
+                  ? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-600/10"
                   : step.status === "current"
-                    ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)] animate-pulse"
-                    : "bg-black border-white/5 text-white/10",
+                    ? "bg-emerald-50 border-emerald-600 text-emerald-600 shadow-sm animate-pulse"
+                    : "bg-white border-slate-200 text-slate-200",
               )}
             >
               {step.status === "completed" ? (
@@ -1337,16 +1338,20 @@ function ProcessingStatusScreen({
             <div className="pt-1.5 flex-1">
               <h4
                 className={cn(
-                  "font-bold text-sm tracking-[0.2em] italic transition-colors",
-                  step.status === "pending" ? "text-white/20" : "text-white",
+                  "font-bold text-sm tracking-[0.2em] italic transition-colors uppercase",
+                  step.status === "pending"
+                    ? "text-slate-300"
+                    : "text-slate-900",
                 )}
               >
                 {step.label}
               </h4>
               <p
                 className={cn(
-                  "text-[9px] font-bold tracking-widest mt-2 transition-colors italic",
-                  step.status === "pending" ? "text-white/5" : "text-white/40",
+                  "text-[9px] font-bold tracking-widest mt-2 transition-colors italic uppercase",
+                  step.status === "pending"
+                    ? "text-slate-200"
+                    : "text-slate-600",
                 )}
               >
                 {step.log}
@@ -1364,21 +1369,21 @@ function ProcessingOverlay() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-100 bg-black/98 backdrop-blur-3xl flex flex-col items-center justify-center text-center"
+      className="fixed inset-0 z-100 bg-white/95 backdrop-blur-3xl flex flex-col items-center justify-center text-center"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent" />
       <div className="relative w-32 h-32 mb-12">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 border-4 border-emerald-500/5 border-t-emerald-500 rounded-[2.5rem] shadow-[0_0_40px_rgba(16,185,129,0.3)]"
+          className="absolute inset-0 border-4 border-emerald-50 border-t-emerald-600 rounded-[2.5rem] shadow-sm"
         />
-        <Fingerprint className="w-14 h-14 text-emerald-500 absolute inset-0 m-auto" />
+        <Fingerprint className="w-14 h-14 text-emerald-600 absolute inset-0 m-auto" />
       </div>
-      <h3 className="text-3xl font-bold text-white mb-3 tracking-tighter italic">
+      <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tighter italic">
         Authorizing port
       </h3>
-      <p className="text-[10px] font-bold tracking-[0.6em] text-emerald-500/40 italic">
+      <p className="text-[10px] font-bold tracking-[0.6em] text-emerald-600/40 italic uppercase">
         Bio-crypt verification active
       </p>
     </motion.div>

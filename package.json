@@ -61,7 +61,14 @@
       "ox": "0.10.0"
     },
     "onlyBuiltDependencies": [
-      "@reown/appkit"
+      "@nestjs/core",
+      "@reown/appkit",
+      "@scarf/scarf",
+      "bufferutil",
+      "keccak",
+      "sharp",
+      "unrs-resolver",
+      "utf-8-validate"
     ]
   }
 }

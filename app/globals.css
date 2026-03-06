@@ -22,9 +22,9 @@
   --spacing-20: 5rem;
   --spacing-24: 6rem;
 
-  /* Neutrals (Slate - Stripe-inspired, modified for dark theme) */
-  --color-slate-50: #ffffff;
-  --color-slate-100: #f8fafc;
+  /* Neutrals (Slate - Stripe-inspired) */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
   --color-slate-200: #e2e8f0;
   --color-slate-300: #cbd5e1;
   --color-slate-400: #94a3b8;
@@ -35,44 +35,51 @@
   --color-slate-900: #0f172a;
   --color-slate-950: #020617;
 
-  /* Accent (Restrained Blue - Primary CTA only) */
+  /* Accent (Emerald Branding) */
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+
+  /* Blue (Info) */
   --color-blue-50: #eff6ff;
   --color-blue-100: #dbeafe;
-  --color-blue-200: #bfdbfe;
   --color-blue-500: #3b82f6;
   --color-blue-600: #2563eb;
-  --color-blue-700: #1d4ed8;
 
-  /* Success (Green - Verification/Release ONLY) */
-  --color-green-50: #f0fdf4;
-  --color-green-100: #dcfce7;
-  --color-green-500: #22c55e;
-  --color-green-600: #16a34a;
-  --color-green-700: #15803d;
-
-  /* Warning (Amber - Pending states) */
+  /* Warning (Amber) */
   --color-amber-50: #fffbeb;
-  --color-amber-100: #fef3c7;
   --color-amber-500: #f59e0b;
   --color-amber-600: #d97706;
 
-  /* Error (Red - Destructive actions only) */
+  /* Error (Red) */
   --color-red-50: #fef2f2;
-  --color-red-100: #fee2e2;
   --color-red-500: #ef4444;
   --color-red-600: #dc2626;
-  --color-red-700: #b91c1c;
 
-  /* Semantic Tokens */
-  --color-background: #0a0a0a;
-  --color-foreground: #ffffff;
-  --color-muted: #111111;
-  --color-muted-foreground: rgba(255, 255, 255, 0.4);
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-input-border: rgba(255, 255, 255, 0.1);
-  --color-ring: var(--color-blue-600);
+  /* Semantic Tokens (Light Theme) */
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted: #f8fafc;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-input-border: #cbd5e1;
+  --color-ring: #10b981;
 
-  /* Shadows (Minimal, Stripe-inspired) */
+  --color-primary: #10b981;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #0f172a;
+  --color-accent: #ecfdf5;
+  --color-accent-foreground: #047857;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  /* Shadows (Stripe-inspired) */
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -100,7 +107,16 @@
   --border: var(--color-border);
   --input: var(--color-input-border);
   --ring: var(--color-ring);
-  --radius: var(--radius-sm);
+  --radius: 0.5rem;
+
+  --primary: var(--color-primary);
+  --primary-foreground: var(--color-primary-foreground);
+  --secondary: var(--color-secondary);
+  --secondary-foreground: var(--color-secondary-foreground);
+  --accent: var(--color-accent);
+  --accent-foreground: var(--color-accent-foreground);
+  --destructive: var(--color-destructive);
+  --destructive-foreground: var(--color-destructive-foreground);
 }
 
 @layer base {
@@ -109,8 +125,8 @@
   }
 
   body {
-    background-color: #050505;
-    color: rgba(255, 255, 255, 0.8);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
     font-family: var(--font-poppins);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -123,11 +139,11 @@
   h4,
   h5,
   h6 {
-    @apply font-semibold tracking-tight text-white;
+    @apply font-semibold tracking-tight text-slate-900;
   }
 
   *:focus-visible {
-    @apply outline-none ring-2 ring-blue-600 ring-offset-2;
+    @apply outline-none ring-2 ring-emerald-500 ring-offset-2;
   }
 
   .tabular-nums {
@@ -141,86 +157,79 @@
     text-wrap: balance;
   }
 
+  /* Components */
   .badge {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-medium border;
   }
 
-  .badge-secured {
-    @apply bg-green-50 text-green-700 border-green-200;
+  .badge-emerald {
+    @apply bg-emerald-50 text-emerald-700 border-emerald-100;
   }
 
-  .badge-verified {
-    @apply bg-green-50 text-green-700 border-green-200;
+  .badge-slate {
+    @apply bg-slate-50 text-slate-700 border-slate-200;
   }
 
-  .badge-pending {
-    @apply bg-white/5 text-white/60 border-white/10;
+  .badge-success {
+    @apply bg-emerald-50 text-emerald-700 border-emerald-100;
   }
 
-  .badge-active {
-    @apply bg-blue-50 text-blue-700 border-blue-200;
+  .badge-warning {
+    @apply bg-amber-50 text-amber-700 border-amber-100;
   }
 
-  .badge-failed {
-    @apply bg-red-50 text-red-700 border-red-200;
+  .badge-error {
+    @apply bg-red-50 text-red-700 border-red-100;
   }
 
-  .badge-cancelled {
-    @apply bg-white/5 text-white border-white/10;
+  .badge-info {
+    @apply bg-blue-50 text-blue-700 border-blue-100;
+  }
+
+  .badge-neutral {
+    @apply bg-slate-50 text-slate-700 border-slate-200;
   }
 
   .card {
-    background-color: #111111;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: var(--radius-lg);
+    @apply bg-white border border-slate-200 rounded-xl shadow-sm;
   }
 
   .card-interactive {
-    background-color: #111111;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: var(--radius-lg);
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
+    @apply bg-white border border-slate-200 rounded-xl shadow-sm cursor-pointer transition-all duration-200;
   }
 
   .card-interactive:hover {
-    border-color: var(--color-slate-300);
-    box-shadow: var(--shadow-sm);
+    @apply border-emerald-500/20 shadow-md -translate-y-0.5;
   }
 
+  /* Typography Utilities */
   .amount-large {
-    @apply text-3xl font-semibold tabular-nums text-white;
+    @apply text-3xl font-bold tabular-nums text-slate-900;
   }
 
   .amount-medium {
-    @apply text-xl font-semibold tabular-nums text-white;
+    @apply text-xl font-semibold tabular-nums text-slate-900;
   }
 
   .amount-small {
-    @apply text-base font-medium tabular-nums text-white;
+    @apply text-base font-semibold tabular-nums text-slate-900;
   }
 
   .amount-muted {
-    @apply text-sm font-medium tabular-nums text-white;
+    @apply text-sm font-medium tabular-nums text-slate-600;
   }
 
-  .btn-lift {
-    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
-  }
-
+  /* Form Elements */
   .input-base {
-    @apply w-full px-3 py-2 bg-transparent border border-white/10 rounded-md text-white placeholder:text-white;
-    @apply focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50;
-    @apply disabled:bg-white/5 disabled:text-white disabled:cursor-not-allowed;
+    @apply w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-600;
+    @apply focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500;
+    @apply disabled:bg-slate-50 disabled:text-slate-600 disabled:cursor-not-allowed;
     @apply transition-colors duration-150;
   }
 
-  .input-error {
-    @apply border-red-500 focus:ring-red-600;
-  }
-
+  /* Layout */
   .section-spacing {
-    @apply py-12 md:py-16 lg:py-20;
+    @apply py-12 md:py-16 lg:py-24;
   }
 
   .container-custom {
@@ -231,10 +240,7 @@
     @apply border-t border-slate-200;
   }
 
-  .spinner {
-    @apply animate-spin rounded-full border-2 border-slate-200 border-t-blue-600;
-  }
-
+  /* Animations */
   .animate-slide-in {
     animation: slideIn 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -249,7 +255,6 @@
     opacity: 0;
     transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -260,7 +265,6 @@
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }

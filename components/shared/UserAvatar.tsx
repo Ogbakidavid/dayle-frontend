@@ -27,7 +27,7 @@ export default function UserAvatar({
 
   return (
     <div
-      className={`relative inline-block overflow-hidden rounded-lg border border-gray-700 bg-zinc-900 ${className}`}
+      className={`relative inline-block overflow-hidden rounded-lg border border-slate-200 bg-slate-100 ${className}`}
       style={{ width: size, height: size }}
     >
       {src ? (

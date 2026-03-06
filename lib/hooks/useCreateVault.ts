@@ -11,7 +11,9 @@ export function useCreateVault() {
   const createVault = async (
     freelancerAddress: string,
     milestoneIds: number[],
-    amounts: string[] // in cUSD, e.g. ["100", "200", "300"]
+    amounts: string[], // e.g. ["100", "200", "300"]
+    tokenAddress: string,
+    tokenDecimals: number = 18
   ) => {
     try {
       setIsCreating(true);
@@ -32,12 +34,13 @@ export function useCreateVault() {
         signer
       );
 
-      // Convert amounts to wei (18 decimals)
-      const amountsWei = amounts.map(a => ethers.parseUnits(a, 18));
+      // Convert amounts to units based on token decimals
+      const amountsWei = amounts.map(a => ethers.parseUnits(a, tokenDecimals));
 
       const tx = await factory.createVault(
         freelancerAddress,
         milestoneIds,
+        tokenAddress,
         amountsWei
       );
 

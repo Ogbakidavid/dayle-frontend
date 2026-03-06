@@ -37,7 +37,7 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
           </p>
           <div className="flex items-baseline gap-1">
             <span className="text-2xl font-bold text-white">$</span>
-            <h2 className="text-3xl font-bold text-white tracking-tighter font-mono">
+            <h2 className="text-3xl font-bold text-white tracking-tighter italic">
               {(vault.totalAmount || vault.amount || 0).toLocaleString()}
             </h2>
           </div>
@@ -46,9 +46,9 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
         {/* Stakeholders */}
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-            <TrendingUp className="w-2.5 h-2.5 text-white/40" />
+            <TrendingUp className="w-2.5 h-2.5 text-slate-900" />
           </div>
-          <p className="text-[10px] text-white/40 font-bold tracking-widest">
+          <p className="text-[10px] text-slate-900 font-bold tracking-widest">
             {isClient ? "Freelancer: " : "Client: "}
             <span className="text-white/80">
               {isClient

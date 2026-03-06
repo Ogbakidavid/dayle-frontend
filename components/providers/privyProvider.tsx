@@ -2,7 +2,7 @@
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import { SmartWalletsProvider } from "@privy-io/react-auth/smart-wallets";
-import { celo } from "viem/chains";
+import { celoSepolia } from "viem/chains";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -10,8 +10,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       appId="cmlgbfk7k029al50bfwfrgti3"
       clientId="client-WY6W1EYmvypDsARfuDn8w1ELcVD4wNDMn3m8RQha7uDh5"
       config={{
-        defaultChain: celo,
-        supportedChains: [celo],
+        defaultChain: celoSepolia,
+        supportedChains: [celoSepolia],
         // Disable auto-creation of embedded wallets to hide the modal.
         // We will manually trigger creation in the background (silent).
         embeddedWallets: {

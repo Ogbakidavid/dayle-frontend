@@ -19,7 +19,7 @@ export function DotLoader({
   };
 
   const colorClasses = {
-    primary: "bg-emerald-500",
+    primary: "bg-white",
     white: "bg-white",
     muted: "bg-zinc-500",
   };

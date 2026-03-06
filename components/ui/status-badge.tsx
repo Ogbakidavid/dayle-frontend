@@ -32,101 +32,101 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     DRAFT: {
       label: "Draft",
       icon: FileText,
-      className: "badge-pending",
+      className: "badge-neutral",
     },
     INVITED: {
       label: "Invited",
       icon: Clock,
-      className: "badge-pending",
+      className: "badge-warning",
     },
     FUNDED_UNASSIGNED: {
       label: "Funded",
       icon: Shield,
-      className: "badge-secured",
+      className: "badge-success",
     },
     FUNDED_ASSIGNED: {
       label: "Funded & assigned",
       icon: Shield,
-      className: "badge-secured",
+      className: "badge-success",
     },
     ACTIVE: {
       label: "Active",
       icon: Activity,
-      className: "badge-active",
+      className: "badge-info",
     },
     IN_REVIEW: {
       label: "In Review",
       icon: Eye,
-      className: "badge-pending",
+      className: "badge-warning",
     },
     COMPLETED: {
       label: "Completed",
       icon: CheckCircle2,
-      className: "badge-verified",
+      className: "badge-success",
     },
     CANCELLED: {
       label: "Cancelled",
       icon: XCircle,
-      className: "badge-cancelled",
+      className: "badge-neutral",
     },
     PAUSED: {
       label: "Paused",
       icon: Pause,
-      className: "badge-pending",
+      className: "badge-neutral",
     },
 
     // Milestone Statuses
     PENDING: {
       label: "Pending",
       icon: Clock,
-      className: "badge-pending",
+      className: "badge-warning",
     },
     SUBMITTED: {
       label: "Submitted",
       icon: CheckCircle2,
-      className: "badge-active",
+      className: "badge-info",
     },
     AWAITING_APPROVAL: {
       label: "Awaiting approval",
       icon: Eye,
-      className: "badge-pending",
+      className: "badge-warning",
     },
     VERIFIED: {
       label: "Verified",
       icon: CheckCircle2,
-      className: "badge-verified",
+      className: "badge-success",
     },
     REJECTED: {
       label: "Rejected",
       icon: XCircle,
-      className: "badge-failed",
+      className: "badge-error",
     },
     REVISION_REQUESTED: {
       label: "Revision requested",
       icon: AlertCircle,
-      className: "badge-pending",
+      className: "badge-warning",
     },
     DISPUTED: {
       label: "Disputed",
       icon: AlertCircle,
-      className: "badge-failed",
+      className: "badge-error",
     },
 
     // Legacy fallbacks (lowercase)
     SECURED: {
       label: "Secured",
       icon: Shield,
-      className: "badge-secured",
+      className: "badge-success",
     },
     FAILED: {
       label: "Failed",
       icon: XCircle,
-      className: "badge-failed",
+      className: "badge-error",
     },
     REVIEW: {
       label: "In Review",
       icon: Eye,
-      className: "badge-pending",
+      className: "badge-warning",
     },
   };
 

@@ -136,23 +136,23 @@ export default function CoverageByRegion() {
   return (
     <section
       id="coverage"
-      className="py-24 md:py-32 px-4 md:px-6 bg-[#050505] border-t border-white/5"
+      className="py-24 md:py-32 px-4 md:px-6 bg-white border-t border-slate-100"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-12">
           <div className="max-w-3xl">
-            <div className="text-[11px] font-bold tracking-[0.22em] text-white/60">
+            <div className="text-[11px] font-bold tracking-[0.22em] text-slate-600">
               Coverage
             </div>
-            <h2 className="mt-3 text-4xl md:text-6xl font-bold text-white tracking-tight leading-[0.95]">
+            <h2 className="mt-3 text-4xl md:text-6xl font-bold text-slate-900 tracking-tight leading-[0.95]">
               Corridors by region.
-              <span className="text-emerald-500 italic">
+              <span className="text-emerald-600 italic">
                 {" "}
                 Clear and verifiable.
               </span>
             </h2>
-            <p className="mt-4 text-white/60 text-sm md:text-base leading-relaxed max-w-2xl">
+            <p className="mt-4 text-slate-600 text-sm md:text-base leading-relaxed max-w-2xl">
               Browse corridor coverage by region. Select a country to view
               currency and payout methods.
             </p>
@@ -173,7 +173,7 @@ export default function CoverageByRegion() {
         {/* Main */}
         <div className="grid lg:grid-cols-12 gap-6">
           {/* Left: Regions + country lists */}
-          <div className="lg:col-span-7 rounded-3xl border border-white/10 bg-[#070707] overflow-hidden">
+          <div className="lg:col-span-7 rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden">
             {Array.from(grouped.entries()).map(([region, countries]) => (
               <RegionAccordion
                 key={region}
@@ -202,14 +202,14 @@ export default function CoverageByRegion() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl border border-white/10 bg-black/30 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-2xl border border-slate-200 bg-white flex items-center justify-center">
                         <span className="text-2xl">{activeCountry.flag}</span>
                       </div>
                       <div>
                         <div className="text-white font-bold tracking-tight text-xl">
                           {activeCountry.country}
                         </div>
-                        <div className="text-[11px] text-white/45 font-semibold tracking-widest">
+                        <div className="text-[11px] text-white/90 font-semibold tracking-widest">
                           {activeCountry.region} • {activeCountry.code}
                         </div>
                       </div>
@@ -217,7 +217,7 @@ export default function CoverageByRegion() {
                   </div>
 
                   <div className="mt-8">
-                    <div className="text-[10px] font-bold tracking-widest text-white/45">
+                    <div className="text-[10px] font-bold tracking-widest text-white/90">
                       Payout methods
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -232,7 +232,7 @@ export default function CoverageByRegion() {
                     <DetailTile label="Region" value={activeCountry.region} />
                   </div>
 
-                  <div className="mt-8 text-white/45 text-sm leading-relaxed">
+                  <div className="mt-8 text-white/90 text-sm leading-relaxed">
                     This corridor is represented as a payout endpoint.
                     Availability depends on partner rails and local settlement
                     constraints.
@@ -243,7 +243,7 @@ export default function CoverageByRegion() {
                   key="empty"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-white/60"
+                  className="text-slate-600"
                 >
                   Select a country to view corridor details.
                 </motion.div>
@@ -281,10 +281,10 @@ function RegionAccordion({
         type="button"
       >
         <div>
-          <div className="text-white font-bold tracking-tight text-xl">
+          <div className="text-slate-900 font-bold tracking-tight text-xl">
             {region}
           </div>
-          <div className="text-[11px] text-white/45 font-semibold tracking-widest mt-1">
+          <div className="text-[11px] text-slate-600 font-semibold tracking-widest mt-1">
             {countries.length} countries
           </div>
         </div>
@@ -313,8 +313,8 @@ function RegionAccordion({
                       onClick={() => onSelectCountry(c.id)}
                       className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 transition-colors ${
                         active
-                          ? "bg-white text-black border-white"
-                          : "bg-black/20 border-white/10 text-white/75 hover:border-white/20 hover:bg-white/3"
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
+                          : "bg-white border-slate-200 text-slate-600 hover:border-emerald-500/20 hover:bg-slate-50"
                       }`}
                       type="button"
                     >
@@ -343,11 +343,11 @@ function RegionAccordion({
 
 function MiniStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#070707] px-4 py-3">
-      <div className="text-white text-2xl font-bold tracking-tight">
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
+      <div className="text-slate-900 text-2xl font-bold tracking-tight">
         {value}
       </div>
-      <div className="text-[10px] text-white/45 font-bold tracking-widest mt-1">
+      <div className="text-[10px] text-slate-900 font-bold tracking-widest mt-1">
         {label}
       </div>
     </div>
@@ -356,11 +356,13 @@ function MiniStat({ label, value }: { label: string; value: number }) {
 
 function DetailTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-4">
-      <div className="text-[10px] text-white/45 font-bold tracking-widest">
+    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
+      <div className="text-[10px] text-slate-900 font-bold tracking-widest">
         {label}
       </div>
-      <div className="mt-1 text-white font-bold tracking-tight">{value}</div>
+      <div className="mt-1 text-slate-900 font-bold tracking-tight">
+        {value}
+      </div>
     </div>
   );
 }
@@ -372,9 +374,9 @@ function MethodChip({ label }: { label: string }) {
   const Icon = isMobile ? Smartphone : Landmark;
 
   return (
-    <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1.5">
+    <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 hover:border-emerald-500/30 transition-colors">
       <Icon className="w-3.5 h-3.5 text-emerald-400/90" />
-      <span className="text-[11px] font-semibold text-white/70">{label}</span>
+      <span className="text-[11px] font-semibold text-slate-900">{label}</span>
     </div>
   );
 }
