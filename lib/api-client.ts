@@ -40,6 +40,14 @@ async function request(endpoint: string, options: RequestOptions = {}) {
     credentials: "include", // Important: sends cookies with requests
   };
 
+  // Automatically add Authorization header if token exists in localStorage
+  if (typeof window !== "undefined" && !config.headers.hasOwnProperty("Authorization")) {
+    const token = localStorage.getItem("dayle_access_token");
+    if (token) {
+      (config.headers as any)["Authorization"] = `Bearer ${token}`;
+    }
+  }
+
   // Add body if present
   if (body) {
     config.body = JSON.stringify(body);
@@ -103,10 +111,13 @@ export const api = {
     },
 
     logout: async (): Promise<any> => {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("dayle_access_token");
+      }
       const result = await request("/auth/logout", {
         method: "POST",
       });
-      // Backend clears cookies, no need to clear localStorage
+      // Backend clears cookies, no need to clear localStorage manually for cookies
       return result;
     },
 
@@ -115,6 +126,11 @@ export const api = {
         method: "POST",
         body: dto,
       });
+      
+      if (data.accessToken && typeof window !== "undefined") {
+        localStorage.setItem("dayle_access_token", data.accessToken);
+      }
+      
       return data;
     },
   },

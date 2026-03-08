@@ -50,7 +50,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check session on mount
-    checkSession();
+    const persistedToken =
+      typeof window !== "undefined"
+        ? localStorage.getItem("dayle_access_token")
+        : null;
+    checkSession(persistedToken || undefined);
   }, []);
 
   const syncWallet = async () => {
