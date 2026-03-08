@@ -23,6 +23,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loginFailed, setLoginFailed] = useState(false);
   const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
   // Guard: prevent multiple simultaneous backend login calls
   const loginInProgressRef = useRef(false);
 
@@ -70,10 +71,12 @@ export default function LoginPage() {
 
         setLoading(true);
         console.log("Exchanging access token with backend...");
-        const { accessToken: backendToken } = await api.auth.socialLogin({
+        const response = await api.auth.socialLogin({
           accessToken,
         });
-        console.log("Backend token received, refreshing user...");
+
+        const { user: backendUser, accessToken: backendToken } = response;
+        console.log("Backend response received, refreshing user with token...");
         const userData = await refreshUser(backendToken);
 
         // Skip complete-profile and use social name if backend name is missing
@@ -107,6 +110,7 @@ export default function LoginPage() {
         setLoading(false);
         setLoginFailed(true);
         loginInProgressRef.current = false;
+        await logout();
       }
     };
 
@@ -128,10 +132,19 @@ export default function LoginPage() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
+    const submittedEmail = (formData.get("email") as string)
+      ?.trim()
+      .toLowerCase();
+
+    if (!submittedEmail) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
 
     try {
-      await sendCode({ email });
+      setEmail(submittedEmail);
+      await sendCode({ email: submittedEmail });
       setLoading(false);
     } catch (err) {
       console.error(err);

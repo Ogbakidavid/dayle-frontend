@@ -36,6 +36,7 @@ interface InviteData {
     isFunded: boolean;
     vaultAddress?: string;
     totalAmount?: number;
+    formattedTotalAmount?: string;
   };
 }
 
@@ -146,7 +147,7 @@ export default function InvitePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <DotLoader size="lg" />
       </div>
     );
@@ -156,15 +157,15 @@ export default function InvitePage() {
   if (error) {
     const isExpired = error.toLowerCase().includes("expired");
     return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-zinc-400">
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-slate-600">
         <div className="max-w-md w-full text-center space-y-6">
-          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
-            <XCircle className="w-10 h-10 text-red-500" />
+          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto border border-red-100">
+            <XCircle className="w-10 h-10 text-red-600" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tighter">
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tighter">
             {isExpired ? "Invitation expired" : "Invitation invalid"}
           </h1>
-          <p className="text-white/60 font-medium font-['Poppins',sans-serif]">
+          <p className="text-slate-600 font-medium font-['Poppins',sans-serif]">
             {isExpired
               ? "This secure link is no longer valid. For security, invitations expire after 72 hours."
               : error}
@@ -173,7 +174,7 @@ export default function InvitePage() {
             <Link href="/">
               <Button
                 variant="outline"
-                className="border-white/10 text-white hover:bg-white/5"
+                className="border-slate-200 text-slate-900 hover:bg-slate-50"
               >
                 Return home
               </Button>
@@ -188,23 +189,23 @@ export default function InvitePage() {
   if (data?.invite?.status !== "PENDING") {
     const status = data?.invite?.status;
     return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-zinc-400">
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-slate-600">
         <div className="max-w-md w-full text-center space-y-6">
           <div
-            className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto border ${status === "ACCEPTED" ? "bg-emerald-500/10 border-emerald-500/20" : "bg-red-500/10 border-red-500/20"}`}
+            className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto border ${status === "ACCEPTED" ? "bg-emerald-50 border-emerald-100" : "bg-red-50 border-red-100"}`}
           >
             {status === "ACCEPTED" ? (
-              <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+              <CheckCircle2 className="w-10 h-10 text-emerald-600" />
             ) : (
-              <XCircle className="w-10 h-10 text-red-500" />
+              <XCircle className="w-10 h-10 text-red-600" />
             )}
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tighter">
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tighter">
             {status === "ACCEPTED"
               ? "Invitation accepted"
               : "Invitation declined"}
           </h1>
-          <p className="text-white/60 font-medium font-['Poppins',sans-serif]">
+          <p className="text-slate-600 font-medium font-['Poppins',sans-serif]">
             You have already responded to this invitation.
           </p>
           {status === "ACCEPTED" && data?.vault && (
@@ -213,7 +214,7 @@ export default function InvitePage() {
                 onClick={() =>
                   router.push(`/freelancer/vault/${data.vault.id}`)
                 }
-                className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold"
+                className="bg-emerald-600 text-white hover:bg-emerald-500 font-bold"
               >
                 View project
               </Button>
@@ -230,25 +231,25 @@ export default function InvitePage() {
   const isLoggedIn = currentUser && currentUser.role !== UserRole.NONE;
 
   return (
-    <div className="min-h-screen bg-[#050505] font-['Poppins',sans-serif] selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-slate-50 font-['Poppins',sans-serif] selection:bg-emerald-500/30">
       {/* Simple Header */}
-      <header className="border-b border-white/5 bg-[#080808]">
+      <header className="border-b border-slate-200 bg-white">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-black">
+            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white">
               <Shield className="w-5 h-5 stroke-[3px]" />
             </div>
-            <span className="font-bold tracking-tighter text-white text-xl">
+            <span className="font-bold tracking-tighter text-slate-900 text-xl">
               Dayle
             </span>
           </Link>
           {isLoggedIn && (
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                  <User className="w-4 h-4 text-white/70" />
+                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                  <User className="w-4 h-4 text-slate-600" />
                 </div>
-                <span className="text-sm font-bold text-white/50">
+                <span className="text-sm font-bold text-slate-600">
                   {currentUser.email}
                 </span>
               </div>
@@ -257,7 +258,7 @@ export default function InvitePage() {
                   await api.auth.logout();
                   window.location.reload();
                 }}
-                className="text-[10px] font-bold tracking-wide text-emerald-500 hover:text-emerald-400 transition-colors border border-emerald-500/30 px-2 py-1 rounded"
+                className="text-[10px] font-bold tracking-wide text-emerald-600 hover:text-emerald-500 transition-colors border border-emerald-500/30 px-2 py-1 rounded"
               >
                 Switch
               </button>
@@ -267,67 +268,67 @@ export default function InvitePage() {
       </header>
 
       <main className="container mx-auto px-4 py-12 md:py-20 flex flex-col items-center">
-        <div className="w-full max-w-3xl mb-12 text-center text-zinc-400">
+        <div className="w-full max-w-3xl mb-12 text-center text-slate-600">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm font-bold tracking-wide mb-6"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-bold tracking-wide mb-6"
           >
             <Briefcase className="w-4 h-4" />
             <span>Project invitation</span>
           </motion.div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tighter mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter mb-4">
             {vault.title}
           </h1>
-          <p className="text-xl text-white/50 font-medium">
-            Sent by <span className="text-white">{vault.clientName}</span>
+          <p className="text-xl text-slate-500 font-medium">
+            Sent by <span className="text-slate-900">{vault.clientName}</span>
           </p>
         </div>
 
         <div className="w-full max-w-4xl grid md:grid-cols-2 gap-6 items-start">
           {/* LEFT: Project Summary */}
-          <div className="bg-muted border border-white/5 rounded-2xl p-6 md:p-8 space-y-8 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Shield className="w-48 h-48 text-white" />
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-8 relative overflow-hidden group shadow-sm">
+            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-slate-200">
+              <Shield className="w-48 h-48" />
             </div>
-
+            
             <div className="relative z-10">
-              <h3 className="text-xs font-bold tracking-wide text-slate-900 mb-6">
+              <h3 className="text-xs font-bold tracking-wide text-slate-900 mb-6 uppercase">
                 Safe project summary
               </h3>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-slate-900 text-xs font-bold tracking-wide mb-1">
+                  <p className="text-slate-600 text-xs font-bold tracking-wide mb-1">
                     Total value
                   </p>
-                  <div className="text-3xl font-bold text-white tracking-tight flex items-baseline gap-1">
-                    <span className="text-lg text-emerald-500">$</span>
-                    {(vault.totalAmount || vault.amount || 0).toLocaleString()}
+                  <div className="text-3xl font-bold text-slate-900 tracking-tight flex items-baseline gap-1">
+                    <span className="text-lg text-emerald-600">$</span>
+                    {vault.formattedTotalAmount || vault.totalAmount}
                   </div>
                 </div>
               </div>
 
-              <div className="h-px bg-white/10 my-6" />
+              <div className="h-px bg-slate-100 my-6" />
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   {vault.isFunded ? (
-                    <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-500">
+                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
                       <Lock className="w-5 h-5" />
                     </div>
                   ) : (
-                    <div className="p-2 bg-amber-500/10 rounded-lg text-amber-500">
+                    <div className="p-2 bg-amber-50 rounded-lg text-amber-600 border border-amber-100">
                       <Clock className="w-5 h-5" />
                     </div>
                   )}
                   <div>
-                    <p className="text-white font-bold text-sm tracking-wide">
+                    <p className="text-slate-900 font-bold text-sm tracking-wide">
                       {vault.isFunded
                         ? "Funds verified & secured"
                         : "Awaiting client funding"}
                     </p>
-                    <p className="text-slate-900 text-xs font-medium mt-0.5">
+                    <p className="text-slate-600 text-xs font-medium mt-0.5">
                       {vault.isFunded
                         ? "Capital is held in a secure escrow account."
                         : "Funds must be secured before work begins."}
@@ -337,14 +338,14 @@ export default function InvitePage() {
 
                 {vault.vaultAddress && (
                   <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2 duration-700 delay-300">
-                    <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400 border border-emerald-500/20">
+                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
                       <Shield className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-emerald-400 font-bold text-[10px] tracking-wide">
+                      <p className="text-emerald-700 font-bold text-[10px] tracking-wide">
                         Securely verified escrow
                       </p>
-                      <p className="text-white/30 text-[10px] italic mt-0.5 break-all">
+                      <p className="text-slate-400 text-[10px] italic mt-0.5 break-all">
                         {vault.vaultAddress}
                       </p>
                     </div>
@@ -355,17 +356,17 @@ export default function InvitePage() {
           </div>
 
           {/* RIGHT: Action Card */}
-          <div className="bg-muted border border-white/5 rounded-2xl p-6 md:p-8 flex flex-col justify-center min-h-[300px]">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 flex flex-col justify-center min-h-[300px] shadow-sm">
             {!isLoggedIn ? (
               <div className="text-center space-y-6">
-                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <User className="w-8 h-8 text-white/70" />
+                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-2 border border-slate-100">
+                  <User className="w-8 h-8 text-slate-300" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white tracking-tight italic">
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight italic">
                     Join to respond
                   </h3>
-                  <p className="text-white/50 text-sm mt-2 font-medium">
+                  <p className="text-slate-600 text-sm mt-2 font-medium">
                     Create an account or sign in to accept this project
                     invitation.
                   </p>
@@ -373,14 +374,14 @@ export default function InvitePage() {
                 <div className="grid gap-3">
                   <Button
                     onClick={handleLoginRedirect}
-                    className="w-full h-12 bg-white text-black hover:bg-emerald-500 hover:text-black font-bold tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
+                    className="w-full h-12 bg-emerald-600 text-white hover:bg-emerald-700 font-bold tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
                   >
                     Log in
                   </Button>
                   <Button
                     onClick={handleSignupRedirect}
                     variant="outline"
-                    className="w-full h-12 border-white/10 text-white hover:bg-white/5 font-bold tracking-wide rounded-xl transition-all active:scale-95"
+                    className="w-full h-12 border-slate-200 text-slate-900 hover:bg-slate-50 font-bold tracking-wide rounded-xl transition-all active:scale-95"
                   >
                     Create account
                   </Button>
@@ -388,14 +389,14 @@ export default function InvitePage() {
               </div>
             ) : isClient ? (
               <div className="text-center space-y-6">
-                <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-2 border border-amber-500/20">
-                  <AlertCircle className="w-8 h-8 text-amber-500" />
+                <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-2 border border-amber-100">
+                  <AlertCircle className="w-8 h-8 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white tracking-tight">
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight">
                     Freelancer access only
                   </h3>
-                  <p className="text-white/50 text-sm mt-2 font-medium">
+                  <p className="text-slate-600 text-sm mt-2 font-medium">
                     You are logged in as a Client. This invitation is intended
                     for a Freelancer account.
                   </p>
@@ -404,7 +405,7 @@ export default function InvitePage() {
                   <Button
                     onClick={() => router.push("/client")}
                     variant="outline"
-                    className="w-full h-12 border-white/10 hover:bg-white/5 text-white font-bold tracking-wide rounded-xl transition-all"
+                    className="w-full h-12 border-slate-200 hover:bg-slate-50 text-slate-900 font-bold tracking-wide rounded-xl transition-all"
                   >
                     Return to dashboard
                   </Button>
@@ -414,7 +415,7 @@ export default function InvitePage() {
                       window.location.reload();
                     }}
                     variant="ghost"
-                    className="w-full h-10 text-white/30 hover:text-white font-bold text-[10px] tracking-widest"
+                    className="w-full h-10 text-slate-400 hover:text-slate-600 font-bold text-[10px] tracking-widest"
                   >
                     Switch account
                   </Button>
@@ -422,18 +423,20 @@ export default function InvitePage() {
               </div>
             ) : currentUser && currentUser.email !== invite.email ? (
               <div className="text-center space-y-6">
-                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-2 border border-red-500/20">
-                  <Lock className="w-8 h-8 text-red-500" />
+                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-2 border border-red-100">
+                  <Lock className="w-8 h-8 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold tracking-tight italic text-red-400">
+                  <h3 className="text-xl font-bold tracking-tight italic text-red-600">
                     Identity mismatch
                   </h3>
-                  <p className="text-white/50 text-sm mt-2 font-medium leading-relaxed">
+                  <p className="text-slate-600 text-sm mt-2 font-medium leading-relaxed">
                     This invitation was sent to{" "}
-                    <span className="text-white font-bold">{invite.email}</span>
+                    <span className="text-slate-900 font-bold">
+                      {invite.email}
+                    </span>
                     , but you are logged in as{" "}
-                    <span className="text-white font-bold">
+                    <span className="text-slate-900 font-bold">
                       {currentUser.email}
                     </span>
                     .
@@ -445,7 +448,7 @@ export default function InvitePage() {
                     window.location.reload();
                   }}
                   variant="outline"
-                  className="w-full h-12 border-white/10 hover:bg-white/5 text-white font-bold tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
+                  className="w-full h-12 border-slate-200 hover:bg-slate-50 text-slate-900 font-bold tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
                 >
                   Login with different account
                 </Button>
@@ -454,10 +457,10 @@ export default function InvitePage() {
               // Freelancer View
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-bold text-white tracking-tight">
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight">
                     Ready to collaborate?
                   </h3>
-                  <p className="text-white/50 text-sm mt-2 font-medium">
+                  <p className="text-slate-600 text-sm mt-2 font-medium">
                     Accepting creates a binding workspace. You can review full
                     requirements before confirming the project.
                   </p>
@@ -467,7 +470,7 @@ export default function InvitePage() {
                   <Button
                     onClick={handleAccept}
                     disabled={processing}
-                    className="w-full h-14 bg-emerald-500 text-black hover:bg-emerald-400 font-bold tracking-wide rounded-xl shadow-lg shadow-emerald-500/20"
+                    className="w-full h-14 bg-emerald-600 text-white hover:bg-emerald-700 font-bold tracking-wide rounded-xl shadow-lg shadow-emerald-600/20"
                   >
                     {processing ? <DotLoader size="md" /> : "Accept invitation"}
                   </Button>
@@ -476,7 +479,7 @@ export default function InvitePage() {
                     onClick={() => setShowDeclineModal(true)}
                     disabled={processing}
                     variant="ghost"
-                    className="w-full h-12 text-white/50 hover:text-red-400 hover:bg-red-500/10 font-bold tracking-wide rounded-xl"
+                    className="w-full h-12 text-slate-400 hover:text-red-600 hover:bg-red-50 font-bold tracking-wide rounded-xl"
                   >
                     Decline
                   </Button>
@@ -486,7 +489,7 @@ export default function InvitePage() {
           </div>
         </div>
 
-        <p className="mt-12 text-white/20 text-xs tracking-widest font-bold flex items-center gap-2">
+        <p className="mt-12 text-slate-300 text-xs tracking-widest font-bold flex items-center gap-2">
           <Shield className="w-3 h-3" />
           Secured by Dayle system
         </p>
@@ -495,18 +498,18 @@ export default function InvitePage() {
       {/* Decline Modal */}
       <AnimatePresence>
         {showDeclineModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-sm bg-muted border border-white/10 rounded-2xl p-6 space-y-6"
+              className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-2xl"
             >
               <div>
-                <h3 className="text-lg font-bold text-white tracking-tight">
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight">
                   Decline invitation
                 </h3>
-                <p className="text-white/50 text-sm mt-1 font-medium">
+                <p className="text-slate-600 text-sm mt-1 font-medium">
                   Please select a reason for declining.
                 </p>
               </div>
@@ -518,8 +521,8 @@ export default function InvitePage() {
                     onClick={() => setDeclineReason(reason.id)}
                     className={`w-full text-left p-3 rounded-lg border text-sm font-medium transition-all ${
                       declineReason === reason.id
-                        ? "bg-white text-black border-white"
-                        : "bg-black border-white/10 text-white/70 hover:border-white/30"
+                        ? "bg-slate-900 text-white border-slate-900"
+                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     }`}
                   >
                     {reason.label}
@@ -531,7 +534,7 @@ export default function InvitePage() {
                 <Button
                   variant="ghost"
                   onClick={() => setShowDeclineModal(false)}
-                  className="flex-1 text-white/50 hover:text-white"
+                  className="flex-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </Button>

@@ -7,8 +7,13 @@ import { celoSepolia } from "viem/chains";
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <PrivyProvider
-      appId="cmlgbfk7k029al50bfwfrgti3"
-      clientId="client-WY6W1EYmvypDsARfuDn8w1ELcVD4wNDMn3m8RQha7uDh5"
+      appId={
+        process.env.NEXT_PUBLIC_PRIVY_APP_ID || "cmlgbfk7k029al50bfwfrgti3"
+      }
+      clientId={
+        process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID ||
+        "client-WY6W1EYmvypDsARfuDn8w1ELcVD4wNDMn3m8RQha7uDh5"
+      }
       config={{
         defaultChain: celoSepolia,
         supportedChains: [celoSepolia],

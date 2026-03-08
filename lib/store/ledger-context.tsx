@@ -13,8 +13,11 @@ import { useUser } from "./user-context";
 import { toast } from "sonner";
 
 export interface LedgerBalance {
-  available: number;
-  pending: number;
+  available: string;
+  pending: string;
+  formattedAvailable?: string;
+  formattedPending?: string;
+  formattedSecured?: string; // Derived field for UI
 }
 
 export interface Transaction {
@@ -44,8 +47,8 @@ const LedgerContext = createContext<LedgerContextType | undefined>(undefined);
 export function LedgerProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const [balance, setBalance] = useState<LedgerBalance>({
-    available: 0,
-    pending: 0,
+    available: "0",
+    pending: "0",
   });
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
@@ -101,8 +104,13 @@ export function LedgerProvider({ children }: { children: ReactNode }) {
       // API already moved funds from available -> pending
       // Update local state to reflect this
       setBalance((prev) => ({
-        available: prev.available - Math.abs(tx.amount),
-        pending: prev.pending + Math.abs(tx.amount),
+        ...prev,
+        available: (
+          BigInt(prev.available) - BigInt(Math.abs(tx.amount))
+        ).toString(),
+        pending: (
+          BigInt(prev.pending) + BigInt(Math.abs(tx.amount))
+        ).toString(),
       }));
 
       const normalized: Transaction = {
@@ -134,10 +142,14 @@ export function LedgerProvider({ children }: { children: ReactNode }) {
               ),
             );
             // Decrement pending (funds already removed from available)
-            setBalance((prev) => ({
-              ...prev,
-              pending: Math.max(0, prev.pending - Math.abs(tx.amount)),
-            }));
+            setBalance((prev) => {
+              const newPending =
+                BigInt(prev.pending) - BigInt(Math.abs(tx.amount));
+              return {
+                ...prev,
+                pending: (newPending < 0n ? 0n : newPending).toString(),
+              };
+            });
             clearInterval(pollInterval);
           }
         } catch (err) {

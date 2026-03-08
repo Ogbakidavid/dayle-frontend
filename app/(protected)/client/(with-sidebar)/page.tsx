@@ -52,9 +52,17 @@ export default function ClientDashboard() {
   );
 
   const totalLocked = securedVaults.reduce(
-    (acc: number, v: any) => acc + (Number(v.totalAmount || v.amount) || 0),
+    (acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0),
     0,
   );
+
+  // Sync balance formatting
+  if (balance) {
+    (balance as any).formattedSecured = totalLocked.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
 
   const totalPages = Math.ceil(activeVaults.length / itemsPerPage);
   const paginatedVaults = activeVaults.slice(
@@ -96,7 +104,7 @@ export default function ClientDashboard() {
           </div>
           <div className="space-y-2">
             <h2 className="text-3xl font-bold text-slate-900 tracking-tighter italic">
-              ${balance?.available?.toLocaleString() || "0.00"}
+              ${balance?.formattedAvailable || "0.00"}
             </h2>
             <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold tracking-wide">
               <Zap className="w-4 h-4" />
@@ -119,7 +127,7 @@ export default function ClientDashboard() {
           </div>
           <div className="space-y-2">
             <h2 className="text-3xl font-bold text-slate-900 tracking-tighter italic">
-              ${totalLocked.toLocaleString()}
+              ${balance?.formattedSecured || "0"}
             </h2>
             <p className="text-slate-600 text-sm font-bold tracking-wide">
               {securedVaults.length} active contracts
@@ -240,8 +248,7 @@ export default function ClientDashboard() {
                           Project value
                         </p>
                         <p className="text-2xl font-bold text-slate-900 tracking-tight italic">
-                          $
-                          {(vault.totalAmount || vault.amount).toLocaleString()}
+                          ${vault.formattedTotalAmount || vault.totalAmount}
                         </p>
                       </div>
                       <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">

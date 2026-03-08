@@ -176,7 +176,7 @@ export default function CoverageByRegion() {
           <div className="lg:col-span-7 rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden">
             {Array.from(grouped.entries()).map(([region, countries]) => (
               <RegionAccordion
-                key={region}
+                key={`region-${region}`}
                 region={region}
                 countries={countries}
                 open={openRegion === region}

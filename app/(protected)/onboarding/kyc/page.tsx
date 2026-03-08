@@ -5,7 +5,7 @@ import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/lib/store/user-context";
 import { UserRole } from "@/lib/api-client";
-import { ScanFace, AlertCircle } from "lucide-react";
+import { ScanFace, AlertCircle, ChevronLeft } from "lucide-react";
 import DiditVerificationBtn from "@/components/kyc/DiditVerificationBtn";
 
 function KYCPageContent() {
@@ -34,11 +34,15 @@ function KYCPageContent() {
       {/* Top Navigation Bar - Mobile App Style */}
       <header className="fixed top-0 inset-x-0 h-16 bg-white z-50 flex items-center justify-between px-6 border-b border-slate-100 shadow-sm">
         <div className="flex items-center gap-4 w-full">
-          <div className="w-10 h-10"></div>
-          <div className="flex-1 text-center font-semibold text-[17px] tracking-tight text-slate-900">
+          <button
+            onClick={() => router.back()}
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-600 active:scale-95"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <div className="flex-1 text-center font-semibold text-[17px] tracking-tight text-slate-900 mr-10">
             Identity verification
           </div>
-          <div className="w-10 h-10 flex items-center justify-center italic text-xs text-slate-600"></div>
         </div>
       </header>
 

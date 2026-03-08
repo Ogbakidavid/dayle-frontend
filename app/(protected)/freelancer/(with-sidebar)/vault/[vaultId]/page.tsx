@@ -167,13 +167,15 @@ export default function FreelancerVaultDetailPage() {
                 Secured contract value
               </p>
               <p className="text-4xl md:text-6xl font-bold text-slate-900 tracking-widest italic leading-none">
-                ${(vault.totalAmount || vault.amount || 0).toLocaleString()}
+                {vault.formattedTotalAmount || vault.totalAmount}
               </p>
               <div className="mt-4 inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                 <p className="text-[10px] md:text-xs text-emerald-700 font-bold tracking-wide italic">
-                  ${(vault.paidAmount || 0).toLocaleString()} capital
-                  distributed
+                  $
+                  {vault.formattedPaidAmount ||
+                    (vault.paidAmount || 0).toLocaleString()}{" "}
+                  capital distributed
                 </p>
               </div>
             </div>

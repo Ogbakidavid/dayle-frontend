@@ -269,7 +269,7 @@ export default function ClientVaultDetailPage() {
               <AlertDescription className="text-sm font-bold mt-2 leading-relaxed italic">
                 Your fiat payment of{" "}
                 <span className="text-red-600 underline">
-                  ${vault.totalAmount.toLocaleString()}
+                  ${vault.formattedTotalAmount || vault.totalAmount}
                 </span>{" "}
                 was confirmed, but we encountered an error while depositing it
                 into the escrow contract.
@@ -352,7 +352,7 @@ export default function ClientVaultDetailPage() {
                   Total secured value
                 </p>
                 <p className="text-4xl font-bold text-slate-900 tracking-widest italic">
-                  ${(vault.totalAmount || vault.amount || 0).toLocaleString()}
+                  ${vault.formattedTotalAmount || vault.totalAmount}
                 </p>
                 <div className="mt-2 flex items-center justify-end gap-2">
                   <div
@@ -728,12 +728,8 @@ export default function ClientVaultDetailPage() {
                           <DialogDescription className="text-slate-600 text-sm leading-relaxed pt-2 font-bold">
                             You are about to release{" "}
                             <span className="text-slate-900 font-bold">
-                              $
-                              {(
-                                vault.totalAmount ||
-                                vault.amount ||
-                                0
-                              ).toLocaleString()}
+                              $ $
+                              {vault.formattedTotalAmount || vault.totalAmount}
                             </span>{" "}
                             to the freelancer. This action is{" "}
                             <span className="text-emerald-700 font-bold tracking-widest text-[10px] uppercase">

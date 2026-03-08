@@ -98,6 +98,52 @@ export default function CreateVaultPage() {
     );
   };
 
+  const STORAGE_KEY = "dayle_create_vault_draft";
+
+  // Load state on mount
+  React.useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (data.vaultPurpose) setVaultPurpose(data.vaultPurpose);
+        if (data.vaultTitle) setVaultTitle(data.vaultTitle);
+        if (data.vaultDescription) setVaultDescription(data.vaultDescription);
+        if (data.budgetAmount) setBudgetAmount(data.budgetAmount);
+        if (data.freelancerEmail) setFreelancerEmail(data.freelancerEmail);
+        if (data.freelancerName) setFreelancerName(data.freelancerName);
+        if (data.deliverables) setDeliverables(data.deliverables);
+        if (data.page) setPage([data.page, 0]);
+      } catch (e) {
+        console.error("Failed to load saved vault draft:", e);
+      }
+    }
+  }, []);
+
+  // Save state on change
+  React.useEffect(() => {
+    const state = {
+      vaultPurpose,
+      vaultTitle,
+      vaultDescription,
+      budgetAmount,
+      freelancerEmail,
+      freelancerName,
+      deliverables,
+      page,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, [
+    vaultPurpose,
+    vaultTitle,
+    vaultDescription,
+    budgetAmount,
+    freelancerEmail,
+    freelancerName,
+    deliverables,
+    page,
+  ]);
+
   const steps = [
     { id: 1, name: "Basics", icon: Info },
     { id: 2, name: "Assign", icon: Users },
@@ -138,7 +184,7 @@ export default function CreateVaultPage() {
       // initialize the secure vault account behind the scenes.
       const payload = {
         title: vaultTitle,
-        type: vaultPurpose,
+        type: vaultPurpose.toUpperCase(),
         description: vaultDescription,
         totalAmount: budget,
         // Defaulting to USDC for Fiat abstraction under the hood
@@ -154,6 +200,9 @@ export default function CreateVaultPage() {
       };
 
       const newVault = await createVault(payload);
+
+      // Clear draft since it was deployed successfully
+      localStorage.removeItem(STORAGE_KEY);
 
       // 2. Send invitation to freelancer if email provided
       if (freelancerEmail) {
@@ -618,10 +667,8 @@ export default function CreateVaultPage() {
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <span className="text-sm text-slate-900 font-bold">
-                    Total value
-                  </span>
-                  <span className="text-2xl font-bold italic">
+                  <span className="text-slate-900 font-bold">Total value</span>
+                  <span className="text-2xl text-slate-900 font-bold italic">
                     ${budget.toLocaleString()}
                   </span>
                 </div>

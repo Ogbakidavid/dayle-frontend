@@ -52,7 +52,9 @@ export default function CheckoutSelectionPage() {
   }, [vaults, vaultId, contextLoading, fetchVault]);
 
   const vault = localVault;
-  const amount = Number(vault?.totalAmount || 0);
+  const amount = vault?.formattedTotalAmount
+    ? Number(vault.formattedTotalAmount)
+    : 0;
   const displayAmount = currency === "USD" ? amount : amount * EXCHANGE_RATE;
   const currencyPrefix = currency === "USD" ? "$" : "₦";
 
@@ -60,7 +62,7 @@ export default function CheckoutSelectionPage() {
     <div className="min-h-screen bg-white text-slate-600 font-['Poppins',sans-serif] antialiased">
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT SIDEBAR (25%) */}
-        <section className="w-full lg:w-[350px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
+        <section className="w-full lg:w-[400px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
           <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
 
           <div className="space-y-16 relative z-10">
@@ -97,8 +99,8 @@ export default function CheckoutSelectionPage() {
                     </button>
                   </div>
                 </div>
-                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-7xl italic flex items-baseline gap-2">
-                  <span className="text-emerald-600 font-bold text-3xl">
+                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-4xl italic flex items-baseline gap-2">
+                  <span className="text-emerald-600 font-bold text-2xl">
                     {currencyPrefix}
                   </span>
                   {displayAmount.toLocaleString(undefined, {
@@ -113,9 +115,9 @@ export default function CheckoutSelectionPage() {
 
               <div className="pt-10 border-t border-slate-200 space-y-6">
                 <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-slate-900 uppercase">
-                  <span className="text-slate-600 italic">Project account</span>
+                  <span className="text-slate-600 italic">Project ID</span>
                   <span className="text-emerald-600 italic tracking-normal text-[9px]">
-                    {vault?.vaultAddress || "Deployment Pending"}
+                    VAULT-{vault?.id.slice(0, 8).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-slate-900 uppercase">
@@ -156,57 +158,81 @@ export default function CheckoutSelectionPage() {
                 </p>
               </div>
 
-              <div className="grid gap-6">
-                {/* Card Payment Selection */}
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/checkout/${vaultId}/card?currency=${currency}`,
-                    )
-                  }
-                  className="w-full p-8 bg-white border border-slate-200 rounded-[2.5rem] flex items-center gap-6 group hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-600/5 transition-all relative overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity" />
+              {user?.kycStatus !== KycStatus.VERIFIED ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-[2.5rem] p-10 space-y-6 text-center shadow-sm">
+                  <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 mx-auto">
+                    <ShieldCheck className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="text-2xl font-bold text-slate-900 italic tracking-tighter">
+                      Identity Verification Required
+                    </h3>
+                    <p className="text-xs text-slate-600 font-bold tracking-wide italic leading-relaxed px-4">
+                      To comply with security and regulatory standards, you need
+                      to verify your identity before you can deposit funds into
+                      escrow.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => router.push("/client/settings?tab=kyc")}
+                    className="w-full h-16 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-[0.2em] italic"
+                  >
+                    Verify Identity Now
+                  </button>
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {/* Card Payment Selection */}
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/checkout/${vaultId}/card?currency=${currency}`,
+                      )
+                    }
+                    className="w-full p-8 bg-white border border-slate-200 rounded-[2.5rem] flex items-center gap-6 group hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-600/5 transition-all relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                  <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-500 transition-all shrink-0">
-                    <CreditCard className="w-6 h-6" />
-                  </div>
-                  <div className="text-left relative z-10">
-                    <p className="text-slate-900 font-bold text-xl tracking-tight italic group-hover:text-emerald-950 transition-colors">
-                      Credit / Debit Card
-                    </p>
-                    <p className="text-[10px] font-bold text-slate-400 tracking-widest group-hover:text-emerald-600 transition-colors uppercase italic mt-1">
-                      Instant payment via Partna Link
-                    </p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 ml-auto text-slate-300 group-hover:text-emerald-500 transition-all group-hover:translate-x-1" />
-                </button>
+                    <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-500 transition-all shrink-0">
+                      <CreditCard className="w-6 h-6" />
+                    </div>
+                    <div className="text-left relative z-10">
+                      <p className="text-slate-900 font-bold text-xl tracking-tight italic group-hover:text-emerald-950 transition-colors">
+                        Credit / Debit Card
+                      </p>
+                      <p className="text-[10px] font-bold text-slate-400 tracking-widest group-hover:text-emerald-600 transition-colors uppercase italic mt-1">
+                        Instant payment via Partna Link
+                      </p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 ml-auto text-slate-300 group-hover:text-emerald-500 transition-all group-hover:translate-x-1" />
+                  </button>
 
-                {/* Bank Transfer Selection */}
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/checkout/${vaultId}/bank?currency=${currency}`,
-                    )
-                  }
-                  className="w-full p-8 bg-white border border-slate-200 rounded-[2.5rem] flex items-center gap-6 group hover:border-blue-200 hover:shadow-xl hover:shadow-blue-600/5 transition-all relative overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {/* Bank Transfer Selection */}
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/checkout/${vaultId}/bank?currency=${currency}`,
+                      )
+                    }
+                    className="w-full p-8 bg-white border border-slate-200 rounded-[2.5rem] flex items-center gap-6 group hover:border-blue-200 hover:shadow-xl hover:shadow-blue-600/5 transition-all relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                  <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-all shrink-0">
-                    <Building2 className="w-6 h-6" />
-                  </div>
-                  <div className="text-left relative z-10">
-                    <p className="text-slate-900 font-bold text-xl tracking-tight italic group-hover:text-blue-950 transition-colors">
-                      Bank Transfer
-                    </p>
-                    <p className="text-[10px] font-bold text-slate-400 tracking-widest group-hover:text-blue-600 transition-colors uppercase italic mt-1">
-                      Direct transfer to virtual account
-                    </p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 ml-auto text-slate-300 group-hover:text-blue-500 transition-all group-hover:translate-x-1" />
-                </button>
-              </div>
+                    <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-all shrink-0">
+                      <Building2 className="w-6 h-6" />
+                    </div>
+                    <div className="text-left relative z-10">
+                      <p className="text-slate-900 font-bold text-xl tracking-tight italic group-hover:text-blue-950 transition-colors">
+                        Bank Transfer
+                      </p>
+                      <p className="text-[10px] font-bold text-slate-400 tracking-widest group-hover:text-blue-600 transition-colors uppercase italic mt-1">
+                        Direct transfer to virtual account
+                      </p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 ml-auto text-slate-300 group-hover:text-blue-500 transition-all group-hover:translate-x-1" />
+                  </button>
+                </div>
+              )}
             </motion.div>
           </div>
         </main>

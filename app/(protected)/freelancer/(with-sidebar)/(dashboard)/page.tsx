@@ -123,7 +123,7 @@ export default function FreelancerDashboard() {
           </div>
           <div className="space-y-2">
             <h2 className="text-4xl font-bold text-slate-900 tracking-tighter italic">
-              ${balance?.available?.toLocaleString() || "0.00"}
+              ${balance?.formattedAvailable || "0.00"}
             </h2>
             <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-bold tracking-wide">
               <Zap className="w-3.5 h-3.5" />
@@ -146,7 +146,17 @@ export default function FreelancerDashboard() {
           </div>
           <div className="space-y-2">
             <h2 className="text-4xl font-bold text-slate-900 tracking-tighter italic">
-              ${totalPending.toLocaleString()}
+              $
+              {activeVaults
+                .reduce(
+                  (acc: number, v: any) =>
+                    acc + (Number(v.formattedTotalAmount) || 0),
+                  0,
+                )
+                .toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
             </h2>
             <p className="text-blue-400 text-[10px] font-bold tracking-wide">
               {activeVaults.length} active assignments
@@ -210,6 +220,15 @@ export default function FreelancerDashboard() {
                     <span className="bg-blue-500/10 text-blue-500 text-[9px] font-bold tracking-wide rounded-lg border border-blue-500/20 py-1 px-3">
                       Action required
                     </span>
+                    {invite.vault?.isFunded ? (
+                      <span className="bg-emerald-50 text-emerald-700 text-[9px] font-bold tracking-wide rounded-lg border border-emerald-200 py-1 px-3">
+                        Funded
+                      </span>
+                    ) : (
+                      <span className="bg-amber-50 text-amber-700 text-[9px] font-bold tracking-wide rounded-lg border border-amber-200 py-1 px-3">
+                        Payment Pending
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
@@ -231,11 +250,8 @@ export default function FreelancerDashboard() {
                     </p>
                     <p className="text-xl font-bold text-slate-900 tracking-tight italic">
                       $
-                      {(
-                        invite.vault?.totalAmount ||
-                        invite.vault?.amount ||
-                        0
-                      ).toLocaleString()}
+                      {invite.vault?.formattedTotalAmount ||
+                        invite.vault?.totalAmount}
                     </p>
                   </div>
                   <Link href={`/invite/${invite.token}`}>
@@ -367,8 +383,7 @@ export default function FreelancerDashboard() {
                           Project value
                         </p>
                         <p className="text-2xl font-bold text-slate-900 tracking-tight italic">
-                          $
-                          {(vault.totalAmount || vault.amount).toLocaleString()}
+                          ${vault.formattedTotalAmount || vault.totalAmount}
                         </p>
                       </div>
                       <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">

@@ -1308,7 +1308,7 @@ function ProcessingStatusScreen({
       <div className="bg-white border border-slate-200 rounded-[40px] p-12 space-y-12 shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
         {steps.map((step, idx) => (
-          <div key={idx} className="flex gap-8 relative group">
+          <div key={step.id} className="flex gap-8 relative group">
             {idx < steps.length - 1 && (
               <div
                 className={cn(

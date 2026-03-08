@@ -150,7 +150,7 @@ export default function ActiveWorkPage() {
                               Contract Value
                             </p>
                             <p className="text-2xl md:text-4xl font-bold text-slate-900 tracking-widest italic group-hover:scale-105 transition-transform origin-right">
-                              ${(vault.totalAmount || 0).toLocaleString()}
+                              {vault.formattedTotalAmount || vault.totalAmount}
                             </p>
                           </div>
                         </div>

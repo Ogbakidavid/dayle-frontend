@@ -34,6 +34,7 @@ async function request(endpoint: string, options: RequestOptions = {}) {
     method,
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420", // Bypass ngrok warning page
       ...headers,
     },
     credentials: "include", // Important: sends cookies with requests
@@ -114,7 +115,7 @@ export const api = {
         method: "POST",
         body: dto,
       });
-      return data.user;
+      return data;
     },
   },
 

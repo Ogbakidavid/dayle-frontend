@@ -363,7 +363,7 @@ export default function LandingPage() {
               },
             ].map((item, i) => (
               <motion.div
-                key={i}
+                key={item.title}
                 variants={fadeInUp}
                 className="p-6 md:p-10 lg:p-12 border rounded-3xl md:rounded-[48px] relative group transition-all bg-white border-slate-200 hover:bg-slate-100 shadow-sm hover:shadow-md"
               >
@@ -536,8 +536,11 @@ export default function LandingPage() {
                   </p>
 
                   <div className="mt-6 space-y-2.5">
-                    {c.bullets.map((b) => (
-                      <div key={b} className="flex items-center gap-3">
+                    {c.bullets.map((b, bulletIdx) => (
+                      <div
+                        key={`${c.title}-bullet-${bulletIdx}`}
+                        className="flex items-center gap-3"
+                      >
                         <div className="w-2 h-2 rounded-full bg-emerald-500" />
                         <span className="text-[12px] md:text-[13px] font-semibold text-slate-900">
                           {b}
@@ -619,7 +622,7 @@ export default function LandingPage() {
               },
             ].map((f, i) => (
               <motion.div
-                key={i}
+                key={f.title}
                 variants={fadeInUp}
                 className="group p-6 md:p-8 border rounded-2xl md:rounded-3xl bg-white border-slate-200 hover:border-emerald-500/40 transition-colors shadow-sm"
               >
@@ -679,7 +682,7 @@ export default function LandingPage() {
                   { label: "Audit-ready system events", icon: ListChecks },
                 ].map((item, i) => (
                   <div
-                    key={i}
+                    key={item.label}
                     className="flex items-center gap-4 text-slate-900"
                   >
                     <item.icon className="w-5 h-5 text-emerald-500 shrink-0" />
@@ -716,7 +719,7 @@ export default function LandingPage() {
                 },
               ].map((item, i) => (
                 <motion.div
-                  key={i}
+                  key={item.title}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -785,7 +788,7 @@ export default function LandingPage() {
               const open = activeFaq === index;
               return (
                 <motion.div
-                  key={index}
+                  key={faq.q}
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}

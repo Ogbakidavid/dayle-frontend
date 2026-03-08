@@ -39,7 +39,9 @@ export default function BankTransferPage() {
   const EXCHANGE_RATE = 1500;
 
   const vault = (vaults || []).find((v) => v.id === vaultId);
-  const amount = Number(vault?.totalAmount || 0);
+  const amount = vault?.formattedTotalAmount
+    ? Number(vault.formattedTotalAmount)
+    : 0;
   const displayAmount = currency === "USD" ? amount : amount * EXCHANGE_RATE;
   const currencyPrefix = currency === "USD" ? "$" : "₦";
 
@@ -101,7 +103,7 @@ export default function BankTransferPage() {
         body: JSON.stringify({
           reference: bankDetails?.providerRef || `vault_fund_${vaultId}`,
           status: "success",
-          amount: String(amount),
+          amount: String(vault?.totalAmount || amount),
           type: "collection",
           voucherCode: `MOCK_VOUCHER_${Date.now()}`,
         }),
@@ -139,7 +141,7 @@ export default function BankTransferPage() {
     <div className="min-h-screen bg-white text-slate-600 font-['Poppins',sans-serif] antialiased">
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT SIDEBAR */}
-        <section className="w-full lg:w-[350px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
+        <section className="w-full lg:w-[400px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
           <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
           <div className="space-y-16 relative z-10">
             <div className="flex items-center gap-4">
@@ -158,8 +160,8 @@ export default function BankTransferPage() {
                 <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em] italic leading-none uppercase">
                   Total transfer
                 </p>
-                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-7xl italic flex items-baseline gap-2">
-                  <span className="text-emerald-600 font-bold text-3xl">
+                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-4xl italic flex items-baseline gap-2">
+                  <span className="text-emerald-600 font-bold text-2xl">
                     {currencyPrefix}
                   </span>
                   {displayAmount.toLocaleString(undefined, {
@@ -170,9 +172,9 @@ export default function BankTransferPage() {
               </div>
               <div className="pt-10 border-t border-slate-200 space-y-6">
                 <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-slate-900 uppercase">
-                  <span className="text-slate-600 italic">Project account</span>
+                  <span className="text-slate-600 italic">Project ID</span>
                   <span className="text-emerald-600 italic tracking-normal text-[9px]">
-                    {vault?.vaultAddress || "Deployment Pending"}
+                    VAULT-{vault?.id.slice(0, 8).toUpperCase()}
                   </span>
                 </div>
               </div>

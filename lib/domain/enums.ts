@@ -14,6 +14,13 @@
 // VAULT STATUS
 // ============================================================================
 
+export enum VaultType {
+  FIXED_PRICE = 'FIXED_PRICE',
+  DEVELOPMENT = 'DEVELOPMENT',
+  DESIGN = 'DESIGN',
+  CONTENT_AI = 'CONTENT_AI',
+}
+
 export enum VaultStatus {
   DRAFT = "DRAFT",
   FUNDED = "FUNDED",
