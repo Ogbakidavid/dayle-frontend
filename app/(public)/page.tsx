@@ -129,7 +129,7 @@ export default function LandingPage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 md:pt-24 lg:pt-32 pb-16 md:pb-24 md:mt-10 lg:pb-32 px-4 md:px-6 overflow-hidden">
+      <section className="relative pt-32 md:pt-24 lg:pt-32 pb-16 md:pb-24 md:mt-10 lg:mt-0 lg:pb-32 px-4 md:px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-8 md:gap-12 lg:gap-16 items-center relative z-10">
           <motion.div
             variants={staggerContainer}
