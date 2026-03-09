@@ -7,6 +7,7 @@ import { DotLoader } from "@/components/ui/dot-loader";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { ScanFace } from "lucide-react";
+import { toast } from "sonner";
 
 interface DiditVerificationBtnProps {
   className?: string;
@@ -43,6 +44,7 @@ export default function DiditVerificationBtn({
         switch (result.type) {
           case "completed":
             console.log("Verification completed!", result.session?.status);
+            toast.success("Identity verification submitted successfully!");
             if (onSuccess) {
               onSuccess();
             } else {

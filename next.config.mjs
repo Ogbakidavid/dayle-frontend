@@ -20,8 +20,8 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: https: blob:",
               // Allow connections to Privy, your backend, and blockchain RPCs
-              "connect-src 'self' https://auth.privy.io https://*.privy.io https://celo-mainnet.infura.io https://forno.celo.org https://forno.celo-sepolia.celo-testnet.org http://localhost:* ws://localhost:* wss://*.privy.io https://*.walletconnect.com wss://*.walletconnect.org https://api.pwnedpasswords.com https://public.pimlico.io https://api.pimlico.io https://*.didit.me https://*.ngrok-free.dev https://*.trycloudflare.com https://*.loca.lt https://*.pinggy.link data: blob:",
-              "frame-src 'self' https://auth.privy.io https://*.privy.io https://*.walletconnect.com https://*.walletconnect.org https://verify.didit.me https://*.didit.me https://*.ngrok-free.dev https://*.trycloudflare.com https://*.loca.lt https://*.pinggy.link data:",
+              "connect-src 'self' https://auth.privy.io https://*.privy.io https://celo-mainnet.infura.io https://forno.celo.org https://forno.celo-sepolia.celo-testnet.org http://localhost:* ws://localhost:* wss://*.privy.io https://*.walletconnect.com wss://*.walletconnect.org https://api.pwnedpasswords.com https://public.pimlico.io https://api.pimlico.io https://*.didit.me https://*.ngrok-free.dev https://*.loca.lt data: blob:",
+              "frame-src 'self' https://auth.privy.io https://*.privy.io https://*.walletconnect.com https://*.walletconnect.org https://verify.didit.me https://*.didit.me https://*.ngrok-free.dev https://*.loca.lt data:",
               "worker-src 'self' blob:",
               "child-src 'self' blob:",
             ].join("; "),
@@ -52,10 +52,9 @@ const nextConfig = {
   devIndicators: {
     appIsrStatus: false,
   },
-  // Allow Turbopack to work with the Cloudflare tunnel
+  // Allow Turbopack to work with development origins
   allowedDevOrigins: [
-    "sbjct-produce-puzzles-increase.trycloudflare.com",
-    "dbhqx-102-88-114-240.a.free.pinggy.link",
+    "localhost:3000",
   ],
 };
 

@@ -54,7 +54,11 @@ export default function CardPaymentPage() {
   const detectCardType = (number: string) => {
     const clean = number.replace(/\D/g, "");
     if (clean.match(/^4/)) return "visa";
-    if (clean.match(/^5[1-5]/)) return "mastercard";
+    if (clean.match(/^(5[1-5]|222[1-9]|22[3-9]|2[3-6]|27[0-1]|2720)/)) return "mastercard";
+    if (clean.match(/^3[47]/)) return "amex";
+    if (clean.match(/^(6011|65|64[4-9]|622)/)) return "discover";
+    if (clean.match(/^(36|38|30[0-5])/)) return "diners";
+    if (clean.match(/^35/)) return "jcb";
     return "";
   };
 
@@ -205,23 +209,27 @@ export default function CardPaymentPage() {
               </span>
             </div>
             <div className="space-y-10">
-              <div className="space-y-3">
+              <div className="space-y-3 ">
                 <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em] italic leading-none uppercase">
                   Amount due
                 </p>
-                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-4xl italic flex items-baseline gap-2">
-                  <span className="text-slate-600 italic">Project ID</span>
-                  <span className="text-emerald-600 italic tracking-normal text-[9px]">
-                    VAULT-{vault?.id.slice(0, 8).toUpperCase()}
-                  </span>
-                  <span className="text-emerald-600 font-bold text-2xl">
-                    {currencyPrefix}
-                  </span>
-                  {displayAmount.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </h1>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl text-slate-400 italic font-bold">Project ID</span>
+                    <span className="text-emerald-600 font-mono tracking-normal text-xs font-bold">
+                      VAULT-{vault?.id.slice(0, 8).toUpperCase()}
+                    </span>
+                  </div>
+                  <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-5xl italic flex items-baseline gap-2">
+                    <span className="text-emerald-600 font-bold text-3xl">
+                      {currencyPrefix}
+                    </span>
+                    {displayAmount.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </h1>
+                </div>
               </div>
             </div>
           </div>
@@ -296,16 +304,37 @@ export default function CardPaymentPage() {
 
                       {/* Number */}
                       <div className="space-y-3">
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center mb-1">
                           <label className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase italic ml-1">
                             Card Number
                           </label>
-                          <div className="flex gap-2">
-                            <div
-                              className={`w-8 h-5 rounded bg-slate-100 flex items-center justify-center opacity-30 ${cardDetails.type === "visa" && "opacity-100 bg-emerald-100 text-emerald-600"}`}
-                            >
-                              <CreditCard className="w-3 h-3" />
-                            </div>
+                          <div className="flex gap-2 h-6 items-center">
+                            <AnimatePresence mode="wait">
+                              {cardDetails.type === "visa" ? (
+                                <motion.div key="visa" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} className="w-10 h-6 pt-0.5 rounded bg-blue-100 flex items-center justify-center text-blue-700 shadow-sm border border-blue-200/50">
+                                  <span className="text-[10px] font-black italic tracking-tighter">VISA</span>
+                                </motion.div>
+                              ) : cardDetails.type === "mastercard" ? (
+                                <motion.div key="mc" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} className="w-10 h-6 rounded bg-slate-50 flex items-center justify-center shadow-sm border border-slate-200">
+                                  <div className="flex -space-x-1.5 opacity-90">
+                                    <div className="w-3.5 h-3.5 rounded-full bg-[#EB001B] mix-blend-multiply" />
+                                    <div className="w-3.5 h-3.5 rounded-full bg-[#F79E1B] mix-blend-multiply" />
+                                  </div>
+                                </motion.div>
+                              ) : cardDetails.type === "amex" ? (
+                                <motion.div key="amex" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} className="w-10 h-6 rounded bg-sky-100 flex items-center justify-center text-sky-700 shadow-sm border border-sky-200">
+                                  <span className="text-[9px] font-black tracking-tighter">AMEX</span>
+                                </motion.div>
+                              ) : cardDetails.type === "discover" ? (
+                                <motion.div key="disc" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} className="w-10 h-6 rounded bg-orange-100 flex items-center justify-center text-orange-600 shadow-sm border border-orange-200">
+                                  <span className="text-[8px] font-black tracking-tight">DISC</span>
+                                </motion.div>
+                              ) : (
+                                <motion.div key="none" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} className="w-8 h-5 rounded bg-slate-100 flex items-center justify-center text-slate-400 opacity-50">
+                                  <CreditCard className="w-3 h-3" />
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
                         </div>
                         <div className="relative">
