@@ -97,7 +97,7 @@ export default function LandingPage() {
           {/* subtle glow */}
           <div className="absolute inset-0 rounded-2xl md:rounded-3xl blur-2xl bg-emerald-500/10 pointer-events-none" />
 
-          <div className="relative backdrop-blur-2xl border transition-all rounded-2xl md:rounded-3xl h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/80 border-slate-200 shadow-xl">
+          <div className="relative backdrop-blur-2xl border transition-all rounded-2xl md:rounded-3xl h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/80 border-slate-200 shadow-sm">
             {/* Brand */}
             <div className="flex items-center gap-2 md:gap-3">
               <div className="w-9 h-9 md:w-10 md:h-10 bg-emerald-500 rounded-xl flex items-center justify-center">
@@ -129,13 +129,13 @@ export default function LandingPage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative pt-26 md:pt-24 lg:pt-32 pb-16 md:pb-24 lg:pb-32 px-4 md:px-6 overflow-hidden">
+      <section className="relative pt-32 md:pt-24 lg:pt-32 pb-16 md:pb-24 md:mt-10 lg:pb-32 px-4 md:px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-8 md:gap-12 lg:gap-16 items-center relative z-10">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="lg:col-span-7 lg:text-left md:text-center text-center "
+            className="lg:col-span-7 flex flex-col items-center text-center lg:items-start lg:text-left"
           >
             {/* Small signal badge */}
             <motion.div
@@ -173,7 +173,7 @@ export default function LandingPage() {
             {/* CTAs */}
             <motion.div
               variants={fadeInUp}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 md:gap-6"
+              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 md:gap-6 w-full sm:w-auto"
             >
               <Link href="/onboarding/role" className="w-full sm:w-auto">
                 <motion.div
@@ -223,9 +223,9 @@ export default function LandingPage() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
-            className="lg:col-span-5 relative"
+            className="hidden lg:block lg:col-span-5 relative"
           >
-            <div className="absolute -inset-10 blur-[120px] rounded-full transition-colors bg-emerald-500/10"></div>
+            <div className="hidden lg:absolute -inset-10 blur-[120px] rounded-full transition-colors bg-emerald-500/10"></div>
 
             <div className="relative space-y-4">
               <motion.div
