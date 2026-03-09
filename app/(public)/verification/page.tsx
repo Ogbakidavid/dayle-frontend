@@ -75,13 +75,13 @@ function VerificationStatusContent() {
         <h1 className="text-3xl font-bold text-white tracking-tighter mb-4">
           Verification link invalid
         </h1>
-        <p className="text-white max-w-sm font-bold tracking-wide text-sm mb-12">
+        <p className="text-white max-w-sm font-bold  text-sm mb-12">
           The specific project account could not be located on the Dayle system.
         </p>
         <Button
           onClick={() => router.push("/")}
           variant="ghost"
-          className="text-emerald-500 font-bold tracking-wide text-sm gap-2"
+          className="text-emerald-500 font-bold  text-sm gap-2"
         >
           <ArrowLeft className="w-4 h-4" /> Return to dashboard
         </Button>
@@ -137,7 +137,7 @@ function VerificationStatusContent() {
               </>
             )}
           </h1>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-bold tracking-wide text-white">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-bold  text-white">
             <Lock className="w-3 h-3 text-emerald-500" /> Account ID: {vault.id}
           </div>
         </div>
@@ -148,9 +148,7 @@ function VerificationStatusContent() {
 
           <div className="space-y-8 relative z-10">
             <div className="space-y-2">
-              <p className="text-sm font-bold text-white tracking-wide">
-                Active project
-              </p>
+              <p className="text-sm font-bold text-white ">Active project</p>
               <h3 className="text-2xl font-bold text-white tracking-tight leading-tight">
                 {vault.title}
               </h3>
@@ -158,11 +156,9 @@ function VerificationStatusContent() {
 
             <div className="py-8 border-y border-white/5 grid grid-cols-2 gap-8">
               <div>
-                <p className="text-sm font-bold text-white tracking-wide mb-1">
-                  Status
-                </p>
+                <p className="text-sm font-bold text-white  mb-1">Status</p>
                 <p
-                  className={`text-sm font-bold tracking-wide ${
+                  className={`text-sm font-bold  ${
                     isVerified
                       ? "text-emerald-500"
                       : isReview
@@ -174,10 +170,8 @@ function VerificationStatusContent() {
                 </p>
               </div>
               <div>
-                <p className="text-sm font-bold text-white tracking-wide mb-1">
-                  Identity
-                </p>
-                <p className="text-sm font-bold text-white tracking-wide truncate">
+                <p className="text-sm font-bold text-white  mb-1">Identity</p>
+                <p className="text-sm font-bold text-white  truncate">
                   {vault.clientName || "Dayle Native Client"}
                 </p>
               </div>
@@ -185,30 +179,30 @@ function VerificationStatusContent() {
 
             {isVerified ? (
               <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center">
-                <p className="text-sm font-bold text-emerald-500 tracking-wide mb-2">
+                <p className="text-sm font-bold text-emerald-500  mb-2">
                   Final settlement reached
                 </p>
-                <p className="text-sm font-bold text-white tracking-wide leading-relaxed font-['Poppins',sans-serif]">
+                <p className="text-sm font-bold text-white  leading-relaxed font-['Poppins',sans-serif]">
                   The objective requirements have been validated. Funds have
                   been distributed to the recipient account.
                 </p>
               </div>
             ) : isReview ? (
               <div className="p-6 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-center">
-                <p className="text-sm font-bold text-blue-500 tracking-wide mb-2">
+                <p className="text-sm font-bold text-blue-500  mb-2">
                   System review
                 </p>
-                <p className="text-sm font-bold text-white tracking-wide leading-relaxed font-['Poppins',sans-serif]">
+                <p className="text-sm font-bold text-white  leading-relaxed font-['Poppins',sans-serif]">
                   Our system is currently verifying the submitted evidence
                   against the project requirements.
                 </p>
               </div>
             ) : (
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
-                <p className="text-sm font-bold text-white tracking-wide mb-2">
+                <p className="text-sm font-bold text-white  mb-2">
                   Waiting for submission
                 </p>
-                <p className="text-sm font-bold text-white tracking-wide leading-relaxed font-['Poppins',sans-serif]">
+                <p className="text-sm font-bold text-white  leading-relaxed font-['Poppins',sans-serif]">
                   Payment is locked and secured. Recipient has not yet submitted
                   work for verification.
                 </p>
@@ -217,7 +211,7 @@ function VerificationStatusContent() {
 
             <Button
               onClick={() => router.push("/")}
-              className="w-full h-16 bg-white/3 border border-white/10 hover:bg-white/5 text-white font-bold tracking-wide text-sm rounded-2xl transition-all"
+              className="w-full h-16 bg-white/3 border border-white/10 hover:bg-white/5 text-white font-bold  text-sm rounded-2xl transition-all"
             >
               Close transmission
             </Button>
@@ -228,13 +222,13 @@ function VerificationStatusContent() {
         <div className="mt-12 flex justify-center gap-8 opacity-40">
           <div className="flex items-center gap-2">
             <Globe className="w-3 h-3 text-white" />
-            <span className="text-sm font-bold tracking-wide text-white">
+            <span className="text-sm font-bold  text-white">
               Global Settlement
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Lock className="w-3 h-3 text-white" />
-            <span className="text-sm font-bold tracking-wide text-white">
+            <span className="text-sm font-bold  text-white">
               Audit-Proof Ledger
             </span>
           </div>

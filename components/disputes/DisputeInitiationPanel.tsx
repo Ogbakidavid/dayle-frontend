@@ -56,7 +56,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
   return (
     <Card className="bg-muted border-white/10 shadow-xl overflow-hidden">
       <CardHeader className="border-b border-white/5 bg-white/2">
-        <CardTitle className="text-white flex items-center gap-2 text-base font-bold tracking-wide">
+        <CardTitle className="text-white flex items-center gap-2 text-base font-bold ">
           <Gavel className="w-4 h-4 text-amber-400" />
           Dispute initiation
         </CardTitle>
@@ -69,9 +69,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
 
         {vault && policy.requiresRequirementId && (
           <div className="space-y-2">
-            <p className="text-[10px] font-bold tracking-widest text-slate-900">
-              Requirement scope
-            </p>
+            <p className=" font-bold st text-slate-900">Requirement scope</p>
             <select
               value={selectedRequirement}
               onChange={handleSelectChange}
@@ -88,9 +86,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
         )}
 
         <div className="space-y-3">
-          <p className="text-[10px] font-bold tracking-widest text-slate-900">
-            Reason codes
-          </p>
+          <p className=" font-bold st text-slate-900">Reason codes</p>
           <div className="grid gap-2">
             {DISPUTE_REASON_CODES.map((reason) => {
               const active = selectedReasons.includes(reason.code);
@@ -113,7 +109,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
                     <p className="text-sm font-semibold text-white/90">
                       {reason.label}
                     </p>
-                    <p className="text-xs text-white/50 leading-relaxed">
+                    <p className="text-sm text-white/50 leading-relaxed">
                       {reason.description}
                     </p>
                   </div>
@@ -137,14 +133,14 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
             <p className="text-sm font-semibold">
               {eligibility.eligible ? "Ready to open" : "Action required"}
             </p>
-            <p className="text-xs text-white/70">
+            <p className="text-sm text-white/70">
               {eligibility.reason || "Select scope above"}
             </p>
           </div>
         </div>
 
         <Button
-          className={`w-full h-11 transition-all font-bold tracking-wider ${
+          className={`w-full h-11 transition-all font-bold r ${
             canSubmit
               ? "bg-amber-500 hover:bg-amber-400 text-black shadow-lg shadow-amber-500/20"
               : "bg-white/5 text-white/20 border border-white/5"

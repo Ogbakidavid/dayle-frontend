@@ -48,7 +48,7 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
         <DotLoader size="lg" />
-        <p className="text-[10px] font-bold text-emerald-500 tracking-[0.2em]">
+        <p className=" font-bold text-emerald-500 tracking-[0.2em]">
           Validating project access
         </p>
       </div>
@@ -70,7 +70,7 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
         </p>
         <Button
           onClick={() => router.back()}
-          className="bg-white text-black font-bold tracking-wide text-xs px-8 h-12 rounded-xl"
+          className="bg-white text-black font-bold  text-sm px-8 h-12 rounded-xl"
         >
           Go back
         </Button>

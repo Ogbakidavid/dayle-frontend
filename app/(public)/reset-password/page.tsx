@@ -89,7 +89,7 @@ export default function ResetPasswordPage() {
                   <CheckCircle2 className="w-6 h-6 text-emerald-600 transition-transform group-hover:scale-110" />
                 </div>
                 <div>
-                  <h4 className="text-slate-900 font-bold text-sm tracking-wide mb-1">
+                  <h4 className="text-slate-900 font-bold text-sm  mb-1">
                     {item.title}
                   </h4>
                   <p className="text-slate-600 font-bold text-lg leading-snug">
@@ -114,7 +114,7 @@ export default function ResetPasswordPage() {
                 <h2 className="text-4xl font-bold text-slate-900 tracking-tight leading-none">
                   Reset password
                 </h2>
-                <p className="text-slate-600 mt-4 text-sm font-bold tracking-wide leading-relaxed">
+                <p className="text-slate-600 mt-4 text-sm font-bold  leading-relaxed">
                   Create a strong new password for your account.
                 </p>
               </div>
@@ -123,7 +123,7 @@ export default function ResetPasswordPage() {
                 <div className="space-y-3">
                   <Label
                     htmlFor="password"
-                    className="text-sm font-bold tracking-wide text-slate-700 ml-1"
+                    className="text-sm font-bold  text-slate-700 ml-1"
                   >
                     New password
                   </Label>
@@ -141,7 +141,7 @@ export default function ResetPasswordPage() {
                 <div className="space-y-3">
                   <Label
                     htmlFor="confirmPassword"
-                    className="text-sm font-bold tracking-wide text-slate-700 ml-1"
+                    className="text-sm font-bold  text-slate-700 ml-1"
                   >
                     Confirm new password
                   </Label>
@@ -158,7 +158,7 @@ export default function ResetPasswordPage() {
 
                 {error && (
                   <div className="flex items-center gap-3 text-red-400 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <p className="text-sm font-bold tracking-wide leading-relaxed">
+                    <p className="text-sm font-bold  leading-relaxed">
                       {error}
                     </p>
                   </div>
@@ -191,7 +191,7 @@ export default function ResetPasswordPage() {
                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
                   Password reset!
                 </h3>
-                <p className="text-slate-600 text-sm font-bold tracking-wide mt-2 leading-relaxed">
+                <p className="text-slate-600 text-sm font-bold  mt-2 leading-relaxed">
                   Your password has been successfully updated. You can now login
                   with your new credentials.
                 </p>

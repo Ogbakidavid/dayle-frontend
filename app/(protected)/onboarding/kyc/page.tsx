@@ -97,7 +97,7 @@ function KYCPageContent() {
                 Secured by AES-256. Bank-grade SOC2 Type II.
               </p>
             </div>
-            <p className="text-[10px] text-slate-300 font-medium uppercase tracking-widest">
+            <p className=" text-slate-300 font-medium uppercase st">
               Powered by the Didit protocol
             </p>
           </div>

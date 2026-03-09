@@ -61,7 +61,7 @@ export default function ActiveWorkPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen bg-slate-50 pb-20 font-['Poppins',sans-serif]"
+      className="min-h-screen pb-20 font-['Poppins',sans-serif]"
     >
       <div className="max-w-6xl mx-auto px-6 space-y-12">
         {/* HEADER */}
@@ -81,12 +81,12 @@ export default function ActiveWorkPage() {
               </p>
             </div>
             <div className="text-right hidden md:block">
-              <p className="text-[9px] font-bold text-slate-600 tracking-widest mb-1 ">
+              <p className="text-[9px] font-bold text-slate-600 mb-1 ">
                 Live throughput
               </p>
               <div className="flex items-center gap-2 justify-end">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <p className="text-xs font-bold text-slate-900 tracking-wide">
+                <p className="text-xs font-bold text-slate-900">
                   {activeVaults.length} Active Node
                   {activeVaults.length !== 1 ? "s" : ""}
                 </p>

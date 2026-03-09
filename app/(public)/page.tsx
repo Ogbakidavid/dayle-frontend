@@ -112,14 +112,14 @@ export default function LandingPage() {
               <Link href="/login">
                 <Button
                   variant="ghost"
-                  className="text-xs sm:text-sm font-bold px-3 sm:px-4 text-slate-900 hover:text-slate-900 hover:bg-slate-100 rounded-xl"
+                  className="text-sm sm:text-sm font-bold px-3 sm:px-4 text-slate-900 hover:text-slate-900 hover:bg-slate-100 rounded-xl"
                 >
                   Sign in
                 </Button>
               </Link>
 
               <Link href="/onboarding/role">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl px-4 sm:px-6 h-9 sm:h-10 text-xs sm:text-sm transition-all">
+                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl px-4 sm:px-6 h-9 sm:h-10 text-sm sm:text-sm transition-all">
                   Start a project
                 </Button>
               </Link>
@@ -140,7 +140,7 @@ export default function LandingPage() {
             {/* Small signal badge */}
             <motion.div
               variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-slate-200 bg-slate-50 text-[11px] md:text-xs font-bold tracking-wide mb-7 md:mb-9 text-slate-600"
+              className="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-slate-200 bg-slate-50 text-[11px] md:text-sm font-bold  mb-7 md:mb-9 text-slate-600"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               Automated escrow protection
@@ -211,7 +211,7 @@ export default function LandingPage() {
             {/* Small credibility line */}
             <motion.p
               variants={fadeInUp}
-              className="mt-5 text-xs md:text-sm font-semibold text-slate-900"
+              className="mt-5 text-sm md:text-sm font-semibold text-slate-900"
             >
               Funds only move after project approval.
             </motion.p>
@@ -233,7 +233,7 @@ export default function LandingPage() {
                 className="border p-8 rounded-[32px] transform -rotate-2 hover:rotate-0 transition-all duration-500 bg-background border-white/10 shadow-2xl"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-bold text-emerald-500 tracking-wide">
+                  <span className="text-sm font-bold text-emerald-500 ">
                     Completed
                   </span>
                   <CheckCircle2 className="w-6 h-6 text-emerald-500" />
@@ -242,7 +242,7 @@ export default function LandingPage() {
                   E-commerce platform
                 </h4>
                 <div className="flex justify-between items-end">
-                  <p className="text-slate-900 text-sm font-bold tracking-wide">
+                  <p className="text-slate-900 text-sm font-bold ">
                     Status: Released
                   </p>
                   <p className="text-xl font-bold text-slate-900">$4,500.00</p>
@@ -259,7 +259,7 @@ export default function LandingPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <RefreshCcw className="w-4 h-4 animate-spin-slow" />
-                      <span className="text-sm font-bold opacity-60 tracking-wide text-white">
+                      <span className="text-sm font-bold opacity-60  text-white">
                         In progress
                       </span>
                     </div>
@@ -275,7 +275,7 @@ export default function LandingPage() {
                   <div className="bg-black h-full w-2/3"></div>
                 </div>
                 <div className="flex justify-between items-center text-white">
-                  <span className="text-sm font-bold opacity-60 tracking-wide text-white">
+                  <span className="text-sm font-bold opacity-60  text-white">
                     Account balance
                   </span>
                   <span className="text-4xl font-bold tracking-tighter text-white">
@@ -291,7 +291,7 @@ export default function LandingPage() {
                 className="border p-8 rounded-[32px] transform rotate-2 transition-all bg-background border-white/5 opacity-40 hover:opacity-100 shadow-2xl"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-bold text-slate-900 tracking-wide">
+                  <span className="text-sm font-bold text-slate-900 ">
                     Funded
                   </span>
                   <Box className="w-6 h-6 text-slate-900" />
@@ -300,9 +300,7 @@ export default function LandingPage() {
                   Brand identity
                 </h4>
                 <div className="flex justify-between items-end">
-                  <p className="text-slate-900 text-sm font-bold tracking-wide">
-                    Pending
-                  </p>
+                  <p className="text-slate-900 text-sm font-bold ">Pending</p>
                   <p className="text-slate-900 text-xl font-bold">$8,500.00</p>
                 </div>
               </motion.div>
@@ -328,7 +326,7 @@ export default function LandingPage() {
               How <span className="text-emerald-500"> Dayle </span> protects
               you.
             </h2>
-            <p className="text-slate-900/80 font-semibold tracking-wide text-sm">
+            <p className="text-slate-900/80 font-semibold  text-sm">
               A three-step workflow that creates payment certainty.
             </p>
           </motion.div>
@@ -401,7 +399,7 @@ export default function LandingPage() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-black/20 mb-5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-[11px] md:text-xs font-bold tracking-wide text-white">
+              <span className="text-[11px] md:text-sm font-bold  text-white">
                 Clear expectations
               </span>
             </div>
@@ -438,7 +436,7 @@ export default function LandingPage() {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-slate-50">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-[11px] md:text-xs font-bold tracking-wide text-slate-900">
+                <span className="text-[11px] md:text-sm font-bold  text-slate-900">
                   Fit
                 </span>
               </div>
@@ -457,7 +455,7 @@ export default function LandingPage() {
 
             {/* Right-side micro-proof */}
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 self-start lg:self-end">
-              <div className="text-[11px] font-bold tracking-wide text-slate-900">
+              <div className="text-[11px] font-bold  text-slate-900">
                 Best for
               </div>
               <div className="mt-2 text-sm font-semibold text-slate-900">
@@ -520,9 +518,7 @@ export default function LandingPage() {
                       <c.icon className="w-6 h-6 text-emerald-400" />
                     </div>
 
-                    <div className="text-[10px] font-bold tracking-wide text-white/35">
-                      0{i + 1}
-                    </div>
+                    <div className=" font-bold  text-white/35">0{i + 1}</div>
                   </div>
 
                   <h3 className="mt-6 text-xl md:text-2xl font-bold tracking-tight text-slate-900">
@@ -583,7 +579,7 @@ export default function LandingPage() {
             </div>
 
             <div className="md:text-right">
-              <div className="text-xs font-bold text-emerald-500 tracking-wide mb-2">
+              <div className="text-sm font-bold text-emerald-500  mb-2">
                 Core capabilities
               </div>
               <div className="h-[2px] w-28 bg-emerald-500 md:ml-auto opacity-80"></div>
@@ -628,12 +624,10 @@ export default function LandingPage() {
                   <div className="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center bg-white/3 border border-white/10 group-hover:border-emerald-500/30 transition-colors">
                     <f.icon className="w-5 h-5 md:w-6 md:h-6 text-emerald-500" />
                   </div>
-                  <div className="text-[10px] font-bold tracking-widest text-slate-900">
-                    Capability
-                  </div>
+                  <div className=" font-bold st text-slate-900">Capability</div>
                 </div>
 
-                <h4 className="text-slate-900 font-bold tracking-wide text-lg md:text-xl mb-3">
+                <h4 className="text-slate-900 font-bold  text-lg md:text-xl mb-3">
                   {f.title}
                 </h4>
                 <p className="text-slate-600 text-sm leading-relaxed">
@@ -684,14 +678,12 @@ export default function LandingPage() {
                     className="flex items-center gap-4 text-slate-900"
                   >
                     <item.icon className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span className="text-sm font-semibold tracking-wide">
-                      {item.label}
-                    </span>
+                    <span className="text-sm font-semibold ">{item.label}</span>
                   </div>
                 ))}
               </div>
 
-              <p className="mt-8 text-slate-900 text-xs font-medium max-w-lg">
+              <p className="mt-8 text-slate-900 text-sm font-medium max-w-lg">
                 Compliance certifications (e.g. SOC 2) are planned as Dayle
                 moves from beta to production scale.
               </p>
@@ -728,7 +720,7 @@ export default function LandingPage() {
                     <div className="flex items-start gap-4">
                       <item.icon className="w-6 h-6 text-emerald-500 mt-1 shrink-0" />
                       <div>
-                        <h4 className="text-slate-900 font-bold text-sm tracking-wide">
+                        <h4 className="text-slate-900 font-bold text-sm ">
                           {item.title}
                         </h4>
                         <p className="text-slate-600 text-sm mt-1 leading-relaxed">
@@ -760,9 +752,7 @@ export default function LandingPage() {
           >
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
               <div>
-                <div className="text-[11px] font-bold tracking-wide text-slate-600">
-                  FAQ
-                </div>
+                <div className="text-[11px] font-bold  text-slate-600">FAQ</div>
                 <h2 className="mt-3 text-3xl md:text-5xl font-bold tracking-tight text-slate-900">
                   Common <span className="text-emerald-600">questions.</span>
                 </h2>
@@ -845,7 +835,7 @@ export default function LandingPage() {
               </span>
             </div>
 
-            <p className="text-slate-600 text-xs md:text-sm font-semibold max-w-md leading-relaxed">
+            <p className="text-slate-600 text-sm md:text-sm font-semibold max-w-md leading-relaxed">
               Vault-based settlement for cross-border contractor payments. Lock
               funds upfront. Release only when work is approved.
             </p>
@@ -853,10 +843,10 @@ export default function LandingPage() {
 
           {/* Product */}
           <div>
-            <h4 className="text-xs md:text-sm font-bold tracking-wide mb-6 md:mb-10 text-slate-900">
+            <h4 className="text-sm md:text-sm font-bold  mb-6 md:mb-10 text-slate-900">
               Product
             </h4>
-            <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-slate-600 font-semibold">
+            <ul className="space-y-3 md:space-y-4 text-sm md:text-sm text-slate-600 font-semibold">
               <li>
                 <Link
                   href="#protocol"
@@ -886,10 +876,10 @@ export default function LandingPage() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-xs md:text-sm font-bold tracking-wide mb-6 md:mb-10 text-slate-900">
+            <h4 className="text-sm md:text-sm font-bold  mb-6 md:mb-10 text-slate-900">
               Contact
             </h4>
-            <ul className="space-y-3 md:space-y-4 text-xs md:text-sm text-slate-600 font-semibold">
+            <ul className="space-y-3 md:space-y-4 text-sm md:text-sm text-slate-600 font-semibold">
               <li>
                 <Link
                   href="/support"
@@ -902,7 +892,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto mt-16 md:mt-24 lg:mt-32 pt-8 md:pt-12 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs md:text-sm font-semibold text-slate-600">
+        <div className="max-w-7xl mx-auto mt-16 md:mt-24 lg:mt-32 pt-8 md:pt-12 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-sm md:text-sm font-semibold text-slate-600">
           <span>© 2026 Dayle.</span>
 
           <div className="flex items-center gap-6">

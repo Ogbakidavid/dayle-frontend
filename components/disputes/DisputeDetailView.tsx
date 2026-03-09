@@ -93,7 +93,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
 
       <header className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-bold tracking-wide text-emerald-400 flex items-center gap-2">
+          <div className="text-sm font-bold  text-emerald-400 flex items-center gap-2">
             <Gavel className="w-3 h-3" />
             Case file
           </div>
@@ -116,7 +116,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-white/10 text-white/70 hover:text-white bg-transparent text-xs tracking-wide"
+                  className="border-white/10 text-white/70 hover:text-white bg-transparent text-sm "
                 >
                   + Add evidence
                 </Button>
@@ -145,14 +145,14 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                           {/* Header */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <span className="text-xs font-bold tracking-wider text-emerald-400">
+                              <span className="text-sm font-bold r text-emerald-400">
                                 {ev.type?.replace("_", " ").toLowerCase()}
                               </span>
-                              <span className="text-xs text-slate-900 ">
+                              <span className="text-sm text-slate-900 ">
                                 {new Date(ev.timestamp).toLocaleString()}
                               </span>
                             </div>
-                            <span className="text-xs font-bold text-white/30 tracking-wide">
+                            <span className="text-sm font-bold text-white/30 ">
                               {ev.actor}
                             </span>
                           </div>
@@ -171,7 +171,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                           {(ev.payload?.reasonCode ||
                             ev.payload?.reasonCodes) && (
                             <div className="flex flex-wrap gap-2 pt-1">
-                              <div className="text-[10px] font-bold tracking-wide text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 shadow-sm shadow-amber-500/10">
+                              <div className=" font-bold  text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 shadow-sm shadow-amber-500/10">
                                 {getReasonLabel(
                                   ev.payload.reasonCode ||
                                     ev.payload.reasonCodes?.[0],
@@ -186,7 +186,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                               {ev.files?.map((file, k) => (
                                 <div
                                   key={k}
-                                  className="flex items-center gap-2 text-xs text-white/50 bg-white/3 px-3 py-1.5 rounded-lg border border-white/5 hover:border-white/20 hover:text-white transition-all cursor-pointer"
+                                  className="flex items-center gap-2 text-sm text-white/50 bg-white/3 px-3 py-1.5 rounded-lg border border-white/5 hover:border-white/20 hover:text-white transition-all cursor-pointer"
                                 >
                                   <FileText className="w-3 h-3 text-emerald-500" />
                                   {file.name}
@@ -208,15 +208,13 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
         <div className="space-y-6">
           <Card className="bg-muted border-white/10 sticky top-8 shadow-xl">
             <CardHeader className="border-b border-white/5">
-              <CardTitle className="text-white text-xs font-bold tracking-wide opacity-60">
+              <CardTitle className="text-white text-sm font-bold  opacity-60">
                 Case details
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div className="space-y-1">
-                <p className="text-[10px] text-white/30 font-bold tracking-wide">
-                  Status
-                </p>
+                <p className=" text-white/30 font-bold ">Status</p>
                 <div className="inline-flex">
                   <p className="text-base font-bold text-white capitalize bg-white/5 px-3 py-1 rounded-full border border-white/5">
                     {dispute.status?.replace("_", " ")}
@@ -224,28 +222,24 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-white/30 font-bold tracking-wide">
-                  Opened by
-                </p>
+                <p className=" text-white/30 font-bold ">Opened by</p>
                 <p className="text-sm font-medium text-white/80">
                   {dispute.openedBy}
                 </p>
               </div>
               {dispute.requirementRef && (
                 <div className="space-y-2">
-                  <p className="text-[10px] text-white/30 font-bold tracking-wide">
+                  <p className=" text-white/30 font-bold ">
                     Target requirement
                   </p>
-                  <div className="bg-emerald-500/5 rounded p-2.5 text-xs  text-emerald-400 border border-emerald-500/10 shadow-inner">
+                  <div className="bg-emerald-500/5 rounded p-2.5 text-sm  text-emerald-400 border border-emerald-500/10 shadow-inner">
                     {dispute.requirementRef}
                   </div>
                 </div>
               )}
               <div className="space-y-3">
-                <p className="text-[10px] text-white/30 font-bold tracking-wide">
-                  Reason protocol
-                </p>
-                <div className="text-xs leading-relaxed text-white/70 bg-white/5 p-3 rounded-xl border border-white/5 font-medium">
+                <p className=" text-white/30 font-bold ">Reason protocol</p>
+                <div className="text-sm leading-relaxed text-white/70 bg-white/5 p-3 rounded-xl border border-white/5 font-medium">
                   {getReasonLabel(
                     dispute.reasonCode || dispute.reasonCodes?.[0] || "",
                   )}

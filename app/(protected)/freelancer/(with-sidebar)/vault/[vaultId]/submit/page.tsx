@@ -146,7 +146,7 @@ export default function SubmissionPage() {
         <header className="pt-8">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-xs text-slate-900 hover:text-white transition-all mb-8 font-bold tracking-[0.2em] bg-white/2 border border-white/5 py-2 px-4 rounded-xl cursor-pointer group shadow-lg"
+            className="inline-flex items-center text-sm text-slate-900 hover:text-white transition-all mb-8 font-bold tracking-[0.2em] bg-white/2 border border-white/5 py-2 px-4 rounded-xl cursor-pointer group shadow-lg"
           >
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to project
@@ -154,7 +154,7 @@ export default function SubmissionPage() {
           <h1 className="text-3xl md:text-5xl font-bold text-white  tracking-tighter leading-none mb-3">
             Submit work
           </h1>
-          <p className="text-[10px] md:text-xs text-slate-900 font-bold tracking-[0.2em]">
+          <p className=" md:text-sm text-slate-900 font-bold tracking-[0.2em]">
             Detailed delivery checklist for your client.
           </p>
         </header>
@@ -191,7 +191,7 @@ export default function SubmissionPage() {
                       )}
                       <span
                         className={cn(
-                          "text-sm font-bold tracking-widest ",
+                          "text-sm font-bold st ",
                           item.included ? "text-white" : "text-white/20",
                         )}
                       >
@@ -202,12 +202,12 @@ export default function SubmissionPage() {
                     {item.included && (
                       <div className="p-6 border-t border-white/5 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="space-y-3">
-                          <Label className="text-[10px] font-bold tracking-widest text-slate-900">
+                          <Label className=" font-bold 00">
                             Notes about this deliverable (optional)
                           </Label>
                           <Textarea
                             placeholder="Briefly describe what's included for this specific goal..."
-                            className="bg-black/30 border-white/5 text-white min-h-[100px] rounded-xl p-4 focus:ring-emerald-500/30 focus:border-emerald-500/30 placeholder:text-white/10 font-bold text-xs"
+                            className="bg-black/30 border-white/5 text-white min-h-[100px] rounded-xl p-4 focus:ring-emerald-500/30 focus:border-emerald-500/30 placeholder:text-white/10 font-bold text-sm"
                             value={item.notes}
                             onChange={(e) =>
                               updateDeliverableNotes(idx, e.target.value)
@@ -217,7 +217,7 @@ export default function SubmissionPage() {
                         </div>
 
                         <div className="space-y-3">
-                          <Label className="text-[10px] font-bold tracking-widest text-slate-900">
+                          <Label className=" font-bold 00">
                             Deliverable files (optional)
                           </Label>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -231,7 +231,7 @@ export default function SubmissionPage() {
                               />
                               <div className="flex flex-col items-center gap-2">
                                 <Upload className="w-5 h-5 text-white/20 group-hover:text-emerald-500 transition-colors" />
-                                <p className="text-[9px] font-bold text-slate-900 tracking-widest">
+                                <p className="text-[9px] font-bold text-slate-900 
                                   Attach assets
                                 </p>
                               </div>
@@ -244,7 +244,7 @@ export default function SubmissionPage() {
                               >
                                 <div className="flex items-center gap-3 min-w-0">
                                   <Paperclip className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                                  <p className="text-[10px] font-bold text-white truncate">
+                                  <p className=" font-bold text-white truncate">
                                     {file.name}
                                   </p>
                                 </div>
@@ -272,12 +272,12 @@ export default function SubmissionPage() {
 
           <Card className="bg-[#0A0A0B] border-white/5 shadow-2xl relative overflow-hidden">
             <CardContent className="p-8 space-y-4">
-              <Label className="text-[10px] font-bold tracking-[0.2em] text-white/60 block ">
+              <Label className=" font-bold tracking-[0.2em] text-white/60 block ">
                 General notes about this submission
               </Label>
               <Textarea
                 placeholder="Overall summary of the work provided in this update..."
-                className="bg-black/30 border-white/5 text-white min-h-[140px] rounded-2xl p-6 focus:ring-emerald-500/30 focus:border-emerald-500/30 placeholder:text-white/10 font-bold text-xs leading-relaxed"
+                className="bg-black/30 border-white/5 text-white min-h-[140px] rounded-2xl p-6 focus:ring-emerald-500/30 focus:border-emerald-500/30 placeholder:text-white/10 font-bold text-sm leading-relaxed"
                 value={overallNotes}
                 onChange={(e) => setOverallNotes(e.target.value)}
               />
@@ -287,7 +287,7 @@ export default function SubmissionPage() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-8 border-t border-white/5">
             <div className="flex items-center gap-3 opacity-40">
               <ShieldCheck className="w-5 h-5 text-emerald-500" />
-              <p className="text-[10px] font-bold tracking-widest ">
+              <p className=" font-bold 
                 Secured delivery system active
               </p>
             </div>
@@ -297,14 +297,14 @@ export default function SubmissionPage() {
                 variant="ghost"
                 type="button"
                 onClick={() => router.back()}
-                className="flex-1 sm:flex-none h-14 px-8 text-[10px] font-bold tracking-widest text-slate-900 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
+                className="flex-1 sm:flex-none h-14 px-8  font-bold 00 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 sm:flex-none h-14 px-12 bg-emerald-500 text-black hover:bg-emerald-400 font-bold tracking-[0.15em] text-xs rounded-2xl shadow-lg shadow-emerald-500/10 active:scale-95 transition-all"
+                className="flex-1 sm:flex-none h-14 px-12 bg-emerald-500 text-black hover:bg-emerald-400 font-bold tracking-[0.15em] text-sm rounded-2xl shadow-lg shadow-emerald-500/10 active:scale-95 transition-all"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

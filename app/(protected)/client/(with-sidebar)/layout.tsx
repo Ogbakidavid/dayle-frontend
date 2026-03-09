@@ -124,8 +124,8 @@ export default function ClientLayout({
                   className={cn(
                     "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                     isActive
-                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold tracking-wide"
-                      : "text-slate-900 hover:bg-slate-100 hover:text-slate-900 font-bold tracking-wide",
+                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold "
+                      : "text-slate-900 hover:bg-slate-100 hover:text-slate-900 font-bold ",
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -173,9 +173,7 @@ export default function ClientLayout({
               )}
             </div>
             <div>
-              <p className="text-sm font-bold tracking-wide text-slate-900">
-                {user?.name}
-              </p>
+              <p className="text-sm font-bold  text-slate-900">{user?.name}</p>
             </div>
           </div>
 
@@ -185,7 +183,7 @@ export default function ClientLayout({
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 w-full text-sm font-bold tracking-wide border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-['Poppins',sans-serif] shadow-sm"
+                className="h-9 w-full text-sm font-bold  border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-['Poppins',sans-serif] shadow-sm"
               >
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
@@ -202,7 +200,7 @@ export default function ClientLayout({
               variant="outline"
               size="sm"
               onClick={logout}
-              className="h-9 text-sm font-bold tracking-wide border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-['Poppins',sans-serif] shadow-sm"
+              className="h-9 text-sm font-bold  border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-['Poppins',sans-serif] shadow-sm"
             >
               <LogOut className="w-3.5 h-3.5 mr-2" />
               Sign out

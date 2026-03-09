@@ -93,7 +93,7 @@ export default function RoleSelectionPage() {
               </p>
               <Button
                 variant="ghost"
-                className="p-0 text-emerald-500 font-bold tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
+                className="p-0 text-emerald-500 font-bold  text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
               >
                 {loading === UserRole.CLIENT ? (
                   <DotLoader size="sm" />
@@ -136,7 +136,7 @@ export default function RoleSelectionPage() {
               </p>
               <Button
                 variant="ghost"
-                className="p-0 text-emerald-500 font-bold tracking-wide text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
+                className="p-0 text-emerald-500 font-bold  text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
               >
                 {loading === UserRole.FREELANCER ? (
                   <DotLoader size="sm" />

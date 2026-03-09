@@ -60,7 +60,7 @@ export default function SupportPage() {
             <div className="mt-6">
               <a
                 href="mailto:support@dayle.app"
-                className="inline-flex items-center gap-2 text-sm font-bold tracking-wide text-emerald-400 hover:text-emerald-300 transition-colors"
+                className="inline-flex items-center gap-2 text-sm font-bold  text-emerald-400 hover:text-emerald-300 transition-colors"
               >
                 support@dayle.app
               </a>
@@ -88,7 +88,7 @@ export default function SupportPage() {
             </p>
 
             <div className="mt-6">
-              <span className="text-xs font-bold tracking-[0.22em] text-slate-900">
+              <span className="text-sm font-bold tracking-[0.22em] text-slate-900">
                 Coming soon
               </span>
             </div>
@@ -126,7 +126,7 @@ export default function SupportPage() {
           <Link href="/">
             <Button
               variant="ghost"
-              className="text-sm font-bold tracking-wide text-white hover:bg-white/6"
+              className="text-sm font-bold  text-white hover:bg-white/6"
             >
               ← Back to Dayle
             </Button>

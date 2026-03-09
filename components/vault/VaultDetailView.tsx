@@ -59,9 +59,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-white/50 gap-4">
         <DotLoader size="lg" />
-        <p className="font-bold tracking-widest text-xs">
-          Securing data link...
-        </p>
+        <p className="font-bold st text-sm">Securing data link...</p>
       </div>
     );
   }
@@ -84,7 +82,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
   return (
     <div className="space-y-8">
       <header className="flex flex-col gap-4">
-        <div className="flex items-center gap-3 text-sm font-bold tracking-wide text-emerald-400">
+        <div className="flex items-center gap-3 text-sm font-bold  text-emerald-400">
           <ShieldCheck className="w-4 h-4" />
           Project details
         </div>
@@ -94,7 +92,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
             <p className="text-sm text-white/60 max-w-2xl">
               {vault.description}
             </p>
-            <div className="flex flex-wrap items-center gap-4 text-xs font-bold tracking-wide text-white">
+            <div className="flex flex-wrap items-center gap-4 text-sm font-bold  text-white">
               <span>Client: {vault.clientName}</span>
               <span>
                 Freelancer:{" "}
@@ -113,9 +111,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
             <div className="text-3xl font-bold text-white">
               ${totalAmount.toLocaleString()}
             </div>
-            <span className="text-xs font-bold tracking-wide text-white">
-              Total locked
-            </span>
+            <span className="text-sm font-bold  text-white">Total locked</span>
           </div>
         </div>
       </header>
@@ -154,7 +150,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
                           <p className="font-semibold text-white">
                             {req.reqId} · {req.label}
                           </p>
-                          <p className="text-xs text-white/50">
+                          <p className="text-sm text-white/50">
                             {req.acceptance}
                           </p>
                         </div>

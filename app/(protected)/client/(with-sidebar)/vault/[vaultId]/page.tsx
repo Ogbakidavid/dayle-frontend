@@ -284,7 +284,7 @@ export default function ClientVaultDetailPage() {
                   </Button>
                   <Link
                     href={`mailto:support@dayle.fi?subject=Settlement Issue: ${vault.id}`}
-                    className="text-xs text-red-600 underline font-bold uppercase tracking-widest "
+                    className="text-sm text-red-600 underline font-bold uppercase st "
                   >
                     Contact Support
                   </Link>
@@ -297,7 +297,7 @@ export default function ClientVaultDetailPage() {
           <header className="pt-8">
             <button
               onClick={() => router.back()}
-              className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-colors mb-6 font-bold tracking-wide bg-transparent border-none p-0 cursor-pointer "
+              className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-colors mb-6 font-bold  bg-transparent border-none p-0 cursor-pointer "
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to dashboard
@@ -310,7 +310,7 @@ export default function ClientVaultDetailPage() {
                   </h1>
                   <Badge
                     variant="outline"
-                    className="bg-emerald-50 text-emerald-700 border-emerald-200 tracking-wide text-[10px] h-6 px-3 rounded-full font-bold shadow-sm shadow-emerald-500/5"
+                    className="bg-emerald-50 text-emerald-700 border-emerald-200   h-6 px-3 rounded-full font-bold shadow-sm shadow-emerald-500/5"
                   >
                     {getVaultDerivedLabel(vault.status)}
                   </Badge>
@@ -322,10 +322,10 @@ export default function ClientVaultDetailPage() {
                       <Users className="w-4 h-4 text-slate-600" />
                     </div>
                     <div>
-                      <p className="text-[9px] text-slate-600 font-bold tracking-widest uppercase">
+                      <p className="text-[9px] text-slate-600 font-bold st uppercase">
                         Freelancer
                       </p>
-                      <p className="text-xs text-slate-900 font-bold ">
+                      <p className="text-sm text-slate-900 font-bold ">
                         {vault.freelancerName || "Unassigned"}
                       </p>
                     </div>
@@ -336,10 +336,10 @@ export default function ClientVaultDetailPage() {
                       <Clock className="w-4 h-4 text-emerald-600/50" />
                     </div>
                     <div>
-                      <p className="text-[9px] text-slate-600 font-bold tracking-widest uppercase">
+                      <p className="text-[9px] text-slate-600 font-bold st uppercase">
                         Created
                       </p>
-                      <p className="text-xs text-slate-900 font-bold ">
+                      <p className="text-sm text-slate-900 font-bold ">
                         {new Date(vault.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -348,10 +348,10 @@ export default function ClientVaultDetailPage() {
               </div>
 
               <div className="text-right p-6 rounded-2xl bg-slate-50 border border-slate-200 shadow-xl min-w-[240px]">
-                <p className="text-xs text-slate-600 font-bold tracking-wide mb-1 uppercase">
+                <p className="text-sm text-slate-600 font-bold  mb-1 uppercase">
                   Total secured value
                 </p>
-                <p className="text-4xl font-bold text-slate-900 tracking-widest ">
+                <p className="text-4xl font-bold text-slate-900 st ">
                   ${vault.formattedTotalAmount || vault.totalAmount}
                 </p>
                 <div className="mt-2 flex items-center justify-end gap-2">
@@ -365,7 +365,7 @@ export default function ClientVaultDetailPage() {
                   />
                   <p
                     className={cn(
-                      "text-[10px] font-bold tracking-wide ",
+                      " font-bold  ",
                       vault.status === VaultStatus.FUNDED
                         ? "text-emerald-600"
                         : "text-slate-400",
@@ -391,10 +391,10 @@ export default function ClientVaultDetailPage() {
                       <ListChecks className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-slate-900 font-bold tracking-wide text-lg ">
+                      <CardTitle className="text-slate-900 font-bold  text-lg ">
                         What was promised
                       </CardTitle>
-                      <CardDescription className="text-slate-600 font-bold tracking-wide text-[10px] mt-1 ">
+                      <CardDescription className="text-slate-600 font-bold mt-1 ">
                         Review the specific items the freelancer committed to
                         delivering
                       </CardDescription>
@@ -405,7 +405,7 @@ export default function ClientVaultDetailPage() {
                   {!vault.deliverables || vault.deliverables.length === 0 ? (
                     <div className="p-12 text-center space-y-4">
                       <AlertCircle className="w-12 h-12 text-red-500/50 mx-auto" />
-                      <p className="text-red-500 font-bold tracking-wide text-xs">
+                      <p className="text-red-500 font-bold  text-sm">
                         Error: no deliverables defined for this project
                       </p>
                     </div>
@@ -446,7 +446,7 @@ export default function ClientVaultDetailPage() {
                               <div className="flex-1 space-y-3">
                                 <div>
                                   <div className="flex items-center gap-2">
-                                    <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
+                                    <h4 className="font-bold text-slate-900 tracking-tight ">
                                       {item.title}
                                     </h4>
                                     {isIncluded && (
@@ -456,7 +456,7 @@ export default function ClientVaultDetailPage() {
                                     )}
                                   </div>
                                   {item.description && (
-                                    <p className="text-xs text-slate-600 leading-relaxed max-w-2xl mt-1 font-bold">
+                                    <p className="text-sm text-slate-600 leading-relaxed max-w-2xl mt-1 font-bold">
                                       {item.description}
                                     </p>
                                   )}
@@ -466,11 +466,11 @@ export default function ClientVaultDetailPage() {
                                   <div className="space-y-3 pt-1">
                                     {deliverableStatus.notes && (
                                       <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 shadow-sm">
-                                        <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1.5 flex items-center gap-1.5 uppercase">
+                                        <p className="text-[9px] text-slate-600 font-bold  mb-1.5 flex items-center gap-1.5 uppercase">
                                           <FileText className="w-3 h-3" />{" "}
                                           Freelancer notes
                                         </p>
-                                        <p className="text-xs text-slate-600  leading-relaxed font-bold">
+                                        <p className="text-sm text-slate-600  leading-relaxed font-bold">
                                           &quot;{deliverableStatus.notes}&quot;
                                         </p>
                                       </div>
@@ -488,7 +488,7 @@ export default function ClientVaultDetailPage() {
                                               className="inline-flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg group/file transition-all shadow-sm"
                                             >
                                               <Download className="w-3 h-3 text-emerald-600" />
-                                              <span className="text-[10px] text-emerald-700 font-bold group-hover/file:text-emerald-900 ">
+                                              <span className=" text-emerald-700 font-bold group-hover/file:text-emerald-900 ">
                                                 {file.filename ||
                                                   `File ${fIdx + 1}`}
                                               </span>
@@ -503,7 +503,7 @@ export default function ClientVaultDetailPage() {
                                 {!isIncluded && activeSubmission && (
                                   <div className="flex items-center gap-2 opacity-60">
                                     <AlertCircle className="w-3 h-3 text-amber-600" />
-                                    <span className="text-[9px] font-bold tracking-widest text-amber-600 uppercase">
+                                    <span className="text-[9px] font-bold st text-amber-600 uppercase">
                                       Missing from this submission
                                     </span>
                                   </div>
@@ -526,10 +526,10 @@ export default function ClientVaultDetailPage() {
                       <Zap className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-slate-900 font-bold tracking-wide text-lg ">
+                      <CardTitle className="text-slate-900 font-bold  text-lg ">
                         What was delivered
                       </CardTitle>
-                      <CardDescription className="text-slate-600 font-bold tracking-wide text-[10px] mt-1 ">
+                      <CardDescription className="text-slate-600 font-bold   mt-1 ">
                         Timeline of work submitted by the freelancer
                       </CardDescription>
                     </div>
@@ -538,7 +538,7 @@ export default function ClientVaultDetailPage() {
                 <CardContent className="p-6">
                   {!vault.submissions || vault.submissions.length === 0 ? (
                     <div className="py-12 text-center">
-                      <p className="text-slate-300 font-bold tracking-wide text-[10px] uppercase">
+                      <p className="text-slate-300 font-bold   uppercase">
                         No work submitted yet
                       </p>
                     </div>
@@ -572,7 +572,7 @@ export default function ClientVaultDetailPage() {
                                   <Clock className="w-4 h-4" />
                                 </div>
                                 <div>
-                                  <p className="text-[10px] font-bold tracking-wide text-slate-600 mb-0.5 uppercase">
+                                  <p className=" font-bold  text-slate-600 mb-0.5 uppercase">
                                     {isSelected
                                       ? "Current review"
                                       : "Previous submission"}
@@ -607,7 +607,7 @@ export default function ClientVaultDetailPage() {
                             </div>
 
                             {sub.notes && (
-                              <p className="text-xs text-slate-600 bg-white p-4 rounded-xl border border-slate-200  mb-4 font-bold shadow-sm">
+                              <p className="text-sm text-slate-600 bg-white p-4 rounded-xl border border-slate-200  mb-4 font-bold shadow-sm">
                                 &quot;{sub.notes}&quot;
                               </p>
                             )}
@@ -621,7 +621,7 @@ export default function ClientVaultDetailPage() {
                                   className="overflow-hidden space-y-4"
                                 >
                                   <div className="pt-4 border-t border-slate-100 space-y-3">
-                                    <p className="text-[9px] font-bold tracking-wide text-slate-600 uppercase">
+                                    <p className="text-[9px] font-bold  text-slate-600 uppercase">
                                       Included deliverables:
                                     </p>
                                     <div className="space-y-2">
@@ -642,12 +642,12 @@ export default function ClientVaultDetailPage() {
                                               ) : (
                                                 <Square className="w-3.5 h-3.5 text-slate-200" />
                                               )}
-                                              <span className="text-[10px] font-bold  text-slate-900">
+                                              <span className=" font-bold  text-slate-900">
                                                 {d.deliverableTitle}
                                               </span>
                                             </div>
                                             {d.included && d.notes && (
-                                              <p className="text-[10px] text-slate-600  ml-5 font-bold">
+                                              <p className=" text-slate-600  ml-5 font-bold">
                                                 - {d.notes}
                                               </p>
                                             )}
@@ -660,7 +660,7 @@ export default function ClientVaultDetailPage() {
                               )}
                             </AnimatePresence>
 
-                            <div className="mt-4 flex items-center justify-end text-[10px] font-bold text-emerald-600 tracking-wide opacity-0 group-hover:opacity-100 transition-opacity ">
+                            <div className="mt-4 flex items-center justify-end  font-bold text-emerald-600  opacity-0 group-hover:opacity-100 transition-opacity ">
                               {isExpanded
                                 ? "Click to collapse"
                                 : "Click to expand details"}
@@ -685,7 +685,7 @@ export default function ClientVaultDetailPage() {
               {/* STATUS & ACTIONS */}
               <Card className="bg-white border-slate-200 shadow-xl relative overflow-hidden group">
                 <CardHeader>
-                  <CardTitle className="text-slate-900 text-base font-bold tracking-wide  flex items-center gap-2">
+                  <CardTitle className="text-slate-900 text-base font-bold mb-4 flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     Project controls
                   </CardTitle>
@@ -694,7 +694,7 @@ export default function ClientVaultDetailPage() {
                   <div className="flex flex-col gap-3">
                     {vault.status === VaultStatus.DRAFT && (
                       <Link href={`/checkout/${vaultId}`} className="w-full">
-                        <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-xs ">
+                        <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm ">
                           <CreditCard className="w-4 h-4 mr-2" />
                           Fund project
                         </Button>
@@ -712,7 +712,7 @@ export default function ClientVaultDetailPage() {
                           !vault.submissions?.length ||
                           vault.isFrozen
                         }
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-xs "
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm "
                       >
                         <button onClick={() => setShowApproveDialog(true)}>
                           <CheckCircle className="w-4 h-4 mr-2" />
@@ -732,7 +732,7 @@ export default function ClientVaultDetailPage() {
                               {vault.formattedTotalAmount || vault.totalAmount}
                             </span>{" "}
                             to the freelancer. This action is{" "}
-                            <span className="text-emerald-700 font-bold tracking-widest text-[10px] uppercase">
+                            <span className="text-emerald-700 font-bold st  uppercase">
                               irreversible
                             </span>{" "}
                             and marks the project as completed.
@@ -740,7 +740,7 @@ export default function ClientVaultDetailPage() {
                         </DialogHeader>
                         <div className="py-6 space-y-4">
                           <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl space-y-2 shadow-sm">
-                            <p className="text-[10px] font-bold tracking-wide text-emerald-600/50 uppercase">
+                            <p className=" font-bold  text-emerald-600/50 uppercase">
                               Selected submission
                             </p>
                             <p className="text-sm font-bold text-slate-900 ">
@@ -779,7 +779,7 @@ export default function ClientVaultDetailPage() {
 
                     <Button
                       variant="outline"
-                      className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl active:scale-95 transition-all text-xs  shadow-sm"
+                      className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl active:scale-95 transition-all text-sm  shadow-sm"
                       onClick={() =>
                         toast.info("Request Changes feature is coming soon!", {
                           description:
@@ -797,7 +797,7 @@ export default function ClientVaultDetailPage() {
                     >
                       <Button
                         variant="outline"
-                        className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] h-12 rounded-xl transition-all shadow-sm active:scale-95 "
+                        className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold  h-12 rounded-xl transition-all shadow-sm active:scale-95 "
                       >
                         <Gavel className="w-4 h-4 mr-2 text-amber-600" />
                         Initiate dispute
@@ -808,7 +808,7 @@ export default function ClientVaultDetailPage() {
                       <Button
                         variant="outline"
                         onClick={() => setReassigning(true)}
-                        className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] h-12 rounded-xl transition-all shadow-sm active:scale-95 "
+                        className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold  h-12 rounded-xl transition-all shadow-sm active:scale-95 "
                       >
                         <UserPlus className="w-4 h-4 mr-2 text-emerald-600" />
                         Reassign freelancer
@@ -817,11 +817,11 @@ export default function ClientVaultDetailPage() {
                   </div>
 
                   <div className="pt-4 border-t border-slate-100 mt-4">
-                    <div className="flex justify-between items-center text-[10px] bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
-                      <span className="text-slate-600 font-bold tracking-wide uppercase">
+                    <div className="flex justify-between items-center  bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                      <span className="text-slate-600 font-bold text-[10px] uppercase">
                         Project logic:
                       </span>
-                      <span className="text-emerald-700 font-bold tracking-wide  uppercase">
+                      <span className="text-emerald-700 font-bold text-[10px] uppercase">
                         Standard escrow
                       </span>
                     </div>
@@ -840,7 +840,7 @@ export default function ClientVaultDetailPage() {
                   >
                     <Card className="bg-white border-emerald-500/20 shadow-xl ring-1 ring-emerald-500/10">
                       <CardHeader className="pb-4 flex flex-row items-center justify-between">
-                        <CardTitle className="text-slate-900 text-xs font-bold tracking-wide  uppercase">
+                        <CardTitle className="text-slate-900 text-sm font-bold   uppercase">
                           New assignment
                         </CardTitle>
                         <Button
@@ -854,7 +854,7 @@ export default function ClientVaultDetailPage() {
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-2">
-                          <Label className="text-[9px] font-bold tracking-wide text-slate-600 uppercase">
+                          <Label className="text-[9px] font-bold  text-slate-600 uppercase">
                             Freelancer email
                           </Label>
                           <div className="relative">
@@ -864,14 +864,14 @@ export default function ClientVaultDetailPage() {
                               value={inviteEmail}
                               onChange={(e) => setInviteEmail(e.target.value)}
                               placeholder="freelancer@example.com"
-                              className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-xs text-slate-900 placeholder:text-slate-300 focus:border-emerald-500/50 outline-none transition-all shadow-sm  font-bold"
+                              className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-900 placeholder:text-slate-300 focus:border-emerald-500/50 outline-none transition-all shadow-sm  font-bold"
                             />
                           </div>
                         </div>
                         <Button
                           onClick={() => handleUpdateFreelancer(inviteEmail)}
                           disabled={!inviteEmail || reassigningLoading}
-                          className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold tracking-wide text-[10px] h-10 rounded-lg shadow-md shadow-emerald-600/10 "
+                          className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold   h-10 rounded-lg shadow-md shadow-emerald-600/10 "
                         >
                           Confirm reassignment
                         </Button>
@@ -895,14 +895,14 @@ export default function ClientVaultDetailPage() {
             <SheetTitle className="text-2xl font-bold tracking-tighter text-slate-900 ">
               Request refund
             </SheetTitle>
-            <SheetDescription className="text-slate-600 font-bold tracking-wide ">
+            <SheetDescription className="text-slate-600 font-bold  ">
               Since you don&apos;t have a payment account, refunds are processed
               manually by our team. Please provide your payout details.
             </SheetDescription>
           </SheetHeader>
           <div className="mt-8 space-y-6">
             <div className="space-y-3">
-              <Label className="text-xs font-bold tracking-widest text-slate-600 uppercase">
+              <Label className="text-sm font-bold st text-slate-600 uppercase">
                 Payout method
               </Label>
               <Select
@@ -926,7 +926,7 @@ export default function ClientVaultDetailPage() {
             {payoutMethod === "bank" && (
               <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-bold tracking-widest text-slate-600 uppercase">
+                  <Label className=" font-bold st text-slate-600 uppercase">
                     Bank name
                   </Label>
                   <input
@@ -942,7 +942,7 @@ export default function ClientVaultDetailPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-bold tracking-widest text-slate-600 uppercase">
+                  <Label className=" font-bold st text-slate-600 uppercase">
                     Account number / IBAN
                   </Label>
                   <input
@@ -957,7 +957,7 @@ export default function ClientVaultDetailPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-bold tracking-widest text-slate-600 uppercase">
+                  <Label className=" font-bold st text-slate-600 uppercase">
                     Account holder name
                   </Label>
                   <input
@@ -977,17 +977,17 @@ export default function ClientVaultDetailPage() {
             <div className="pt-4 space-y-3">
               <Alert className="bg-amber-50 border-amber-100 text-amber-700 shadow-sm shadow-amber-500/5">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
-                <AlertTitle className="text-[10px] font-black uppercase tracking-widest">
+                <AlertTitle className=" font-black uppercase st">
                   Note
                 </AlertTitle>
-                <AlertDescription className="text-[10px] font-bold  leading-relaxed">
+                <AlertDescription className=" font-bold  leading-relaxed">
                   Our team will process this within 1-3 business days. Funds
                   will be returned minus any platform processing fees.
                 </AlertDescription>
               </Alert>
 
               <Button
-                className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold tracking-widest h-11 rounded-xl shadow-md shadow-emerald-600/10 "
+                className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold st h-11 rounded-xl shadow-md shadow-emerald-600/10 "
                 onClick={submitRefundRequest}
                 disabled={requestingRefund}
               >

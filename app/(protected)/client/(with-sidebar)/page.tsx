@@ -83,7 +83,7 @@ export default function ClientDashboard() {
           <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-slate-900 ">
             Overview
           </h1>
-          <p className="text-xs md:text-sm text-slate-600 font-bold">
+          <p className="text-sm md:text-sm text-slate-600 font-bold">
             Welcome back to your client dashboard
           </p>
         </motion.div>
@@ -98,7 +98,7 @@ export default function ClientDashboard() {
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
               <Landmark className="w-4 h-4 text-emerald-600" />
             </div>
-            <span className="text-sm font-bold tracking-wide text-slate-900">
+            <span className="text-sm font-bold  text-slate-900">
               Available balance
             </span>
           </div>
@@ -106,7 +106,7 @@ export default function ClientDashboard() {
             <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
               ${balance?.formattedAvailable || "0.00"}
             </h2>
-            <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold tracking-wide">
+            <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold ">
               <Zap className="w-4 h-4" />
               Fully liquid
             </div>
@@ -121,7 +121,7 @@ export default function ClientDashboard() {
             <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
               <Shield className="w-4 h-4 text-emerald-600" />
             </div>
-            <span className="text-sm font-bold tracking-wide text-slate-900">
+            <span className="text-sm font-bold  text-slate-900">
               Secured in projects
             </span>
           </div>
@@ -129,7 +129,7 @@ export default function ClientDashboard() {
             <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
               ${balance?.formattedSecured || "0"}
             </h2>
-            <p className="text-slate-600 text-sm font-bold tracking-wide">
+            <p className="text-slate-600 text-sm font-bold ">
               {securedVaults.length} active contracts
             </p>
           </div>
@@ -146,11 +146,11 @@ export default function ClientDashboard() {
             <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <LayoutGrid className="w-5 h-5 text-emerald-600" />
             </div>
-            <h2 className="text-xl font-bold tracking-wide text-slate-900 ">
+            <h2 className="text-xl font-bold  text-slate-900 ">
               Active projects
             </h2>
           </div>
-          <div className="text-[10px] font-bold tracking-wide text-slate-600 bg-slate-50 px-3 py-1 rounded-full border border-slate-200">
+          <div className=" font-bold  text-slate-600 bg-slate-50 px-3 py-1 rounded-full border border-slate-200">
             {activeVaults.length} active
           </div>
         </motion.div>
@@ -174,14 +174,14 @@ export default function ClientDashboard() {
             <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-6 border border-slate-100 group">
               <Activity className="w-8 h-8 text-slate-200 group-hover:text-slate-600 transition-colors" />
             </div>
-            <p className="text-sm font-bold tracking-wide text-slate-900">
+            <p className="text-sm font-bold  text-slate-900">
               No active projects
             </p>
-            <p className="text-[10px] text-slate-600 mt-3 font-semibold tracking-wide max-w-xs mx-auto leading-relaxed">
+            <p className=" text-slate-600 mt-3 font-semibold  max-w-xs mx-auto leading-relaxed">
               Get started by creating your first project
             </p>
             <Link href="/client/create-vault">
-              <Button className="mt-8 bg-emerald-600 hover:bg-emerald-700 font-bold transition-all text-[10px] px-6 h-10 rounded-xl shadow-lg shadow-emerald-500/10">
+              <Button className="mt-8 bg-emerald-600 hover:bg-emerald-700 font-bold transition-all  px-6 h-10 rounded-xl shadow-lg shadow-emerald-500/10">
                 <Plus className="w-3.5 h-3.5 mr-2" />
                 New project
               </Button>
@@ -210,25 +210,25 @@ export default function ClientDashboard() {
                         <h4 className="text-lg font-bold tracking-tight text-slate-900 truncate max-w-md">
                           {vault.title}
                         </h4>
-                        <span className="bg-emerald-50 text-emerald-700 text-[9px] font-bold tracking-wide rounded-lg border border-emerald-200 py-1 px-3 whitespace-nowrap">
+                        <span className="bg-emerald-50 text-emerald-700 text-[9px] font-bold  rounded-lg border border-emerald-200 py-1 px-3 whitespace-nowrap">
                           {getVaultDerivedLabel(vault.status)}
                         </span>
                       </div>
                       <div className="flex flex-col gap-2">
-                        <p className="text-sm font-bold tracking-wide text-slate-600 truncate">
+                        <p className="text-sm font-bold  text-slate-600 truncate">
                           {vault.freelancerName ||
                             vault.freelancerEmail ||
                             vault.freelancer?.email ||
                             "Unassigned freelancer"}
                         </p>
                         <div className="flex items-center gap-3">
-                          <span className="text-[10px] font-bold tracking-wide text-slate-600">
+                          <span className=" font-bold  text-slate-600">
                             {vault.deliverables?.length || 0} deliverables
                           </span>
                           <span className="w-1 h-1 rounded-full bg-slate-200" />
                           <span
                             className={cn(
-                              "text-[10px] font-bold tracking-wide px-2 py-0.5 rounded-md",
+                              " font-bold  px-2 py-0.5 rounded-md",
                               vault.submissions?.length > 0
                                 ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
                                 : "bg-slate-100 text-slate-600 border border-slate-200",
@@ -244,7 +244,7 @@ export default function ClientDashboard() {
 
                     <div className="flex items-center justify-between sm:justify-end gap-8 border-t sm:border-t-0 border-slate-100 pt-6 sm:pt-0">
                       <div className="sm:text-right">
-                        <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1">
+                        <p className="text-[9px] text-slate-600 font-bold  mb-1">
                           Project value
                         </p>
                         <p className="text-2xl font-bold text-slate-900 tracking-tight ">
@@ -263,7 +263,7 @@ export default function ClientDashboard() {
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="mt-8 flex items-center justify-between bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                <p className="text-[10px] font-bold text-slate-600 tracking-wide">
+                <p className=" font-bold text-slate-600 ">
                   Page <span className="text-slate-600">{currentPage}</span> /{" "}
                   {totalPages}
                 </p>
@@ -275,7 +275,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(1, prev - 1))
                     }
-                    className="h-10 px-4 text-[10px] border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-wide transition-all disabled:opacity-50"
+                    className="h-10 px-4  border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold  transition-all disabled:opacity-50"
                   >
                     Previous
                   </Button>
@@ -286,7 +286,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                     }
-                    className="h-10 px-4 text-[10px] border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-wide transition-all disabled:opacity-50"
+                    className="h-10 px-4  border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold  transition-all disabled:opacity-50"
                   >
                     Next
                   </Button>

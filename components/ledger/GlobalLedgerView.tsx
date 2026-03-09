@@ -2,12 +2,22 @@
 
 import * as React from "react";
 import { useMemo, useState } from "react";
+import { ethers } from "ethers";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLedger } from "@/lib/store/ledger-context";
 import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 import { Search, ArrowUpRight, ArrowDownLeft, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+
+// Helper: format a raw USDC/USDT amount stored in 6-decimal base units
+const formatAmount = (raw: bigint | number | string): number => {
+  try {
+    return parseFloat(ethers.formatUnits(BigInt(raw), 6));
+  } catch {
+    return 0;
+  }
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -60,7 +70,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
         .filter((entry: any) =>
           ["PROCESSING", "PENDING"].includes(entry.status),
         )
-        .reduce((sum: number, entry: any) => sum + Math.abs(entry.amount), 0),
+        .reduce((sum: number, entry: any) => sum + Math.abs(formatAmount(entry.amount)), 0),
     [entries],
   );
 
@@ -68,7 +78,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
     () =>
       (entries || [])
         .filter((entry: any) => entry.status === "CONFIRMED")
-        .reduce((sum: number, entry: any) => sum + Math.abs(entry.amount), 0),
+        .reduce((sum: number, entry: any) => sum + Math.abs(formatAmount(entry.amount)), 0),
     [entries],
   );
 
@@ -82,7 +92,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
       <header className="space-y-3">
         <motion.div
           variants={itemVariants}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold tracking-wide text-emerald-700 "
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100  font-bold  text-emerald-700 "
         >
           <ShieldCheck className="w-3.5 h-3.5" />
           Financial activity protocol
@@ -95,7 +105,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
         </motion.h1>
         <motion.p
           variants={itemVariants}
-          className="text-xs md:text-sm font-bold text-slate-600 tracking-wide max-w-2xl leading-relaxed"
+          className="text-sm md:text-sm font-bold text-slate-600  max-w-2xl leading-relaxed"
         >
           Synchronized transaction log reflecting all capital movements.
         </motion.p>
@@ -142,7 +152,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                 )}
               />
               <CardContent className="py-8 relative z-10">
-                <p className="text-sm font-bold tracking-wide text-slate-600 mb-2 group-hover:text-slate-600 transition-colors ">
+                <p className="text-sm font-bold  text-slate-600 mb-2 group-hover:text-slate-600 transition-colors ">
                   {stat.label}
                 </p>
                 <p
@@ -169,11 +179,11 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search ledger entries..."
-            className="w-full pl-12 pr-4 py-4 bg-white font-bold tracking-wide border border-slate-200 rounded-2xl text-sm md:text-base text-slate-900 placeholder-slate-900 focus:outline-none focus:border-emerald-500/30 shadow-sm transition-all"
+            className="w-full pl-12 pr-4 py-4 bg-white font-bold  border border-slate-200 rounded-2xl text-sm md:text-base text-slate-900 placeholder-slate-900 focus:outline-none focus:border-emerald-500/30 shadow-sm transition-all"
           />
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-xs font-bold text-slate-600 tracking-wide hidden sm:block ">
+          <div className="text-sm font-bold text-slate-600  hidden sm:block ">
             Real-time verification active
           </div>
         </div>
@@ -187,16 +197,16 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-600 tracking-wide uppercase">
+                    <th className="px-6 py-4 text-[11px] font-bold text-slate-600  uppercase">
                       Transaction node
                     </th>
-                    <th className="hidden md:table-cell px-6 py-4 text-[11px] font-bold tracking-wide text-slate-600 uppercase">
+                    <th className="hidden md:table-cell px-6 py-4 text-[11px] font-bold  text-slate-600 uppercase">
                       Project axis
                     </th>
-                    <th className="px-6 py-4 text-[11px] font-bold tracking-wide text-slate-600 uppercase">
+                    <th className="px-6 py-4 text-[11px] font-bold  text-slate-600 uppercase">
                       State
                     </th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-600 tracking-wide uppercase text-right">
+                    <th className="px-6 py-4 text-[11px] font-bold text-slate-600  uppercase text-right">
                       Value (USD)
                     </th>
                   </tr>
@@ -207,7 +217,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                       <td colSpan={4} className="py-20 text-center">
                         <div className="flex flex-col items-center justify-center gap-4">
                           <div className="w-8 h-8 border-2 border-white/5 border-t-emerald-500 rounded-full animate-spin" />
-                          <span className="text-[10px] font-bold tracking-wide text-slate-600">
+                          <span className=" font-bold  text-slate-600">
                             Syncing node history
                           </span>
                         </div>
@@ -220,7 +230,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                           <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/5 group">
                             <Search className="w-6 h-6 text-white/10 group-hover:text-white/20 transition-all" />
                           </div>
-                          <span className="text-[10px] font-bold tracking-wide text-slate-600">
+                          <span className=" font-bold  text-slate-600">
                             No matching records detected
                           </span>
                         </div>
@@ -261,15 +271,15 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                                 <p className="text-sm text-slate-900 font-bold tracking-tight truncate group-hover:text-emerald-700 transition-colors ">
                                   {entry.description || entry.id}
                                 </p>
-                                <p className="text-xs font-bold tracking-wide text-slate-600 mt-1 ">
+                                <p className="text-xs font-bold  text-slate-600 mt-1 ">
                                   Sig: {entry.id}
                                 </p>
                                 <div className="md:hidden mt-2 flex items-center gap-2">
-                                  <span className="text-xs text-slate-600 font-bold tracking-wide truncate max-w-[120px]">
+                                  <span className="text-sm text-slate-600 font-bold  truncate max-w-[120px]">
                                     {vault?.title || "Vault"}
                                   </span>
                                   <span className="w-1 h-1 rounded-full bg-slate-200" />
-                                  <span className="text-xs text-slate-600 font-bold tracking-widest ">
+                                  <span className="text-sm text-slate-600 font-bold st ">
                                     {new Date(
                                       entry.createdAt,
                                     ).toLocaleDateString()}
@@ -282,7 +292,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             <p className="text-sm text-slate-600 font-bold tracking-tight  truncate max-w-[200px]">
                               {vault?.title || "Independent transaction"}
                             </p>
-                            <p className="text-xs text-slate-600 font-bold tracking-wide mt-1.5 flex items-center gap-1.5">
+                            <p className="text-sm text-slate-600 font-bold  mt-1.5 flex items-center gap-1.5">
                               <Clock className="w-3 h-3" />
                               {new Date(entry.createdAt).toLocaleDateString(
                                 "en-US",
@@ -298,7 +308,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             <div className="flex justify-center sm:justify-start">
                               <span
                                 className={cn(
-                                  "px-3 py-1.5 text-xs font-bold tracking-wide rounded-full border shadow-sm  transition-all",
+                                  "px-3 py-1.5 text-sm font-bold  rounded-full border shadow-sm  transition-all",
                                   statusStyles[entry.status] ||
                                     "bg-slate-50 border-slate-200 text-slate-600",
                                 )}
@@ -309,10 +319,10 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             </div>
                           </td>
                           <td className="px-6 py-6 text-right">
-                            <p className="text-base font-bold text-slate-900 tracking-widest leading-none ">
-                              ${Math.abs(entry.amount).toLocaleString()}
+                            <p className="text-base font-bold text-slate-900 st leading-none ">
+                              ${Math.abs(formatAmount(entry.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </p>
-                            <p className="text-xs text-slate-600 font-bold tracking-wide mt-1 ">
+                            <p className="text-sm text-slate-600 font-bold  mt-1 ">
                               {entry.amount < 0 ? "Debit" : "Credit"}
                             </p>
                           </td>

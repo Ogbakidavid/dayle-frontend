@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
                   <CheckCircle2 className="w-6 h-6 text-emerald-600 transition-transform group-hover:scale-110" />
                 </div>
                 <div>
-                  <h4 className="text-slate-900 font-bold text-sm tracking-wide mb-1">
+                  <h4 className="text-slate-900 font-bold text-sm  mb-1">
                     {item.title}
                   </h4>
                   <p className="text-slate-600 font-bold text-lg leading-snug">
@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-[440px] relative z-10">
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 text-slate-600 hover:text-emerald-600 mb-8 font-bold tracking-wide text-xs transition-colors group"
+            className="inline-flex items-center gap-2 text-slate-600 hover:text-emerald-600 mb-8 font-bold  text-sm transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />{" "}
             Back to login
@@ -110,7 +110,7 @@ export default function ForgotPasswordPage() {
             <h2 className="text-4xl font-bold text-slate-900 tracking-tight leading-none">
               Forgot password
             </h2>
-            <p className="text-slate-600 mt-4 text-sm font-bold tracking-wide leading-relaxed">
+            <p className="text-slate-600 mt-4 text-sm font-bold  leading-relaxed">
               Enter your email to receive a password reset link.
             </p>
           </div>
@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
               <div className="space-y-3">
                 <Label
                   htmlFor="email"
-                  className="text-sm font-bold tracking-wide text-slate-700 ml-1"
+                  className="text-sm font-bold  text-slate-700 ml-1"
                 >
                   Email address
                 </Label>
@@ -139,9 +139,7 @@ export default function ForgotPasswordPage() {
 
               {error && (
                 <div className="flex items-center gap-3 text-red-400 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <p className="text-sm font-bold tracking-wide leading-relaxed">
-                    {error}
-                  </p>
+                  <p className="text-sm font-bold  leading-relaxed">{error}</p>
                 </div>
               )}
 
@@ -171,7 +169,7 @@ export default function ForgotPasswordPage() {
                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
                   Link sent!
                 </h3>
-                <p className="text-slate-600 text-sm font-bold tracking-wide mt-2 leading-relaxed">
+                <p className="text-slate-600 text-sm font-bold  mt-2 leading-relaxed">
                   We&apos;ve sent a password reset link to your email address.
                   Please check your inbox.
                 </p>
@@ -187,7 +185,7 @@ export default function ForgotPasswordPage() {
               <div className="pt-4 border-t border-white/5">
                 <Link
                   href="/reset-password"
-                  className="text-emerald-600 text-xs font-bold tracking-wide hover:underline"
+                  className="text-emerald-600 text-sm font-bold  hover:underline"
                 >
                   (Demo: go to reset password page)
                 </Link>

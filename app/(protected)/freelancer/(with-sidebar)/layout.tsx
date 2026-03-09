@@ -115,8 +115,8 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                   className={cn(
                     "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                     isActive
-                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold tracking-wide shadow-lg shadow-emerald-500/5"
-                      : "text-slate-900 hover:bg-slate-100 hover:text-slate-900 font-bold tracking-wide",
+                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold  shadow-lg shadow-emerald-500/5"
+                      : "text-slate-900 hover:bg-slate-100 hover:text-slate-900 font-bold ",
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -150,10 +150,10 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
 
         {/* Status Indicator (Activated) */}
         <div className="px-6 py-4 mx-4 mb-4 bg-emerald-50 border border-emerald-100 rounded-2xl group hover:bg-emerald-100 transition-colors shadow-sm">
-          <div className="flex items-center gap-2 text-emerald-600 text-[10px] font-bold tracking-wide mb-1  uppercase">
+          <div className="flex items-center gap-2 text-emerald-600  font-bold  mb-1  uppercase">
             <CheckCircle className="w-3 h-3" /> Activated
           </div>
-          <p className="text-[11px] text-slate-600 font-bold tracking-wide leading-relaxed">
+          <p className="text-[11px] text-slate-600 font-bold  leading-relaxed">
             Approved for active project access
           </p>
         </div>
@@ -174,10 +174,10 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-bold tracking-wide text-slate-900 truncate">
+              <p className="text-sm font-bold  text-slate-900 truncate">
                 {user?.name || "Freelancer"}
               </p>
-              <p className="text-xs font-bold text-slate-600 truncate">
+              <p className="text-sm font-bold text-slate-600 truncate">
                 {user?.email}
               </p>
             </div>
@@ -189,7 +189,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 w-full text-sm font-bold tracking-wide border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-['Poppins',sans-serif] shadow-sm"
+                className="h-9 w-full text-sm font-bold  border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-['Poppins',sans-serif] shadow-sm"
               >
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
@@ -206,7 +206,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               variant="outline"
               size="sm"
               onClick={logout}
-              className="h-9 text-sm font-bold tracking-wide border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-['Poppins',sans-serif] shadow-sm"
+              className="h-9 text-sm font-bold  border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-['Poppins',sans-serif] shadow-sm"
             >
               <LogOut className="w-3.5 h-3.5 mr-2" />
               Sign out

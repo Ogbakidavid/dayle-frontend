@@ -22,19 +22,19 @@ export function LedgerBalance({
         </div>
         <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500 to-transparent" />
         <CardContent className="p-8 relative z-10">
-          <div className="flex items-center gap-2 text-slate-900 font-bold tracking-wide text-sm mb-5">
+          <div className="flex items-center gap-2 text-slate-900 font-bold  text-sm mb-5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
             Available balance
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-light text-slate-900">$</span>
             <span className="text-5xl font-bold text-slate-900 tracking-tighter ">
-              {balance?.available?.toLocaleString() || "0.00"}
+              {parseFloat(balance?.formattedAvailable || balance?.available || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <span className="text-sm font-bold text-slate-900 ml-1">USD</span>
           </div>
           <div className="mt-8 flex items-center gap-3">
-            <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-sm font-bold text-emerald-500 tracking-wide border border-emerald-500/20 flex items-center gap-2">
+            <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-sm font-bold text-emerald-500  border border-emerald-500/20 flex items-center gap-2">
               <Zap size={10} /> Fully liquid
             </div>
           </div>
@@ -47,18 +47,18 @@ export function LedgerBalance({
           <Clock size={120} className="text-black rotate-12" />
         </div>
         <CardContent className="p-8 relative z-10">
-          <div className="flex items-center gap-2 text-slate-900 font-bold tracking-wide text-sm mb-5">
+          <div className="flex items-center gap-2 text-slate-900 font-bold  text-sm mb-5">
             <ShieldCheck size={14} className="text-emerald-500/50" />
             Pending settlement
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-light text-slate-900">$</span>
             <span className="text-5xl font-bold text-slate-900 tracking-tighter ">
-              {balance?.pending?.toLocaleString() || "0.00"}
+              {parseFloat(balance?.formattedPending || balance?.pending || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
           <div className="mt-8 flex items-center gap-2">
-            <span className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
+            <span className="text-sm font-bold text-slate-900  flex items-center gap-2">
               <span className="w-1 h-1 rounded-full bg-white/10" />
               {role === "client"
                 ? "Reserved for project release"

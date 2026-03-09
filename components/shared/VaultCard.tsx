@@ -32,9 +32,7 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
       <div className="space-y-4">
         {/* Value */}
         <div>
-          <p className="text-[10px] font-bold tracking-widest text-white/30 mb-1">
-            Project value
-          </p>
+          <p className=" font-bold st text-white/30 mb-1">Project value</p>
           <div className="flex items-baseline gap-1">
             <span className="text-2xl font-bold text-white">$</span>
             <h2 className="text-3xl font-bold text-white tracking-tighter ">
@@ -48,7 +46,7 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
           <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
             <TrendingUp className="w-2.5 h-2.5 text-slate-900" />
           </div>
-          <p className="text-[10px] text-slate-900 font-bold tracking-widest">
+          <p className=" text-slate-900 font-bold st">
             {isClient ? "Freelancer: " : "Client: "}
             <span className="text-white/80">
               {isClient
@@ -60,13 +58,13 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
 
         {/* Status Indicators */}
         <div className="flex items-center gap-3 pt-2 border-t border-white/5">
-          <span className="text-[9px] font-bold tracking-widest text-white/30">
+          <span className="text-[9px] font-bold st text-white/30">
             {vault.deliverables?.length || 0} deliverables
           </span>
           <span className="w-1 h-1 rounded-full bg-white/10" />
           <span
             className={cn(
-              "text-[9px] font-bold tracking-widest",
+              "text-[9px] font-bold st",
               vault.submissions?.length > 0
                 ? "text-emerald-500"
                 : "text-white/30",
@@ -87,7 +85,7 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
       >
         <Button
           variant="outline"
-          className="w-full border-white/10 hover:border-white/20 hover:bg-white/5 text-white font-bold tracking-widest text-[10px] h-11"
+          className="w-full border-white/10 hover:border-white/20 hover:bg-white/5 text-white font-bold st  h-11"
         >
           View details
         </Button>

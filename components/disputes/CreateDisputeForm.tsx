@@ -296,7 +296,7 @@ export function CreateDisputeForm({
           Back
         </Button>
 
-        <div className="flex items-center gap-2 text-xs text-slate-900">
+        <div className="flex items-center gap-2 text-sm text-slate-900">
           <span
             className={cn(
               "h-2 w-2 rounded-full",
@@ -345,7 +345,7 @@ export function CreateDisputeForm({
               subtitle="Pick the vault this dispute applies to."
               right={
                 selectedVault ? (
-                  <div className="rounded-lg border border-white/10 bg-white/3 px-3 py-1 text-xs text-white/60">
+                  <div className="rounded-lg border border-white/10 bg-white/3 px-3 py-1 text-sm text-white/60">
                     {selectedVault.id}
                   </div>
                 ) : null
@@ -397,7 +397,7 @@ export function CreateDisputeForm({
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-slate-900">
+                <p className="text-sm text-slate-900">
                   This determines the dispute jurisdiction and parties.
                 </p>
               </div>
@@ -411,7 +411,7 @@ export function CreateDisputeForm({
                     <div className="text-sm font-semibold text-white">
                       {selectedVault.title}
                     </div>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-xs text-white/50">
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm text-white/50">
                       <div>
                         Status:{" "}
                         <span className="text-white/70 font-bold">
@@ -426,7 +426,7 @@ export function CreateDisputeForm({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-1 text-xs text-white/60">
+                  <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-1 text-sm text-white/60">
                     <Gavel className="h-4 w-4 text-amber-400" />
                     Dispute scope locked
                   </div>
@@ -501,7 +501,7 @@ export function CreateDisputeForm({
                                 {deliverable.title}
                               </span>
                               {deliverable.description && (
-                                <span className="text-xs text-slate-900">
+                                <span className="text-sm text-slate-900">
                                   {deliverable.description}
                                 </span>
                               )}
@@ -512,7 +512,7 @@ export function CreateDisputeForm({
                     </SelectContent>
                   </Select>
 
-                  <p className="text-xs text-slate-900">
+                  <p className="text-sm text-slate-900">
                     This dispute type must specifically reference which
                     verification requirement was handled incorrectly.
                   </p>
@@ -526,7 +526,7 @@ export function CreateDisputeForm({
                     <Label className="text-sm font-medium text-white">
                       Reason code *
                     </Label>
-                    <div className="text-xs text-slate-900">
+                    <div className="text-sm text-slate-900">
                       Choose one. Make it defensible.
                     </div>
                   </div>
@@ -566,7 +566,7 @@ export function CreateDisputeForm({
                                   {code.label}
                                 </div>
                                 {code.requiresDeliverableRef && (
-                                  <span className="text-[10px] font-bold tracking-wide text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                  <span className=" font-bold  text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
                                     Needs proof
                                   </span>
                                 )}
@@ -605,11 +605,11 @@ export function CreateDisputeForm({
                     <div className="flex items-end justify-between gap-3">
                       <Label className="text-sm font-medium text-white">
                         Description{" "}
-                        <span className="text-xs font-normal text-slate-900">
+                        <span className="text-sm font-normal text-slate-900">
                           (optional)
                         </span>
                       </Label>
-                      <div className="text-xs text-slate-900">
+                      <div className="text-sm text-slate-900">
                         {description.length}/600
                       </div>
                     </div>
@@ -622,7 +622,7 @@ export function CreateDisputeForm({
                       placeholder="State facts. Timeline. What you delivered vs what was agreed. Avoid emotions."
                       className="min-h-[140px] resize-none border-white/10 bg-black/40 text-white hover:border-white/20 focus:ring-2 focus:ring-amber-500/30"
                     />
-                    <p className="text-xs text-slate-900">
+                    <p className="text-sm text-slate-900">
                       Good disputes read like a report: facts, dates, evidence.
                       No drama.
                     </p>
@@ -636,7 +636,7 @@ export function CreateDisputeForm({
                       <Button
                         type="button"
                         variant="ghost"
-                        className="text-xs text-white/60 hover:text-white hover:bg-white/5"
+                        className="text-sm text-white/60 hover:text-white hover:bg-white/5"
                         onClick={() => inputRef.current?.click()}
                       >
                         <Upload className="mr-2 h-4 w-4" />
@@ -711,7 +711,7 @@ export function CreateDisputeForm({
                                 <div className="truncate text-sm font-medium text-white/85">
                                   {file.name}
                                 </div>
-                                <div className="text-xs text-white/45">
+                                <div className="text-sm text-white/45">
                                   {formatBytes(file.size)}
                                 </div>
                               </div>
@@ -738,7 +738,7 @@ export function CreateDisputeForm({
 
         {/* Footer actions */}
         <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/2 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-2 text-xs text-white/45">
+          <div className="flex items-start gap-2 text-sm text-white/45">
             <Info className="mt-0.5 h-4 w-4 shrink-0" />
             <p>
               Submitting a dispute means you&apos;re asserting the information

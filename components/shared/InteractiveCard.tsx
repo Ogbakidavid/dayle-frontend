@@ -133,7 +133,7 @@ export default function InteractiveCard({
                   </svg>
                 )}
                 {!["visa", "mastercard"].includes(cardType) && (
-                  <span className="text-white font-bold tracking-wide  opacity-80">
+                  <span className="text-white font-bold   opacity-80">
                     {cardType || "Card"}
                   </span>
                 )}
@@ -154,18 +154,18 @@ export default function InteractiveCard({
 
               <div className="flex justify-between items-end">
                 <div className="space-y-1">
-                  <span className="text-sm text-white-400 tracking-wide block">
+                  <span className="text-sm text-white-400  block">
                     Card holder
                   </span>
-                  <p className="text-sm text-white font-medium tracking-wide truncate max-w-[200px]">
+                  <p className="text-sm text-white font-medium  truncate max-w-[200px]">
                     {cardHolder || "Your name"}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-sm text-white-400 tracking-wide block text-right">
+                  <span className="text-sm text-white-400  block text-right">
                     Expires
                   </span>
-                  <p className="text-sm text-white font-medium tracking-wide">
+                  <p className="text-sm text-white font-medium ">
                     {expiry || "MM/YY"}
                   </p>
                 </div>
@@ -192,7 +192,7 @@ export default function InteractiveCard({
                 </span>
               </div>
               <div className="h-10 bg-white flex items-center justify-end px-3 rounded-sm">
-                <span className="text-black font-bold tracking-wide text-lg">
+                <span className="text-black font-bold  text-lg">
                   {cvc || "•••"}
                 </span>
               </div>

@@ -30,7 +30,7 @@ export function KYCAlert() {
           <div className="space-y-1">
             <h3 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
               Action required: Verify your identity
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/20 text-amber-500 tracking-wide border border-amber-500/20">
+              <span className="inline-flex items-center px-2 py-0.5 rounded  font-semibold bg-amber-500/20 text-amber-500  border border-amber-500/20">
                 {user.kycStatus === KycStatus.REJECTED
                   ? "Verification failed"
                   : "Pending verification"}
@@ -46,7 +46,7 @@ export function KYCAlert() {
         </div>
 
         <Link href={`/onboarding/kyc?role=${user.role}`}>
-          <Button className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-black font-semibold tracking-wide transition-all shadow-lg shadow-amber-500/20">
+          <Button className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-black font-semibold  transition-all shadow-lg shadow-amber-500/20">
             Complete KYC
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>

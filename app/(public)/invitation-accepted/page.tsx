@@ -86,9 +86,7 @@ export default function InvitationAcceptedPage() {
         <Card className="bg-white border-slate-200 max-w-xl mx-auto text-left shadow-sm">
           <CardContent className="p-6 space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-slate-100">
-              <span className="text-slate-500 text-sm tracking-wide">
-                Status
-              </span>
+              <span className="text-slate-500 text-sm ">Status</span>
               <Badge
                 variant="outline"
                 className="text-emerald-700 bg-emerald-50 border-emerald-100 font-bold"
@@ -97,17 +95,13 @@ export default function InvitationAcceptedPage() {
               </Badge>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-slate-100">
-              <span className="text-slate-500 text-sm tracking-wide">
-                Client
-              </span>
+              <span className="text-slate-500 text-sm ">Client</span>
               <span className="text-slate-900 font-bold">
                 {vault.clientName || "Client"}
               </span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="text-slate-500 text-sm tracking-wide">
-                Total Value
-              </span>
+              <span className="text-slate-500 text-sm ">Total Value</span>
               <span className="text-slate-900 font-bold">
                 ${vault.formattedTotalAmount || vault.amount.toLocaleString()}
               </span>
@@ -118,7 +112,7 @@ export default function InvitationAcceptedPage() {
         <div className="pt-8">
           <Button
             onClick={() => router.push(`/freelancer/vault/${vault.id}`)}
-            className="bg-emerald-600 text-white hover:bg-emerald-700 font-bold tracking-wide px-8 shadow-lg shadow-emerald-600/20"
+            className="bg-emerald-600 text-white hover:bg-emerald-700 font-bold  px-8 shadow-lg shadow-emerald-600/20"
           >
             View project
           </Button>

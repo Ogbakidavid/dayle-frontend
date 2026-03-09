@@ -64,7 +64,7 @@ export default function FreelancerVaultDetailPage() {
 
   if (vaultsLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-900 font-bold tracking-wide">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-900 font-bold ">
         <div className="w-12 h-12 border-4 border-slate-100 border-t-emerald-600 rounded-full animate-spin mb-6" />
         Initializing vault data
       </div>
@@ -79,7 +79,7 @@ export default function FreelancerVaultDetailPage() {
           <h2 className="text-xl font-bold text-slate-900 tracking-tighter mb-2">
             Access restricted
           </h2>
-          <p className="text-xs text-slate-600 font-bold tracking-wide leading-relaxed">
+          <p className="text-sm text-slate-600 font-bold  leading-relaxed">
             Vault not found or access denied. Please verify your credentials as
             the assigned freelancer.
           </p>
@@ -87,7 +87,7 @@ export default function FreelancerVaultDetailPage() {
         <Link href="/freelancer">
           <Button
             variant="outline"
-            className="border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold text-[10px] h-11 px-8 rounded-xl transition-all shadow-sm"
+            className="border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold  h-11 px-8 rounded-xl transition-all shadow-sm"
           >
             Return to workspace
           </Button>
@@ -111,7 +111,7 @@ export default function FreelancerVaultDetailPage() {
         <header className="pt-4 md:pt-8 bg-transparent">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-xs text-slate-600 hover:text-slate-900 transition-all mb-6 md:mb-8 font-bold tracking-wide bg-white border border-slate-200 py-2 px-4 rounded-xl cursor-pointer group shadow-sm"
+            className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-all mb-6 md:mb-8 font-bold  bg-white border border-slate-200 py-2 px-4 rounded-xl cursor-pointer group shadow-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Workspace
@@ -125,7 +125,7 @@ export default function FreelancerVaultDetailPage() {
                 </h1>
                 <Badge
                   variant="outline"
-                  className="bg-emerald-50 text-emerald-700 border-emerald-100 tracking-wide text-[10px] font-bold px-4 py-1.5 rounded-full shadow-sm"
+                  className="bg-emerald-50 text-emerald-700 border-emerald-100   font-bold px-4 py-1.5 rounded-full shadow-sm"
                 >
                   {getVaultDerivedLabel(vault.status)}
                 </Badge>
@@ -137,10 +137,10 @@ export default function FreelancerVaultDetailPage() {
                     <Users className="w-4 h-4 text-slate-600" />
                   </div>
                   <div>
-                    <p className="text-[9px] text-slate-600 font-bold tracking-wide">
+                    <p className="text-[9px] text-slate-600 font-bold ">
                       Client
                     </p>
-                    <p className="text-xs text-slate-900 font-bold">
+                    <p className="text-sm text-slate-900 font-bold">
                       {vault.clientName || "Unknown Client"}
                     </p>
                   </div>
@@ -151,10 +151,10 @@ export default function FreelancerVaultDetailPage() {
                     <Clock className="w-4 h-4 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-[9px] text-slate-600 font-bold tracking-wide">
+                    <p className="text-[9px] text-slate-600 font-bold ">
                       Created
                     </p>
-                    <p className="text-xs text-slate-900 font-bold">
+                    <p className="text-sm text-slate-900 font-bold">
                       {new Date(vault.createdAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -163,15 +163,15 @@ export default function FreelancerVaultDetailPage() {
             </div>
 
             <div className="text-left md:text-right p-6 rounded-2xl bg-white border border-slate-200 shadow-sm min-w-[240px]">
-              <p className="text-[9px] md:text-[11px] text-slate-600 font-bold tracking-wide mb-1 ">
+              <p className="text-[9px] md:text-[11px] text-slate-600 font-bold  mb-1 ">
                 Secured contract value
               </p>
-              <p className="text-4xl md:text-6xl font-bold text-slate-900 tracking-widest  leading-none">
+              <p className="text-4xl md:text-6xl font-bold text-slate-900 st  leading-none">
                 {vault.formattedTotalAmount || vault.totalAmount}
               </p>
               <div className="mt-4 inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <p className="text-[10px] md:text-xs text-emerald-700 font-bold tracking-wide ">
+                <p className=" md:text-sm text-emerald-700 font-bold  ">
                   $
                   {vault.formattedPaidAmount ||
                     (vault.paidAmount || 0).toLocaleString()}{" "}
@@ -193,10 +193,10 @@ export default function FreelancerVaultDetailPage() {
                     <ListChecks className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-slate-900 font-bold tracking-wide text-lg ">
+                    <CardTitle className="text-slate-900 font-bold  text-lg ">
                       What was promised
                     </CardTitle>
-                    <CardDescription className="text-slate-600 font-bold tracking-wide text-[10px] mt-1">
+                    <CardDescription className="text-slate-600 font-bold   mt-1">
                       The specific items you committed to deliver
                     </CardDescription>
                   </div>
@@ -206,7 +206,7 @@ export default function FreelancerVaultDetailPage() {
                 {!vault.deliverables || vault.deliverables.length === 0 ? (
                   <div className="p-12 text-center space-y-4">
                     <AlertCircle className="w-12 h-12 text-slate-100 mx-auto" />
-                    <p className="text-slate-600 font-bold tracking-widest text-[10px] uppercase">
+                    <p className="text-slate-600 font-bold uppercase">
                       No deliverables defined for this project
                     </p>
                   </div>
@@ -236,18 +236,18 @@ export default function FreelancerVaultDetailPage() {
                                 {item.title}
                               </h4>
                               {item.description && (
-                                <p className="text-xs text-slate-600 leading-relaxed max-w-2xl">
+                                <p className="text-sm text-slate-600 leading-relaxed max-w-2xl">
                                   Description: {item.description}
                                 </p>
                               )}
                               <div className="pt-2 flex items-center gap-2">
-                                <span className="text-[9px] font-bold tracking-widest text-slate-600">
+                                <span className="text-[9px] font-bold 00">
                                   Status:
                                 </span>
                                 <Badge
                                   variant="outline"
                                   className={cn(
-                                    "text-[9px] tracking-wide border-none px-0",
+                                    "text-[9px]  border-none px-0",
                                     submissionWithThis
                                       ? "text-emerald-700"
                                       : "text-amber-600/50",
@@ -276,10 +276,10 @@ export default function FreelancerVaultDetailPage() {
                     <Zap className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-slate-900 font-bold tracking-wide text-lg ">
+                    <CardTitle className="text-slate-900 font-bold  text-lg ">
                       Your submissions
                     </CardTitle>
-                    <CardDescription className="text-slate-600 font-bold tracking-widest text-[10px] mt-1">
+                    <CardDescription className="text-slate-600 font-bold mt-1">
                       Timeline of work you have submitted
                     </CardDescription>
                   </div>
@@ -288,7 +288,7 @@ export default function FreelancerVaultDetailPage() {
               <CardContent className="p-6">
                 {!vault.submissions || vault.submissions.length === 0 ? (
                   <div className="py-12 text-center">
-                    <p className="text-slate-100 font-bold tracking-[0.2em] text-[10px]">
+                    <p className="text-slate-100 font-bold tracking-[0.2em] ">
                       No work submitted yet
                     </p>
                   </div>
@@ -307,16 +307,16 @@ export default function FreelancerVaultDetailPage() {
                         >
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center  text-[10px] font-bold text-emerald-700">
+                              <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center   font-bold text-emerald-700">
                                 {String(
                                   vault.submissions.length - idx,
                                 ).padStart(2, "0")}
                               </div>
                               <div>
-                                <p className="text-xs font-bold text-slate-900 tracking-wide ">
+                                <p className="text-sm font-bold text-slate-900  ">
                                   Submission #{vault.submissions.length - idx}
                                 </p>
-                                <p className="text-[9px] text-slate-600 font-bold tracking-wide mt-0.5">
+                                <p className="text-[9px] text-slate-600 font-bold  mt-0.5">
                                   {new Date(sub.submittedAt).toLocaleDateString(
                                     "en-US",
                                     {
@@ -332,7 +332,7 @@ export default function FreelancerVaultDetailPage() {
                             </div>
                             <Badge
                               variant="outline"
-                              className="bg-emerald-50 text-emerald-700 border-emerald-100 text-[9px] font-bold tracking-wide px-3"
+                              className="bg-emerald-50 text-emerald-700 border-emerald-100 text-[9px] font-bold  px-3"
                             >
                               {sub.deliverableStatus?.filter(
                                 (d: any) => d.included,
@@ -344,7 +344,7 @@ export default function FreelancerVaultDetailPage() {
                           </div>
 
                           {sub.notes && (
-                            <p className="text-xs text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100  mb-4 shadow-sm">
+                            <p className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100  mb-4 shadow-sm">
                               &quot;{sub.notes}&quot;
                             </p>
                           )}
@@ -358,7 +358,7 @@ export default function FreelancerVaultDetailPage() {
                                 className="overflow-hidden space-y-4"
                               >
                                 <div className="pt-4 border-t border-slate-100 space-y-3">
-                                  <p className="text-[9px] font-bold tracking-widest text-slate-600">
+                                  <p className="text-[9px] font-bold 00">
                                     Included deliverables:
                                   </p>
                                   <div className="space-y-2">
@@ -379,12 +379,12 @@ export default function FreelancerVaultDetailPage() {
                                             ) : (
                                               <Square className="w-3.5 h-3.5 text-slate-100" />
                                             )}
-                                            <span className="text-[10px] font-bold tracking-widest  text-slate-900">
+                                            <span className=" font-bold 900">
                                               {d.deliverableTitle}
                                             </span>
                                           </div>
                                           {d.included && d.notes && (
-                                            <p className="text-[10px] text-slate-600  ml-5">
+                                            <p className=" text-slate-600  ml-5">
                                               - {d.notes}
                                             </p>
                                           )}
@@ -397,7 +397,7 @@ export default function FreelancerVaultDetailPage() {
                             )}
                           </AnimatePresence>
 
-                          <div className="mt-4 flex items-center justify-end text-[10px] font-bold text-emerald-700 tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="mt-4 flex items-center justify-end  font-bold text-emerald-700 oup-hover:opacity-100 transition-opacity">
                             {isExpanded
                               ? "Click to collapse"
                               : "Click to expand details"}
@@ -431,7 +431,7 @@ export default function FreelancerVaultDetailPage() {
                 <div className="flex flex-col gap-3">
                   {vault.status === VaultStatus.FUNDED && (
                     <Link href={`/freelancer/vault/${vaultId}/submit`}>
-                      <Button className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold h-12 rounded-xl shadow-md shadow-emerald-500/20 active:scale-95 transition-all text-xs ">
+                      <Button className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold h-12 rounded-xl shadow-md shadow-emerald-500/20 active:scale-95 transition-all text-sm ">
                         <Upload className="w-4 h-4 mr-2" />
                         Deliver work
                       </Button>
@@ -444,7 +444,7 @@ export default function FreelancerVaultDetailPage() {
                   >
                     <Button
                       variant="outline"
-                      className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold text-[10px] h-12 rounded-xl transition-all shadow-sm active:scale-95"
+                      className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold  h-12 rounded-xl transition-all shadow-sm active:scale-95"
                     >
                       <Gavel className="w-4 h-4 mr-2 text-amber-600" />
                       Initiate dispute
@@ -468,18 +468,18 @@ export default function FreelancerVaultDetailPage() {
               )}
             >
               <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-3 text-slate-900 font-bold tracking-widest text-sm ">
+                <CardTitle className="flex items-center gap-3 text-slate-900 font-bold 
                   <Gavel className="w-5 h-5 text-amber-600" />
                   Vault support
                 </CardTitle>
-                <CardDescription className="font-bold tracking-widest text-[9px] mt-2 leading-relaxed  text-slate-600">
+                <CardDescription className="font-bold t-2 leading-relaxed  text-slate-600">
                   Initiate a formal case file if contract terms are breached.
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-2">
                 <Button
                   variant="outline"
-                  className="w-full border-slate-200 bg-white text-slate-600 hover:text-slate-900 font-bold tracking-widest text-[10px] h-12 rounded-xl transition-all shadow-sm active:scale-95"
+                  className="w-full border-slate-200 bg-white text-slate-600 hover:text-slate-900 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
                   disabled={!isEligibleForDispute}
                   asChild={isEligibleForDispute}
                 >

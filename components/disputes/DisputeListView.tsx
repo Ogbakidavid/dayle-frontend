@@ -110,7 +110,7 @@ function StatusPill({ status }: StatusPillProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase ",
+        "inline-flex items-center gap-2 rounded-full border px-2.5 py-1  font-bold  uppercase ",
         cfg.pill,
       )}
     >
@@ -168,14 +168,12 @@ function StatCard({
         <CardContent className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-bold tracking-wide text-slate-600 mb-2 ">
-                {title}
-              </p>
+              <p className="text-sm font-bold  text-slate-600 mb-2 ">{title}</p>
               <p className="text-3xl font-bold text-slate-900 tracking-tighter ">
                 {value}
               </p>
               {hint ? (
-                <p className="mt-1 text-[10px] text-slate-600 font-bold tracking-wide  uppercase">
+                <p className="mt-1  text-slate-600 font-bold   uppercase">
                   {hint}
                 </p>
               ) : null}
@@ -307,7 +305,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
               <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
                 Disputes
               </h1>
-              <p className="text-xs md:text-sm font-bold text-slate-600 tracking-wide max-w-2xl leading-relaxed">
+              <p className="text-sm md:text-sm font-bold text-slate-600  max-w-2xl leading-relaxed">
                 {role === "client"
                   ? "Review and manage disputes tied to your vaults."
                   : "Open and track disputes for fair vault resolution."}
@@ -318,7 +316,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
         <motion.div variants={itemVariants}>
           <Link href={`/${role}/disputes/create`} className="w-full sm:w-auto">
-            <Button className="h-11 w-full sm:w-auto bg-amber-500 px-6 font-bold text-white hover:bg-amber-600 tracking-wide shadow-md shadow-amber-500/20 rounded-xl transition-all">
+            <Button className="h-11 w-full sm:w-auto bg-amber-500 px-6 font-bold text-white hover:bg-amber-600  shadow-md shadow-amber-500/20 rounded-xl transition-all">
               <Plus className="mr-2 h-4 w-4" strokeWidth={3} />
               Open dispute
             </Button>
@@ -373,7 +371,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                   className="
                   h-12 w-full rounded-2xl border border-slate-200 bg-white
                   pl-12 pr-12 text-sm text-slate-900 placeholder:text-slate-900
-                  outline-none transition-all font-bold tracking-wide
+                  outline-none transition-all font-bold 
                   focus:border-emerald-500/30 focus:ring-4 focus:ring-emerald-500/5 shadow-sm
                 "
                 />
@@ -394,7 +392,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-11 w-full sm:w-auto border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold tracking-wide transition-all shadow-sm rounded-xl"
+                  className="h-11 w-full sm:w-auto border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold  transition-all shadow-sm rounded-xl"
                   onClick={() =>
                     setSortKey((s) => (s === "newest" ? "oldest" : "newest"))
                   }
@@ -415,7 +413,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                     type="button"
                     onClick={() => setStatusFilter(t.key)}
                     className={cn(
-                      "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold tracking-wide transition-all  uppercase",
+                      "inline-flex items-center gap-2 rounded-full border px-3 py-1.5  font-bold  transition-all  uppercase",
                       active
                         ? "border-amber-200 bg-amber-50 text-amber-700 shadow-sm"
                         : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900",
@@ -430,7 +428,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                     {t.label}
                     <span
                       className={cn(
-                        "ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold ",
+                        "ml-1 rounded-full px-2 py-0.5  font-bold ",
                         active
                           ? "bg-amber-100 text-amber-700"
                           : "bg-slate-100 text-slate-600",
@@ -453,8 +451,8 @@ export function DisputeListView({ role }: DisputeListViewProps) {
             <CardTitle className="flex items-center justify-between gap-3 text-slate-900">
               <div className="flex items-center gap-2">
                 <Gavel className="h-5 w-5 text-amber-600" />
-                <span className="text-lg font-bold tracking-wide ">Cases</span>
-                <span className="text-[11px] font-bold text-slate-600 font-mono tracking-widest mt-0.5">
+                <span className="text-lg font-bold  ">Cases</span>
+                <span className="text-[11px] font-bold text-slate-600 font-mono st mt-0.5">
                   ({filtered.length})
                 </span>
               </div>
@@ -465,7 +463,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
             {loading ? (
               <div className="p-20 text-center">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-amber-500/20 border-t-amber-500" />
-                <p className="mt-4 text-sm font-bold tracking-wide text-slate-600">
+                <p className="mt-4 text-sm font-bold  text-slate-600">
                   Syncing ledger...
                 </p>
               </div>
@@ -475,15 +473,15 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                   <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white shadow-sm">
                     <Gavel className="h-7 w-7 text-slate-200" />
                   </div>
-                  <p className="text-lg font-bold tracking-wide text-slate-900">
+                  <p className="text-lg font-bold  text-slate-900">
                     No records found
                   </p>
-                  <p className="mt-2 text-sm tracking-wide text-slate-600 max-w-xs mx-auto leading-relaxed">
+                  <p className="mt-2 text-sm  text-slate-600 max-w-xs mx-auto leading-relaxed">
                     Try adjusting filters or open a new dispute for resolution.
                   </p>
                   <div className="mt-8 flex justify-center">
                     <Link href={`/${role}/disputes/create`}>
-                      <Button className="h-11 bg-amber-500 px-8 font-bold text-white hover:bg-amber-600 tracking-wide shadow-md shadow-amber-500/20 rounded-xl transition-all">
+                      <Button className="h-11 bg-amber-500 px-8 font-bold text-white hover:bg-amber-600  shadow-md shadow-amber-500/20 rounded-xl transition-all">
                         <Plus className="mr-2 h-4 w-4" strokeWidth={3} />
                         Open dispute
                       </Button>
@@ -512,13 +510,13 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
                             {/* Meta line: ID + status */}
                             <div className="flex flex-wrap items-center gap-3">
-                              <span className="text-xs font-mono font-bold text-slate-600 tracking-wider ">
+                              <span className="text-sm font-mono font-bold text-slate-600 r ">
                                 #{dispute.id.slice(0, 8)}
                               </span>
                               <StatusPill status={dispute.status} />
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] md:text-xs font-bold tracking-wide text-slate-600 uppercase ">
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1  md:text-sm font-bold  text-slate-600 uppercase ">
                               <span className="text-slate-600">
                                 {dispute.vaultId.slice(0, 8)}
                               </span>
@@ -543,7 +541,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                               </p>
                             ) : (
                               <div className="mt-4 inline-block px-3 py-1 rounded-full border border-slate-100 bg-slate-50">
-                                <span className="text-[10px] text-slate-600 font-bold tracking-wide">
+                                <span className=" text-slate-600 font-bold ">
                                   No description file
                                 </span>
                               </div>
@@ -561,7 +559,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                               variant="outline"
                               className="
                                 h-11 w-full lg:w-auto border-slate-200 bg-white
-                                text-slate-600 font-bold tracking-wide transition-all
+                                text-slate-600 font-bold  transition-all
                                 hover:bg-slate-50 hover:text-slate-900
                                 px-6 text-[11px] shadow-sm rounded-xl uppercase 
                               "

@@ -258,7 +258,7 @@ export default function InvitePage() {
                   await api.auth.logout();
                   window.location.reload();
                 }}
-                className="text-[10px] font-bold tracking-wide text-emerald-600 hover:text-emerald-500 transition-colors border border-emerald-500/30 px-2 py-1 rounded"
+                className=" font-bold  text-emerald-600 hover:text-emerald-500 transition-colors border border-emerald-500/30 px-2 py-1 rounded"
               >
                 Switch
               </button>
@@ -272,7 +272,7 @@ export default function InvitePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-bold tracking-wide mb-6"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-bold  mb-6"
           >
             <Briefcase className="w-4 h-4" />
             <span>Project invitation</span>
@@ -293,13 +293,13 @@ export default function InvitePage() {
             </div>
 
             <div className="relative z-10">
-              <h3 className="text-xs font-bold tracking-wide text-slate-900 mb-6 uppercase">
+              <h3 className="text-sm font-bold  text-slate-900 mb-6 uppercase">
                 Safe project summary
               </h3>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-slate-600 text-xs font-bold tracking-wide mb-1">
+                  <p className="text-slate-600 text-sm font-bold  mb-1">
                     Total value
                   </p>
                   <div className="text-3xl font-bold text-slate-900 tracking-tight flex items-baseline gap-1">
@@ -323,12 +323,12 @@ export default function InvitePage() {
                     </div>
                   )}
                   <div>
-                    <p className="text-slate-900 font-bold text-sm tracking-wide">
+                    <p className="text-slate-900 font-bold text-sm ">
                       {vault.isFunded
                         ? "Funds verified & secured"
                         : "Awaiting client funding"}
                     </p>
-                    <p className="text-slate-600 text-xs font-medium mt-0.5">
+                    <p className="text-slate-600 text-sm font-medium mt-0.5">
                       {vault.isFunded
                         ? "Capital is held in a secure escrow account."
                         : "Funds must be secured before work begins."}
@@ -342,10 +342,10 @@ export default function InvitePage() {
                       <Shield className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-emerald-700 font-bold text-[10px] tracking-wide">
+                      <p className="text-emerald-700 font-bold  ">
                         Securely verified escrow
                       </p>
-                      <p className="text-slate-400 text-[10px]  mt-0.5 break-all">
+                      <p className="text-slate-400   mt-0.5 break-all">
                         {vault.vaultAddress}
                       </p>
                     </div>
@@ -374,14 +374,14 @@ export default function InvitePage() {
                 <div className="grid gap-3">
                   <Button
                     onClick={handleLoginRedirect}
-                    className="w-full h-12 bg-emerald-600 text-white hover:bg-emerald-700 font-bold tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
+                    className="w-full h-12 bg-emerald-600 text-white hover:bg-emerald-700 font-bold  rounded-xl transition-all shadow-lg active:scale-95"
                   >
                     Log in
                   </Button>
                   <Button
                     onClick={handleSignupRedirect}
                     variant="outline"
-                    className="w-full h-12 border-slate-200 text-slate-900 hover:bg-slate-50 font-bold tracking-wide rounded-xl transition-all active:scale-95"
+                    className="w-full h-12 border-slate-200 text-slate-900 hover:bg-slate-50 font-bold  rounded-xl transition-all active:scale-95"
                   >
                     Create account
                   </Button>
@@ -405,7 +405,7 @@ export default function InvitePage() {
                   <Button
                     onClick={() => router.push("/client")}
                     variant="outline"
-                    className="w-full h-12 border-slate-200 hover:bg-slate-50 text-slate-900 font-bold tracking-wide rounded-xl transition-all"
+                    className="w-full h-12 border-slate-200 hover:bg-slate-50 text-slate-900 font-bold  rounded-xl transition-all"
                   >
                     Return to dashboard
                   </Button>
@@ -415,7 +415,7 @@ export default function InvitePage() {
                       window.location.reload();
                     }}
                     variant="ghost"
-                    className="w-full h-10 text-slate-400 hover:text-slate-600 font-bold text-[10px] tracking-widest"
+                    className="w-full h-10 text-slate-400 hover:text-slate-600 font-bold  st"
                   >
                     Switch account
                   </Button>
@@ -448,7 +448,7 @@ export default function InvitePage() {
                     window.location.reload();
                   }}
                   variant="outline"
-                  className="w-full h-12 border-slate-200 hover:bg-slate-50 text-slate-900 font-bold tracking-wide rounded-xl transition-all shadow-lg active:scale-95"
+                  className="w-full h-12 border-slate-200 hover:bg-slate-50 text-slate-900 font-bold  rounded-xl transition-all shadow-lg active:scale-95"
                 >
                   Login with different account
                 </Button>
@@ -470,7 +470,7 @@ export default function InvitePage() {
                   <Button
                     onClick={handleAccept}
                     disabled={processing}
-                    className="w-full h-14 bg-emerald-600 text-white hover:bg-emerald-700 font-bold tracking-wide rounded-xl shadow-lg shadow-emerald-600/20"
+                    className="w-full h-14 bg-emerald-600 text-white hover:bg-emerald-700 font-bold  rounded-xl shadow-lg shadow-emerald-600/20"
                   >
                     {processing ? <DotLoader size="md" /> : "Accept invitation"}
                   </Button>
@@ -479,7 +479,7 @@ export default function InvitePage() {
                     onClick={() => setShowDeclineModal(true)}
                     disabled={processing}
                     variant="ghost"
-                    className="w-full h-12 text-slate-400 hover:text-red-600 hover:bg-red-50 font-bold tracking-wide rounded-xl"
+                    className="w-full h-12 text-slate-400 hover:text-red-600 hover:bg-red-50 font-bold  rounded-xl"
                   >
                     Decline
                   </Button>
@@ -489,7 +489,7 @@ export default function InvitePage() {
           </div>
         </div>
 
-        <p className="mt-12 text-slate-300 text-xs tracking-widest font-bold flex items-center gap-2">
+        <p className="mt-12 text-slate-300 text-sm st font-bold flex items-center gap-2">
           <Shield className="w-3 h-3" />
           Secured by Dayle system
         </p>

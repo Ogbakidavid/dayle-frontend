@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ethers } from "ethers";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -59,6 +60,15 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
+// Helper: format a raw USDC amount stored in 6-decimal base units
+const formatAmount = (raw: bigint | number | string): number => {
+  try {
+    return parseFloat(ethers.formatUnits(BigInt(raw), 6));
+  } catch {
+    return 0;
+  }
+};
+
 export default function LedgerPageContent() {
   const { balance, transactions, loading, withdraw } = useLedger();
   const [isWithdrawing, setIsWithdrawing] = useState(false);
@@ -110,7 +120,7 @@ export default function LedgerPageContent() {
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter  flex items-center gap-3">
               Financial Center
             </h1>
-            <p className="text-xs md:text-sm font-bold text-slate-600 tracking-wide">
+            <p className="text-sm md:text-sm font-bold text-slate-600 ">
               Manage your vault earnings and global settlements
             </p>
           </motion.div>
@@ -120,7 +130,7 @@ export default function LedgerPageContent() {
           >
             <Button
               variant="outline"
-              className="w-full md:w-auto gap-2 font-bold h-11 px-6 border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-600 shrink-0 tracking-wide shadow-sm"
+              className="w-full md:w-auto gap-2 font-bold h-11 px-6 border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-600 shrink-0  shadow-sm"
             >
               <Download size={16} />
               Export Ledger
@@ -144,14 +154,14 @@ export default function LedgerPageContent() {
             <motion.div variants={itemVariants}>
               <Card className="bg-white border-slate-200 overflow-hidden sticky top-32 rounded-sm shadow-xl">
                 <div className="bg-emerald-50 border-b border-emerald-100 py-4 px-6">
-                  <h3 className="text-emerald-700 font-bold tracking-wide text-sm">
+                  <h3 className="text-emerald-700 font-bold  text-sm">
                     Instant withdrawal
                   </h3>
                 </div>
                 <CardContent className="p-8 space-y-8">
                   <form onSubmit={handleWithdraw} className="space-y-8">
                     <div>
-                      <label className="text-sm font-bold text-slate-900 tracking-wide mb-4 block">
+                      <label className="text-sm font-bold text-slate-900  mb-4 block">
                         Amount (USD)
                       </label>
                       <div className="relative group">
@@ -168,10 +178,10 @@ export default function LedgerPageContent() {
                           step="0.01"
                         />
                       </div>
-                      <div className="mt-4 flex items-center justify-between text-sm font-bold tracking-wide">
+                      <div className="mt-4 flex items-center justify-between text-sm font-bold ">
                         <span className="text-slate-600">Available Limit</span>
                         <span className="text-emerald-600">
-                          ${balance?.available?.toLocaleString() || "0.00"}
+                          ${parseFloat(balance?.formattedAvailable || balance?.available || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
                     </div>
@@ -180,7 +190,7 @@ export default function LedgerPageContent() {
                       <div className="flex gap-4">
                         <Zap className="w-5 h-5 text-emerald-600 shrink-0" />
                         <div>
-                          <p className="text-sm font-bold text-emerald-700 tracking-wide mb-1">
+                          <p className="text-sm font-bold text-emerald-700  mb-1">
                             Turbo settlement
                           </p>
                           <p className="text-sm font-bold text-slate-600 leading-relaxed">
@@ -193,11 +203,11 @@ export default function LedgerPageContent() {
 
                     <Button
                       type="submit"
-                      className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm tracking-wide rounded-sm transition-all shadow-md shadow-emerald-600/10 active:scale-[0.98]"
+                      className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm  rounded-sm transition-all shadow-md shadow-emerald-600/10 active:scale-[0.98]"
                       disabled={
                         !withdrawAmount ||
                         isWithdrawing ||
-                        parseFloat(withdrawAmount) > (balance?.available || 0)
+                        parseFloat(withdrawAmount) > parseFloat(balance?.formattedAvailable || balance?.available || "0")
                       }
                     >
                       {isWithdrawing ? "Processing..." : "Execute Settlement"}
@@ -234,13 +244,13 @@ export default function LedgerPageContent() {
               <table className="w-full border-collapse">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="px-4 md:px-6 py-5 text-left text-[11px] font-bold text-slate-600 tracking-wide uppercase">
+                    <th className="px-4 md:px-6 py-5 text-left text-[11px] font-bold text-slate-600  uppercase">
                       Transaction
                     </th>
-                    <th className="hidden sm:table-cell px-6 py-5 text-left text-[11px] font-bold text-slate-600 tracking-wide uppercase">
+                    <th className="hidden sm:table-cell px-6 py-5 text-left text-[11px] font-bold text-slate-600  uppercase">
                       Status
                     </th>
-                    <th className="px-4 md:px-6 py-5 text-right text-[11px] font-bold text-slate-600 tracking-wide uppercase">
+                    <th className="px-4 md:px-6 py-5 text-right text-[11px] font-bold text-slate-600  uppercase">
                       Amount
                     </th>
                   </tr>
@@ -283,10 +293,10 @@ export default function LedgerPageContent() {
                               )}
                             </div>
                             <div className="min-w-0">
-                              <div className="font-bold text-slate-900 text-sm tracking-wide group-hover:text-emerald-700 transition-colors truncate">
+                              <div className="font-bold text-slate-900 text-sm  group-hover:text-emerald-700 transition-colors truncate">
                                 {tx.description}
                               </div>
-                              <div className="text-[10px] md:text-sm text-slate-600 font-bold tracking-wide mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                              <div className=" md:text-sm text-slate-600 font-bold  mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                                 {new Date(tx.date).toLocaleDateString()}
                                 <span className="hidden md:block w-1 h-1 rounded-full bg-slate-200" />
                                 <span className="truncate">
@@ -302,7 +312,7 @@ export default function LedgerPageContent() {
                         <td className="hidden sm:table-cell px-6 py-6">
                           <span
                             className={cn(
-                              "px-2.5 py-1 text-[11px] font-bold tracking-wide rounded-sm border",
+                              "px-2.5 py-1 text-[11px] font-bold  rounded-sm border",
                               tx.status === TransactionStatus.CONFIRMED
                                 ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                 : tx.status === TransactionStatus.PENDING
@@ -323,7 +333,7 @@ export default function LedgerPageContent() {
                             )}
                           >
                             {tx.amount < 0 ? "-" : "+"}$
-                            {Math.abs(tx.amount).toLocaleString()}
+                            {Math.abs(formatAmount(tx.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </div>
                         </td>
                       </tr>
@@ -335,7 +345,7 @@ export default function LedgerPageContent() {
               {/* Pagination Controls */}
               {totalPages > 1 && (
                 <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
-                  <div className="text-sm font-bold text-slate-600 tracking-wide">
+                  <div className="text-sm font-bold text-slate-600 ">
                     Page {currentPage} of {totalPages}
                   </div>
                   <div className="flex items-center gap-2">

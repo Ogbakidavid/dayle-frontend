@@ -206,7 +206,7 @@ export default function CoverageByRegion() {
                         <div className="text-slate-900 font-bold tracking-tight text-xl">
                           {activeCountry.country}
                         </div>
-                        <div className="text-[11px] text-slate-500 font-semibold tracking-widest">
+                        <div className="text-[11px] text-slate-500 font-semibold st">
                           {activeCountry.region} • {activeCountry.code}
                         </div>
                       </div>
@@ -214,7 +214,7 @@ export default function CoverageByRegion() {
                   </div>
 
                   <div className="mt-8">
-                    <div className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                    <div className=" font-bold st text-slate-500 uppercase">
                       Payout methods
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -281,7 +281,7 @@ function RegionAccordion({
           <div className="text-slate-900 font-bold tracking-tight text-xl">
             {region}
           </div>
-          <div className="text-[11px] text-slate-600 font-semibold tracking-widest mt-1">
+          <div className="text-[11px] text-slate-600 font-semibold st mt-1">
             {countries.length} countries
           </div>
         </div>
@@ -322,7 +322,7 @@ function RegionAccordion({
                         </div>
                       </div>
                       <div
-                        className={`text-[11px] font-bold tracking-widest ${active ? "text-emerald-100" : "text-slate-400"}`}
+                        className={`text-[11px] font-bold st ${active ? "text-emerald-100" : "text-slate-400"}`}
                       >
                         {c.code}
                       </div>
@@ -344,9 +344,7 @@ function MiniStat({ label, value }: { label: string; value: number }) {
       <div className="text-slate-900 text-2xl font-bold tracking-tight">
         {value}
       </div>
-      <div className="text-[10px] text-slate-900 font-bold tracking-widest mt-1">
-        {label}
-      </div>
+      <div className=" text-slate-900 font-bold st mt-1">{label}</div>
     </div>
   );
 }
@@ -354,9 +352,7 @@ function MiniStat({ label, value }: { label: string; value: number }) {
 function DetailTile({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-      <div className="text-[10px] text-slate-500 font-bold tracking-widest uppercase">
-        {label}
-      </div>
+      <div className=" text-slate-500 font-bold st uppercase">{label}</div>
       <div className="mt-1 text-slate-900 font-bold tracking-tight">
         {value}
       </div>

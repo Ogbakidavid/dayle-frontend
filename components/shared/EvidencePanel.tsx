@@ -81,7 +81,7 @@ function SectionHeader({ icon: Icon, title, subtitle }: SectionHeaderProps) {
             {title}
           </p>
           {subtitle ? (
-            <p className="mt-0.5 text-xs text-white/50 font-bold tracking-normal">
+            <p className="mt-0.5 text-sm text-white/50 font-bold tracking-normal">
               {subtitle}
             </p>
           ) : null}
@@ -252,12 +252,12 @@ export function EvidencePanel({ vault, evidence }: EvidencePanelProps) {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-bold tracking-widest text-white/50 flex items-center gap-1">
+              <span className=" font-bold st text-white/50 flex items-center gap-1">
                 <Cpu className="h-3 w-3" /> AI verification engine
               </span>
               <span
                 className={cx(
-                  "ml-auto px-2 py-0.5 rounded text-[10px] font-bold",
+                  "ml-auto px-2 py-0.5 rounded  font-bold",
                   vault.verification?.result === "FAIL"
                     ? "bg-red-500 text-white"
                     : vault.verification?.result === "FLAGGED"
@@ -275,7 +275,7 @@ export function EvidencePanel({ vault, evidence }: EvidencePanelProps) {
                   ? "Manual Review Recommended"
                   : "Automated Compliance Passed"}
             </p>
-            <p className="text-xs text-white/60 leading-relaxed font-bold tracking-normal">
+            <p className="text-sm text-white/60 leading-relaxed font-bold tracking-normal">
               {vault.verification?.result === "FAIL"
                 ? "Critical discrepancies found in submitted deliverables vs contract requirements."
                 : vault.verification?.result === "FLAGGED"

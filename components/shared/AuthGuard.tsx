@@ -88,10 +88,10 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           <DotLoader size="lg" className="relative z-10" />
         </div>
         <div className="text-center space-y-1">
-          <p className="text-xs font-bold text-emerald-600 tracking-[0.2em] animate-pulse">
+          <p className="text-sm font-bold text-emerald-600 tracking-[0.2em] animate-pulse">
             Authenticating
           </p>
-          <p className="text-[10px] font-medium text-slate-600 tracking-wider">
+          <p className=" font-medium text-slate-600 r">
             Establishing secure session
           </p>
         </div>

@@ -81,19 +81,19 @@ export default function CheckoutSelectionPage() {
             <div className="space-y-10">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em]  leading-none uppercase">
+                  <p className=" font-bold text-slate-600 tracking-[0.4em]  leading-none uppercase">
                     Total settlement
                   </p>
                   <div className="flex bg-slate-200/50 p-1 rounded-lg">
                     <button
                       onClick={() => setCurrency("USD")}
-                      className={`px-3 py-1 text-[10px] font-bold tracking-wider rounded-md transition-all uppercase ${currency === "USD" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                      className={`px-3 py-1  font-bold r rounded-md transition-all uppercase ${currency === "USD" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                     >
                       USD
                     </button>
                     <button
                       onClick={() => setCurrency("NGN")}
-                      className={`px-3 py-1 text-[10px] font-bold tracking-wider rounded-md transition-all uppercase ${currency === "NGN" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                      className={`px-3 py-1  font-bold r rounded-md transition-all uppercase ${currency === "NGN" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                     >
                       NGN
                     </button>
@@ -114,13 +114,13 @@ export default function CheckoutSelectionPage() {
               </div>
 
               <div className="pt-10 border-t border-slate-200 space-y-6">
-                <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-slate-900 uppercase">
+                <div className="flex justify-between items-center  font-bold tracking-[0.2em] text-slate-900 uppercase">
                   <span className="text-slate-600 ">Project ID</span>
                   <span className="text-emerald-600  tracking-normal text-[9px]">
                     VAULT-{vault?.id.slice(0, 8).toUpperCase()}
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-slate-900 uppercase">
+                <div className="flex justify-between items-center  font-bold tracking-[0.2em] text-slate-900 uppercase">
                   <span className="text-slate-600 ">Network fee</span>
                   <span className="text-emerald-600 ">Sponsored</span>
                 </div>
@@ -131,10 +131,10 @@ export default function CheckoutSelectionPage() {
           <div className="p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
             <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="flex items-center gap-3 text-emerald-600 text-[10px] font-bold tracking-[0.3em] mb-3  uppercase">
+              <div className="flex items-center gap-3 text-emerald-600  font-bold tracking-[0.3em] mb-3  uppercase">
                 <ShieldCheck className="w-4 h-4" /> Secure checkout
               </div>
-              <p className="text-[10px] text-slate-600 leading-relaxed font-bold tracking-widest mt-2  uppercase">
+              <p className=" text-slate-600 leading-relaxed font-bold st mt-2  uppercase">
                 Select your preferred method to complete the escrow deposit.
               </p>
             </div>
@@ -153,7 +153,7 @@ export default function CheckoutSelectionPage() {
                 <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter ">
                   Authorize deposit
                 </h2>
-                <p className="text-xs font-bold text-slate-600 tracking-[0.3em] uppercase">
+                <p className="text-sm font-bold text-slate-600 tracking-[0.3em] uppercase">
                   Select your preferred method
                 </p>
               </div>
@@ -167,7 +167,7 @@ export default function CheckoutSelectionPage() {
                     <h3 className="text-2xl font-bold text-slate-900  tracking-tighter">
                       Identity Verification Required
                     </h3>
-                    <p className="text-xs text-slate-600 font-bold tracking-wide  leading-relaxed px-4">
+                    <p className="text-sm text-slate-600 font-bold   leading-relaxed px-4">
                       To comply with security and regulatory standards, you need
                       to verify your identity before you can deposit funds into
                       escrow.
@@ -175,7 +175,7 @@ export default function CheckoutSelectionPage() {
                   </div>
                   <button
                     onClick={() => router.push("/client/settings?tab=kyc")}
-                    className="w-full h-16 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-[0.2em] "
+                    className="w-full h-16 bg-slate-900 hover:bg-black text-white font-bold text-sm rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-[0.2em] "
                   >
                     Verify Identity Now
                   </button>
@@ -200,7 +200,7 @@ export default function CheckoutSelectionPage() {
                       <p className="text-slate-900 font-bold text-xl tracking-tight  group-hover:text-emerald-950 transition-colors">
                         Credit / Debit Card
                       </p>
-                      <p className="text-[10px] font-bold text-slate-400 tracking-widest group-hover:text-emerald-600 transition-colors uppercase  mt-1">
+                      <p className=" font-bold text-slate-400 st group-hover:text-emerald-600 transition-colors uppercase  mt-1">
                         Instant payment via Partna Link
                       </p>
                     </div>
@@ -225,7 +225,7 @@ export default function CheckoutSelectionPage() {
                       <p className="text-slate-900 font-bold text-xl tracking-tight  group-hover:text-blue-950 transition-colors">
                         Bank Transfer
                       </p>
-                      <p className="text-[10px] font-bold text-slate-400 tracking-widest group-hover:text-blue-600 transition-colors uppercase  mt-1">
+                      <p className=" font-bold text-slate-400 st group-hover:text-blue-600 transition-colors uppercase  mt-1">
                         Direct transfer to virtual account
                       </p>
                     </div>
