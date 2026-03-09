@@ -147,10 +147,7 @@ export default function CoverageByRegion() {
             </div>
             <h2 className="mt-3 text-4xl md:text-6xl font-bold text-slate-900 tracking-tight leading-[0.95]">
               Corridors by region.
-              <span className="text-emerald-600 italic">
-                {" "}
-                Clear and verifiable.
-              </span>
+              <span className="text-emerald-600 "> Clear and verifiable.</span>
             </h2>
             <p className="mt-4 text-slate-600 text-sm md:text-base leading-relaxed max-w-2xl">
               Browse corridor coverage by region. Select a country to view

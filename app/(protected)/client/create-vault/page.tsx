@@ -240,7 +240,7 @@ export default function CreateVaultPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold tracking-[0.2em] mb-4">
               <Lock className="w-3 h-3" /> Secure project account
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter italic">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter ">
               New <span className="text-emerald-500">project</span>
             </h1>
           </div>
@@ -365,7 +365,7 @@ export default function CreateVaultPage() {
                               value={budgetAmount}
                               onChange={(e) => setBudgetAmount(e.target.value)}
                               placeholder="0.00"
-                              className="bg-muted! border-white/10! h-14 pl-12 text-xl italic text-slate-900 font-medium focus:border-emerald-500/50 rounded-xl"
+                              className="bg-muted! border-white/10! h-14 pl-12 text-xl  text-slate-900 font-medium focus:border-emerald-500/50 rounded-xl"
                             />
                           </div>
                         </div>
@@ -440,7 +440,7 @@ export default function CreateVaultPage() {
                                   <div className="flex items-start gap-3">
                                     <div className="flex flex-col items-center gap-1 shrink-0">
                                       <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                        <span className="text-[10px] font-bold text-emerald-500 italic">
+                                        <span className="text-[10px] font-bold text-emerald-500 ">
                                           {String(index + 1).padStart(2, "0")}
                                         </span>
                                       </div>
@@ -491,7 +491,7 @@ export default function CreateVaultPage() {
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl rotate-12 flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
                           <Users className="w-10 h-10 text-emerald-500 -rotate-12" />
                         </div>
-                        <h2 className="text-2xl font-bold italic tracking-tighter">
+                        <h2 className="text-2xl font-bold  tracking-tighter">
                           Assign freelancer
                         </h2>
                         <p className="text-slate-900 text-xs font-bold tracking-widest">
@@ -527,7 +527,7 @@ export default function CreateVaultPage() {
                   {step === 3 && (
                     <div className="space-y-8">
                       <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold tracking-tighter italic">
+                        <h2 className="text-xl font-bold tracking-tighter ">
                           Confirm project
                         </h2>
                         <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
@@ -543,7 +543,7 @@ export default function CreateVaultPage() {
                           <Label className="text-[12px] font-bold text-slate-900 tracking-widest block mb-1">
                             Total value
                           </Label>
-                          <p className="text-2xl font-bold text-emerald-500 italic">
+                          <p className="text-2xl font-bold text-emerald-500 ">
                             ${budget.toLocaleString()}
                           </p>
                         </div>
@@ -560,7 +560,7 @@ export default function CreateVaultPage() {
                       {/* Single Deliverable Info */}
                       <div className="bg-black/80 border border-white/5 p-4 rounded-xl flex items-center justify-between group">
                         <div className="flex items-center gap-4">
-                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-sm text-white italic border border-white/5">
+                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-sm text-white  border border-white/5">
                             01
                           </div>
                           <div>
@@ -662,13 +662,13 @@ export default function CreateVaultPage() {
           {/* Sidebar Info */}
           <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-12">
             <div className="bg-white/2 border border-white/5 rounded-3xl p-6">
-              <h3 className="text-sm font-bold tracking-[0.2em] text-slate-900 mb-6 italic">
+              <h3 className="text-sm font-bold tracking-[0.2em] text-slate-900 mb-6 ">
                 Project configuration
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
                   <span className="text-slate-900 font-bold">Total value</span>
-                  <span className="text-2xl text-slate-900 font-bold italic">
+                  <span className="text-2xl text-slate-900 font-bold ">
                     ${budget.toLocaleString()}
                   </span>
                 </div>

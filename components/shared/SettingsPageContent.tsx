@@ -388,7 +388,7 @@ export default function SettingsPageContent({ role = "client" }) {
           {/* Sidebar: Clean & Floating */}
           <aside className="md:w-64 shrink-0">
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-slate-900 tracking-tighter italic">
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tighter ">
                 Settings
               </h1>
               <p className="text-sm font-bold text-slate-600 tracking-wide mt-2">
@@ -481,7 +481,7 @@ export default function SettingsPageContent({ role = "client" }) {
                     />
                   </div>
                   <div className="pb-1">
-                    <h3 className="text-lg font-bold text-slate-900 tracking-tight italic">
+                    <h3 className="text-lg font-bold text-slate-900 tracking-tight ">
                       {isClient ? "Profile picture" : "Freelancer profile"}
                     </h3>
                     <p className="text-sm font-bold text-slate-600 tracking-wide mt-1">
@@ -493,14 +493,14 @@ export default function SettingsPageContent({ role = "client" }) {
                 {/* Success/Error Messages */}
                 {profileSuccess && (
                   <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
-                    <p className="text-sm text-emerald-700 font-bold italic">
+                    <p className="text-sm text-emerald-700 font-bold ">
                       {profileSuccess}
                     </p>
                   </div>
                 )}
                 {profileError && (
                   <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
-                    <p className="text-sm text-red-700 font-bold italic">
+                    <p className="text-sm text-red-700 font-bold ">
                       {profileError}
                     </p>
                   </div>
@@ -546,7 +546,7 @@ export default function SettingsPageContent({ role = "client" }) {
                   <Button
                     onClick={handleSaveProfile}
                     disabled={savingProfile}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 rounded-lg transition-all shadow-md shadow-emerald-600/10 disabled:opacity-50 disabled:cursor-not-allowed italic"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 rounded-lg transition-all shadow-md shadow-emerald-600/10 disabled:opacity-50 disabled:cursor-not-allowed "
                   >
                     {savingProfile ? "Saving..." : "Save changes"}
                   </Button>
@@ -558,7 +558,7 @@ export default function SettingsPageContent({ role = "client" }) {
             {activeTab === "payment" && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-bold text-slate-900 tracking-wide italic">
+                  <h3 className="text-sm font-bold text-slate-900 tracking-wide ">
                     {isClient ? "Cards on file" : "Settlement methods"}
                   </h3>
                   <Button
@@ -581,7 +581,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-bold text-slate-900 tracking-tight italic">
+                            <p className="text-sm font-bold text-slate-900 tracking-tight ">
                               {isClient && "last4" in item
                                 ? `•••• ${item.last4}`
                                 : "label" in item
@@ -624,7 +624,7 @@ export default function SettingsPageContent({ role = "client" }) {
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 {/* Header */}
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 tracking-wide mb-1 italic">
+                  <h3 className="text-sm font-bold text-slate-900 tracking-wide mb-1 ">
                     Notification channels
                   </h3>
                   <p className="text-sm text-slate-600 leading-relaxed">
@@ -635,14 +635,14 @@ export default function SettingsPageContent({ role = "client" }) {
                 {/* Success/Error Messages */}
                 {prefsSuccess && (
                   <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
-                    <p className="text-sm text-emerald-700 font-bold italic">
+                    <p className="text-sm text-emerald-700 font-bold ">
                       {prefsSuccess}
                     </p>
                   </div>
                 )}
                 {prefsError && (
                   <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
-                    <p className="text-sm text-red-700 font-bold italic">
+                    <p className="text-sm text-red-700 font-bold ">
                       {prefsError}
                     </p>
                   </div>
@@ -662,7 +662,7 @@ export default function SettingsPageContent({ role = "client" }) {
                             <Bell className="w-5 h-5 text-emerald-600" />
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-slate-900 tracking-tight italic">
+                            <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
                               In-app notifications
                             </h4>
                             <p className="text-sm text-slate-600 leading-relaxed max-w-md">
@@ -682,7 +682,7 @@ export default function SettingsPageContent({ role = "client" }) {
                             <Mail className="w-5 h-5 text-blue-600" />
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-slate-900 tracking-tight italic">
+                            <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
                               Email notifications
                             </h4>
                             <p className="text-sm text-slate-600 leading-relaxed max-w-md">
@@ -708,7 +708,7 @@ export default function SettingsPageContent({ role = "client" }) {
                             <Shield className="w-5 h-5 text-purple-600" />
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-slate-900 tracking-tight italic">
+                            <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
                               Transaction security (MFA)
                             </h4>
                             <p className="text-sm text-slate-600 leading-relaxed max-w-md">
@@ -718,7 +718,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         </div>
                         <Button
                           onClick={() => showMfaEnrollmentModal()}
-                          className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 text-sm rounded-lg shadow-md shadow-purple-600/10 italic"
+                          className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 text-sm rounded-lg shadow-md shadow-purple-600/10 "
                         >
                           Manage MFA
                         </Button>
@@ -731,7 +731,7 @@ export default function SettingsPageContent({ role = "client" }) {
                             <MessageSquare className="w-5 h-5 text-sky-600" />
                           </div>
                           <div className="space-y-2 flex-1">
-                            <h4 className="text-sm font-bold text-slate-900 tracking-tight italic">
+                            <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
                               Telegram
                             </h4>
                             <p className="text-sm text-slate-600 leading-relaxed max-w-md">
@@ -739,10 +739,10 @@ export default function SettingsPageContent({ role = "client" }) {
                             </p>
                             {notificationPrefs.telegram.connected && (
                               <div className="flex items-center gap-2">
-                                <span className="text-xs px-2 py-1 rounded-full font-bold tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-100 italic">
+                                <span className="text-xs px-2 py-1 rounded-full font-bold tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-100 ">
                                   Connected
                                 </span>
-                                <span className="text-xs text-slate-600 font-bold italic">
+                                <span className="text-xs text-slate-600 font-bold ">
                                   {notificationPrefs.telegram.username}
                                 </span>
                               </div>
@@ -754,7 +754,7 @@ export default function SettingsPageContent({ role = "client" }) {
                             <Button
                               onClick={handleTelegramConnect}
                               disabled={loadingTelegram}
-                              className="bg-sky-600 hover:bg-sky-700 text-white font-bold px-4 text-sm rounded-lg shadow-md shadow-sky-600/10 italic"
+                              className="bg-sky-600 hover:bg-sky-700 text-white font-bold px-4 text-sm rounded-lg shadow-md shadow-sky-600/10 "
                             >
                               {loadingTelegram ? "Connecting..." : "Connect"}
                             </Button>
@@ -763,7 +763,7 @@ export default function SettingsPageContent({ role = "client" }) {
                               onClick={handleTelegramDisconnect}
                               disabled={loadingTelegram}
                               variant="outline"
-                              className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-bold px-4 text-sm italic"
+                              className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-bold px-4 text-sm "
                             >
                               {loadingTelegram
                                 ? "Disconnecting..."
@@ -781,7 +781,7 @@ export default function SettingsPageContent({ role = "client" }) {
                               <Phone className="w-5 h-5 text-green-600" />
                             </div>
                             <div className="space-y-2 flex-1">
-                              <h4 className="text-sm font-bold text-slate-900 tracking-tight italic">
+                              <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
                                 WhatsApp
                               </h4>
                               <p className="text-sm text-slate-600 leading-relaxed max-w-md">
@@ -789,10 +789,10 @@ export default function SettingsPageContent({ role = "client" }) {
                               </p>
                               {notificationPrefs.whatsapp.phoneVerified && (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs px-2 py-1 rounded-full font-bold tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-100 italic">
+                                  <span className="text-xs px-2 py-1 rounded-full font-bold tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-100 ">
                                     Verified
                                   </span>
-                                  <span className="text-xs text-slate-600 font-bold italic">
+                                  <span className="text-xs text-slate-600 font-bold ">
                                     {notificationPrefs.whatsapp.phoneE164}
                                   </span>
                                 </div>
@@ -803,7 +803,7 @@ export default function SettingsPageContent({ role = "client" }) {
                             {!notificationPrefs.whatsapp.phoneVerified ? (
                               <Button
                                 onClick={() => setShowWhatsAppFlow(true)}
-                                className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 text-sm rounded-lg shadow-md shadow-green-600/10 italic"
+                                className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 text-sm rounded-lg shadow-md shadow-green-600/10 "
                               >
                                 {loadingWhatsApp ? "Verifying..." : "Verify"}
                               </Button>
@@ -812,7 +812,7 @@ export default function SettingsPageContent({ role = "client" }) {
                                 onClick={handleWhatsAppDisable}
                                 disabled={loadingWhatsApp}
                                 variant="outline"
-                                className="border-slate-200 text-slate-600 hover:text-red-600 hover:bg-red-50 font-bold px-4 text-sm italic"
+                                className="border-slate-200 text-slate-600 hover:text-red-600 hover:bg-red-50 font-bold px-4 text-sm "
                               >
                                 {loadingWhatsApp ? "Disabling..." : "Disable"}
                               </Button>
@@ -826,12 +826,12 @@ export default function SettingsPageContent({ role = "client" }) {
                         <div className="flex items-start gap-3">
                           <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                           <div>
-                            <h5 className="text-sm font-bold text-slate-900 mb-1 italic">
+                            <h5 className="text-sm font-bold text-slate-900 mb-1 ">
                               Quiet Hours
                             </h5>
                             <p className="text-xs text-slate-600 leading-relaxed font-bold">
                               Customize notification schedules and quiet hours.{" "}
-                              <span className="text-amber-600 font-bold italic">
+                              <span className="text-amber-600 font-bold ">
                                 Coming in v2
                               </span>
                             </p>
@@ -851,7 +851,7 @@ export default function SettingsPageContent({ role = "client" }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-3">
-                      <h3 className="text-sm font-bold text-slate-900 tracking-wide italic">
+                      <h3 className="text-sm font-bold text-slate-900 tracking-wide ">
                         Notifications
                       </h3>
                       {unreadCount > 0 && (
@@ -871,7 +871,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       onClick={markAllAsRead}
                       variant="ghost"
                       size="sm"
-                      className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 font-bold tracking-wide text-xs italic"
+                      className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 font-bold tracking-wide text-xs "
                     >
                       Mark all read
                     </Button>
@@ -889,7 +889,7 @@ export default function SettingsPageContent({ role = "client" }) {
                     }}
                     variant="outline"
                     size="sm"
-                    className="ml-2 text-slate-600 hover:text-slate-900 border-slate-200 bg-white hover:bg-slate-50 font-bold tracking-wide text-xs shadow-sm italic"
+                    className="ml-2 text-slate-600 hover:text-slate-900 border-slate-200 bg-white hover:bg-slate-50 font-bold tracking-wide text-xs shadow-sm "
                   >
                     Send test
                   </Button>
@@ -953,7 +953,7 @@ export default function SettingsPageContent({ role = "client" }) {
                                 <div className="flex items-center gap-2">
                                   <p
                                     className={cn(
-                                      "text-sm font-bold tracking-tight italic",
+                                      "text-sm font-bold tracking-tight ",
                                       notification.read
                                         ? "text-slate-600"
                                         : "text-slate-900",
@@ -975,7 +975,7 @@ export default function SettingsPageContent({ role = "client" }) {
                                 >
                                   {notification.message}
                                 </p>
-                                <p className="text-[10px] text-slate-600 mt-2 font-bold tracking-wide italic">
+                                <p className="text-[10px] text-slate-600 mt-2 font-bold tracking-wide ">
                                   {getRelativeTime(notification.timestamp)}
                                 </p>
                               </div>
@@ -987,7 +987,7 @@ export default function SettingsPageContent({ role = "client" }) {
                                   <Button
                                     size="sm"
                                     className={cn(
-                                      "font-bold tracking-wide text-[10px] h-7 px-3 shrink-0 italic",
+                                      "font-bold tracking-wide text-[10px] h-7 px-3 shrink-0 ",
                                       color === "amber" &&
                                         "bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 shadow-sm",
                                     )}
@@ -1007,7 +1007,7 @@ export default function SettingsPageContent({ role = "client" }) {
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-                    <p className="text-xs text-slate-600 font-bold tracking-wide italic">
+                    <p className="text-xs text-slate-600 font-bold tracking-wide ">
                       Showing {(currentPage - 1) * itemsPerPage + 1}-
                       {Math.min(
                         currentPage * itemsPerPage,
@@ -1023,7 +1023,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         disabled={currentPage === 1}
                         variant="outline"
                         size="sm"
-                        className="h-8 px-3 text-xs border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-wide disabled:opacity-30 shadow-sm italic"
+                        className="h-8 px-3 text-xs border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-wide disabled:opacity-30 shadow-sm "
                       >
                         Previous
                       </Button>
@@ -1053,7 +1053,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         disabled={currentPage === totalPages}
                         variant="outline"
                         size="sm"
-                        className="h-8 px-3 text-xs border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-wide disabled:opacity-30 shadow-sm italic"
+                        className="h-8 px-3 text-xs border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-wide disabled:opacity-30 shadow-sm "
                       >
                         Next
                       </Button>
@@ -1077,7 +1077,7 @@ export default function SettingsPageContent({ role = "client" }) {
               <X className="w-4 h-4 text-slate-600 hover:text-slate-900" />
             </button>
 
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-6 italic">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-6 ">
               Add WhatsApp number
             </h2>
 
@@ -1095,7 +1095,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       onChange={(e) => setWhatsappPhone(e.target.value)}
                       className="bg-white border-slate-200 text-slate-900 focus:ring-1 focus:ring-green-500/30 h-11 shadow-sm"
                     />
-                    <p className="text-xs text-slate-600 tracking-wide font-bold italic">
+                    <p className="text-xs text-slate-600 tracking-wide font-bold ">
                       Include country code (e.g., +1 for US)
                     </p>
                   </div>
@@ -1110,14 +1110,14 @@ export default function SettingsPageContent({ role = "client" }) {
                     <Button
                       onClick={closeWhatsAppFlow}
                       variant="outline"
-                      className="flex-1 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold tracking-wide italic"
+                      className="flex-1 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold tracking-wide "
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={handleWhatsAppStartVerification}
                       disabled={loadingWhatsApp || !whatsappPhone}
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold tracking-wide shadow-md shadow-green-600/10 italic"
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold tracking-wide shadow-md shadow-green-600/10 "
                     >
                       {loadingWhatsApp ? "Sending..." : "Send code"}
                     </Button>
@@ -1139,10 +1139,10 @@ export default function SettingsPageContent({ role = "client" }) {
                             e.target.value.replace(/\D/g, "").slice(0, 6),
                           )
                         }
-                        className="bg-white border-slate-200 text-slate-900 text-center text-2xl italic tracking-[0.5em] h-14 shadow-sm"
+                        className="bg-white border-slate-200 text-slate-900 text-center text-2xl  tracking-[0.5em] h-14 shadow-sm"
                         maxLength={6}
                       />
-                      <p className="text-xs text-slate-600 text-center tracking-wide font-bold italic">
+                      <p className="text-xs text-slate-600 text-center tracking-wide font-bold ">
                         Enter the 6-digit code sent to your phone
                       </p>
                     </div>
@@ -1160,7 +1160,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       </div>
                       <label
                         htmlFor="whatsapp-consent-modal"
-                        className="text-xs text-slate-600 leading-relaxed font-bold tracking-tight italic"
+                        className="text-xs text-slate-600 leading-relaxed font-bold tracking-tight "
                       >
                         I agree to receive WhatsApp alerts for vault activity.
                         Reply STOP to opt out.
@@ -1183,7 +1183,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         setWhatsappError("");
                       }}
                       variant="outline"
-                      className="flex-1 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold tracking-wide italic"
+                      className="flex-1 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold tracking-wide "
                     >
                       Back
                     </Button>
@@ -1194,7 +1194,7 @@ export default function SettingsPageContent({ role = "client" }) {
                         whatsappCode.length !== 6 ||
                         !whatsappConsent
                       }
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold tracking-wide shadow-md shadow-green-600/10 italic"
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold tracking-wide shadow-md shadow-green-600/10 "
                     >
                       {loadingWhatsApp ? "Verifying..." : "Verify & enable"}
                     </Button>

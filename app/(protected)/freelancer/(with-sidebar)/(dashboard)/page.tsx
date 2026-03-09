@@ -91,7 +91,7 @@ export default function FreelancerDashboard() {
       {/* Header */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
         <motion.div variants={itemVariants} className="space-y-2">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-slate-900 italic">
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-slate-900 ">
             Overview
           </h1>
           <p className="text-[10px] md:text-xs text-slate-600 font-bold tracking-wide">
@@ -122,7 +122,7 @@ export default function FreelancerDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tighter italic">
+            <h2 className="text-4xl font-bold text-slate-900 tracking-tighter ">
               ${balance?.formattedAvailable || "0.00"}
             </h2>
             <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-bold tracking-wide">
@@ -145,7 +145,7 @@ export default function FreelancerDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tighter italic">
+            <h2 className="text-4xl font-bold text-slate-900 tracking-tighter ">
               $
               {activeVaults
                 .reduce(
@@ -177,7 +177,7 @@ export default function FreelancerDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tighter italic">
+            <h2 className="text-4xl font-bold text-slate-900 tracking-tighter ">
               {completedVaults.length}
             </h2>
             <p className="text-amber-400 text-[10px] font-bold tracking-wide">
@@ -195,7 +195,7 @@ export default function FreelancerDashboard() {
               <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                 <Shield className="w-5 h-5 text-emerald-600" />
               </div>
-              <h2 className="text-xl font-bold tracking-wide text-slate-900 italic">
+              <h2 className="text-xl font-bold tracking-wide text-slate-900 ">
                 Pending project invitations
               </h2>
             </div>
@@ -248,7 +248,7 @@ export default function FreelancerDashboard() {
                     <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1">
                       Project value
                     </p>
-                    <p className="text-xl font-bold text-slate-900 tracking-tight italic">
+                    <p className="text-xl font-bold text-slate-900 tracking-tight ">
                       $
                       {invite.vault?.formattedTotalAmount ||
                         invite.vault?.totalAmount}
@@ -276,7 +276,7 @@ export default function FreelancerDashboard() {
             <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <Briefcase className="w-5 h-5 text-emerald-600" />
             </div>
-            <h2 className="text-xl font-bold tracking-wide text-slate-900 italic">
+            <h2 className="text-xl font-bold tracking-wide text-slate-900 ">
               Active assignments
             </h2>
           </div>
@@ -382,7 +382,7 @@ export default function FreelancerDashboard() {
                         <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1">
                           Project value
                         </p>
-                        <p className="text-2xl font-bold text-slate-900 tracking-tight italic">
+                        <p className="text-2xl font-bold text-slate-900 tracking-tight ">
                           ${vault.formattedTotalAmount || vault.totalAmount}
                         </p>
                       </div>

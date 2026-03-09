@@ -55,7 +55,7 @@ function KYCPageContent() {
           </div>
 
           <div className="space-y-4 text-center mb-10">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 italic">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 ">
               Verify your identity
             </h1>
             <p className="text-sm text-slate-600 font-medium">
@@ -70,7 +70,7 @@ function KYCPageContent() {
               <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-sm">
                 1
               </div>
-              <p className="font-semibold tracking-tight text-slate-900 italic">
+              <p className="font-semibold tracking-tight text-slate-900 ">
                 Have your ID card handy
               </p>
             </div>
@@ -79,7 +79,7 @@ function KYCPageContent() {
               <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-sm">
                 2
               </div>
-              <p className="font-semibold tracking-tight text-slate-900 italic">
+              <p className="font-semibold tracking-tight text-slate-900 ">
                 Take a quick selfie
               </p>
             </div>
@@ -87,13 +87,13 @@ function KYCPageContent() {
 
           <DiditVerificationBtn
             onSuccess={handleSuccess}
-            className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[15px] rounded-3xl transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/10 italic"
+            className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[15px] rounded-3xl transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/10 "
           />
 
           <div className="flex justify-center flex-col items-center gap-2 mt-8 text-slate-600">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
-              <p className="text-[11px] font-bold tracking-[0.05em] uppercase italic">
+              <p className="text-[11px] font-bold tracking-[0.05em] uppercase ">
                 Secured by AES-256. Bank-grade SOC2 Type II.
               </p>
             </div>

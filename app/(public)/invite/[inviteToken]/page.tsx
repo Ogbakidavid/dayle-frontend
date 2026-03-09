@@ -291,7 +291,7 @@ export default function InvitePage() {
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-slate-200">
               <Shield className="w-48 h-48" />
             </div>
-            
+
             <div className="relative z-10">
               <h3 className="text-xs font-bold tracking-wide text-slate-900 mb-6 uppercase">
                 Safe project summary
@@ -345,7 +345,7 @@ export default function InvitePage() {
                       <p className="text-emerald-700 font-bold text-[10px] tracking-wide">
                         Securely verified escrow
                       </p>
-                      <p className="text-slate-400 text-[10px] italic mt-0.5 break-all">
+                      <p className="text-slate-400 text-[10px]  mt-0.5 break-all">
                         {vault.vaultAddress}
                       </p>
                     </div>
@@ -363,7 +363,7 @@ export default function InvitePage() {
                   <User className="w-8 h-8 text-slate-300" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 tracking-tight italic">
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight ">
                     Join to respond
                   </h3>
                   <p className="text-slate-600 text-sm mt-2 font-medium">
@@ -427,7 +427,7 @@ export default function InvitePage() {
                   <Lock className="w-8 h-8 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold tracking-tight italic text-red-600">
+                  <h3 className="text-xl font-bold tracking-tight  text-red-600">
                     Identity mismatch
                   </h3>
                   <p className="text-slate-600 text-sm mt-2 font-medium leading-relaxed">

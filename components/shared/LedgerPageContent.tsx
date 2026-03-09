@@ -103,11 +103,11 @@ export default function LedgerPageContent() {
       <header className="mb-6 md:mb-10 px-4 md:px-0">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <motion.div variants={itemVariants} className="space-y-1">
-            <div className="flex items-center gap-2 text-sm md:text-sm font-bold text-emerald-500 tracking-[0.2em] md:tracking-[0.2em] mb-2 italic">
+            <div className="flex items-center gap-2 text-sm md:text-sm font-bold text-emerald-500 tracking-[0.2em] md:tracking-[0.2em] mb-2 ">
               <Lock className="w-3.5 h-3.5 shrink-0" />
               Secured Settlement Account
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter italic flex items-center gap-3">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter  flex items-center gap-3">
               Financial Center
             </h1>
             <p className="text-xs md:text-sm font-bold text-slate-600 tracking-wide">
@@ -163,7 +163,7 @@ export default function LedgerPageContent() {
                           value={withdrawAmount}
                           onChange={(e) => setWithdrawAmount(e.target.value)}
                           placeholder="0.00"
-                          className="w-full text-4xl font-bold tabular-nums bg-transparent border-b border-slate-200 focus:border-emerald-600 outline-none py-4 pl-8 transition-all text-slate-900 placeholder:text-slate-900 italic"
+                          className="w-full text-4xl font-bold tabular-nums bg-transparent border-b border-slate-200 focus:border-emerald-600 outline-none py-4 pl-8 transition-all text-slate-900 placeholder:text-slate-900 "
                           min="1"
                           step="0.01"
                         />

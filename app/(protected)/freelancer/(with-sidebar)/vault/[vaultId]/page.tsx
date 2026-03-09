@@ -120,7 +120,7 @@ export default function FreelancerVaultDetailPage() {
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
             <div className="min-w-0 space-y-4">
               <div className="flex flex-wrap items-center gap-4">
-                <h1 className="text-3xl md:text-5xl font-bold text-slate-900 italic tracking-tighter leading-none">
+                <h1 className="text-3xl md:text-5xl font-bold text-slate-900  tracking-tighter leading-none">
                   {vault.title}
                 </h1>
                 <Badge
@@ -163,15 +163,15 @@ export default function FreelancerVaultDetailPage() {
             </div>
 
             <div className="text-left md:text-right p-6 rounded-2xl bg-white border border-slate-200 shadow-sm min-w-[240px]">
-              <p className="text-[9px] md:text-[11px] text-slate-600 font-bold tracking-wide mb-1 italic">
+              <p className="text-[9px] md:text-[11px] text-slate-600 font-bold tracking-wide mb-1 ">
                 Secured contract value
               </p>
-              <p className="text-4xl md:text-6xl font-bold text-slate-900 tracking-widest italic leading-none">
+              <p className="text-4xl md:text-6xl font-bold text-slate-900 tracking-widest  leading-none">
                 {vault.formattedTotalAmount || vault.totalAmount}
               </p>
               <div className="mt-4 inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <p className="text-[10px] md:text-xs text-emerald-700 font-bold tracking-wide italic">
+                <p className="text-[10px] md:text-xs text-emerald-700 font-bold tracking-wide ">
                   $
                   {vault.formattedPaidAmount ||
                     (vault.paidAmount || 0).toLocaleString()}{" "}
@@ -193,7 +193,7 @@ export default function FreelancerVaultDetailPage() {
                     <ListChecks className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-slate-900 font-bold tracking-wide text-lg italic">
+                    <CardTitle className="text-slate-900 font-bold tracking-wide text-lg ">
                       What was promised
                     </CardTitle>
                     <CardDescription className="text-slate-600 font-bold tracking-wide text-[10px] mt-1">
@@ -232,7 +232,7 @@ export default function FreelancerVaultDetailPage() {
                               )}
                             </div>
                             <div className="flex-1 space-y-1">
-                              <h4 className="text-sm font-bold text-slate-900 italic">
+                              <h4 className="text-sm font-bold text-slate-900 ">
                                 {item.title}
                               </h4>
                               {item.description && (
@@ -276,7 +276,7 @@ export default function FreelancerVaultDetailPage() {
                     <Zap className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-slate-900 font-bold tracking-wide text-lg italic">
+                    <CardTitle className="text-slate-900 font-bold tracking-wide text-lg ">
                       Your submissions
                     </CardTitle>
                     <CardDescription className="text-slate-600 font-bold tracking-widest text-[10px] mt-1">
@@ -307,13 +307,13 @@ export default function FreelancerVaultDetailPage() {
                         >
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center italic text-[10px] font-bold text-emerald-700">
+                              <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center  text-[10px] font-bold text-emerald-700">
                                 {String(
                                   vault.submissions.length - idx,
                                 ).padStart(2, "0")}
                               </div>
                               <div>
-                                <p className="text-xs font-bold text-slate-900 tracking-wide italic">
+                                <p className="text-xs font-bold text-slate-900 tracking-wide ">
                                   Submission #{vault.submissions.length - idx}
                                 </p>
                                 <p className="text-[9px] text-slate-600 font-bold tracking-wide mt-0.5">
@@ -344,7 +344,7 @@ export default function FreelancerVaultDetailPage() {
                           </div>
 
                           {sub.notes && (
-                            <p className="text-xs text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100 italic mb-4 shadow-sm">
+                            <p className="text-xs text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100  mb-4 shadow-sm">
                               &quot;{sub.notes}&quot;
                             </p>
                           )}
@@ -379,12 +379,12 @@ export default function FreelancerVaultDetailPage() {
                                             ) : (
                                               <Square className="w-3.5 h-3.5 text-slate-100" />
                                             )}
-                                            <span className="text-[10px] font-bold tracking-widest italic text-slate-900">
+                                            <span className="text-[10px] font-bold tracking-widest  text-slate-900">
                                               {d.deliverableTitle}
                                             </span>
                                           </div>
                                           {d.included && d.notes && (
-                                            <p className="text-[10px] text-slate-600 italic ml-5">
+                                            <p className="text-[10px] text-slate-600  ml-5">
                                               - {d.notes}
                                             </p>
                                           )}
@@ -422,7 +422,7 @@ export default function FreelancerVaultDetailPage() {
             {/* VAULT CONTROLS */}
             <Card className="bg-white border-slate-200 shadow-sm relative overflow-hidden group">
               <CardHeader>
-                <CardTitle className="text-slate-900 text-base font-bold tracking-[0.2em] italic flex items-center gap-2">
+                <CardTitle className="text-slate-900 text-base font-bold tracking-[0.2em]  flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   Freelancer workspace
                 </CardTitle>
@@ -431,7 +431,7 @@ export default function FreelancerVaultDetailPage() {
                 <div className="flex flex-col gap-3">
                   {vault.status === VaultStatus.FUNDED && (
                     <Link href={`/freelancer/vault/${vaultId}/submit`}>
-                      <Button className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold h-12 rounded-xl shadow-md shadow-emerald-500/20 active:scale-95 transition-all text-xs italic">
+                      <Button className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold h-12 rounded-xl shadow-md shadow-emerald-500/20 active:scale-95 transition-all text-xs ">
                         <Upload className="w-4 h-4 mr-2" />
                         Deliver work
                       </Button>
@@ -468,11 +468,11 @@ export default function FreelancerVaultDetailPage() {
               )}
             >
               <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-3 text-slate-900 font-bold tracking-widest text-sm italic">
+                <CardTitle className="flex items-center gap-3 text-slate-900 font-bold tracking-widest text-sm ">
                   <Gavel className="w-5 h-5 text-amber-600" />
                   Vault support
                 </CardTitle>
-                <CardDescription className="font-bold tracking-widest text-[9px] mt-2 leading-relaxed italic text-slate-600">
+                <CardDescription className="font-bold tracking-widest text-[9px] mt-2 leading-relaxed  text-slate-600">
                   Initiate a formal case file if contract terms are breached.
                 </CardDescription>
               </CardHeader>

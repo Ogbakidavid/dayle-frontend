@@ -291,7 +291,7 @@ export default function SignupPage() {
 
           <h1 className="text-6xl lg:text-7xl font-bold text-slate-900 leading-[0.95] tracking-tighter mb-12">
             Secure <br />
-            <span className="text-emerald-600 italic">payments.</span>
+            <span className="text-emerald-600 ">payments.</span>
           </h1>
 
           <div className="space-y-8">

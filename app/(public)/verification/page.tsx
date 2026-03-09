@@ -125,17 +125,15 @@ function VerificationStatusContent() {
           <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tighter mb-4">
             {isVerified ? (
               <>
-                Capital{" "}
-                <span className="text-emerald-500 italic">Released.</span>
+                Capital <span className="text-emerald-500 ">Released.</span>
               </>
             ) : isReview ? (
               <>
-                Verification{" "}
-                <span className="text-blue-500 italic">Active.</span>
+                Verification <span className="text-blue-500 ">Active.</span>
               </>
             ) : (
               <>
-                Project <span className="text-white italic">Protected.</span>
+                Project <span className="text-white ">Protected.</span>
               </>
             )}
           </h1>

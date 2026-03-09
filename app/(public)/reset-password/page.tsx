@@ -66,7 +66,7 @@ export default function ResetPasswordPage() {
 
           <h1 className="text-6xl lg:text-7xl font-bold text-slate-900 leading-[0.95] tracking-tighter mb-12">
             Secure <br />
-            <span className="text-emerald-600 italic">access.</span>
+            <span className="text-emerald-600 ">access.</span>
           </h1>
 
           <div className="space-y-8">

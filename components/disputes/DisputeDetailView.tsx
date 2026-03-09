@@ -148,7 +148,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                               <span className="text-xs font-bold tracking-wider text-emerald-400">
                                 {ev.type?.replace("_", " ").toLowerCase()}
                               </span>
-                              <span className="text-xs text-slate-900 italic">
+                              <span className="text-xs text-slate-900 ">
                                 {new Date(ev.timestamp).toLocaleString()}
                               </span>
                             </div>
@@ -236,7 +236,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                   <p className="text-[10px] text-white/30 font-bold tracking-wide">
                     Target requirement
                   </p>
-                  <div className="bg-emerald-500/5 rounded p-2.5 text-xs italic text-emerald-400 border border-emerald-500/10 shadow-inner">
+                  <div className="bg-emerald-500/5 rounded p-2.5 text-xs  text-emerald-400 border border-emerald-500/10 shadow-inner">
                     {dispute.requirementRef}
                   </div>
                 </div>

@@ -110,7 +110,7 @@ export default function VaultsPage() {
         {/* 1. TOP NAVIGATION / HEADER */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
           <motion.div variants={itemVariants} className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-slate-900 italic">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-slate-900 ">
               Secured projects
             </h1>
             <p className="text-xs md:text-sm text-slate-600 font-bold">
@@ -162,7 +162,7 @@ export default function VaultsPage() {
               <p className="text-sm font-bold tracking-wide text-slate-600 mb-2">
                 {stat.label}
               </p>
-              <h2 className="text-3xl font-bold text-slate-900 tracking-tighter italic">
+              <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
                 {stat.value}
               </h2>
             </motion.div>
@@ -304,7 +304,7 @@ export default function VaultsPage() {
                         </div>
                       </td>
                       <td className="px-4 md:px-6 py-5 text-right">
-                        <p className="text-sm md:text-base font-bold text-slate-900 tracking-wide italic">
+                        <p className="text-sm md:text-base font-bold text-slate-900 tracking-wide ">
                           $
                           {(vault.totalAmount || vault.amount).toLocaleString()}
                         </p>

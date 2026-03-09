@@ -155,9 +155,7 @@ export default function LandingPage() {
               <br />
               Approve work.
               <br />
-              <span className="text-emerald-600 italic">
-                Release with certainty.
-              </span>
+              <span className="text-emerald-600 ">Release with certainty.</span>
             </motion.h1>
 
             {/* Subcopy */}

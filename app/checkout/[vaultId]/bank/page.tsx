@@ -151,16 +151,16 @@ export default function BankTransferPage() {
               >
                 <Lock className="w-5 h-5 text-white" />
               </div>
-              <span className="text-slate-900 font-bold tracking-tighter text-2xl italic">
+              <span className="text-slate-900 font-bold tracking-tighter text-2xl ">
                 Dayle
               </span>
             </div>
             <div className="space-y-10">
               <div className="space-y-3">
-                <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em] italic leading-none uppercase">
+                <p className="text-[10px] font-bold text-slate-600 tracking-[0.4em]  leading-none uppercase">
                   Total transfer
                 </p>
-                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-4xl italic flex items-baseline gap-2">
+                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-4xl  flex items-baseline gap-2">
                   <span className="text-emerald-600 font-bold text-2xl">
                     {currencyPrefix}
                   </span>
@@ -172,8 +172,8 @@ export default function BankTransferPage() {
               </div>
               <div className="pt-10 border-t border-slate-200 space-y-6">
                 <div className="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-slate-900 uppercase">
-                  <span className="text-slate-600 italic">Project ID</span>
-                  <span className="text-emerald-600 italic tracking-normal text-[9px]">
+                  <span className="text-slate-600 ">Project ID</span>
+                  <span className="text-emerald-600  tracking-normal text-[9px]">
                     VAULT-{vault?.id.slice(0, 8).toUpperCase()}
                   </span>
                 </div>
@@ -183,10 +183,10 @@ export default function BankTransferPage() {
           <div className="p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
             <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="flex items-center gap-3 text-emerald-600 text-[10px] font-bold tracking-[0.3em] mb-4 italic uppercase">
+              <div className="flex items-center gap-3 text-emerald-600 text-[10px] font-bold tracking-[0.3em] mb-4  uppercase">
                 <Shield className="w-4 h-4" /> Secure Funding
               </div>
-              <p className="text-[10px] text-slate-600 leading-relaxed font-bold tracking-widest italic uppercase">
+              <p className="text-[10px] text-slate-600 leading-relaxed font-bold tracking-widest  uppercase">
                 Bank-verified secure funding. Assets are protected in escrow via
                 Partna.
               </p>
@@ -200,7 +200,7 @@ export default function BankTransferPage() {
             {/* Back Button */}
             <button
               onClick={() => router.push(`/checkout/${vaultId}`)}
-              className="flex items-center gap-3 text-slate-900 hover:text-emerald-500 transition-all text-[10px] font-bold tracking-[0.3em] mb-12 group bg-white border border-slate-200 py-4 px-6 rounded-2xl italic shadow-sm"
+              className="flex items-center gap-3 text-slate-900 hover:text-emerald-500 transition-all text-[10px] font-bold tracking-[0.3em] mb-12 group bg-white border border-slate-200 py-4 px-6 rounded-2xl  shadow-sm"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               Change payment method
@@ -218,10 +218,10 @@ export default function BankTransferPage() {
                   <Building2 className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="space-y-4">
-                  <h4 className="text-3xl font-bold text-slate-900 italic tracking-tighter">
+                  <h4 className="text-3xl font-bold text-slate-900  tracking-tighter">
                     Transfer instructions
                   </h4>
-                  <p className="text-[11px] text-slate-600 leading-relaxed font-bold tracking-widest italic">
+                  <p className="text-[11px] text-slate-600 leading-relaxed font-bold tracking-widest ">
                     Please transfer the exact amount to the virtual bank account
                     below. Your funds will be automatically detected and secured
                     in the escrow contract upon bank confirmation.
@@ -229,7 +229,7 @@ export default function BankTransferPage() {
                 </div>
 
                 <div className="pt-10 border-t border-slate-100 space-y-6">
-                  <div className="flex items-center gap-4 text-[10px] font-bold text-slate-600 tracking-[0.3em] italic uppercase">
+                  <div className="flex items-center gap-4 text-[10px] font-bold text-slate-600 tracking-[0.3em]  uppercase">
                     <Globe className="w-4 h-4 text-emerald-600" /> Partna Direct
                     Settlement
                   </div>
@@ -237,7 +237,7 @@ export default function BankTransferPage() {
                     <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 shrink-0">
                       <Clock className="w-5 h-5" />
                     </div>
-                    <p className="text-[11px] text-amber-700 leading-relaxed font-bold tracking-wide italic">
+                    <p className="text-[11px] text-amber-700 leading-relaxed font-bold tracking-wide ">
                       Account expires in{" "}
                       <span className="text-amber-900 font-extrabold">
                         24 hours
@@ -275,14 +275,14 @@ export default function BankTransferPage() {
                 <div className="p-8 bg-white border border-slate-200 rounded-3xl flex flex-col items-center gap-6 shadow-sm">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    <p className="text-[10px] font-bold text-slate-500 tracking-widest uppercase italic">
+                    <p className="text-[10px] font-bold text-slate-500 tracking-widest uppercase ">
                       Awaiting confirmation from bank...
                     </p>
                   </div>
                   <button
                     onClick={handleConfirmTransfer}
                     disabled={isProcessing}
-                    className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-3xl shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.2em] italic disabled:opacity-50"
+                    className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-3xl shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.2em]  disabled:opacity-50"
                   >
                     {isProcessing ? "Processing..." : "I've sent the transfer"}
                   </button>
@@ -302,11 +302,11 @@ function BankInfo({ label, value, copy, onCopy, copied, highlight }: any) {
       className={`p-8 flex justify-between items-center group transition-colors hover:bg-slate-50 ${highlight ? "bg-emerald-50/30" : ""}`}
     >
       <div className="space-y-1">
-        <p className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase italic">
+        <p className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase ">
           {label}
         </p>
         <p
-          className={`text-xl font-bold tracking-tight italic ${highlight ? "text-emerald-700" : "text-slate-900"}`}
+          className={`text-xl font-bold tracking-tight  ${highlight ? "text-emerald-700" : "text-slate-900"}`}
         >
           {value}
         </p>

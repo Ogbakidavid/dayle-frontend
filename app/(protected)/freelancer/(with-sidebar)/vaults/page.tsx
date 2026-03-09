@@ -89,7 +89,7 @@ export default function FreelancerVaultsPage() {
         {/* 1. TOP NAVIGATION / HEADER */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <motion.div variants={itemVariants} className="space-y-2">
-            <h1 className="text-4xl font-bold tracking-tighter text-white italic">
+            <h1 className="text-4xl font-bold tracking-tighter text-white ">
               Your projects
             </h1>
             <p className="text-[10px] text-white/50 font-bold tracking-[0.2em]">
@@ -135,7 +135,7 @@ export default function FreelancerVaultsPage() {
               <p className="text-[10px] font-bold tracking-[0.2em] text-white/30 mb-2 group-hover:text-white/50 transition-colors">
                 {stat.label}
               </p>
-              <h2 className="text-3xl font-bold text-white tracking-widest italic">
+              <h2 className="text-3xl font-bold text-white tracking-widest ">
                 {stat.value}
               </h2>
             </motion.div>
@@ -265,10 +265,10 @@ export default function FreelancerVaultsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-6 text-right">
-                      <p className="text-base font-bold text-white tracking-widest italic">
+                      <p className="text-base font-bold text-white tracking-widest ">
                         ${(vault.totalAmount || vault.amount).toLocaleString()}
                       </p>
-                      <p className="text-[9px] text-white/20 font-bold tracking-[0.2em] mt-1 italic">
+                      <p className="text-[9px] text-white/20 font-bold tracking-[0.2em] mt-1 ">
                         Secured
                       </p>
                     </td>
@@ -297,7 +297,7 @@ export default function FreelancerVaultsPage() {
 
         {/* 5. FOOTER SUMMARY / PAGINATION */}
         <footer className="flex flex-col sm:flex-row items-center justify-between gap-6 py-10 border-t border-white/5">
-          <p className="text-[10px] font-bold text-white/20 tracking-[0.2em] italic">
+          <p className="text-[10px] font-bold text-white/20 tracking-[0.2em] ">
             Securing{" "}
             <span className="text-slate-900">{paginatedVaults.length}</span> /{" "}
             {filteredVaults.length} Escrow Projects

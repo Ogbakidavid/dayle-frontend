@@ -103,7 +103,7 @@ export default function InteractiveCard({
                       fontSize="18"
                       fontWeight="bold"
                       fill="white"
-                      fontStyle="italic"
+                      fontStyle=""
                     >
                       VISA
                     </text>
@@ -133,7 +133,7 @@ export default function InteractiveCard({
                   </svg>
                 )}
                 {!["visa", "mastercard"].includes(cardType) && (
-                  <span className="text-white font-bold tracking-wide italic opacity-80">
+                  <span className="text-white font-bold tracking-wide  opacity-80">
                     {cardType || "Card"}
                   </span>
                 )}

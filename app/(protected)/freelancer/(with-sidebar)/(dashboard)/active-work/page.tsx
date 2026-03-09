@@ -66,13 +66,13 @@ export default function ActiveWorkPage() {
       <div className="max-w-6xl mx-auto px-6 space-y-12">
         {/* HEADER */}
         <header className="pt-8 md:pt-12 space-y-4">
-          {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold tracking-wide text-emerald-700 italic">
+          {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold tracking-wide text-emerald-700 ">
             <Zap className="w-3.5 h-3.5" />
             Active Node: Workspace
           </div> */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div className="space-y-2">
-              <h1 className="text-3xl md:text-5xl font-bold text-slate-900 italic tracking-tighter leading-none">
+              <h1 className="text-3xl md:text-5xl font-bold text-slate-900  tracking-tighter leading-none">
                 Active assignments
               </h1>
               <p className="text-[10px] md:text-xs font-bold text-slate-600 tracking-widest leading-relaxed">
@@ -81,7 +81,7 @@ export default function ActiveWorkPage() {
               </p>
             </div>
             <div className="text-right hidden md:block">
-              <p className="text-[9px] font-bold text-slate-600 tracking-widest mb-1 italic">
+              <p className="text-[9px] font-bold text-slate-600 tracking-widest mb-1 ">
                 Live throughput
               </p>
               <div className="flex items-center gap-2 justify-end">
@@ -116,7 +116,7 @@ export default function ActiveWorkPage() {
                 <ShieldCheck className="w-10 h-10 text-slate-200" />
               </div>
               <div className="text-center space-y-2">
-                <p className="text-xl font-bold text-slate-900 tracking-tighter italic">
+                <p className="text-xl font-bold text-slate-900 tracking-tighter ">
                   Clean slate
                 </p>
                 <p className="text-xs font-bold text-slate-600 tracking-widest leading-relaxed max-w-xs mx-auto">
@@ -135,21 +135,21 @@ export default function ActiveWorkPage() {
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                           <div className="space-y-4 flex-1 min-w-0">
                             <div className="flex items-center gap-3">
-                              <h3 className="text-xl md:text-2xl font-bold text-slate-900 italic tracking-tight group-hover:text-emerald-700 transition-colors">
+                              <h3 className="text-xl md:text-2xl font-bold text-slate-900  tracking-tight group-hover:text-emerald-700 transition-colors">
                                 {vault.title}
                               </h3>
                             </div>
-                            <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 max-w-2xl font-bold tracking-wide italic">
+                            <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 max-w-2xl font-bold tracking-wide ">
                               {vault.description ||
                                 "Standard contractual engagement through the Dayle escrow protocol."}
                             </p>
                           </div>
 
                           <div className="text-left md:text-right shrink-0">
-                            <p className="text-[9px] font-bold text-slate-600 tracking-widest mb-1 italic">
+                            <p className="text-[9px] font-bold text-slate-600 tracking-widest mb-1 ">
                               Contract Value
                             </p>
-                            <p className="text-2xl md:text-4xl font-bold text-slate-900 tracking-widest italic group-hover:scale-105 transition-transform origin-right">
+                            <p className="text-2xl md:text-4xl font-bold text-slate-900 tracking-widest  group-hover:scale-105 transition-transform origin-right">
                               {vault.formattedTotalAmount || vault.totalAmount}
                             </p>
                           </div>
@@ -157,7 +157,7 @@ export default function ActiveWorkPage() {
 
                         <div className="pt-8 mt-8 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6">
                           <div>
-                            <p className="text-[8px] font-bold text-slate-600 tracking-widest mb-2 italic">
+                            <p className="text-[8px] font-bold text-slate-600 tracking-widest mb-2 ">
                               COUNTERPARTY
                             </p>
                             <p className="text-[10px] font-bold text-slate-900 tracking-wide flex items-center gap-2">
@@ -166,7 +166,7 @@ export default function ActiveWorkPage() {
                             </p>
                           </div>
                           <div>
-                            <p className="text-[8px] font-bold text-slate-600 tracking-widest mb-2 italic">
+                            <p className="text-[8px] font-bold text-slate-600 tracking-widest mb-2 ">
                               TIMESTAMP
                             </p>
                             <p className="text-[10px] font-bold text-slate-900 tracking-wide flex items-center gap-2">
@@ -175,10 +175,10 @@ export default function ActiveWorkPage() {
                             </p>
                           </div>
                           <div>
-                            <p className="text-[8px] font-bold text-slate-600 tracking-widest mb-2 italic">
+                            <p className="text-[8px] font-bold text-slate-600 tracking-widest mb-2 ">
                               VERIFICATION
                             </p>
-                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100 transition-colors text-[9px] font-bold px-3 py-0.5 rounded-full italic">
+                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100 transition-colors text-[9px] font-bold px-3 py-0.5 rounded-full ">
                               Protocol Secured
                             </Badge>
                           </div>
@@ -206,7 +206,7 @@ export default function ActiveWorkPage() {
               variants={itemVariants}
               className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-slate-200 pt-10"
             >
-              <p className="text-[10px] font-bold text-slate-600 tracking-widest italic">
+              <p className="text-[10px] font-bold text-slate-600 tracking-widest ">
                 Displaying {paginatedVaults.length} of {activeVaults.length}{" "}
                 active assignments
               </p>

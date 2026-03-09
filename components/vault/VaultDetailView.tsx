@@ -140,7 +140,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
               <div className="rounded-lg border border-white/5 bg-black/40 p-4 space-y-2">
                 <div className="space-y-2">
                   {(vault.requirements || []).length === 0 ? (
-                    <p className="text-sm text-white/50 italic">
+                    <p className="text-sm text-white/50 ">
                       No specific requirements listed.
                     </p>
                   ) : (

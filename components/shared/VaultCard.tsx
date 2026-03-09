@@ -23,7 +23,7 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
   return (
     <Card className="bg-muted border-white/5 card-interactive group p-6 space-y-4">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-lg font-bold tracking-tight text-white italic truncate">
+        <h3 className="text-lg font-bold tracking-tight text-white  truncate">
           {vault.title}
         </h3>
         <StatusBadge status={vault.status} />
@@ -37,7 +37,7 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
           </p>
           <div className="flex items-baseline gap-1">
             <span className="text-2xl font-bold text-white">$</span>
-            <h2 className="text-3xl font-bold text-white tracking-tighter italic">
+            <h2 className="text-3xl font-bold text-white tracking-tighter ">
               {(vault.totalAmount || vault.amount || 0).toLocaleString()}
             </h2>
           </div>

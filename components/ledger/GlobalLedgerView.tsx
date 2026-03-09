@@ -82,14 +82,14 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
       <header className="space-y-3">
         <motion.div
           variants={itemVariants}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold tracking-wide text-emerald-700 italic"
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold tracking-wide text-emerald-700 "
         >
           <ShieldCheck className="w-3.5 h-3.5" />
           Financial activity protocol
         </motion.div>
         <motion.h1
           variants={itemVariants}
-          className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tighter italic"
+          className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tighter "
         >
           {role === "client" ? "Ledger management" : "Earning history"}
         </motion.h1>
@@ -142,12 +142,12 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                 )}
               />
               <CardContent className="py-8 relative z-10">
-                <p className="text-sm font-bold tracking-wide text-slate-600 mb-2 group-hover:text-slate-600 transition-colors italic">
+                <p className="text-sm font-bold tracking-wide text-slate-600 mb-2 group-hover:text-slate-600 transition-colors ">
                   {stat.label}
                 </p>
                 <p
                   className={cn(
-                    "text-3xl font-bold text-slate-900 tracking-tighter italic",
+                    "text-3xl font-bold text-slate-900 tracking-tighter ",
                     stat.color,
                   )}
                 >
@@ -173,7 +173,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
           />
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-xs font-bold text-slate-600 tracking-wide hidden sm:block italic">
+          <div className="text-xs font-bold text-slate-600 tracking-wide hidden sm:block ">
             Real-time verification active
           </div>
         </div>
@@ -258,10 +258,10 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                                 )}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-sm text-slate-900 font-bold tracking-tight truncate group-hover:text-emerald-700 transition-colors italic">
+                                <p className="text-sm text-slate-900 font-bold tracking-tight truncate group-hover:text-emerald-700 transition-colors ">
                                   {entry.description || entry.id}
                                 </p>
-                                <p className="text-xs font-bold tracking-wide text-slate-600 mt-1 italic">
+                                <p className="text-xs font-bold tracking-wide text-slate-600 mt-1 ">
                                   Sig: {entry.id}
                                 </p>
                                 <div className="md:hidden mt-2 flex items-center gap-2">
@@ -269,7 +269,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                                     {vault?.title || "Vault"}
                                   </span>
                                   <span className="w-1 h-1 rounded-full bg-slate-200" />
-                                  <span className="text-xs text-slate-600 font-bold tracking-widest italic">
+                                  <span className="text-xs text-slate-600 font-bold tracking-widest ">
                                     {new Date(
                                       entry.createdAt,
                                     ).toLocaleDateString()}
@@ -279,7 +279,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             </div>
                           </td>
                           <td className="hidden md:table-cell px-6 py-6 font-['Poppins',sans-serif]">
-                            <p className="text-sm text-slate-600 font-bold tracking-tight italic truncate max-w-[200px]">
+                            <p className="text-sm text-slate-600 font-bold tracking-tight  truncate max-w-[200px]">
                               {vault?.title || "Independent transaction"}
                             </p>
                             <p className="text-xs text-slate-600 font-bold tracking-wide mt-1.5 flex items-center gap-1.5">
@@ -298,7 +298,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             <div className="flex justify-center sm:justify-start">
                               <span
                                 className={cn(
-                                  "px-3 py-1.5 text-xs font-bold tracking-wide rounded-full border shadow-sm italic transition-all",
+                                  "px-3 py-1.5 text-xs font-bold tracking-wide rounded-full border shadow-sm  transition-all",
                                   statusStyles[entry.status] ||
                                     "bg-slate-50 border-slate-200 text-slate-600",
                                 )}
@@ -309,10 +309,10 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             </div>
                           </td>
                           <td className="px-6 py-6 text-right">
-                            <p className="text-base font-bold text-slate-900 tracking-widest leading-none italic">
+                            <p className="text-base font-bold text-slate-900 tracking-widest leading-none ">
                               ${Math.abs(entry.amount).toLocaleString()}
                             </p>
-                            <p className="text-xs text-slate-600 font-bold tracking-wide mt-1 italic">
+                            <p className="text-xs text-slate-600 font-bold tracking-wide mt-1 ">
                               {entry.amount < 0 ? "Debit" : "Credit"}
                             </p>
                           </td>

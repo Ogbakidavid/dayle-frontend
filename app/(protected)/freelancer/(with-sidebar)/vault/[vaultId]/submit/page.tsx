@@ -151,7 +151,7 @@ export default function SubmissionPage() {
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to project
           </button>
-          <h1 className="text-3xl md:text-5xl font-bold text-white italic tracking-tighter leading-none mb-3">
+          <h1 className="text-3xl md:text-5xl font-bold text-white  tracking-tighter leading-none mb-3">
             Submit work
           </h1>
           <p className="text-[10px] md:text-xs text-slate-900 font-bold tracking-[0.2em]">
@@ -161,7 +161,7 @@ export default function SubmissionPage() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-6">
-            <Label className="text-[12px] font-bold tracking-[0.2em] text-emerald-500 block italic mb-2">
+            <Label className="text-[12px] font-bold tracking-[0.2em] text-emerald-500 block  mb-2">
               Mark which deliverables are included in this submission
             </Label>
 
@@ -191,7 +191,7 @@ export default function SubmissionPage() {
                       )}
                       <span
                         className={cn(
-                          "text-sm font-bold tracking-widest italic",
+                          "text-sm font-bold tracking-widest ",
                           item.included ? "text-white" : "text-white/20",
                         )}
                       >
@@ -272,7 +272,7 @@ export default function SubmissionPage() {
 
           <Card className="bg-[#0A0A0B] border-white/5 shadow-2xl relative overflow-hidden">
             <CardContent className="p-8 space-y-4">
-              <Label className="text-[10px] font-bold tracking-[0.2em] text-white/60 block italic">
+              <Label className="text-[10px] font-bold tracking-[0.2em] text-white/60 block ">
                 General notes about this submission
               </Label>
               <Textarea
@@ -287,7 +287,7 @@ export default function SubmissionPage() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-8 border-t border-white/5">
             <div className="flex items-center gap-3 opacity-40">
               <ShieldCheck className="w-5 h-5 text-emerald-500" />
-              <p className="text-[10px] font-bold tracking-widest italic">
+              <p className="text-[10px] font-bold tracking-widest ">
                 Secured delivery system active
               </p>
             </div>

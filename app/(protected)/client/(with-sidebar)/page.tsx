@@ -80,7 +80,7 @@ export default function ClientDashboard() {
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <motion.div variants={itemVariants} className="space-y-1">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-slate-900 italic">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-slate-900 ">
             Overview
           </h1>
           <p className="text-xs md:text-sm text-slate-600 font-bold">
@@ -103,7 +103,7 @@ export default function ClientDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tighter italic">
+            <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
               ${balance?.formattedAvailable || "0.00"}
             </h2>
             <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold tracking-wide">
@@ -126,7 +126,7 @@ export default function ClientDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tighter italic">
+            <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
               ${balance?.formattedSecured || "0"}
             </h2>
             <p className="text-slate-600 text-sm font-bold tracking-wide">
@@ -146,7 +146,7 @@ export default function ClientDashboard() {
             <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <LayoutGrid className="w-5 h-5 text-emerald-600" />
             </div>
-            <h2 className="text-xl font-bold tracking-wide text-slate-900 italic">
+            <h2 className="text-xl font-bold tracking-wide text-slate-900 ">
               Active projects
             </h2>
           </div>
@@ -247,7 +247,7 @@ export default function ClientDashboard() {
                         <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1">
                           Project value
                         </p>
-                        <p className="text-2xl font-bold text-slate-900 tracking-tight italic">
+                        <p className="text-2xl font-bold text-slate-900 tracking-tight ">
                           ${vault.formattedTotalAmount || vault.totalAmount}
                         </p>
                       </div>

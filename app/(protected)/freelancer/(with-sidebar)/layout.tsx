@@ -150,7 +150,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
 
         {/* Status Indicator (Activated) */}
         <div className="px-6 py-4 mx-4 mb-4 bg-emerald-50 border border-emerald-100 rounded-2xl group hover:bg-emerald-100 transition-colors shadow-sm">
-          <div className="flex items-center gap-2 text-emerald-600 text-[10px] font-bold tracking-wide mb-1 italic uppercase">
+          <div className="flex items-center gap-2 text-emerald-600 text-[10px] font-bold tracking-wide mb-1  uppercase">
             <CheckCircle className="w-3 h-3" /> Activated
           </div>
           <p className="text-[11px] text-slate-600 font-bold tracking-wide leading-relaxed">

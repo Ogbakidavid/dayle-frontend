@@ -28,7 +28,7 @@ export function LedgerBalance({
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-light text-slate-900">$</span>
-            <span className="text-5xl font-bold text-slate-900 tracking-tighter italic">
+            <span className="text-5xl font-bold text-slate-900 tracking-tighter ">
               {balance?.available?.toLocaleString() || "0.00"}
             </span>
             <span className="text-sm font-bold text-slate-900 ml-1">USD</span>
@@ -53,7 +53,7 @@ export function LedgerBalance({
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-light text-slate-900">$</span>
-            <span className="text-5xl font-bold text-slate-900 tracking-tighter italic">
+            <span className="text-5xl font-bold text-slate-900 tracking-tighter ">
               {balance?.pending?.toLocaleString() || "0.00"}
             </span>
           </div>

@@ -197,7 +197,7 @@ export default function LoginPage() {
 
           <h1 className="text-6xl lg:text-7xl font-bold text-slate-900 leading-[0.95] tracking-tighter mb-12">
             Secure <br />
-            <span className="text-emerald-600 italic">payments.</span>
+            <span className="text-emerald-600 ">payments.</span>
           </h1>
 
           <div className="space-y-8">
@@ -392,7 +392,7 @@ export default function LoginPage() {
                     onChange={(e) =>
                       setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
                     }
-                    className="bg-slate-50! border-slate-200 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-600 tracking-[0.5em] text-center italic shadow-sm"
+                    className="bg-slate-50! border-slate-200 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-600 tracking-[0.5em] text-center  shadow-sm"
                   />
                   <KeyRound className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                 </div>
