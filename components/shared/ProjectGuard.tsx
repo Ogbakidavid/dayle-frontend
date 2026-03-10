@@ -29,12 +29,20 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
 
       try {
         setChecking(true);
+        console.log(`[ProjectGuard] Verifying access to vault ${vaultId} for user ${user.id}`);
         // We verify access by attempting to fetch the project details.
         // The backend should return 403 if the user is not a participant.
-        await api.vaults.getById(vaultId as string);
+        const vault = await api.vaults.getById(vaultId as string);
+        console.log(`[ProjectGuard] Access granted for vault: ${vault.title}`);
         setAuthorized(true);
       } catch (err: any) {
-        console.error("Project access verification failed:", err);
+        console.error("[ProjectGuard] Project access verification failed:", {
+          vaultId,
+          userId: user.id,
+          status: err.statusCode,
+          message: err.message,
+          error: err
+        });
         setAuthorized(false);
       } finally {
         setChecking(false);
@@ -57,23 +65,32 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
 
   if (authorized === false) {
     return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
-          <ShieldAlert className="w-10 h-10 text-red-500" />
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center font-['Poppins',sans-serif]">
+        <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6 border border-red-100 shadow-sm">
+          <ShieldAlert className="w-12 h-12 text-red-500" />
         </div>
-        <h2 className="text-2xl font-bold text-white tracking-tight mb-2">
+        <h2 className="text-3xl font-bold text-slate-900 tracking-tighter mb-4">
           Access denied
         </h2>
-        <p className="text-zinc-400 text-sm max-w-md mb-8">
+        <p className="text-slate-500 text-sm max-w-md mb-8 font-bold leading-relaxed">
           You do not have permission to access this project. If you believe this
           is an error, please contact support or the project owner.
         </p>
-        <Button
-          onClick={() => router.back()}
-          className="bg-white text-black font-bold  text-sm px-8 h-12 rounded-xl"
-        >
-          Go back
-        </Button>
+        <div className="flex gap-4">
+          <Button
+            onClick={() => router.push("/client")}
+            className="bg-slate-900 text-white font-bold text-sm px-8 h-12 rounded-xl shadow-lg active:scale-95 transition-all"
+          >
+            Dashboard
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
+            className="bg-white border-slate-200 text-slate-600 font-bold text-sm px-8 h-12 rounded-xl shadow-sm active:scale-95 transition-all"
+          >
+            Go back
+          </Button>
+        </div>
       </div>
     );
   }
