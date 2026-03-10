@@ -48,6 +48,7 @@ export default function BankTransferPage() {
   const [bankDetails, setBankDetails] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState("");
+  const [step, setStep] = useState<"form" | "success">("form");
 
   // Fetch bank details on mount
   useEffect(() => {
@@ -60,7 +61,10 @@ export default function BankTransferPage() {
           idempotencyKey: crypto.randomUUID(),
         });
 
-        if (res.paymentUrl) {
+        if (
+          res.paymentUrl &&
+          !res.paymentUrl.includes(window.location.pathname)
+        ) {
           toast.success("Redirecting to payment provider...");
           window.location.href = res.paymentUrl;
           return;
@@ -105,7 +109,6 @@ export default function BankTransferPage() {
           status: "success",
           amount: String(vault?.totalAmount || amount),
           type: "collection",
-          voucherCode: `MOCK_VOUCHER_${Date.now()}`,
         }),
       });
 
@@ -113,11 +116,15 @@ export default function BankTransferPage() {
         throw new Error("On-chain settlement failed. Please try again.");
       }
 
+      setIsProcessing(false);
+      setStep("success");
       toast.success("Payment detected!", {
         description: "Your funds are being secured in the escrow account.",
       });
 
-      router.push(`/client/vault/${vaultId}?success=true`);
+      setTimeout(() => {
+        router.push(`/client/vault/${vaultId}?success=true`);
+      }, 3000);
     } catch (err: any) {
       console.error("Confirmation failed", err);
       toast.error("Confirmation Failed", {
@@ -206,89 +213,127 @@ export default function BankTransferPage() {
               Change payment method
             </button>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="grid lg:grid-cols-2 gap-16 items-start"
-            >
-              {/* INFO CARD */}
-              <div className="p-10 bg-white border border-slate-200 rounded-[2.5rem] space-y-10 relative overflow-hidden shadow-xl">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -mr-32 -mt-32" />
-                <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-4xl flex items-center justify-center shadow-inner group">
-                  <Building2 className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
-                </div>
-                <div className="space-y-4">
-                  <h4 className="text-3xl font-bold text-slate-900  tracking-tighter">
-                    Transfer instructions
-                  </h4>
-                  <p className="text-[11px] text-slate-600 leading-relaxed font-bold st ">
-                    Please transfer the exact amount to the virtual bank account
-                    below. Your funds will be automatically detected and secured
-                    in the escrow contract upon bank confirmation.
-                  </p>
-                </div>
-
-                <div className="pt-10 border-t border-slate-100 space-y-6">
-                  <div className="flex items-center gap-4  font-bold text-slate-600 tracking-[0.3em]  uppercase">
-                    <Globe className="w-4 h-4 text-emerald-600" /> Partna Direct
-                    Settlement
-                  </div>
-                  <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 flex gap-4">
-                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 shrink-0">
-                      <Clock className="w-5 h-5" />
+            <AnimatePresence mode="wait">
+              {step === "form" ? (
+                <motion.div
+                  key="form"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  className="grid lg:grid-cols-2 gap-16 items-start"
+                >
+                  {/* INFO CARD */}
+                  <div className="p-10 bg-white border border-slate-200 rounded-[2.5rem] space-y-10 relative overflow-hidden shadow-xl">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -mr-32 -mt-32" />
+                    <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-4xl flex items-center justify-center shadow-inner group">
+                      <Building2 className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
                     </div>
-                    <p className="text-[11px] text-amber-700 leading-relaxed font-bold  ">
-                      Account expires in{" "}
-                      <span className="text-amber-900 font-extrabold">
-                        24 hours
-                      </span>
-                      . Please complete your transfer before then.
+                    <div className="space-y-4">
+                      <h4 className="text-3xl font-bold text-slate-900  tracking-tighter">
+                        Transfer instructions
+                      </h4>
+                      <p className="text-[11px] text-slate-600 leading-relaxed font-bold st ">
+                        Please transfer the exact amount to the virtual bank
+                        account below. Your funds will be automatically
+                        detected and secured in the escrow contract upon bank
+                        confirmation.
+                      </p>
+                    </div>
+
+                    <div className="pt-10 border-t border-slate-100 space-y-6">
+                      <div className="flex items-center gap-4  font-bold text-slate-600 tracking-[0.3em]  uppercase">
+                        <Globe className="w-4 h-4 text-emerald-600" /> Partna
+                        Direct Settlement
+                      </div>
+                      <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 flex gap-4">
+                        <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 shrink-0">
+                          <Clock className="w-5 h-5" />
+                        </div>
+                        <p className="text-[11px] text-amber-700 leading-relaxed font-bold  ">
+                          Account expires in{" "}
+                          <span className="text-amber-900 font-extrabold">
+                            24 hours
+                          </span>
+                          . Please complete your transfer before then.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BANK DETAILS */}
+                  <div className="space-y-8 flex flex-col">
+                    <div className="bg-white border border-slate-200 rounded-[2.5rem] divide-y divide-slate-50 overflow-hidden shadow-xl">
+                      <BankInfo
+                        label="Bank Name"
+                        value={bankDetails.bankName}
+                      />
+                      <BankInfo
+                        label="Account Number"
+                        value={bankDetails.accountNumber}
+                        copy
+                        onCopy={() =>
+                          handleCopy(
+                            bankDetails.accountNumber,
+                            "Account Number",
+                          )
+                        }
+                        copied={copied === "Account Number"}
+                      />
+                      <BankInfo
+                        label="Account Name"
+                        value={bankDetails.accountName}
+                      />
+                      <BankInfo
+                        label="Amount to Transfer"
+                        value={`${currencyPrefix}${Number(bankDetails.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                        highlight
+                      />
+                    </div>
+
+                    <div className="p-8 bg-white border border-slate-200 rounded-3xl flex flex-col items-center gap-6 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                        <p className=" font-bold text-slate-500 st uppercase ">
+                          Awaiting confirmation from bank...
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleConfirmTransfer}
+                        disabled={isProcessing}
+                        className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-3xl shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.2em]  disabled:opacity-50"
+                      >
+                        {isProcessing
+                          ? "Processing..."
+                          : "I've sent the transfer"}
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center text-center space-y-12 max-w-xl mx-auto"
+                >
+                  <div className="w-32 h-32 bg-emerald-600 rounded-[2.5rem] flex items-center justify-center shadow-2xl relative">
+                    <div className="absolute inset-0 bg-emerald-600/20 rounded-[2.5rem] animate-ping" />
+                    <CheckCircle2 className="w-16 h-16 text-white" />
+                  </div>
+                  <div className="space-y-4">
+                    <h2 className="text-5xl font-bold text-slate-900 tracking-tighter ">
+                      Payment Accepted
+                    </h2>
+                    <p className=" text-emerald-600 font-bold tracking-[0.5em] uppercase ">
+                      Funds are being secured on-chain
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* BANK DETAILS */}
-              <div className="space-y-8 flex flex-col">
-                <div className="bg-white border border-slate-200 rounded-[2.5rem] divide-y divide-slate-50 overflow-hidden shadow-xl">
-                  <BankInfo label="Bank Name" value={bankDetails.bankName} />
-                  <BankInfo
-                    label="Account Number"
-                    value={bankDetails.accountNumber}
-                    copy
-                    onCopy={() =>
-                      handleCopy(bankDetails.accountNumber, "Account Number")
-                    }
-                    copied={copied === "Account Number"}
-                  />
-                  <BankInfo
-                    label="Account Name"
-                    value={bankDetails.accountName}
-                  />
-                  <BankInfo
-                    label="Amount to Transfer"
-                    value={`${currencyPrefix}${Number(bankDetails.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                    highlight
-                  />
-                </div>
-
-                <div className="p-8 bg-white border border-slate-200 rounded-3xl flex flex-col items-center gap-6 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    <p className=" font-bold text-slate-500 st uppercase ">
-                      Awaiting confirmation from bank...
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleConfirmTransfer}
-                    disabled={isProcessing}
-                    className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-3xl shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.2em]  disabled:opacity-50"
-                  >
-                    {isProcessing ? "Processing..." : "I've sent the transfer"}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+                  <p className=" font-bold text-slate-400 tracking-[0.2em] uppercase ">
+                    Redirecting to your project in a few seconds...
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </main>
       </div>

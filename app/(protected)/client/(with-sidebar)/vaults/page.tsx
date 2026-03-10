@@ -59,7 +59,7 @@ export default function VaultsPage() {
   );
 
   const totalValue = (vaults || []).reduce(
-    (acc: number, v: any) => acc + (v.totalAmount || v.amount || 0),
+    (acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0),
     0,
   );
 
@@ -78,7 +78,7 @@ export default function VaultsPage() {
   const stats = [
     {
       label: "Total Value",
-      value: `$${totalValue.toLocaleString()}`,
+      value: `$${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       change: "+0%",
       icon: Shield,
       color: "text-emerald-500",
@@ -305,8 +305,7 @@ export default function VaultsPage() {
                       </td>
                       <td className="px-4 md:px-6 py-5 text-right">
                         <p className="text-sm md:text-base font-bold text-slate-900  ">
-                          $
-                          {(vault.totalAmount || vault.amount).toLocaleString()}
+                          ${vault.formattedTotalAmount || vault.totalAmount}
                         </p>
                         <p className=" md:text-sm text-slate-600 font-bold ">
                           USD

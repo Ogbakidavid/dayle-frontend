@@ -21,7 +21,10 @@ import {
   ChevronRight,
   Clock,
   Users,
+  FileIcon,
+  LinkIcon,
 } from "lucide-react";
+
 import {
   Card,
   CardContent,
@@ -110,11 +113,11 @@ export default function FreelancerVaultDetailPage() {
         {/* SECTION A: HEADER */}
         <header className="pt-4 md:pt-8 bg-transparent">
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push("/freelancer")}
             className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-all mb-6 md:mb-8 font-bold  bg-white border border-slate-200 py-2 px-4 rounded-xl cursor-pointer group shadow-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Workspace
+            Back to dashboard
           </button>
 
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
@@ -167,7 +170,7 @@ export default function FreelancerVaultDetailPage() {
                 Secured contract value
               </p>
               <p className="text-4xl md:text-6xl font-bold text-slate-900 st  leading-none">
-                {vault.formattedTotalAmount || vault.totalAmount}
+                {vault.formattedTotalAmount || "0.00"}
               </p>
               <div className="mt-4 inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
@@ -215,7 +218,7 @@ export default function FreelancerVaultDetailPage() {
                     {vault.deliverables.map((item: any, idx: number) => {
                       const submissionWithThis = vault.submissions?.find(
                         (s: any) =>
-                          s.deliverableIds?.includes(item.id || item.title),
+                          s.deliverableStatus?.some((ds: any) => (ds.deliverableId === item.id || ds.deliverableTitle === item.title) && ds.included)
                       );
 
                       return (
@@ -237,9 +240,27 @@ export default function FreelancerVaultDetailPage() {
                               </h4>
                               {item.description && (
                                 <p className="text-sm text-slate-600 leading-relaxed max-w-2xl">
-                                  Description: {item.description}
+                                  {item.description}
                                 </p>
                               )}
+                              <div className="flex gap-2 pt-1">
+                                {item.submissionType === 'FILE' && (
+                                  <Badge variant="outline" className="text-[9px] bg-slate-50 text-slate-400 border-slate-200 flex items-center gap-1">
+                                    <FileIcon className="w-2.5 h-2.5" /> File required
+                                  </Badge>
+                                )}
+                                {item.submissionType === 'LINK' && (
+                                  <Badge variant="outline" className="text-[9px] bg-slate-50 text-slate-400 border-slate-200 flex items-center gap-1">
+                                    <LinkIcon className="w-2.5 h-2.5" /> Link required
+                                  </Badge>
+                                )}
+                                {item.submissionType === 'BOTH' && (
+                                  <Badge variant="outline" className="text-[9px] bg-emerald-50 text-emerald-600 border-emerald-100 flex items-center gap-1">
+                                    <ShieldCheck className="w-2.5 h-2.5" /> File & Link
+                                  </Badge>
+                                )}
+                              </div>
+
                               <div className="pt-2 flex items-center gap-2">
                                 <span className="text-[9px] font-bold 00">
                                   Status:
@@ -468,7 +489,7 @@ export default function FreelancerVaultDetailPage() {
               )}
             >
               <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-3 text-slate-900 font-bold 
+                <CardTitle className="flex items-center gap-3 text-slate-900 font-bold">
                   <Gavel className="w-5 h-5 text-amber-600" />
                   Vault support
                 </CardTitle>

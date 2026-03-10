@@ -300,7 +300,7 @@ export default function FreelancerWithdrawPage() {
             <div className="flex items-center gap-4">
               <div
                 className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(5,150,105,0.2)] active:scale-95 transition-all cursor-pointer group"
-                onClick={() => router.push("/freelancer/balance")}
+                onClick={() => router.replace("/freelancer/balance")}
               >
                 <Lock className="w-5 h-5 text-white group-hover:rotate-12 transition-transform" />
               </div>
@@ -560,13 +560,13 @@ export default function FreelancerWithdrawPage() {
                               <option
                                 key={c.code}
                                 value={c.code}
-                                className="bg-[#0D0D0E] font-sans"
+                                className="bg-white font-sans text-slate-900"
                               >
                                 {c.name}
                               </option>
                             ))}
                           </select>
-                          <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 pointer-events-none" />
+                          <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none" />
                         </div>
                       </div>
 
@@ -652,8 +652,9 @@ export default function FreelancerWithdrawPage() {
                               <option
                                 value=""
                                 disabled
-                                className="bg-[#0D0D0E]"
+                                className="bg-white text-slate-400"
                               >
+
                                 Select Provider
                               </option>
                               {[
@@ -685,8 +686,9 @@ export default function FreelancerWithdrawPage() {
                                   <option
                                     key={bank}
                                     value={bank}
-                                    className="bg-[#0D0D0E] font-sans"
+                                    className="bg-white font-sans text-slate-900"
                                   >
+
                                     {bank}
                                   </option>
                                 ))}
@@ -982,7 +984,7 @@ export default function FreelancerWithdrawPage() {
                   </div>
 
                   <Button
-                    onClick={() => router.push("/freelancer/balance")}
+                    onClick={() => router.replace("/freelancer/balance")}
                     className="w-full h-18 bg-slate-900 text-white font-bold text-sm tracking-[0.3em] rounded-4xl hover:bg-slate-800 transition-all shadow-xl active:scale-95  uppercase"
                   >
                     Exit to overview
@@ -1041,7 +1043,7 @@ export default function FreelancerWithdrawPage() {
                       Try again
                     </Button>
                     <Button
-                      onClick={() => router.push("/freelancer/balance")}
+                      onClick={() => router.replace("/freelancer/balance")}
                       className="h-16 bg-slate-900 text-white font-bold  tracking-[0.3em] rounded-2xl transition-all shadow-xl active:scale-95  text-sm uppercase"
                     >
                       Return to origin
@@ -1103,6 +1105,7 @@ function MethodBtn({
       <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-600 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
         {React.cloneElement(icon, { className: "w-8 h-8" } as any)}
       </div>
+
       <div className="flex-1">
         <p className="text-slate-900 font-bold text-xl tracking-tighter  group-hover:text-emerald-700 transition-colors">
           {title}

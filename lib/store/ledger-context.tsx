@@ -1,12 +1,13 @@
 "use client";
 
-import {
+import React, {
   createContext,
   useContext,
   useState,
   useEffect,
   ReactNode,
 } from "react";
+import { ethers } from "ethers";
 import { api } from "@/lib/api-client";
 import { TransactionStatus, KycStatus } from "@/lib/domain/enums";
 import { useUser } from "./user-context";
@@ -66,7 +67,15 @@ export function LedgerProvider({ children }: { children: ReactNode }) {
         api.ledger.getBalance(),
         api.ledger.getTransactions(),
       ]);
-      setBalance(balanceData);
+
+      // Add formatted fields for UI consumption
+      const enhancedBalance: LedgerBalance = {
+        ...balanceData,
+        formattedAvailable: ethers.formatUnits(balanceData.available || "0", 6),
+        formattedPending: ethers.formatUnits(balanceData.pending || "0", 6),
+      };
+
+      setBalance(enhancedBalance);
       setTransactions(transactionsData);
     } catch (err: any) {
       // Silently handle auth errors (user not logged in)

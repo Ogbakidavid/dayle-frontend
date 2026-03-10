@@ -140,7 +140,8 @@ export default function CardPaymentPage() {
       });
 
       // Step 2: Handle Redirect Provider (e.g. Paycrest)
-      if (res.paymentUrl) {
+      // Only redirect if it's an external URL or a different internal path
+      if (res.paymentUrl && !res.paymentUrl.includes(window.location.pathname)) {
         toast.success("Redirecting to checkout...");
         window.location.href = res.paymentUrl;
         return;
@@ -158,7 +159,6 @@ export default function CardPaymentPage() {
           status: "success",
           amount: String(vault?.totalAmount || amount),
           type: "collection",
-          voucherCode: `MOCK_CARD_VOUCHER_${Date.now()}`,
         }),
       });
 
@@ -174,7 +174,7 @@ export default function CardPaymentPage() {
 
       setTimeout(() => {
         router.push(`/client/vault/${vaultId}?success=true`);
-      }, 2000);
+      }, 3000);
     } catch (err: any) {
       setIsProcessing(false);
       setPaymentError(err.message || "Transaction failed. Payment rejected.");

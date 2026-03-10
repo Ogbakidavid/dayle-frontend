@@ -30,6 +30,7 @@ interface InviteData {
   vault: {
     id: string;
     title: string;
+    description?: string;
     amount: number;
     clientName: string;
     deliverableCount: number;
@@ -37,6 +38,7 @@ interface InviteData {
     vaultAddress?: string;
     totalAmount?: number;
     formattedTotalAmount?: string;
+    deliverables?: any[];
   };
 }
 
@@ -304,10 +306,51 @@ export default function InvitePage() {
                   </p>
                   <div className="text-3xl font-bold text-slate-900 tracking-tight flex items-baseline gap-1">
                     <span className="text-lg text-emerald-600">$</span>
-                    {vault.formattedTotalAmount || vault.totalAmount}
+                    {vault.formattedTotalAmount || "0.00"}
                   </div>
                 </div>
               </div>
+
+              {vault.description && (
+                <div className="mt-8">
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    Project Description
+                  </h4>
+                  <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">
+                    {vault.description}
+                  </p>
+                </div>
+              )}
+
+              {vault.deliverables && vault.deliverables.length > 0 && (
+                <div className="mt-8">
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                    Deliverables Checklist
+                  </h4>
+                  <div className="space-y-2">
+                    {vault.deliverables.map((item: any, idx: number) => (
+                      <div
+                        key={item.id || idx}
+                        className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 group/item transition-all hover:bg-white hover:shadow-sm"
+                      >
+                        <div className="mt-0.5 w-4 h-4 rounded border-2 border-slate-200 shrink-0 flex items-center justify-center">
+                          <div className="w-1.5 h-1.5 bg-emerald-500 rounded-sm opacity-0" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-slate-900 leading-tight">
+                            {item.title}
+                          </p>
+                          {item.description && (
+                            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="h-px bg-slate-100 my-6" />
 
@@ -336,21 +379,17 @@ export default function InvitePage() {
                   </div>
                 </div>
 
-                {vault.vaultAddress && (
-                  <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2 duration-700 delay-300">
-                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
-                      <Shield className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-emerald-700 font-bold  ">
-                        Securely verified escrow
-                      </p>
-                      <p className="text-slate-400   mt-0.5 break-all">
-                        {vault.vaultAddress}
-                      </p>
-                    </div>
+                <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2 duration-700 delay-300">
+                  <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
+                    <Shield className="w-5 h-5" />
                   </div>
-                )}
+                  <div>
+                    <p className="text-emerald-700 font-bold  ">Vault ID</p>
+                    <p className="text-slate-400 text-xs mt-0.5 break-all font-mono">
+                      {vault.id}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

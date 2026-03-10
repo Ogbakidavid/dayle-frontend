@@ -29,7 +29,7 @@ export function LedgerBalance({
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-light text-slate-900">$</span>
             <span className="text-5xl font-bold text-slate-900 tracking-tighter ">
-              {parseFloat(balance?.formattedAvailable || balance?.available || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {Number(balance?.formattedAvailable || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <span className="text-sm font-bold text-slate-900 ml-1">USD</span>
           </div>
@@ -54,7 +54,7 @@ export function LedgerBalance({
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-light text-slate-900">$</span>
             <span className="text-5xl font-bold text-slate-900 tracking-tighter ">
-              {parseFloat(balance?.formattedPending || balance?.pending || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {Number(balance?.formattedPending || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
           <div className="mt-8 flex items-center gap-2">

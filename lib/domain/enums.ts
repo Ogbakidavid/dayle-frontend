@@ -190,6 +190,17 @@ export enum EvidenceType {
   VAULT_PAUSED = "VAULT_PAUSED",
 }
 
+// ============================================================================
+// SUBMISSION TYPE
+// ============================================================================
+
+export enum SubmissionType {
+  FILE = 'FILE',
+  LINK = 'LINK',
+  BOTH = 'BOTH',
+}
+
+
 export const getVaultDerivedLabel = (status: string | undefined): string => {
   switch (status?.toUpperCase()) {
     case VaultStatus.DRAFT:

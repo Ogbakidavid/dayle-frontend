@@ -250,8 +250,7 @@ export default function FreelancerDashboard() {
                     </p>
                     <p className="text-xl font-bold text-slate-900 tracking-tight ">
                       $
-                      {invite.vault?.formattedTotalAmount ||
-                        invite.vault?.totalAmount}
+                      {invite.vault?.formattedTotalAmount || "0.00"}
                     </p>
                   </div>
                   <Link href={`/invite/${invite.token}`}>
@@ -383,7 +382,7 @@ export default function FreelancerDashboard() {
                           Project value
                         </p>
                         <p className="text-2xl font-bold text-slate-900 tracking-tight ">
-                          ${vault.formattedTotalAmount || vault.totalAmount}
+                          ${vault.formattedTotalAmount || "0.00"}
                         </p>
                       </div>
                       <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">

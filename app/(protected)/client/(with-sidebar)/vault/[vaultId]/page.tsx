@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState, useMemo, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,8 @@ import {
   Download,
   Zap,
   Users,
+  FileIcon,
+  LinkIcon,
   X,
   Check,
   Gavel,
@@ -85,10 +87,12 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function ClientVaultDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const vaultId = params.vaultId as string;
   const { user } = useUser();
   const { vaults, loading: vaultsLoading, refreshVaults } = useVault();
 
+  const isSuccessReturn = searchParams.get("success") === "true";
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Find vault from context or use a fallback for safety
@@ -135,6 +139,22 @@ export default function ClientVaultDetailPage() {
     }
     fetchInviteStatus();
   }, [vault]);
+
+  // Poll for status update after returning from checkout
+  useEffect(() => {
+    if (isSuccessReturn && vault?.status === VaultStatus.DRAFT) {
+      const intervalId = setInterval(() => {
+        refreshVaults();
+      }, 3000); // Poll every 3 seconds
+      
+      return () => clearInterval(intervalId);
+    } else if (isSuccessReturn && vault?.status === VaultStatus.FUNDED) {
+      // Clear the query param so we don't keep polling or showing success unnecessarily on refresh
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      toast.success("Deposit confirmed!", { description: "Funds are now secured in the escrow contract." });
+    }
+  }, [isSuccessReturn, vault?.status, refreshVaults]);
 
   const handleApprove = async () => {
     try {
@@ -238,6 +258,16 @@ export default function ClientVaultDetailPage() {
     );
   };
 
+  if (vaultsLoading || !vault) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="animate-spin text-emerald-600">
+          <RefreshCcw className="w-8 h-8" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="min-h-screen bg-white text-slate-600 font-sans selection:bg-emerald-500/30 pb-20">
@@ -269,7 +299,7 @@ export default function ClientVaultDetailPage() {
               <AlertDescription className="text-sm font-bold mt-2 leading-relaxed ">
                 Your fiat payment of{" "}
                 <span className="text-red-600 underline">
-                  ${vault.formattedTotalAmount || vault.totalAmount}
+                  ${vault.formattedTotalAmount || "0.00"}
                 </span>{" "}
                 was confirmed, but we encountered an error while depositing it
                 into the escrow contract.
@@ -296,7 +326,7 @@ export default function ClientVaultDetailPage() {
           {/* SECTION A: HEADER */}
           <header className="pt-8">
             <button
-              onClick={() => router.back()}
+              onClick={() => router.push("/client")}
               className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-colors mb-6 font-bold  bg-transparent border-none p-0 cursor-pointer "
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -312,7 +342,9 @@ export default function ClientVaultDetailPage() {
                     variant="outline"
                     className="bg-emerald-50 text-emerald-700 border-emerald-200   h-6 px-3 rounded-full font-bold shadow-sm shadow-emerald-500/5"
                   >
-                    {getVaultDerivedLabel(vault.status)}
+                    {isSuccessReturn && vault.status === VaultStatus.DRAFT 
+                      ? "CONFIRMING DEPOSIT" 
+                      : getVaultDerivedLabel(vault.status)}
                   </Badge>
                 </div>
 
@@ -352,7 +384,7 @@ export default function ClientVaultDetailPage() {
                   Total secured value
                 </p>
                 <p className="text-4xl font-bold text-slate-900 st ">
-                  ${vault.formattedTotalAmount || vault.totalAmount}
+                  ${vault.formattedTotalAmount || "0.00"}
                 </p>
                 <div className="mt-2 flex items-center justify-end gap-2">
                   <div
@@ -360,6 +392,8 @@ export default function ClientVaultDetailPage() {
                       "w-1.5 h-1.5 rounded-full shadow-sm",
                       vault.status === VaultStatus.FUNDED
                         ? "bg-emerald-500 animate-pulse shadow-emerald-500/50"
+                        : isSuccessReturn && vault.status === VaultStatus.DRAFT
+                        ? "bg-amber-500 animate-pulse shadow-amber-500/50"
                         : "bg-slate-300 shadow-slate-300/30",
                     )}
                   />
@@ -368,11 +402,15 @@ export default function ClientVaultDetailPage() {
                       " font-bold  ",
                       vault.status === VaultStatus.FUNDED
                         ? "text-emerald-600"
+                        : isSuccessReturn && vault.status === VaultStatus.DRAFT
+                        ? "text-amber-600"
                         : "text-slate-400",
                     )}
                   >
                     {vault.status === VaultStatus.FUNDED
                       ? "Funds secured in escrow"
+                      : isSuccessReturn && vault.status === VaultStatus.DRAFT
+                      ? "Confirming on-chain deposit..."
                       : "Deposit pending simulation"}
                   </p>
                 </div>
@@ -460,6 +498,24 @@ export default function ClientVaultDetailPage() {
                                       {item.description}
                                     </p>
                                   )}
+                                  <div className="flex gap-2 mt-2">
+                                    {item.submissionType === 'FILE' && (
+                                      <Badge variant="outline" className="text-[9px] bg-slate-50 text-slate-400 border-slate-200 flex items-center gap-1">
+                                        <FileIcon className="w-2.5 h-2.5" /> File required
+                                      </Badge>
+                                    )}
+                                    {item.submissionType === 'LINK' && (
+                                      <Badge variant="outline" className="text-[9px] bg-slate-50 text-slate-400 border-slate-200 flex items-center gap-1">
+                                        <LinkIcon className="w-2.5 h-2.5" /> Link required
+                                      </Badge>
+                                    )}
+                                    {item.submissionType === 'BOTH' && (
+                                      <Badge variant="outline" className="text-[9px] bg-emerald-50 text-emerald-600 border-emerald-100 flex items-center gap-1">
+                                        <ShieldCheck className="w-2.5 h-2.5" /> File & Link
+                                      </Badge>
+                                    )}
+                                  </div>
+
                                 </div>
 
                                 {isIncluded && (
@@ -475,6 +531,25 @@ export default function ClientVaultDetailPage() {
                                         </p>
                                       </div>
                                     )}
+
+                                    {deliverableStatus.link && (
+                                      <div className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100 shadow-sm">
+                                        <p className="text-[9px] text-emerald-600 font-bold mb-1.5 flex items-center gap-1.5 uppercase">
+                                          <ExternalLink className="w-3 h-3" />{" "}
+                                          Submission Link
+                                        </p>
+                                        <a 
+                                          href={deliverableStatus.link.startsWith('http') ? deliverableStatus.link : `https://${deliverableStatus.link}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-sm text-emerald-700 font-bold underline break-all flex items-center gap-2"
+                                        >
+                                          {deliverableStatus.link}
+                                          <ExternalLink className="w-3 h-3 shrink-0" />
+                                        </a>
+                                      </div>
+                                    )}
+
 
                                     {deliverableStatus.files?.length > 0 && (
                                       <div className="flex flex-wrap gap-2">
@@ -692,13 +767,20 @@ export default function ClientVaultDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex flex-col gap-3">
-                    {vault.status === VaultStatus.DRAFT && (
+                    {vault.status === VaultStatus.DRAFT && !isSuccessReturn && (
                       <Link href={`/checkout/${vaultId}`} className="w-full">
                         <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm ">
                           <CreditCard className="w-4 h-4 mr-2" />
                           Fund project
                         </Button>
                       </Link>
+                    )}
+                    
+                    {vault.status === VaultStatus.DRAFT && isSuccessReturn && (
+                       <Button disabled className="w-full bg-emerald-600/50 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 transition-all text-sm ">
+                         <RefreshCcw className="w-4 h-4 mr-2 animate-spin" />
+                         Confirming Deposit...
+                       </Button>
                     )}
 
                     <Dialog
@@ -728,8 +810,8 @@ export default function ClientVaultDetailPage() {
                           <DialogDescription className="text-slate-600 text-sm leading-relaxed pt-2 font-bold">
                             You are about to release{" "}
                             <span className="text-slate-900 font-bold">
-                              $ $
-                              {vault.formattedTotalAmount || vault.totalAmount}
+                              $
+                              {vault.formattedTotalAmount || "0.00"}
                             </span>{" "}
                             to the freelancer. This action is{" "}
                             <span className="text-emerald-700 font-bold st  uppercase">

@@ -29,6 +29,8 @@ import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
 import { api } from "@/lib/api-client";
 import { useVault } from "@/lib/store/vault-context";
 import { SUPPORTED_TOKENS, CONTRACTS } from "@/lib/contracts";
+import { SubmissionType } from "@/lib/domain/enums";
+
 
 const variants: Variants = {
   enter: (direction: number) => ({
@@ -70,16 +72,18 @@ export default function CreateVaultPage() {
   const [freelancerName, setFreelancerName] = useState("");
   // Default to USDC
   const [deliverables, setDeliverables] = useState<
-    { title: string; description: string; id: string }[]
-  >([{ title: "", description: "", id: crypto.randomUUID() }]);
+    { title: string; description: string; id: string; submissionType: SubmissionType }[]
+  >([{ title: "", description: "", id: crypto.randomUUID(), submissionType: SubmissionType.FILE }]);
+
 
   const handleAddDeliverable = () => {
     if (deliverables.length < 10) {
       setDeliverables([
         ...deliverables,
-        { title: "", description: "", id: crypto.randomUUID() },
+        { title: "", description: "", id: crypto.randomUUID(), submissionType: SubmissionType.FILE },
       ]);
     }
+
   };
 
   const handleRemoveDeliverable = (id: string) => {
@@ -90,13 +94,14 @@ export default function CreateVaultPage() {
 
   const updateDeliverable = (
     id: string,
-    field: "title" | "description",
+    field: "title" | "description" | "submissionType",
     value: string,
   ) => {
     setDeliverables(
       deliverables.map((d) => (d.id === id ? { ...d, [field]: value } : d)),
     );
   };
+
 
   const STORAGE_KEY = "dayle_create_vault_draft";
 
@@ -193,11 +198,13 @@ export default function CreateVaultPage() {
         tokenDecimals: 6, // USDC uses 6 decimals
         chainId: 11142220, // Celo Sepolia
         idempotencyKey,
-        deliverables: deliverables.map(({ title, description }) => ({
+        deliverables: deliverables.map(({ title, description, submissionType }) => ({
           title,
           description,
+          submissionType,
         })),
       };
+
 
       const newVault = await createVault(payload);
 
@@ -471,9 +478,31 @@ export default function CreateVaultPage() {
                                         placeholder="Brief description of requirements... (Optional)"
                                         className="bg-transparent! border-white/5! min-h-[60px] p-3 text-sm text-slate-900 focus:border-emerald-500/30 rounded-xl leading-relaxed transition-all placeholder:text-slate-600/40"
                                       />
+                                      <div className="flex gap-2">
+                                        {[
+                                          { id: SubmissionType.FILE, label: "File Upload" },
+                                          { id: SubmissionType.LINK, label: "Link/URL" },
+                                          { id: SubmissionType.BOTH, label: "Both Required" }
+                                        ].map((opt) => (
+                                          <button
+                                            key={opt.id}
+                                            type="button"
+                                            onClick={() => updateDeliverable(deliverable.id, "submissionType", opt.id)}
+                                            className={cn(
+                                              "px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase transition-all border",
+                                              deliverable.submissionType === opt.id
+                                                ? "bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/20"
+                                                : "bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-300 hover:bg-slate-100"
+                                            )}
+                                          >
+                                            {opt.label}
+                                          </button>
+                                        ))}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
+
                               </Reorder.Item>
                             ))}
                           </Reorder.Group>

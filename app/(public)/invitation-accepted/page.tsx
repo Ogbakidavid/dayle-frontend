@@ -103,7 +103,7 @@ export default function InvitationAcceptedPage() {
             <div className="flex justify-between items-center py-2">
               <span className="text-slate-500 text-sm ">Total Value</span>
               <span className="text-slate-900 font-bold">
-                ${vault.formattedTotalAmount || vault.amount.toLocaleString()}
+                ${vault.formattedTotalAmount || vault.amount}
               </span>
             </div>
           </CardContent>
@@ -111,7 +111,7 @@ export default function InvitationAcceptedPage() {
 
         <div className="pt-8">
           <Button
-            onClick={() => router.push(`/freelancer/vault/${vault.id}`)}
+            onClick={() => router.replace(`/freelancer/vault/${vault.id}`)}
             className="bg-emerald-600 text-white hover:bg-emerald-700 font-bold  px-8 shadow-lg shadow-emerald-600/20"
           >
             View project
