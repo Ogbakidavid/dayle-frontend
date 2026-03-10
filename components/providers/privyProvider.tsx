@@ -27,7 +27,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         },
 
         appearance: {
-          theme: "dark",
+          theme: "light",
           showWalletLoginFirst: false,
           walletList: ["detected_wallets", "metamask", "coinbase_wallet"],
           // Attempt to fix some potential CSS/Style issues if possible, although 'fill-rule' is likely deep in SVG
