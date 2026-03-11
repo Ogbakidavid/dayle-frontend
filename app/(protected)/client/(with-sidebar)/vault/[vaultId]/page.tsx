@@ -392,6 +392,10 @@ export default function ClientVaultDetailPage() {
                       "w-1.5 h-1.5 rounded-full shadow-sm",
                       vault.status === VaultStatus.FUNDED
                         ? "bg-emerald-500 animate-pulse shadow-emerald-500/50"
+                        : vault.status === VaultStatus.RELEASED
+                        ? "bg-blue-500 shadow-blue-500/30"
+                        : vault.status === VaultStatus.REFUNDED
+                        ? "bg-slate-400 shadow-slate-400/30"
                         : isSuccessReturn && vault.status === VaultStatus.DRAFT
                         ? "bg-amber-500 animate-pulse shadow-amber-500/50"
                         : "bg-slate-300 shadow-slate-300/30",
@@ -402,6 +406,10 @@ export default function ClientVaultDetailPage() {
                       " font-bold  ",
                       vault.status === VaultStatus.FUNDED
                         ? "text-emerald-600"
+                        : vault.status === VaultStatus.RELEASED
+                        ? "text-blue-600"
+                        : vault.status === VaultStatus.REFUNDED
+                        ? "text-slate-500"
                         : isSuccessReturn && vault.status === VaultStatus.DRAFT
                         ? "text-amber-600"
                         : "text-slate-400",
@@ -409,9 +417,13 @@ export default function ClientVaultDetailPage() {
                   >
                     {vault.status === VaultStatus.FUNDED
                       ? "Funds secured in escrow"
+                      : vault.status === VaultStatus.RELEASED
+                      ? "Payment released to freelancer"
+                      : vault.status === VaultStatus.REFUNDED
+                      ? "Funds refunded to client"
                       : isSuccessReturn && vault.status === VaultStatus.DRAFT
                       ? "Confirming on-chain deposit..."
-                      : "Deposit pending simulation"}
+                      : "Awaiting deposit"}
                   </p>
                 </div>
               </div>
@@ -783,108 +795,154 @@ export default function ClientVaultDetailPage() {
                        </Button>
                     )}
 
-                    <Dialog
-                      open={showApproveDialog}
-                      onOpenChange={setShowApproveDialog}
-                    >
-                      <Button
-                        asChild
-                        disabled={
-                          vault.status !== VaultStatus.FUNDED ||
-                          !vault.submissions?.length ||
-                          vault.isFrozen
-                        }
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm "
+                    {/* Approve & Release — only show when FUNDED */}
+                    {vault.status === VaultStatus.FUNDED && (
+                      <Dialog
+                        open={showApproveDialog}
+                        onOpenChange={setShowApproveDialog}
                       >
-                        <button onClick={() => setShowApproveDialog(true)}>
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Approve & release
-                        </button>
-                      </Button>
-                      <DialogContent className="bg-white border-slate-200 text-slate-900 shadow-2xl">
-                        <DialogHeader>
-                          <DialogTitle className="text-xl font-bold tracking-tight  flex items-center gap-2">
-                            <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                            Confirm release
-                          </DialogTitle>
-                          <DialogDescription className="text-slate-600 text-sm leading-relaxed pt-2 font-bold">
-                            You are about to release{" "}
-                            <span className="text-slate-900 font-bold">
-                              $
-                              {vault.formattedTotalAmount || "0.00"}
-                            </span>{" "}
-                            to the freelancer. This action is{" "}
-                            <span className="text-emerald-700 font-bold st  uppercase">
-                              irreversible
-                            </span>{" "}
-                            and marks the project as completed.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="py-6 space-y-4">
-                          <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl space-y-2 shadow-sm">
-                            <p className=" font-bold  text-emerald-600/50 uppercase">
-                              Selected submission
-                            </p>
-                            <p className="text-sm font-bold text-slate-900 ">
-                              {new Date(
-                                vault.submissions?.find(
-                                  (s: any) => s.id === selectedSubmissionId,
-                                )?.submittedAt || Date.now(),
-                              ).toLocaleDateString("en-US", {
-                                month: "long",
-                                day: "numeric",
-                                year: "numeric",
-                              })}
-                            </p>
+                        <Button
+                          asChild
+                          disabled={
+                            !vault.submissions?.length ||
+                            vault.isFrozen
+                          }
+                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm "
+                        >
+                          <button onClick={() => setShowApproveDialog(true)}>
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Approve & release
+                          </button>
+                        </Button>
+                        <DialogContent className="bg-white border-slate-200 text-slate-900 shadow-2xl">
+                          <DialogHeader>
+                            <DialogTitle className="text-xl font-bold tracking-tight  flex items-center gap-2">
+                              <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                              Confirm release
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-600 text-sm leading-relaxed pt-2 font-bold">
+                              You are about to release{" "}
+                              <span className="text-slate-900 font-bold">
+                                ${vault.formattedTotalAmount || "0.00"}
+                              </span>{" "}
+                              to the freelancer. This action is{" "}
+                              <span className="text-emerald-700 font-bold uppercase">
+                                irreversible
+                              </span>{" "}
+                              and marks the project as completed.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="py-6 space-y-4">
+                            <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl space-y-2 shadow-sm">
+                              <p className=" font-bold  text-emerald-600/50 uppercase">
+                                Selected submission
+                              </p>
+                              <p className="text-sm font-bold text-slate-900 ">
+                                {new Date(
+                                  vault.submissions?.find(
+                                    (s: any) => s.id === selectedSubmissionId,
+                                  )?.submittedAt || Date.now(),
+                                ).toLocaleDateString("en-US", {
+                                  month: "long",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                        <DialogFooter className="gap-3 sm:gap-0">
-                          <Button
-                            variant="ghost"
-                            onClick={() => setShowApproveDialog(false)}
-                            className="hover:bg-slate-50 text-slate-600 font-bold hover:text-slate-900 "
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              setShowApproveDialog(false);
-                              handleApprove();
-                            }}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-black  shadow-md shadow-emerald-600/10"
-                          >
-                            Yes, Release Funds
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                          <DialogFooter className="gap-3 sm:gap-0">
+                            <Button
+                              variant="ghost"
+                              onClick={() => setShowApproveDialog(false)}
+                              className="hover:bg-slate-50 text-slate-600 font-bold hover:text-slate-900 "
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={() => {
+                                setShowApproveDialog(false);
+                                handleApprove();
+                              }}
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-black  shadow-md shadow-emerald-600/10"
+                            >
+                              Yes, Release Funds
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    )}
 
-                    <Button
-                      variant="outline"
-                      className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl active:scale-95 transition-all text-sm  shadow-sm"
-                      onClick={() =>
-                        toast.info("Request Changes feature is coming soon!", {
-                          description:
-                            "Please use the chat or external communication to provide feedback for now.",
-                        })
-                      }
-                    >
-                      <RefreshCcw className="w-4 h-4 mr-2" />
-                      Request changes
-                    </Button>
-
-                    <Link
-                      href={`/client/disputes/create?vaultId=${vaultId}`}
-                      className="w-full"
-                    >
+                    {/* Request Changes — only show when FUNDED */}
+                    {vault.status === VaultStatus.FUNDED && (
                       <Button
                         variant="outline"
-                        className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold  h-12 rounded-xl transition-all shadow-sm active:scale-95 "
+                        className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl active:scale-95 transition-all text-sm  shadow-sm"
+                        onClick={() =>
+                          toast.info("Request Changes feature is coming soon!", {
+                            description:
+                              "Please use the chat or external communication to provide feedback for now.",
+                          })
+                        }
                       >
-                        <Gavel className="w-4 h-4 mr-2 text-amber-600" />
-                        Initiate dispute
+                        <RefreshCcw className="w-4 h-4 mr-2" />
+                        Request changes
                       </Button>
-                    </Link>
+                    )}
+
+                    {/* Dispute — only available within 7 days of release */}
+                    {(() => {
+                      if (vault.status === VaultStatus.RELEASED) {
+                        const releaseEntry = vault.ledgerEntries?.find(
+                          (e: any) => e.type === LedgerEntryType.RELEASE && e.status === TransactionStatus.CONFIRMED
+                        );
+                        const releasedAt = releaseEntry?.completedAt
+                          ? new Date(releaseEntry.completedAt)
+                          : null;
+                        const sevenDaysAfterRelease = releasedAt
+                          ? new Date(releasedAt.getTime() + 7 * 24 * 60 * 60 * 1000)
+                          : null;
+                        const disputeOpen = sevenDaysAfterRelease
+                          ? new Date() < sevenDaysAfterRelease
+                          : false;
+                        const daysLeft = sevenDaysAfterRelease
+                          ? Math.ceil((sevenDaysAfterRelease.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                          : 0;
+
+                        return disputeOpen ? (
+                          <Link href={`/client/disputes/create?vaultId=${vaultId}`} className="w-full">
+                            <Button
+                              variant="outline"
+                              className="w-full border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
+                            >
+                              <Gavel className="w-4 h-4 mr-2 text-amber-600" />
+                              Raise dispute ({daysLeft}d left)
+                            </Button>
+                          </Link>
+                        ) : (
+                          <div className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 text-center">
+                            <p className="text-slate-400 text-xs font-bold">Dispute window has closed</p>
+                          </div>
+                        );
+                      }
+
+                      // For FUNDED vaults — normal dispute button
+                      if (vault.status === VaultStatus.FUNDED) {
+                        return (
+                          <Link href={`/client/disputes/create?vaultId=${vaultId}`} className="w-full">
+                            <Button
+                              variant="outline"
+                              className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
+                            >
+                              <Gavel className="w-4 h-4 mr-2 text-amber-600" />
+                              Initiate dispute
+                            </Button>
+                          </Link>
+                        );
+                      }
+
+                      return null;
+                    })()
+                    }
 
                     {!vault.freelancerId && (
                       <Button

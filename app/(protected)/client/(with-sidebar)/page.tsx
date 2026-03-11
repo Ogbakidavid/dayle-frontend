@@ -70,6 +70,11 @@ export default function ClientDashboard() {
     currentPage * itemsPerPage,
   );
 
+  const totalInvestment = vaults.reduce(
+    (acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0),
+    0,
+  );
+
   return (
     <motion.div
       variants={containerVariants}
@@ -99,16 +104,16 @@ export default function ClientDashboard() {
               <Landmark className="w-4 h-4 text-emerald-600" />
             </div>
             <span className="text-sm font-bold  text-slate-900">
-              Available balance
+              Total investment
             </span>
           </div>
           <div className="space-y-2">
             <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
-              ${balance?.formattedAvailable || "0.00"}
+              ${totalInvestment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </h2>
             <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold ">
-              <Zap className="w-4 h-4" />
-              Fully liquid
+              <Activity className="w-4 h-4" />
+              All-time project value
             </div>
           </div>
         </motion.div>

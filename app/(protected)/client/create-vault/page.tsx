@@ -565,21 +565,45 @@ export default function CreateVaultPage() {
                       </div>
 
                       {/* Header Summary */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="p-5 bg-white/3 border border-white/5 rounded-2xl">
-                          <Label className="text-[12px] font-bold text-slate-900 st block mb-1">
-                            Total value
-                          </Label>
-                          <p className="text-2xl font-bold text-emerald-500 ">
-                            ${budget.toLocaleString()}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-5 bg-white/3 border border-white/5 rounded-2xl space-y-3">
+                          <div className="flex justify-between items-center group/tooltip relative">
+                            <Label className="text-[12px] font-bold text-slate-900 st block">
+                              Budget
+                            </Label>
+                            <span className="text-xl font-bold text-slate-900 ">
+                              ${budget.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <Label className="text-[12px] font-bold text-emerald-500 st block">
+                              Service Fee (3%)
+                            </Label>
+                            <span className="text-sm font-bold text-emerald-500 ">
+                              +${(budget / 0.97 - budget).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          <div className="pt-3 border-t border-white/5 flex justify-between items-center">
+                            <Label className="text-[12px] font-bold text-slate-900 st block">
+                              Total investment
+                            </Label>
+                            <span className="text-2xl font-bold text-emerald-500 ">
+                              ${(budget / 0.97).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-slate-900 font-bold opacity-60">
+                            * Includes platform service fee for escrow & verification.
                           </p>
                         </div>
-                        <div className="p-5 bg-white/3 border border-white/5 rounded-2xl">
+                        <div className="p-5 bg-white/3 border border-white/5 rounded-2xl flex flex-col justify-center">
                           <Label className="text-[12px] font-bold text-slate-900 st block mb-1">
                             Beneficiary
                           </Label>
                           <p className="text-sm font-bold truncate text-slate-600 r">
                             {freelancerEmail}
+                          </p>
+                          <p className="text-[10px] text-slate-900 font-bold opacity-60 mt-2">
+                             Full budget will be delivered to the freelancer upon release.
                           </p>
                         </div>
                       </div>
@@ -693,11 +717,20 @@ export default function CreateVaultPage() {
                 Project configuration
               </h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-end">
-                  <span className="text-slate-900 font-bold">Total value</span>
-                  <span className="text-2xl text-slate-900 font-bold ">
+                <div className="flex justify-between items-end border-b border-white/5 pb-4">
+                  <span className="text-slate-900 font-bold text-sm">Budget</span>
+                  <span className="text-xl text-slate-900 font-bold ">
                     ${budget.toLocaleString()}
                   </span>
+                </div>
+                <div className="flex justify-between items-end">
+                  <span className="text-slate-900 font-bold text-sm">Total investment</span>
+                  <div className="text-right">
+                    <span className="text-2xl text-emerald-500 font-bold block">
+                      ${(budget / 0.97).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[10px] text-slate-900/50 font-bold">Incl. 3% fee</span>
+                  </div>
                 </div>
               </div>
             </div>

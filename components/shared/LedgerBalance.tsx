@@ -24,7 +24,7 @@ export function LedgerBalance({
         <CardContent className="p-8 relative z-10">
           <div className="flex items-center gap-2 text-slate-900 font-bold  text-sm mb-5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
-            Available balance
+            {role === "client" ? "Total investment" : "Available balance"}
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-light text-slate-900">$</span>
@@ -35,7 +35,7 @@ export function LedgerBalance({
           </div>
           <div className="mt-8 flex items-center gap-3">
             <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-sm font-bold text-emerald-500  border border-emerald-500/20 flex items-center gap-2">
-              <Zap size={10} /> Fully liquid
+              <Zap size={10} /> {role === "client" ? "All-time project worth" : "Fully liquid"}
             </div>
           </div>
         </CardContent>
