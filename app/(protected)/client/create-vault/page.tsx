@@ -233,7 +233,7 @@ export default function CreateVaultPage() {
   };
 
   return (
-    <div className="min-h-screen text-white selection:bg-emerald-500/30 selection:text-emerald-400 font-['Poppins',sans-serif]">
+    <div className="min-h-screen text-white selection:bg-emerald-500/30 selection:text-emerald-400 font-primary">
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 rounded-full blur-[120px]" />

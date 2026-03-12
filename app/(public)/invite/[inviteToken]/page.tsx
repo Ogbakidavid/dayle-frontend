@@ -167,7 +167,7 @@ export default function InvitePage() {
           <h1 className="text-3xl font-bold text-slate-900 tracking-tighter">
             {isExpired ? "Invitation expired" : "Invitation invalid"}
           </h1>
-          <p className="text-slate-600 font-medium font-['Poppins',sans-serif]">
+          <p className="text-slate-600 font-medium font-primary">
             {isExpired
               ? "This secure link is no longer valid. For security, invitations expire after 72 hours."
               : error}
@@ -207,7 +207,7 @@ export default function InvitePage() {
               ? "Invitation accepted"
               : "Invitation declined"}
           </h1>
-          <p className="text-slate-600 font-medium font-['Poppins',sans-serif]">
+          <p className="text-slate-600 font-medium font-primary">
             You have already responded to this invitation.
           </p>
           {status === "ACCEPTED" && data?.vault && (
@@ -233,7 +233,7 @@ export default function InvitePage() {
   const isLoggedIn = currentUser && currentUser.role !== UserRole.NONE;
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Poppins',sans-serif] selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-slate-50 font-primary selection:bg-emerald-500/30">
       {/* Simple Header */}
       <header className="border-b border-slate-200 bg-white">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">

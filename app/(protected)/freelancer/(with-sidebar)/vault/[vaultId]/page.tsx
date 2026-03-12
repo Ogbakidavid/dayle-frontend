@@ -76,7 +76,7 @@ export default function FreelancerVaultDetailPage() {
 
   if (!vault) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-8 font-['Poppins',sans-serif]">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-8 font-primary">
         <div className="p-6 rounded-2xl bg-red-50 border border-red-100 text-center max-w-md shadow-sm">
           <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-slate-900 tracking-tighter mb-2">
@@ -108,7 +108,7 @@ export default function FreelancerVaultDetailPage() {
   const isEligibleForDispute = getDisputeEligibility(vault).eligible;
 
   return (
-    <div className="min-h-screen text-slate-600 selection:bg-emerald-500/30 pb-20 font-['Poppins',sans-serif]">
+    <div className="min-h-screen text-slate-600 selection:bg-emerald-500/30 pb-20 font-primary">
       <div className="max-w-6xl mx-auto px-6 space-y-8">
         {/* SECTION A: HEADER */}
         <header className="pt-4 md:pt-8 bg-transparent">

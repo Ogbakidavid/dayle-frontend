@@ -5,7 +5,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { DotLoader } from "@/components/ui/dot-loader";
-import { Shield, Users, Briefcase, ArrowRight } from "lucide-react";
+import { Users, Briefcase, ArrowRight } from "lucide-react";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 import { api, UserRole } from "@/lib/api-client";
 import { usePrivy } from "@privy-io/react-auth";
 import { useUser } from "@/lib/store/user-context";
@@ -40,7 +41,7 @@ export default function RoleSelectionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 font-['Poppins',sans-serif]">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 font-primary">
       {/* Background Grid Decoration */}
       <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
@@ -49,9 +50,7 @@ export default function RoleSelectionPage() {
         {/* Header Section */}
         <div className="text-center mb-16 space-y-6">
           <div className="flex justify-center mb-8">
-            <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <Shield className="w-8 h-8 text-black stroke-[3px]" />
-            </div>
+            <DayleLogo className="w-20 h-20 text-emerald-500" />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-slate-900 tracking-tighter">
             Identify your <span className="text-emerald-600">account.</span>

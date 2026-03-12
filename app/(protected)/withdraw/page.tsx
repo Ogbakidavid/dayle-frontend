@@ -288,7 +288,7 @@ export default function FreelancerWithdrawPage() {
   }, [step, amount, bankDetails, selectedCurrency]);
 
   return (
-    <div className="min-h-screen bg-white text-slate-600 font-['Poppins',sans-serif] antialiased overflow-hidden">
+    <div className="min-h-screen bg-white text-slate-600 font-primary antialiased overflow-hidden">
       <AnimatePresence>{isProcessing && <ProcessingOverlay />}</AnimatePresence>
 
       <div className="flex flex-col lg:flex-row min-h-screen">

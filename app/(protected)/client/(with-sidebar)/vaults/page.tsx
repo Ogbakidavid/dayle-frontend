@@ -104,7 +104,7 @@ export default function VaultsPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen  text-slate-900 selection:bg-emerald-500/30 font-['Poppins',sans-serif]"
+      className="min-h-screen  text-slate-900 selection:bg-emerald-500/30 font-primary"
     >
       <div className="max-w-7xl mx-auto px-6 space-y-10">
         {/* 1. TOP NAVIGATION / HEADER */}
@@ -337,7 +337,7 @@ export default function VaultsPage() {
 
         {/* 5. FOOTER SUMMARY */}
         {!loading && filteredVaults.length > 0 && (
-          <footer className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-slate-200 font-['Poppins',sans-serif]">
+          <footer className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-slate-200 font-primary">
             <p className="text-sm md:text-sm font-bold text-slate-600  text-center sm:text-left">
               Displaying {paginatedVaults.length} of {filteredVaults.length}{" "}
               escrow projects

@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import UserAvatar from "@/components/shared/UserAvatar";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 
 const sidebarVariants = {
   hidden: { x: -280, opacity: 0 },
@@ -70,7 +71,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex font-['Poppins',sans-serif]">
+    <div className="min-h-screen bg-background text-foreground flex font-primary">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
@@ -92,10 +93,8 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
       >
         {/* Logo & Brand */}
         <div className="p-6 pb-4">
-          <Link href="/freelancer" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
-              <Shield className="w-5 h-5 text-black" strokeWidth={2.5} />
-            </div>
+          <Link href="/freelancer" className="flex items-center gap-4 group">
+            <DayleLogo className="w-10 h-10 text-emerald-500 transition-transform group-hover:scale-110" />
             <div>
               <h1 className="text-2xl text-slate-900 tracking-tight font-bold">
                 Dayle
@@ -148,15 +147,6 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
           })}
         </nav>
 
-        {/* Status Indicator (Activated) */}
-        <div className="px-6 py-4 mx-4 mb-4 bg-emerald-50 border border-emerald-100 rounded-2xl group hover:bg-emerald-100 transition-colors shadow-sm">
-          <div className="flex items-center gap-2 text-emerald-600  font-bold  mb-1  uppercase">
-            <CheckCircle className="w-3 h-3" /> Activated
-          </div>
-          <p className="text-[11px] text-slate-600 font-bold  leading-relaxed">
-            Approved for active project access
-          </p>
-        </div>
 
         <div className="p-4 border-t border-slate-200 mt-auto">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
@@ -169,7 +159,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               />
               {user?.kycStatus === "VERIFIED" && (
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-muted flex items-center justify-center shadow-lg">
-                  <Shield className="w-2.5 h-2.5 text-black" strokeWidth={4} />
+                  <DayleLogo className="w-2.5 h-2.5 text-black" />
                 </div>
               )}
             </div>
@@ -189,7 +179,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 w-full text-sm font-bold  border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-['Poppins',sans-serif] shadow-sm"
+                className="h-9 w-full text-sm font-bold  border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-primary shadow-sm"
               >
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
@@ -206,7 +196,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               variant="outline"
               size="sm"
               onClick={logout}
-              className="h-9 text-sm font-bold  border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-['Poppins',sans-serif] shadow-sm"
+              className="h-9 text-sm font-bold  border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-primary shadow-sm"
             >
               <LogOut className="w-3.5 h-3.5 mr-2" />
               Sign out
@@ -227,7 +217,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
           >
             <Menu className="w-5 h-5" />
           </Button>
-          <h1 className="text-lg font-bold font-['Poppins',sans-serif]">
+          <h1 className="text-lg font-bold font-primary">
             Dayle
           </h1>
           <div className="w-9" /> {/* Spacer for centering */}

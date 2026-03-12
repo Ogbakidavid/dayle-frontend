@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
-  Shield,
+  Check,
   LayoutDashboard,
   Plus,
   LogOut,
@@ -20,6 +20,7 @@ import { useUser } from "@/lib/store/user-context";
 import { cn } from "@/lib/utils";
 import { motion, Variants } from "framer-motion";
 import UserAvatar from "@/components/shared/UserAvatar";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 
 const sidebarVariants: Variants = {
   hidden: { x: -280, opacity: 0 },
@@ -91,7 +92,7 @@ export default function ClientLayout({
         animate="visible"
         variants={sidebarVariants}
         className={cn(
-          "w-[280px] border-r border-slate-200 bg-slate-50 flex flex-col h-screen transition-transform duration-300 ease-in-out",
+          "w-[280px] border-r border-slate-200 bg-white flex flex-col h-screen transition-transform duration-300 ease-in-out",
           "fixed lg:sticky top-0 z-50 lg:z-auto",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
@@ -100,13 +101,11 @@ export default function ClientLayout({
         <div className="p-6 pb-4">
           <Link
             href="/client"
-            className="flex items-center gap-3 group font-['Poppins',sans-serif]"
+            className="flex items-center gap-1 group font-primary"
           >
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/10">
-              <Shield className="w-5 h-5 text-white" strokeWidth={2.5} />
-            </div>
+            <DayleLogo className="w-10 h-10 text-emerald-500 transition-transform group-hover:scale-110" />
             <div>
-              <h1 className="text-2xl text-slate-900 tracking-tight font-bold">
+              <h1 className="text-[22px] text-slate-900 tracking-tight font-bold">
                 Dayle
               </h1>
             </div>
@@ -114,7 +113,7 @@ export default function ClientLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1 font-['Poppins',sans-serif]">
+        <nav className="flex-1 px-4 py-6 space-y-1 font-primary">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -157,23 +156,28 @@ export default function ClientLayout({
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-200 mt-auto font-['Poppins',sans-serif]">
-          <div className="flex items-center gap-3 p-3 rounded-lg">
+        <div className="p-4 border-t border-slate-200 mt-auto font-primary">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
             <div className="relative group">
               <UserAvatar
                 identifier={user?.id || user?.email || "guest"}
                 src={user?.profileImage}
                 size={36}
-                className="font-medium text-sm border border-slate-200"
+                className="font-bold text-sm border-2 border-white/10 group-hover:border-emerald-500/50 transition-colors"
               />
               {user?.kycStatus === "VERIFIED" && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-muted flex items-center justify-center">
-                  <Shield className="w-2 h-2 text-black" strokeWidth={4} />
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-muted flex items-center justify-center shadow-lg">
+                  <Check className="w-2.5 h-2.5 text-white" />
                 </div>
               )}
             </div>
-            <div>
-              <p className="text-sm font-bold  text-slate-900">{user?.name}</p>
+            <div className="min-w-0">
+              <p className="text-sm font-bold  text-slate-900 truncate">
+                {user?.name || "Client"}
+              </p>
+              <p className="text-sm font-bold text-slate-600 truncate">
+                {user?.email}
+              </p>
             </div>
           </div>
 
@@ -183,7 +187,7 @@ export default function ClientLayout({
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 w-full text-sm font-bold  border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-['Poppins',sans-serif] shadow-sm"
+                className="h-9 w-full text-sm font-bold  border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-primary shadow-sm"
               >
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
@@ -200,7 +204,7 @@ export default function ClientLayout({
               variant="outline"
               size="sm"
               onClick={logout}
-              className="h-9 text-sm font-bold  border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-['Poppins',sans-serif] shadow-sm"
+              className="h-9 text-sm font-bold  border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-primary shadow-sm"
             >
               <LogOut className="w-3.5 h-3.5 mr-2" />
               Sign out
@@ -221,14 +225,14 @@ export default function ClientLayout({
           >
             <Menu className="w-5 h-5" />
           </Button>
-          <h1 className="text-lg font-bold font-['Poppins',sans-serif]">
+          <h1 className="text-lg font-bold font-primary">
             Dayle
           </h1>
           <div className="w-9" /> {/* Spacer for centering */}
         </div>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto bg-background">
+        <main className="flex-1 overflow-y-auto bg-gray-50">
           <div className="p-4 lg:p-8">
             <div className="max-w-7xl mx-auto">{children}</div>
           </div>

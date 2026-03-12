@@ -80,7 +80,7 @@ export default function ClientDashboard() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8 max-w-6xl mx-auto font-['Poppins',sans-serif]"
+      className="space-y-8 max-w-6xl mx-auto font-primary"
     >
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">

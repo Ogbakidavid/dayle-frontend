@@ -4,7 +4,9 @@
 
 @theme {
   /* Typography Scale */
-  --font-sans: var(--font-poppins);
+  --font-primary: var(--font-space-grotesk);
+  --font-secondary: var(--font-poppins);
+  --font-sans: var(--font-primary);
 
   /* Spacing Scale (4px base) */
   --spacing-0\.5: 0.125rem;
@@ -127,7 +129,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-poppins);
+    font-family: var(--font-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     @apply antialiased;
@@ -139,7 +141,7 @@
   h4,
   h5,
   h6 {
-    @apply font-semibold tracking-tight text-slate-900;
+    @apply font-primary font-semibold tracking-tight text-slate-900;
   }
 
   *:focus-visible {

@@ -184,7 +184,7 @@ export default function CardPaymentPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center text-slate-900 font-['Poppins',sans-serif]">
+      <div className="min-h-screen bg-white flex items-center justify-center text-slate-900 font-primary">
         <div className="animate-spin text-emerald-600">
           <Lock />
         </div>
@@ -192,7 +192,7 @@ export default function CardPaymentPage() {
     );
 
   return (
-    <div className="min-h-screen bg-white text-slate-600 font-['Poppins',sans-serif] antialiased">
+    <div className="min-h-screen bg-white text-slate-600 font-primary antialiased">
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT SIDEBAR */}
         <section className="w-full lg:w-[400px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">

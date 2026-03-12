@@ -1,5 +1,5 @@
 "use client";
-import { DotLoader } from "@/components/ui/dot-loader";
+import { LogoLoader } from "@/components/ui/logo-loader";
 
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
@@ -8,7 +8,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, ArrowRight, CheckCircle2, User, KeyRound } from "lucide-react";
+import { ArrowRight, CheckCircle2, User, KeyRound } from "lucide-react";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 import { api, UserRole } from "@/lib/api-client";
 import { useUser } from "@/lib/store/user-context";
 import { usePrivy, useLoginWithEmail } from "@privy-io/react-auth";
@@ -176,7 +177,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col md:flex-row selection:bg-emerald-500/30 font-[Poppins,sans-serif]">
+    <div className="min-h-screen bg-white flex flex-col md:flex-row selection:bg-emerald-500/30 font-primary">
       {/* LEFT SIDE: Branding & Features (Visual Anchor) */}
       <div className="hidden md:flex md:w-[45%] bg-slate-50 relative justify-center p-20 border-r border-slate-200 overflow-hidden">
         {/* Grid Background */}
@@ -186,10 +187,8 @@ export default function LoginPage() {
         <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full"></div>
 
         <div className="relative z-10 w-full max-w-lg">
-          <Link href="/" className="flex items-center gap-4 mb-20 group">
-            <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-emerald-500/20 text-black">
-              <Shield className="w-7 h-7 stroke-[3px]" />
-            </div>
+          <Link href="/" className="flex items-center gap-5 mb-20 group">
+            <DayleLogo className="w-14 h-14 text-emerald-500 transition-transform group-hover:scale-105" />
             <span className="font-bold tracking-tighter text-slate-900 text-3xl">
               Dayle
             </span>
@@ -288,7 +287,7 @@ export default function LoginPage() {
               >
                 {loading || (authenticated && !loginFailed) ? (
                   <div className="flex items-center gap-3">
-                    <DotLoader size="sm" />
+                    <LogoLoader size="sm" />
                     <span>
                       {authenticated ? "Signing in..." : "Sending code..."}
                     </span>
@@ -412,7 +411,7 @@ export default function LoginPage() {
               >
                 {loading ? (
                   <div className="flex items-center gap-3">
-                    <DotLoader size="sm" />
+                    <LogoLoader size="sm" />
                     <span>Verifying...</span>
                   </div>
                 ) : (

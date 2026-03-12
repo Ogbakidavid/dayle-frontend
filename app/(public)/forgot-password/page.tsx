@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col md:flex-row selection:bg-emerald-500/30 font-['Poppins',sans-serif]">
+    <div className="min-h-screen bg-white flex flex-col md:flex-row selection:bg-emerald-500/30 font-primary">
       {/* LEFT SIDE: Branding & Features */}
       <div className="hidden md:flex md:w-[45%] bg-slate-50 relative justify-center p-20 border-r border-slate-200 overflow-hidden">
         {/* Grid Background */}

@@ -93,7 +93,7 @@ function VerificationStatusContent() {
   const isReview = false;
 
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 font-['Poppins',sans-serif]">
+    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 font-primary">
       {/* Background Grid Decoration */}
       <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
@@ -182,7 +182,7 @@ function VerificationStatusContent() {
                 <p className="text-sm font-bold text-emerald-500  mb-2">
                   Final settlement reached
                 </p>
-                <p className="text-sm font-bold text-white  leading-relaxed font-['Poppins',sans-serif]">
+                <p className="text-sm font-bold text-white  leading-relaxed font-primary">
                   The objective requirements have been validated. Funds have
                   been distributed to the recipient account.
                 </p>
@@ -192,7 +192,7 @@ function VerificationStatusContent() {
                 <p className="text-sm font-bold text-blue-500  mb-2">
                   System review
                 </p>
-                <p className="text-sm font-bold text-white  leading-relaxed font-['Poppins',sans-serif]">
+                <p className="text-sm font-bold text-white  leading-relaxed font-primary">
                   Our system is currently verifying the submitted evidence
                   against the project requirements.
                 </p>
@@ -202,7 +202,7 @@ function VerificationStatusContent() {
                 <p className="text-sm font-bold text-white  mb-2">
                   Waiting for submission
                 </p>
-                <p className="text-sm font-bold text-white  leading-relaxed font-['Poppins',sans-serif]">
+                <p className="text-sm font-bold text-white  leading-relaxed font-primary">
                   Payment is locked and secured. Recipient has not yet submitted
                   work for verification.
                 </p>

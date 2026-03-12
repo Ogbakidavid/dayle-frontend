@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 export default function SupportPage() {
   return (
-    <section className="min-h-screen bg-[#050505] px-4 md:px-6 pt-32 pb-24 font-['Poppins',sans-serif]">
+    <section className="min-h-screen bg-[#050505] px-4 md:px-6 pt-32 pb-24 font-primary">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div

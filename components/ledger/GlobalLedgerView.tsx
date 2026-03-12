@@ -9,6 +9,7 @@ import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 import { Search, ArrowUpRight, ArrowDownLeft, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 
 // Helper: format a raw USDC/USDT amount stored in 6-decimal base units
 const formatAmount = (raw: bigint | number | string): number => {
@@ -87,14 +88,14 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8 font-['Poppins',sans-serif]"
+      className="space-y-8 font-primary"
     >
       <header className="space-y-3">
         <motion.div
           variants={itemVariants}
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100  font-bold  text-emerald-700 "
         >
-          <ShieldCheck className="w-3.5 h-3.5" />
+          <DayleLogo className="w-3.5 h-3.5" />
           Financial activity protocol
         </motion.div>
         <motion.h1
@@ -340,22 +341,3 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
   );
 }
 
-function ShieldCheck(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-      <path d="m9 12 2 2 4-4" />
-    </svg>
-  );
-}

@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import { useUser } from "@/lib/store/user-context";
 import { DotLoader } from "@/components/ui/dot-loader";
+import { LogoLoader } from "@/components/ui/logo-loader";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -83,18 +84,15 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   ) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-4">
-        <div className="relative">
-          <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full animate-pulse" />
-          <DotLoader size="lg" className="relative z-10" />
-        </div>
-        <div className="text-center space-y-1">
+        <LogoLoader size="lg" />
+        {/* <div className="text-center space-y-1">
           <p className="text-sm font-bold text-emerald-600 tracking-[0.2em] animate-pulse">
             Authenticating
           </p>
           <p className=" font-medium text-slate-600 r">
             Establishing secure session
           </p>
-        </div>
+        </div> */}
       </div>
     );
   }

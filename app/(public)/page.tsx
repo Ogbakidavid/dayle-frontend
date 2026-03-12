@@ -81,7 +81,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen transition-colors duration-500 selection:bg-emerald-500/30 antialiased font-['Poppins',sans-serif] bg-white text-slate-900">
+    <div className="min-h-screen transition-colors duration-500 selection:bg-emerald-500/30 antialiased font-primary bg-white text-slate-900">
       {/* Background Sophistication */}
       <div className="fixed inset-0 z-0 opacity-[0.04] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
@@ -140,7 +140,7 @@ export default function LandingPage() {
             {/* Small signal badge */}
             <motion.div
               variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-slate-200 bg-slate-50 text-[11px] md:text-sm font-bold  mb-7 md:mb-9 text-slate-600"
+              className="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-slate-200 bg-slate-50 text-[11px] md:text-sm font-bold  mb-7 md:mb-9 text-slate-900"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               Automated escrow protection
@@ -397,9 +397,9 @@ export default function LandingPage() {
             transition={{ duration: 0.45, ease: "easeOut" }}
             className="rounded-3xl border border-slate-200 bg-slate-50 p-6 md:p-10"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-black/20 mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-[11px] md:text-sm font-bold  text-white">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] md:text-sm font-bold text-emerald-700">
                 Clear expectations
               </span>
             </div>

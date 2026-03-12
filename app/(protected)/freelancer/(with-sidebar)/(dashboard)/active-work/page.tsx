@@ -61,7 +61,7 @@ export default function ActiveWorkPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen pb-20 font-['Poppins',sans-serif]"
+      className="min-h-screen pb-20 font-primary"
     >
       <div className="max-w-6xl mx-auto px-6 space-y-12">
         {/* HEADER */}

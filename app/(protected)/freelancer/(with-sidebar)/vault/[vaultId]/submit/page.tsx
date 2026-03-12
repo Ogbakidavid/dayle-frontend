@@ -177,7 +177,7 @@ export default function SubmissionPage() {
 
 
   return (
-    <div className="min-h-screen text-slate-600 selection:bg-emerald-500/30 pb-20 font-['Poppins',sans-serif]">
+    <div className="min-h-screen text-slate-600 selection:bg-emerald-500/30 pb-20 font-primary">
       <div className="max-w-4xl mx-auto px-6 space-y-8">
         <header className="pt-8">
           <button
