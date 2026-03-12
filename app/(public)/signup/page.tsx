@@ -326,13 +326,13 @@ export default function SignupPage() {
       </div>
 
       {/* RIGHT SIDE: Form (The Action) */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-24 bg-white relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-24 bg-white relative overflow-hidden">
         {/* Subtle Form Background Detail */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="w-full max-w-[440px] relative z-10">
           <div className="mb-10">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tight leading-none">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-none">
               {step === "otp" ? "Verify email" : "Create account"}
             </h2>
             <p className="text-slate-600 mt-4 text-sm font-bold  leading-relaxed">

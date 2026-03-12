@@ -54,15 +54,15 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
   };
 
   return (
-    <Card className="bg-muted border-white/10 shadow-xl overflow-hidden">
-      <CardHeader className="border-b border-white/5 bg-white/2">
-        <CardTitle className="text-white flex items-center gap-2 text-base font-bold ">
-          <Gavel className="w-4 h-4 text-amber-400" />
+    <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+      <CardHeader className="border-b border-slate-100 bg-slate-50/50">
+        <CardTitle className="text-slate-900 flex items-center gap-2 text-base font-bold ">
+          <Gavel className="w-4 h-4 text-amber-500" />
           Dispute initiation
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
-        <p className="text-sm text-white/60 leading-relaxed">
+        <p className="text-sm text-slate-600 leading-relaxed font-bold">
           Disputes are vault-scoped and require structured reason codes.
           Free-text complaints are not accepted.
         </p>
@@ -73,7 +73,7 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
             <select
               value={selectedRequirement}
               onChange={handleSelectChange}
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/40 transition-all outline-none"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500/40 transition-all outline-none font-bold"
             >
               <option value="">Select requirement...</option>
               {(vault as any).submission?.requirements?.map((req: any) => (
@@ -95,21 +95,21 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
                   key={reason.code}
                   className={`flex items-start gap-4 border transition-all cursor-pointer rounded-xl p-4 text-sm ${
                     active
-                      ? "border-amber-500/30 bg-amber-500/10 text-white shadow-inner"
-                      : "border-white/5 bg-black/40 text-white/60 hover:border-white/20 hover:bg-white/4"
+                      ? "border-amber-500 bg-amber-50/50 text-slate-900 shadow-xs"
+                      : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={active}
                     onChange={() => toggleReason(reason.code)}
-                    className="mt-1 h-4 w-4 rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500/30"
+                    className="mt-1 h-4 w-4 rounded border-slate-300 bg-white text-amber-500 focus:ring-amber-500/10"
                   />
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold text-white/90">
+                    <p className="text-sm font-bold text-slate-900">
                       {reason.label}
                     </p>
-                    <p className="text-sm text-white/50 leading-relaxed">
+                    <p className="text-xs text-slate-600 font-bold leading-relaxed">
                       {reason.description}
                     </p>
                   </div>
@@ -122,28 +122,28 @@ export function DisputeInitiationPanel({ vault }: DisputeInitiationPanelProps) {
         <div
           className={`flex items-start gap-3 rounded-xl border p-4 transition-all ${
             eligibility.eligible
-              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-200"
-              : "border-amber-500/20 bg-amber-500/10 text-amber-200"
+              ? "border-emerald-100 bg-emerald-50 text-emerald-900"
+              : "border-amber-100 bg-amber-50 text-amber-900"
           }`}
         >
           <EligibilityIcon
-            className={`w-5 h-5 mt-0.5 shrink-0 ${eligibilityTone}`}
+            className={`w-5 h-5 mt-0.5 shrink-0 ${eligibility.eligible ? "text-emerald-600" : "text-amber-600"}`}
           />
           <div className="min-w-0">
-            <p className="text-sm font-semibold">
+            <p className="text-sm font-bold">
               {eligibility.eligible ? "Ready to open" : "Action required"}
             </p>
-            <p className="text-sm text-white/70">
+            <p className="text-sm font-bold opacity-70">
               {eligibility.reason || "Select scope above"}
             </p>
           </div>
         </div>
 
         <Button
-          className={`w-full h-11 transition-all font-bold r ${
+          className={`w-full h-11 transition-all font-bold rounded-xl ${
             canSubmit
-              ? "bg-amber-500 hover:bg-amber-400 text-black shadow-lg shadow-amber-500/20"
-              : "bg-white/5 text-white/20 border border-white/5"
+              ? "bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-sm"
+              : "bg-slate-100 text-slate-400 border border-slate-200"
           }`}
           disabled={!canSubmit}
         >

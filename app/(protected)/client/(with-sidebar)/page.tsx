@@ -85,10 +85,10 @@ export default function ClientDashboard() {
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <motion.div variants={itemVariants} className="space-y-1">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-slate-900 ">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tighter text-slate-900">
             Overview
           </h1>
-          <p className="text-sm md:text-sm text-slate-600 font-bold">
+          <p className="text-xs md:text-sm text-slate-600 font-bold">
             Welcome back to your client dashboard
           </p>
         </motion.div>
@@ -100,8 +100,8 @@ export default function ClientDashboard() {
           className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
-              <Landmark className="w-4 h-4 text-emerald-600" />
+            <div className="w-9 h-9 rounded-sm bg-[#F8F9FA] flex items-center justify-center">
+              <Landmark className="w-4 h-4 text-slate-900" />
             </div>
             <span className="text-sm font-bold  text-slate-900">
               Total investment
@@ -120,11 +120,11 @@ export default function ClientDashboard() {
 
         <motion.div
           variants={itemVariants}
-          className="bg-muted border border-white/10 p-6 rounded-sm hover:border-white/20 transition-colors"
+          className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-sm bg-emerald-500/10 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-emerald-600" />
+            <div className="w-9 h-9 rounded-sm bg-[#F8F9FA] flex items-center justify-center">
+              <Shield className="w-4 h-4 text-slate-900" />
             </div>
             <span className="text-sm font-bold  text-slate-900">
               Secured in projects
@@ -134,7 +134,7 @@ export default function ClientDashboard() {
             <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
               ${balance?.formattedSecured || "0"}
             </h2>
-            <p className="text-slate-600 text-sm font-bold ">
+            <p className="text-emerald-600 text-sm font-bold ">
               {securedVaults.length} active contracts
             </p>
           </div>
@@ -148,8 +148,8 @@ export default function ClientDashboard() {
           className="flex items-center justify-between"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <LayoutGrid className="w-5 h-5 text-emerald-600" />
+            <div className="p-2 rounded-lg bg-[#F8F9FA] border border-slate-200">
+              <LayoutGrid className="w-5 h-5 text-slate-900" />
             </div>
             <h2 className="text-xl font-bold  text-slate-900 ">
               Active projects
@@ -176,8 +176,8 @@ export default function ClientDashboard() {
             animate="visible"
             className="py-20 text-center bg-white border border-slate-200 rounded-2xl shadow-sm"
           >
-            <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-6 border border-slate-100 group">
-              <Activity className="w-8 h-8 text-slate-200 group-hover:text-slate-600 transition-colors" />
+            <div className="w-16 h-16 rounded-full bg-[#F8F9FA] flex items-center justify-center mx-auto mb-6 border border-slate-100 group">
+              <Activity className="w-8 h-8 text-slate-400 group-hover:text-slate-600 transition-colors" />
             </div>
             <p className="text-sm font-bold  text-slate-900">
               No active projects
@@ -247,17 +247,17 @@ export default function ClientDashboard() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-8 border-t sm:border-t-0 border-slate-100 pt-6 sm:pt-0">
+                    <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-8 border-t sm:border-t-0 border-slate-100 pt-5 sm:pt-0">
                       <div className="sm:text-right">
-                        <p className="text-[9px] text-slate-600 font-bold  mb-1">
+                        <p className="text-[10px] text-slate-600 font-bold mb-1">
                           Project value
                         </p>
-                        <p className="text-2xl font-bold text-slate-900 tracking-tight ">
+                        <p className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight ">
                           ${vault.formattedTotalAmount || vault.totalAmount}
                         </p>
                       </div>
-                      <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">
-                        <ArrowUpRight className="w-5 h-5 text-slate-600 group-hover:text-white transition-colors" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">
+                        <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 group-hover:text-white transition-colors" />
                       </div>
                     </div>
                   </motion.div>
@@ -267,12 +267,12 @@ export default function ClientDashboard() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-between bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                <p className=" font-bold text-slate-600 ">
+              <div className="mt-8 flex flex-col xs:flex-row items-center justify-between bg-slate-50 border border-slate-200 rounded-2xl p-4 gap-4">
+                <p className="text-xs sm:text-sm font-bold text-slate-600 ">
                   Page <span className="text-slate-600">{currentPage}</span> /{" "}
                   {totalPages}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full xs:w-auto">
                   <Button
                     variant="outline"
                     size="sm"
@@ -280,7 +280,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(1, prev - 1))
                     }
-                    className="h-10 px-4  border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold  transition-all disabled:opacity-50"
+                    className="flex-1 xs:flex-none h-9 px-4 text-xs sm:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition-all disabled:opacity-50"
                   >
                     Previous
                   </Button>
@@ -291,7 +291,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                     }
-                    className="h-10 px-4  border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold  transition-all disabled:opacity-50"
+                    className="flex-1 xs:flex-none h-9 px-4 text-xs sm:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition-all disabled:opacity-50"
                   >
                     Next
                   </Button>

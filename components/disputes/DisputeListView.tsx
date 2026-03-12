@@ -173,7 +173,7 @@ function StatCard({
                 {value}
               </p>
               {hint ? (
-                <p className="mt-1  text-slate-600 font-bold   uppercase">
+                <p className="mt-1  text-slate-600 font-bold">
                   {hint}
                 </p>
               ) : null}
@@ -325,7 +325,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Open"
           value={counts.open}
@@ -413,7 +413,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                     type="button"
                     onClick={() => setStatusFilter(t.key)}
                     className={cn(
-                      "inline-flex items-center gap-2 rounded-full border px-3 py-1.5  font-bold  transition-all  uppercase",
+                      "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-bold transition-all",
                       active
                         ? "border-amber-200 bg-amber-50 text-amber-700 shadow-sm"
                         : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900",

@@ -58,13 +58,13 @@ function StepHeader({ step, title, subtitle, right }: StepHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/3">
-          <span className="text-sm font-semibold text-white/80">{step}</span>
+        <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-50">
+          <span className="text-sm font-bold text-slate-600">{step}</span>
         </div>
         <div className="space-y-0.5">
-          <div className="text-base font-semibold text-white">{title}</div>
+          <div className="text-base font-bold text-slate-900">{title}</div>
           {subtitle ? (
-            <div className="text-sm text-white/50">{subtitle}</div>
+            <div className="text-sm font-bold text-slate-500">{subtitle}</div>
           ) : null}
         </div>
       </div>
@@ -85,18 +85,18 @@ function StatusBanner({ eligible, title, description }: StatusBannerProps) {
       className={cn(
         "flex items-start gap-4 rounded-xl border p-4",
         eligible
-          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-200"
-          : "border-red-500/20 bg-red-500/10 text-red-200",
+          ? "border-emerald-100 bg-emerald-50 text-emerald-900"
+          : "border-red-100 bg-red-50 text-red-900",
       )}
     >
       {eligible ? (
-        <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
+        <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
       ) : (
-        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
       )}
       <div className="min-w-0">
-        <div className="text-sm font-semibold">{title}</div>
-        <div className="text-sm text-white/70">{description}</div>
+        <div className="text-sm font-bold">{title}</div>
+        <div className="text-sm font-bold opacity-70">{description}</div>
       </div>
     </div>
   );
@@ -290,17 +290,17 @@ export function CreateDisputeForm({
           type="button"
           variant="ghost"
           onClick={() => router.back()}
-          className="text-white/70 hover:text-white hover:bg-white/5"
+          className="text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-bold"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
 
-        <div className="flex items-center gap-2 text-sm text-slate-900">
+        <div className="flex items-center gap-2 text-sm text-slate-600 font-bold">
           <span
             className={cn(
               "h-2 w-2 rounded-full",
-              step1Complete ? "bg-emerald-400" : "bg-white/20",
+              step1Complete ? "bg-emerald-500" : "bg-slate-200",
             )}
           />
           <span>Step 1</span>
@@ -308,7 +308,7 @@ export function CreateDisputeForm({
           <span
             className={cn(
               "h-2 w-2 rounded-full",
-              step2Ready ? "bg-emerald-400" : "bg-white/20",
+              step2Ready ? "bg-emerald-500" : "bg-slate-200",
             )}
           />
           <span>Step 2</span>
@@ -317,10 +317,10 @@ export function CreateDisputeForm({
 
       {/* Header */}
       <header className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
           Open a dispute
         </h1>
-        <p className="text-sm leading-relaxed text-white/60">
+        <p className="text-sm leading-relaxed text-slate-600 font-bold">
           Disputes are scoped to a specific vault and a reason code. Choose
           carefully. Weak or vague disputes get rejected.
         </p>
@@ -333,11 +333,9 @@ export function CreateDisputeForm({
             <div>{formError}</div>
           </div>
         </div>
-      ) : null}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
+      ) : null}      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Step 1 */}
-        <Card className="border-white/10 bg-[#0B0B0C]">
+        <Card className="border-slate-200 bg-white shadow-sm">
           <CardHeader className="space-y-3 mb-4">
             <StepHeader
               step="1"
@@ -345,8 +343,8 @@ export function CreateDisputeForm({
               subtitle="Pick the vault this dispute applies to."
               right={
                 selectedVault ? (
-                  <div className="rounded-lg border border-white/10 bg-white/3 px-3 py-1 text-sm text-white/60">
-                    {selectedVault.id}
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-600">
+                    {selectedVault.id.slice(0, 8)}...
                   </div>
                 ) : null
               }
@@ -357,7 +355,7 @@ export function CreateDisputeForm({
             <div className="grid gap-4 sm:grid-cols-1">
               {/* Vault */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-white">Vault</Label>
+                <Label className="text-sm font-bold text-slate-700">Vault</Label>
                 <Select
                   value={selectedVaultId}
                   onValueChange={(val) => {
@@ -365,7 +363,7 @@ export function CreateDisputeForm({
                     resetDownstream();
                   }}
                 >
-                  <SelectTrigger className="h-11 w-full border-white/10 bg-black/40 text-white hover:border-white/20 focus:ring-2 focus:ring-amber-500/30">
+                  <SelectTrigger className="h-11 w-full border-slate-200 bg-white text-slate-900 hover:border-slate-300 focus:ring-2 focus:ring-emerald-500/20 font-bold">
                     <SelectValue placeholder="Select a vault...">
                       {selectedVault ? (
                         <span className="block w-full truncate">
@@ -378,26 +376,26 @@ export function CreateDisputeForm({
                   <SelectContent
                     className="
                       w-(--radix-select-trigger-width)
-                      border-white/10 bg-[#141416] text-white
+                      border-slate-200 bg-white text-slate-900
                     "
                   >
                     {availableVaults.map((vault) => (
                       <SelectItem
                         key={vault.id}
                         value={vault.id}
-                        className="focus:bg-white/10 focus:text-white"
+                        className="focus:bg-slate-50 focus:text-slate-900 font-bold"
                       >
                         <div className="flex w-full items-center justify-between gap-3">
                           <span className="truncate">{vault.title}</span>
-                          <span className="shrink-0 text-[11px] text-slate-900">
-                            {vault.id}
+                          <span className="shrink-0 text-[10px] text-slate-400">
+                            {vault.id.slice(0, 8)}
                           </span>
                         </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-slate-900">
+                <p className="text-xs text-slate-500 font-bold">
                   This determines the dispute jurisdiction and parties.
                 </p>
               </div>
@@ -405,29 +403,29 @@ export function CreateDisputeForm({
 
             {/* Quick vault context */}
             {selectedVault ? (
-              <div className="rounded-xl border border-white/10 bg-white/3 p-4">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 space-y-2">
-                    <div className="text-sm font-semibold text-white">
+                    <div className="text-sm font-bold text-slate-900">
                       {selectedVault.title}
                     </div>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm text-white/50">
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-xs text-slate-500 font-bold">
                       <div>
                         Status:{" "}
-                        <span className="text-white/70 font-bold">
+                        <span className="text-slate-900">
                           {selectedVault.status}
                         </span>
                       </div>
                       <div>
                         Type:{" "}
-                        <span className="text-white/70 font-bold">
+                        <span className="text-slate-900">
                           Single release
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-1 text-sm text-white/60">
-                    <Gavel className="h-4 w-4 text-amber-400" />
+                  <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-600 shadow-xs">
+                    <Gavel className="h-4 w-4 text-amber-500" />
                     Dispute scope locked
                   </div>
                 </div>
@@ -438,7 +436,7 @@ export function CreateDisputeForm({
 
         {/* Step 2 */}
         {step1Complete ? (
-          <Card className="border-white/10 bg-[#0B0B0C]">
+          <Card className="border-slate-200 bg-white shadow-sm">
             <CardHeader className="space-y-3">
               <StepHeader
                 step="2"
@@ -464,16 +462,16 @@ export function CreateDisputeForm({
               {eligibility?.eligible &&
               selectedReasonCode &&
               requiresDeliverableRef ? (
-                <div className="space-y-2 pt-4 border-t border-white/5 animate-in slide-in-from-top-2 fade-in">
-                  <Label className="text-sm font-medium text-white">
-                    Related requirement <span className="text-red-400">*</span>
+                <div className="space-y-2 pt-4 border-t border-slate-100 animate-in slide-in-from-top-2 fade-in">
+                  <Label className="text-sm font-bold text-slate-700">
+                    Related requirement <span className="text-red-500">*</span>
                   </Label>
 
                   <Select
                     value={selectedDeliverableTitle}
                     onValueChange={setSelectedDeliverableTitle}
                   >
-                    <SelectTrigger className="h-11 w-full border-white/10 bg-black/40 text-white hover:border-white/20 focus:ring-2 focus:ring-amber-500/30">
+                    <SelectTrigger className="h-11 w-full border-slate-200 bg-white text-slate-900 hover:border-slate-300 focus:ring-2 focus:ring-emerald-500/20 font-bold">
                       <SelectValue placeholder="Select deliverable...">
                         {selectedDeliverable ? (
                           <span className="block w-full truncate">
@@ -486,7 +484,7 @@ export function CreateDisputeForm({
                     <SelectContent
                       className="
                         w-(--radix-select-trigger-width)
-                        border-white/10 bg-[#141416] text-white
+                        border-slate-200 bg-white text-slate-900
                       "
                     >
                       {(selectedVault?.deliverables || []).map(
@@ -494,14 +492,14 @@ export function CreateDisputeForm({
                           <SelectItem
                             key={deliverable.id}
                             value={deliverable.title}
-                            className="focus:bg-white/10 focus:text-white"
+                            className="focus:bg-slate-50 focus:text-slate-900 font-bold"
                           >
                             <div className="flex flex-col items-start py-1">
-                              <span className="text-sm font-medium">
+                              <span className="text-sm font-bold">
                                 {deliverable.title}
                               </span>
                               {deliverable.description && (
-                                <span className="text-sm text-slate-900">
+                                <span className="text-[11px] text-slate-500 font-bold">
                                   {deliverable.description}
                                 </span>
                               )}
@@ -512,7 +510,7 @@ export function CreateDisputeForm({
                     </SelectContent>
                   </Select>
 
-                  <p className="text-sm text-slate-900">
+                  <p className="text-xs text-slate-500 font-bold">
                     This dispute type must specifically reference which
                     verification requirement was handled incorrectly.
                   </p>
@@ -523,10 +521,10 @@ export function CreateDisputeForm({
               {eligibility?.eligible ? (
                 <div className="space-y-3">
                   <div className="flex items-end justify-between gap-3">
-                    <Label className="text-sm font-medium text-white">
+                    <Label className="text-sm font-bold text-slate-700">
                       Reason code *
                     </Label>
-                    <div className="text-sm text-slate-900">
+                    <div className="text-xs text-slate-400 font-bold">
                       Choose one. Make it defensible.
                     </div>
                   </div>
@@ -539,10 +537,10 @@ export function CreateDisputeForm({
                         <label
                           key={code.code}
                           className={cn(
-                            "group relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all",
+                            "group relative flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition-all",
                             active
-                              ? "border-amber-500/50 bg-amber-500/10"
-                              : "border-white/10 bg-black/30 hover:border-white/20 hover:bg-white/4",
+                              ? "border-amber-500 bg-amber-50/50"
+                              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50",
                           )}
                         >
                           <input
@@ -562,27 +560,27 @@ export function CreateDisputeForm({
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-3">
                               <div className="flex items-center gap-2">
-                                <div className="text-sm font-semibold text-white">
+                                <div className="text-[15px] font-bold text-slate-900">
                                   {code.label}
                                 </div>
                                 {code.requiresDeliverableRef && (
-                                  <span className=" font-bold  text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                  <span className="text-[10px] font-bold text-amber-700 bg-amber-100/50 px-1.5 py-0.5 rounded border border-amber-200">
                                     Needs proof
                                   </span>
                                 )}
                               </div>
                               <div
                                 className={cn(
-                                  "rounded-md border px-2 py-0.5 text-[11px]",
+                                  "rounded-md border px-2 py-0.5 text-[10px] font-bold",
                                   active
-                                    ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
-                                    : "border-white/10 bg-white/3 text-white/50",
+                                    ? "border-amber-200 bg-amber-100 text-amber-700"
+                                    : "border-slate-200 bg-slate-50 text-slate-400",
                                 )}
                               >
                                 {code.code}
                               </div>
                             </div>
-                            <div className="mt-1 text-sm text-white/60">
+                            <div className="mt-1 text-sm text-slate-500 font-bold leading-relaxed">
                               {code.description}
                             </div>
                           </div>
@@ -593,23 +591,18 @@ export function CreateDisputeForm({
                 </div>
               ) : null}
 
-              {/* Requirement Dropdown MOVED before this block in DOM order logic, but visually we want it potentially after.
-                  Actually, user flow usually is: Pick Code -> If Code needs Req -> Pick Req.
-                  So we should place the Requirement block AFTER the Reason Code block.
-              */}
-
               {/* Summary + files */}
               {eligibility?.eligible && selectedReasonCode ? (
-                <div className="space-y-6 border-t border-white/10 pt-6">
+                <div className="space-y-6 border-t border-slate-100 pt-6">
                   <div className="space-y-2">
                     <div className="flex items-end justify-between gap-3">
-                      <Label className="text-sm font-medium text-white">
+                      <Label className="text-sm font-bold text-slate-700">
                         Description{" "}
-                        <span className="text-sm font-normal text-slate-900">
+                        <span className="text-xs font-bold text-slate-400">
                           (optional)
                         </span>
                       </Label>
-                      <div className="text-sm text-slate-900">
+                      <div className="text-xs text-slate-400 font-bold">
                         {description.length}/600
                       </div>
                     </div>
@@ -620,9 +613,9 @@ export function CreateDisputeForm({
                         setDescription(e.target.value.slice(0, 600))
                       }
                       placeholder="State facts. Timeline. What you delivered vs what was agreed. Avoid emotions."
-                      className="min-h-[140px] resize-none border-white/10 bg-black/40 text-white hover:border-white/20 focus:ring-2 focus:ring-amber-500/30"
+                      className="min-h-[140px] resize-none border-slate-200 bg-white text-slate-900 hover:border-slate-300 focus:ring-2 focus:ring-emerald-500/10 font-bold"
                     />
-                    <p className="text-sm text-slate-900">
+                    <p className="text-xs text-slate-500 font-bold">
                       Good disputes read like a report: facts, dates, evidence.
                       No drama.
                     </p>
@@ -630,13 +623,13 @@ export function CreateDisputeForm({
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <Label className="text-sm font-medium text-white">
+                      <Label className="text-sm font-bold text-slate-700">
                         Supporting evidence
                       </Label>
                       <Button
                         type="button"
                         variant="ghost"
-                        className="text-sm text-white/60 hover:text-white hover:bg-white/5"
+                        className="text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                         onClick={() => inputRef.current?.click()}
                       >
                         <Upload className="mr-2 h-4 w-4" />
@@ -669,21 +662,21 @@ export function CreateDisputeForm({
                       onDrop={onDrop}
                       onClick={() => inputRef.current?.click()}
                       className={cn(
-                        "cursor-pointer rounded-xl border border-dashed p-6 transition-all",
+                        "cursor-pointer rounded-xl border-2 border-dashed p-6 transition-all",
                         isDragging
-                          ? "border-amber-500/50 bg-amber-500/10"
-                          : "border-white/15 bg-white/2 hover:bg-white/4 hover:border-white/25",
+                          ? "border-emerald-500/50 bg-emerald-50"
+                          : "border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300",
                       )}
                     >
                       <div className="flex items-start gap-4">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-black/40">
-                          <Upload className="h-5 w-5 text-white/60" />
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-xs">
+                          <Upload className="h-5 w-5 text-slate-400" />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-sm font-semibold text-white">
+                          <div className="text-sm font-bold text-slate-900">
                             Drag and drop files here
                           </div>
-                          <div className="mt-1 text-sm text-white/50">
+                          <div className="mt-1 text-xs text-slate-400 font-bold">
                             PDF, PNG, JPG • up to {MAX_FILE_MB}MB each
                           </div>
                         </div>
@@ -691,7 +684,7 @@ export function CreateDisputeForm({
                     </div>
 
                     {fileError ? (
-                      <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200">
+                      <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-600">
                         {fileError}
                       </div>
                     ) : null}
@@ -701,17 +694,17 @@ export function CreateDisputeForm({
                         {files.map((file, index) => (
                           <div
                             key={`${file.name}_${file.size}_${file.lastModified}_${index}`}
-                            className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/30 p-3 hover:border-white/20"
+                            className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-3 hover:border-slate-300 shadow-xs"
                           >
                             <div className="flex min-w-0 items-center gap-3">
-                              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/3">
-                                <FileText className="h-4 w-4 text-emerald-400" />
+                              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
+                                <FileText className="h-4 w-4 text-emerald-500" />
                               </div>
                               <div className="min-w-0">
-                                <div className="truncate text-sm font-medium text-white/85">
+                                <div className="truncate text-sm font-bold text-slate-900">
                                   {file.name}
                                 </div>
-                                <div className="text-sm text-white/45">
+                                <div className="text-xs text-slate-400 font-bold">
                                   {formatBytes(file.size)}
                                 </div>
                               </div>
@@ -720,7 +713,7 @@ export function CreateDisputeForm({
                               type="button"
                               variant="ghost"
                               size="sm"
-                              className="h-9 w-9 p-0 text-white/50 hover:text-red-300 hover:bg-red-500/10"
+                              className="h-8 w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50"
                               onClick={() => removeFile(index)}
                             >
                               <X className="h-4 w-4" />
@@ -737,10 +730,10 @@ export function CreateDisputeForm({
         ) : null}
 
         {/* Footer actions */}
-        <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/2 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-2 text-sm text-white/45">
-            <Info className="mt-0.5 h-4 w-4 shrink-0" />
-            <p>
+        <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between shadow-xs">
+          <div className="flex items-start gap-2 text-xs text-slate-500 font-bold max-w-md">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+            <p className="leading-relaxed">
               Submitting a dispute means you&apos;re asserting the information
               is accurate. Poor evidence and vague claims will get denied.
             </p>
@@ -750,7 +743,7 @@ export function CreateDisputeForm({
             <Button
               type="button"
               variant="ghost"
-              className="text-white/70 hover:text-white hover:bg-white/5 w-full sm:w-auto"
+              className="text-slate-600 hover:text-slate-900 hover:bg-slate-50 w-full sm:w-auto font-bold h-11"
               onClick={() => router.back()}
               disabled={isSubmitting}
             >
@@ -759,7 +752,7 @@ export function CreateDisputeForm({
 
             <Button
               type="submit"
-              className="h-11 bg-amber-500 px-8 font-bold text-black hover:bg-amber-400 disabled:opacity-60 w-full sm:w-auto"
+              className="h-11 bg-amber-500 px-8 font-bold text-slate-900 hover:bg-amber-400 disabled:opacity-60 w-full sm:w-auto shadow-sm rounded-xl"
               disabled={!canSubmit}
             >
               {isSubmitting ? "Submitting…" : "Submit dispute"}

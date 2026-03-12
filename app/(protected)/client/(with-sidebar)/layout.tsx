@@ -101,9 +101,9 @@ export default function ClientLayout({
         <div className="p-6 pb-4">
           <Link
             href="/client"
-            className="flex items-center gap-1 group font-primary"
+            className="flex items-center gap-0 group font-primary"
           >
-            <DayleLogo className="w-10 h-10 text-emerald-500 transition-transform group-hover:scale-110" />
+            <DayleLogo className="w-10 h-10 text-slate-900 transition-transform group-hover:scale-110" />
             <div>
               <h1 className="text-[22px] text-slate-900 tracking-tight font-bold">
                 Dayle
@@ -123,7 +123,7 @@ export default function ClientLayout({
                   className={cn(
                     "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                     isActive
-                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold "
+                      ? "bg-[#F8F9FA] text-slate-900 border font-bold "
                       : "text-slate-900 hover:bg-slate-100 hover:text-slate-900 font-bold ",
                   )}
                 >
@@ -132,7 +132,7 @@ export default function ClientLayout({
                       className={cn(
                         "w-4 h-4 transition-colors font-bold",
                         isActive
-                          ? "text-emerald-600"
+                          ? "text-slate-900"
                           : "text-slate-900 group-hover:text-slate-900 font-bold",
                       )}
                     />

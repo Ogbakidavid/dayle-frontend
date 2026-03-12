@@ -194,7 +194,7 @@ export default function LoginPage() {
             </span>
           </Link>
 
-          <h1 className="text-6xl lg:text-7xl font-bold text-slate-900 leading-[0.95] tracking-tighter mb-12">
+          <h1 className="text-4xl lg:text-6xl font-bold text-slate-900 leading-[0.95] tracking-tighter mb-12">
             Secure <br />
             <span className="text-emerald-600 ">payments.</span>
           </h1>
@@ -219,10 +219,10 @@ export default function LoginPage() {
                   <CheckCircle2 className="w-6 h-6 text-emerald-600 transition-transform group-hover:scale-110" />
                 </div>
                 <div>
-                  <h4 className="text-slate-900 font-bold text-sm  mb-1">
+                  <h4 className="text-slate-900 font-bold text-lg mb-1">
                     {item.title}
                   </h4>
-                  <p className="text-slate-600 font-bold text-lg leading-snug">
+                  <p className="text-slate-600 font-bold text-sm lg:text-lg leading-snug">
                     {item.text}
                   </p>
                 </div>
@@ -233,13 +233,13 @@ export default function LoginPage() {
       </div>
 
       {/* RIGHT SIDE: Form (The Action) */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-24 bg-white relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-24 bg-white relative overflow-hidden">
         {/* Subtle Form Background Detail */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/2 blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="w-full max-w-[440px] relative z-10">
           <div className="mb-12">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tight leading-none">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-none">
               Sign in
             </h2>
             <p className="text-slate-600 mt-4 text-sm font-bold  leading-relaxed">
@@ -256,7 +256,7 @@ export default function LoginPage() {
               <div className="space-y-3">
                 <Label
                   htmlFor="email"
-                  className="text-sm font-bold  text-slate-700 ml-1"
+                  className="text-sm font-bold  text-slate-700"
                 >
                   Email address
                 </Label>
@@ -370,10 +370,7 @@ export default function LoginPage() {
               className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500"
             >
               <div className="space-y-3">
-                <Label
-                  htmlFor="otp"
-                  className="text-sm font-bold  text-white ml-1"
-                >
+                <Label htmlFor="otp" className="text-sm font-bold  text-white">
                   Verification code
                 </Label>
                 <div className="relative group">
@@ -389,7 +386,7 @@ export default function LoginPage() {
                     onChange={(e) =>
                       setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
                     }
-                    className="bg-slate-50! border-slate-200 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-600 tracking-[0.5em] text-center  shadow-sm"
+                    className="bg-slate-50! border-slate-200 h-16 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-600 tracking-[0.2em] sm:tracking-[0.5em] text-center shadow-sm"
                   />
                   <KeyRound className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                 </div>

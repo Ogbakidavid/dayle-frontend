@@ -68,14 +68,14 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
 
   if (loading)
     return (
-      <div className="text-white/70 p-8 text-center bg-black/20 rounded-xl border border-white/5">
+      <div className="text-slate-600 p-8 text-center bg-slate-50 rounded-xl border border-slate-200 font-bold">
         Loading case file...
       </div>
     );
 
   if (!dispute) {
     return (
-      <div className="text-white/70 p-8 text-center bg-black/20 rounded-xl border border-white/5">
+      <div className="text-slate-600 p-8 text-center bg-slate-50 rounded-xl border border-slate-200 font-bold">
         Dispute not found.
       </div>
     );
@@ -85,7 +85,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
     <div className="space-y-8 pb-20">
       <Link
         href={`/${role}/disputes`}
-        className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors font-bold"
       >
         <ChevronLeft className="w-4 h-4" />
         Back to disputes
@@ -93,15 +93,15 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
 
       <header className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-bold  text-emerald-400 flex items-center gap-2">
+          <div className="text-sm font-bold  text-emerald-600 flex items-center gap-2">
             <Gavel className="w-3 h-3" />
             Case file
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">
-          Case #{dispute.id}
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+          Case #{dispute.id.slice(0, 12)}...
         </h1>
-        <p className="text-sm text-white/60">
+        <p className="text-sm text-slate-600 font-bold">
           Vault: {vault?.title || "Vault"}
         </p>
       </header>
@@ -109,56 +109,56 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
       <div className="grid lg:grid-cols-[1fr_300px] gap-8">
         {/* Timeline / Evidence Ledger */}
         <div className="space-y-6">
-          <Card className="bg-[#0D0D0E] border-white/5 shadow-2xl">
-            <CardHeader className="border-b border-white/5 bg-white/1">
-              <CardTitle className="text-white text-lg flex items-center justify-between">
+          <Card className="bg-white border-slate-200 shadow-sm">
+            <CardHeader className="border-b border-slate-100 bg-slate-50/50">
+              <CardTitle className="text-slate-900 text-lg flex items-center justify-between font-bold">
                 <span>Evidence Ledger</span>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-white/10 text-white/70 hover:text-white bg-transparent text-sm "
+                  className="border-slate-200 text-slate-600 hover:text-slate-900 bg-white text-xs font-bold shadow-xs transition-all active:scale-[0.98]"
                 >
                   + Add evidence
                 </Button>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-slate-100">
                 {events.length === 0 ? (
-                  <div className="p-12 text-center text-white/30 text-sm">
+                  <div className="p-12 text-center text-slate-400 text-sm font-bold">
                     No events logged in the evidence ledger yet.
                   </div>
                 ) : (
                   events.map((ev, i) => (
                     <div
                       key={i}
-                      className="p-6 hover:bg-white/1 transition-colors"
+                      className="p-6 hover:bg-slate-50/50 transition-colors"
                     >
                       <div className="flex items-start gap-4">
                         {/* Icon/Actor */}
                         <div className="flex flex-col items-center gap-1">
-                          <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/50 mt-2 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                          <div className="h-full w-px bg-white/5 min-h-[40px]" />
+                          <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 mt-2 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                          <div className="h-full w-px bg-slate-100 min-h-[40px]" />
                         </div>
 
                         <div className="flex-1 space-y-3">
                           {/* Header */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <span className="text-sm font-bold r text-emerald-400">
+                              <span className="text-sm font-bold r text-emerald-600">
                                 {ev.type?.replace("_", " ").toLowerCase()}
                               </span>
-                              <span className="text-sm text-slate-900 ">
+                              <span className="text-xs text-slate-400 font-bold">
                                 {new Date(ev.timestamp).toLocaleString()}
                               </span>
                             </div>
-                            <span className="text-sm font-bold text-white/30 ">
+                            <span className="text-xs font-bold text-slate-300">
                               {ev.actor}
                             </span>
                           </div>
 
                           {/* Payload Content */}
-                          <div className="bg-black/40 rounded-xl p-4 border border-white/5 text-sm text-gray-400 leading-relaxed shadow-inner">
+                          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100/50 text-sm text-slate-600 font-bold leading-relaxed shadow-inner">
                             {ev.payloadJson?.notes ||
                               ev.payload?.note ||
                               ev.payload?.decision ||
@@ -171,7 +171,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                           {(ev.payload?.reasonCode ||
                             ev.payload?.reasonCodes) && (
                             <div className="flex flex-wrap gap-2 pt-1">
-                              <div className=" font-bold  text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 shadow-sm shadow-amber-500/10">
+                              <div className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 shadow-xs">
                                 {getReasonLabel(
                                   ev.payload.reasonCode ||
                                     ev.payload.reasonCodes?.[0],
@@ -186,7 +186,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                               {ev.files?.map((file, k) => (
                                 <div
                                   key={k}
-                                  className="flex items-center gap-2 text-sm text-white/50 bg-white/3 px-3 py-1.5 rounded-lg border border-white/5 hover:border-white/20 hover:text-white transition-all cursor-pointer"
+                                  className="flex items-center gap-2 text-xs font-bold text-slate-500 bg-white px-3 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer shadow-xs"
                                 >
                                   <FileText className="w-3 h-3 text-emerald-500" />
                                   {file.name}
@@ -206,40 +206,40 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
 
         {/* Sidebar Info */}
         <div className="space-y-6">
-          <Card className="bg-muted border-white/10 sticky top-8 shadow-xl">
-            <CardHeader className="border-b border-white/5">
-              <CardTitle className="text-white text-sm font-bold  opacity-60">
+          <Card className="bg-white border-slate-200 sticky top-8 shadow-sm overflow-hidden">
+            <CardHeader className="border-b border-slate-100 bg-slate-50/50">
+              <CardTitle className="text-slate-400 text-[10px] font-bold  uppercase tracking-wider">
                 Case details
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
-              <div className="space-y-1">
-                <p className=" text-white/30 font-bold ">Status</p>
+              <div className="space-y-1.5">
+                <p className=" text-slate-400 text-xs font-bold ">Status</p>
                 <div className="inline-flex">
-                  <p className="text-base font-bold text-white capitalize bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                  <p className="text-sm font-bold text-slate-900 capitalize bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
                     {dispute.status?.replace("_", " ")}
                   </p>
                 </div>
               </div>
-              <div className="space-y-1">
-                <p className=" text-white/30 font-bold ">Opened by</p>
-                <p className="text-sm font-medium text-white/80">
+              <div className="space-y-1.5">
+                <p className=" text-slate-400 text-xs font-bold ">Opened by</p>
+                <p className="text-sm font-bold text-slate-900 truncate">
                   {dispute.openedBy}
                 </p>
               </div>
               {dispute.requirementRef && (
                 <div className="space-y-2">
-                  <p className=" text-white/30 font-bold ">
+                  <p className=" text-slate-400 text-xs font-bold ">
                     Target requirement
                   </p>
-                  <div className="bg-emerald-500/5 rounded p-2.5 text-sm  text-emerald-400 border border-emerald-500/10 shadow-inner">
+                  <div className="bg-emerald-50/50 rounded-xl p-3 text-xs font-bold text-emerald-700 border border-emerald-100 shadow-inner">
                     {dispute.requirementRef}
                   </div>
                 </div>
               )}
               <div className="space-y-3">
-                <p className=" text-white/30 font-bold ">Reason protocol</p>
-                <div className="text-sm leading-relaxed text-white/70 bg-white/5 p-3 rounded-xl border border-white/5 font-medium">
+                <p className=" text-slate-400 text-xs font-bold ">Reason protocol</p>
+                <div className="text-sm leading-relaxed text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 font-bold">
                   {getReasonLabel(
                     dispute.reasonCode || dispute.reasonCodes?.[0] || "",
                   )}
