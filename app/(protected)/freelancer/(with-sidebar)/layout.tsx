@@ -11,7 +11,7 @@ import {
   PieChart,
   LogOut,
   Settings,
-  CheckCircle,
+  Check,
   Gavel,
   Menu,
   Landmark,
@@ -114,7 +114,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                   className={cn(
                     "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                     isActive
-                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold  shadow-lg shadow-emerald-500/5"
+                      ? "bg-[#F8F9FA] text-slate-900 border border-emerald-500/20 font-bold  shadow-lg shadow-emerald-500/5"
                       : "text-slate-900 hover:bg-slate-100 hover:text-slate-900 font-bold ",
                   )}
                 >
@@ -123,7 +123,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                       className={cn(
                         "w-4 h-4 transition-all",
                         isActive
-                          ? "text-emerald-600"
+                          ? "text-slate-900"
                           : "text-slate-900 group-hover:text-slate-900",
                       )}
                     />
@@ -135,7 +135,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                         "text-sm px-2 py-0.5 rounded-full font-bold",
                         isActive
                           ? "bg-emerald-500/20 text-emerald-600"
-                          : "bg-slate-100 text-slate-600",
+                          : "bg-slate-100 text-slate-600 font-bold",
                       )}
                     >
                       {item.badge}
@@ -159,7 +159,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               />
               {user?.kycStatus === "VERIFIED" && (
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-muted flex items-center justify-center shadow-lg">
-                  <DayleLogo className="w-2.5 h-2.5 text-black" />
+                  <Check className="w-2.5 h-2.5 text-white" />
                 </div>
               )}
             </div>
