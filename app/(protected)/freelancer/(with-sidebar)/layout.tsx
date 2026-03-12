@@ -93,8 +93,8 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
       >
         {/* Logo & Brand */}
         <div className="p-6 pb-4">
-          <Link href="/freelancer" className="flex items-center gap-4 group">
-            <DayleLogo className="w-10 h-10 text-emerald-500 transition-transform group-hover:scale-110" />
+          <Link href="/freelancer" className="flex items-center gap-0 group">
+            <DayleLogo className="w-10 h-10 text-slate-900 transition-transform group-hover:scale-110" />
             <div>
               <h1 className="text-2xl text-slate-900 tracking-tight font-bold">
                 Dayle
