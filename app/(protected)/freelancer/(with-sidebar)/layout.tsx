@@ -86,7 +86,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
         animate="visible"
         variants={sidebarVariants}
         className={cn(
-          "w-[280px] border-r border-slate-200 bg-slate-50 flex flex-col h-screen transition-all duration-300 ease-in-out shadow-sm",
+          "w-[280px] border-r border-slate-200 bg-white flex flex-col h-screen transition-all duration-300 ease-in-out shadow-sm",
           "fixed lg:sticky top-0 z-50 lg:z-auto",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
@@ -224,8 +224,11 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
         </div>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto bg-background">
-          <div className="p-4 lg:p-8">
+        <main className="flex-1 overflow-y-auto bg-[#F8F9FA] relative">
+          {/* Subtle Noise Texture for Premium Feel */}
+          <div className="absolute inset-0 z-0 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02]"></div>
+          
+          <div className="relative z-10 p-4 lg:p-8">
             <div className="max-w-7xl mx-auto">{children}</div>
           </div>
         </main>

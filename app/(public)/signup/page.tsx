@@ -1,5 +1,4 @@
 "use client";
-import { LogoLoader } from "@/components/ui/logo-loader";
 
 import * as React from "react";
 import { useState, useEffect } from "react";
@@ -19,6 +18,7 @@ import { DayleLogo } from "@/components/shared/DayleLogo";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/lib/store/user-context";
 import { usePrivy, useLoginWithEmail } from "@privy-io/react-auth";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 // OTP Input Component
 const OTPInput = ({
@@ -280,9 +280,9 @@ export default function SignupPage() {
         <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full"></div>
 
         <div className="relative z-10 w-full max-w-lg">
-          <Link href="/" className="flex items-center gap-5 mb-20 group">
+          <Link href="/" className="flex items-center gap-0 mb-20 group">
             <DayleLogo className="w-14 h-14 text-emerald-500 transition-transform group-hover:scale-105" />
-            <span className="font-bold tracking-tighter text-slate-900 text-3xl">
+            <span className="font-bold tracking-tighter text-slate-900 text-xl md:text-[22px]">
               Dayle
             </span>
           </Link>
@@ -408,7 +408,7 @@ export default function SignupPage() {
                 >
                   {loading ? (
                     <div className="flex items-center gap-3">
-                      <LogoLoader size="sm" />
+                      <DotLoader size="sm" color="white" />
                       <span>Sending code...</span>
                     </div>
                   ) : (
@@ -517,7 +517,7 @@ export default function SignupPage() {
                 >
                   {loading ? (
                     <div className="flex items-center gap-3">
-                      <LogoLoader size="sm" />
+                      <DotLoader size="sm" color="white" />
                       <span>Verifying...</span>
                     </div>
                   ) : (

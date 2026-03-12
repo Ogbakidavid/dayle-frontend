@@ -9,7 +9,6 @@ import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 import { Search, ArrowUpRight, ArrowDownLeft, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import { DayleLogo } from "@/components/shared/DayleLogo";
 
 // Helper: format a raw USDC/USDT amount stored in 6-decimal base units
 const formatAmount = (raw: bigint | number | string): number => {
@@ -95,7 +94,6 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
           variants={itemVariants}
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100  font-bold  text-emerald-700 "
         >
-          <DayleLogo className="w-3.5 h-3.5" />
           Financial activity protocol
         </motion.div>
         <motion.h1

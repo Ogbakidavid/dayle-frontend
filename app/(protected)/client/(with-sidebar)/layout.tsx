@@ -232,8 +232,11 @@ export default function ClientLayout({
         </div>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto bg-gray-50">
-          <div className="p-4 lg:p-8">
+        <main className="flex-1 overflow-y-auto bg-[#F8F9FA] relative">
+          {/* Subtle Noise Texture for Premium Feel */}
+          <div className="absolute inset-0 z-0 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02]"></div>
+          
+          <div className="relative z-10 p-4 lg:p-8">
             <div className="max-w-7xl mx-auto">{children}</div>
           </div>
         </main>

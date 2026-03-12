@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 
 import Countries from "./components/Countries";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -99,11 +100,9 @@ export default function LandingPage() {
 
           <div className="relative backdrop-blur-2xl border transition-all rounded-2xl md:rounded-3xl h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/80 border-slate-200 shadow-sm">
             {/* Brand */}
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className="w-9 h-9 md:w-10 md:h-10 bg-emerald-500 rounded-xl flex items-center justify-center">
-                <Shield className="w-5 h-5 md:w-6 md:h-6 text-black stroke-[3px]" />
-              </div>
-              <span className="font-bold tracking-tighter text-xl md:text-2xl text-slate-900">
+            <div className="flex items-center gap-1">
+              <DayleLogo className="w-10 h-10 text-emerald-500 transition-transform group-hover:scale-110" />
+              <span className="font-bold tracking-tighter text-xl md:text-[22px] text-slate-900">
                 Dayle
               </span>
             </div>
@@ -826,11 +825,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-16 lg:gap-20">
           {/* Brand */}
           <div className="sm:col-span-2 space-y-6 md:space-y-10">
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-600 rounded-xl flex items-center justify-center">
-                <Shield className="w-6 h-6 md:w-7 md:h-7 text-white stroke-[3px]" />
-              </div>
-              <span className="font-bold tracking-tighter text-2xl md:text-3xl text-slate-900">
+            <div className="flex items-center gap-1">
+              <DayleLogo className="w-10 h-10 text-emerald-500 transition-transform group-hover:scale-110" />
+              <span className="font-bold tracking-tighter text-xl md:text-[22px] text-slate-900">
                 Dayle
               </span>
             </div>

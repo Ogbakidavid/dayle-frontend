@@ -31,23 +31,15 @@ export function LogoLoader({
     <div className={cn("flex flex-col items-center justify-center gap-8", className)}>
       <div className="relative flex items-center justify-center">
         {/* Hostinger-style Spinning Ring */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute"
+        <div
+          className="absolute animate-spin"
           style={{
             width: currentSize * 2.2,
             height: currentSize * 2.2,
+            animationDuration: "1.5s",
           }}
         >
-          <svg
-            viewBox="0 0 100 100"
-            className="w-full h-full"
-          >
+          <svg viewBox="0 0 100 100" className="w-full h-full">
             <circle
               cx="50"
               cy="50"
@@ -58,7 +50,7 @@ export function LogoLoader({
               strokeLinecap="round"
               className="text-emerald-500/20"
             />
-            <motion.path
+            <path
               d="M50 2 A 48 48 0 0 1 98 50"
               fill="none"
               stroke="currentColor"
@@ -67,7 +59,7 @@ export function LogoLoader({
               className="text-emerald-500"
             />
           </svg>
-        </motion.div>
+        </div>
 
         {/* Central Logo (SVG) */}
         <div 
