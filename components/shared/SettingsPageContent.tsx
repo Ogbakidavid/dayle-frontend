@@ -876,23 +876,6 @@ export default function SettingsPageContent({ role = "client" }) {
                       Mark all read
                     </Button>
                   )}
-                  <Button
-                    onClick={async () => {
-                      try {
-                        await api.notifications.createTest();
-                        const data = await api.notifications.list();
-                        setNotificationList(data);
-                      } catch (e) {
-                        console.error(e);
-                        alert("Failed to send test notification");
-                      }
-                    }}
-                    variant="outline"
-                    size="sm"
-                    className="ml-2 text-slate-600 hover:text-slate-900 border-slate-200 bg-white hover:bg-slate-50 font-bold  text-sm shadow-sm "
-                  >
-                    Send test
-                  </Button>
                 </div>
 
                 {/* Notification List */}
