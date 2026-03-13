@@ -161,7 +161,7 @@ export default function SettingsPageContent({ role = "client" }) {
     switch (type) {
       case "kyc":
         return Shield;
-      case "milestone":
+      case "vault":
         return CheckCircle2;
       case "payment":
         return CreditCard;
@@ -178,7 +178,7 @@ export default function SettingsPageContent({ role = "client" }) {
     switch (type) {
       case "kyc":
         return "amber";
-      case "milestone":
+      case "vault":
         return "emerald";
       case "payment":
         return "blue";

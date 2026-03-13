@@ -72,8 +72,8 @@ export function getDisputeEligibility(vault: any, deliverableTitle?: string | nu
   }
 
   const status = vault.status;
-  // Use vault-level verification if available, or fallback
-  const verificationResult = vault.verification?.result || (vault.milestones?.[0]?.verification?.result);
+  // Use vault-level verification if available
+  const verificationResult = vault.verification?.result;
 
   let allowedCodes = [];
 

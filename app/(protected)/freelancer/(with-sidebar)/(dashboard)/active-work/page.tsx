@@ -77,7 +77,7 @@ export default function ActiveWorkPage() {
               </h1>
               <p className="text-[10px] md:text-xs font-bold text-slate-600 tracking-widest leading-relaxed">
                 A verified stream of your current contractual obligations and
-                deliverable milestones.
+                project deliverables.
               </p>
             </div>
             <div className="text-right hidden md:block">

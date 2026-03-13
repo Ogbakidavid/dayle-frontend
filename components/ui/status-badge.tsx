@@ -75,7 +75,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       className: "badge-neutral",
     },
 
-    // Milestone Statuses
+    // Deliverable Statuses
     PENDING: {
       label: "Pending",
       icon: Clock,

@@ -30,8 +30,6 @@ export enum VaultStatus {
   CANCELLED = "CANCELLED",
 }
 
-// MilestoneStatus removed as milestones are no longer part of the application.
-
 // ============================================================================
 // RELEASE STATUS (Money Action Status)
 // ============================================================================
@@ -55,8 +53,6 @@ export enum VerificationResult {
   FLAGGED = "FLAGGED",
   HUMAN_REVIEW = "HUMAN_REVIEW",
 }
-
-// MilestoneReviewOutcome removed.
 
 // ============================================================================
 // DISPUTE STATUS

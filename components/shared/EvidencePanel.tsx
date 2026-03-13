@@ -33,13 +33,13 @@ export interface EvidenceItemData {
   createdAt: string | Date;
 }
 
-export interface MilestoneVerification {
+export interface VaultVerification {
   result?: "FAIL" | "FLAGGED" | "PASS";
 }
 
 export interface VaultData {
   title: string;
-  verification?: MilestoneVerification;
+  verification?: VaultVerification;
 }
 
 export interface EvidencePanelProps {

@@ -10,7 +10,7 @@ export function useCreateVault() {
 
   const createVault = async (
     freelancerAddress: string,
-    milestoneIds: number[],
+    deliverableIds: number[],
     amounts: string[], // e.g. ["100", "200", "300"]
     tokenAddress: string,
     tokenDecimals: number = 18
@@ -39,7 +39,7 @@ export function useCreateVault() {
 
       const tx = await factory.createVault(
         freelancerAddress,
-        milestoneIds,
+        deliverableIds,
         tokenAddress,
         amountsWei
       );
@@ -50,9 +50,9 @@ export function useCreateVault() {
       const event = receipt.logs
         .map((log: any) => {
           try {
-             return factory.interface.parseLog(log);
+            return factory.interface.parseLog(log);
           } catch(e) {
-             return null;
+            return null;
           }
         })
         .find((e: any) => e?.name === 'VaultCreated');

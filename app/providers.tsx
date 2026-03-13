@@ -9,13 +9,19 @@ export interface ProvidersProps {
 
 import PrivyProviderWrapper from "@/components/providers/privyProvider";
 
+import { SocketProvider } from "@/lib/contexts/socket-context";
+import { RealTimeNotificationListener } from "@/components/shared/RealTimeNotificationListener";
+
 export function Providers({ children }: ProvidersProps) {
   return (
     <PrivyProviderWrapper>
       <UserProvider>
-        <LedgerProvider>
-          <VaultProvider>{children}</VaultProvider>
-        </LedgerProvider>
+        <SocketProvider>
+          <RealTimeNotificationListener />
+          <LedgerProvider>
+            <VaultProvider>{children}</VaultProvider>
+          </LedgerProvider>
+        </SocketProvider>
       </UserProvider>
     </PrivyProviderWrapper>
   );
