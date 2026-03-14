@@ -246,12 +246,12 @@ export default function InvitePage() {
             </span>
           </Link>
           {isLoggedIn && (
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
                   <User className="w-4 h-4 text-slate-600" />
                 </div>
-                <span className="text-sm font-bold text-slate-600">
+                <span className="text-sm font-bold text-slate-600 hidden md:block max-w-[150px] truncate">
                   {currentUser.email}
                 </span>
               </div>
@@ -260,7 +260,7 @@ export default function InvitePage() {
                   await api.auth.logout();
                   window.location.reload();
                 }}
-                className=" font-bold  text-emerald-600 hover:text-emerald-500 transition-colors border border-emerald-500/30 px-2 py-1 rounded"
+                className="text-xs md:text-sm font-bold text-emerald-600 hover:text-emerald-500 transition-colors border border-emerald-500/30 px-2 py-1 rounded"
               >
                 Switch
               </button>
@@ -270,19 +270,19 @@ export default function InvitePage() {
       </header>
 
       <main className="container mx-auto px-4 py-12 md:py-20 flex flex-col items-center">
-        <div className="w-full max-w-3xl mb-12 text-center text-slate-600">
+        <div className="w-full max-w-3xl mb-12 text-center text-slate-600 px-2">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-bold  mb-6"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs md:text-sm font-bold mb-4 md:mb-6"
           >
             <Briefcase className="w-4 h-4" />
             <span>Project invitation</span>
           </motion.div>
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter mb-4">
+          <h1 className="text-2xl md:text-5xl font-bold text-slate-900 tracking-tighter mb-4 leading-tight">
             {vault.title}
           </h1>
-          <p className="text-xl text-slate-500 font-medium">
+          <p className="text-lg md:text-xl text-slate-500 font-medium">
             Sent by <span className="text-slate-900">{vault.clientName}</span>
           </p>
         </div>
@@ -299,13 +299,13 @@ export default function InvitePage() {
                 Safe project summary
               </h3>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <div>
-                  <p className="text-slate-600 text-sm font-bold  mb-1">
+                  <p className="text-slate-600 text-xs md:text-sm font-bold mb-1">
                     Total value
                   </p>
-                  <div className="text-3xl font-bold text-slate-900 tracking-tight flex items-baseline gap-1">
-                    <span className="text-lg text-emerald-600">$</span>
+                  <div className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight flex items-baseline gap-1">
+                    <span className="text-base text-emerald-600">$</span>
                     {vault.formattedTotalAmount || "0.00"}
                   </div>
                 </div>
@@ -395,7 +395,7 @@ export default function InvitePage() {
           </div>
 
           {/* RIGHT: Action Card */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 flex flex-col justify-center min-h-[300px] shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 flex flex-col justify-center min-h-fit md:min-h-[300px] shadow-sm">
             {!isLoggedIn ? (
               <div className="text-center space-y-6">
                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-2 border border-slate-100">

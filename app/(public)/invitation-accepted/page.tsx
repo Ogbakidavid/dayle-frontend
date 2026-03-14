@@ -73,11 +73,11 @@ export default function InvitationAcceptedPage() {
           <CheckCircle className="w-10 h-10 text-emerald-600" />
         </div>
 
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900 tracking-tighter mb-4">
+        <div className="px-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter mb-4 leading-tight">
             Invitation accepted
           </h1>
-          <p className="text-xl text-slate-500 max-w-lg mx-auto">
+          <p className="text-lg md:text-xl text-slate-500 max-w-lg mx-auto">
             You have successfully accepted the invitation for{" "}
             <span className="text-slate-900 font-bold">{vault.title}</span>.
           </p>
@@ -109,10 +109,10 @@ export default function InvitationAcceptedPage() {
           </CardContent>
         </Card>
 
-        <div className="pt-8">
+        <div className="pt-8 px-4">
           <Button
             onClick={() => router.replace(`/freelancer/vault/${vault.id}`)}
-            className="bg-emerald-600 text-white hover:bg-emerald-700 font-bold  px-8 shadow-lg shadow-emerald-600/20"
+            className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 font-bold px-8 py-6 h-auto shadow-lg shadow-emerald-600/20"
           >
             View project
           </Button>
