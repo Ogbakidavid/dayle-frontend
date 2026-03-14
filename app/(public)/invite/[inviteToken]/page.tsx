@@ -19,6 +19,7 @@ import {
   Clock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { LogoLoader } from "@/components/ui/logo-loader";
 
 interface InviteData {
   invite: {
@@ -150,7 +151,7 @@ export default function InvitePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <DotLoader size="lg" />
+        <LogoLoader />
       </div>
     );
   }
