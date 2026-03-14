@@ -1,5 +1,5 @@
 "use client";
-import { DotLoader } from "@/components/ui/dot-loader";
+import { LogoLoader } from "@/components/ui/logo-loader";
 
 import * as React from "react";
 import { useEffect, useState } from "react";
@@ -49,9 +49,9 @@ export default function InvitationAcceptedPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <DotLoader size="lg" />
-      </div>
+      <LogoLoader 
+        fullPage 
+      />
     );
   }
 

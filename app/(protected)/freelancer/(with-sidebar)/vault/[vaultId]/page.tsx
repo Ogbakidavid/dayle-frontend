@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { LogoLoader } from "@/components/ui/logo-loader";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -67,9 +68,8 @@ export default function FreelancerVaultDetailPage() {
 
   if (vaultsLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-900 font-bold ">
-        <div className="w-12 h-12 border-4 border-slate-100 border-t-emerald-600 rounded-full animate-spin mb-6" />
-        Initializing vault data
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-8 font-primary">
+        <LogoLoader />
       </div>
     );
   }
@@ -170,7 +170,7 @@ export default function FreelancerVaultDetailPage() {
                 Secured contract value
               </p>
               <p className="text-4xl md:text-6xl font-bold text-slate-900 st  leading-none">
-                {vault.formattedTotalAmount || "0.00"}
+                ${vault.formattedTotalAmount || "0.00"}
               </p>
               <div className="mt-4 inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />

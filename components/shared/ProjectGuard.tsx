@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useUser } from "@/lib/store/user-context";
 import { api } from "@/lib/api-client";
-import { DotLoader } from "@/components/ui/dot-loader";
+import { LogoLoader } from "@/components/ui/logo-loader";
 import { ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -55,10 +55,7 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
   if (userLoading || checking) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-        <DotLoader size="lg" />
-        <p className=" font-bold text-emerald-500 tracking-[0.2em]">
-          Validating project access
-        </p>
+        <LogoLoader />
       </div>
     );
   }
