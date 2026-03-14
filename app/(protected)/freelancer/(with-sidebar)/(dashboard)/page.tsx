@@ -190,8 +190,8 @@ export default function FreelancerDashboard() {
       {/* Pending Invitations Section */}
       {invitations.length > 0 && (
         <div className="pt-4 space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col items-start sm:flex-row sm:items-center gap-3">
+          <div className="flex flex-col items-start sm:flex-row sm:items-center justify-between">
+            <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                 <Shield className="w-5 h-5 text-emerald-600" />
               </div>
