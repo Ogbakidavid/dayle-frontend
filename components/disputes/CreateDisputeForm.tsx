@@ -172,6 +172,7 @@ export function CreateDisputeForm({
     Boolean(selectedVault) &&
     Boolean(eligibility?.eligible) &&
     Boolean(selectedReasonCode) &&
+    Boolean(description.trim()) &&
     (!requiresDeliverableRef || Boolean(selectedDeliverableTitle)) &&
     !isSubmitting;
 
@@ -254,6 +255,8 @@ export function CreateDisputeForm({
     if (!selectedReasonCode) return setFormError("Select a reason code.");
     if (requiresDeliverableRef && !selectedDeliverableTitle)
       return setFormError("This dispute type requires a linked deliverable.");
+    if (!description.trim())
+      return setFormError("Please provide a detailed description of the issue.");
 
     setIsSubmitting(true);
 
@@ -597,10 +600,7 @@ export function CreateDisputeForm({
                   <div className="space-y-2">
                     <div className="flex items-end justify-between gap-3">
                       <Label className="text-sm font-bold text-slate-700">
-                        Description{" "}
-                        <span className="text-xs font-bold text-slate-400">
-                          (optional)
-                        </span>
+                        Description <span className="text-red-500">*</span>
                       </Label>
                       <div className="text-xs text-slate-400 font-bold">
                         {description.length}/600

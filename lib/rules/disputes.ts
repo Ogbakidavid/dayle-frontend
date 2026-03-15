@@ -1,64 +1,37 @@
 import { VaultStatus } from "@/lib/domain/enums";
 
 export const DISPUTE_REASON_CODES = [
-  // AI Verification Disputes (when AI audit fails/flags incorrectly)
   {
-    code: "VERIFICATION_ERROR",
-    label: "Verification Error",
-    description: "Objective verification was applied incorrectly.",
-    verificationResults: ["FAIL", "FLAGGED"],
-    statuses: [VaultStatus.FUNDED], // Assuming FUNDED is the state where review happens
-    requiresDeliverableRef: true,
+    code: "INTEGRITY_VIOLATION",
+    label: "Integrity & Security",
+    description: "Evidence of fake data, malicious code, or gross misrepresentation of work.",
+    verificationResults: ["PASS", "FAIL", "FLAGGED", "HUMAN_REVIEW"],
+    statuses: [VaultStatus.FUNDED, VaultStatus.DISPUTED],
+    requiresDeliverableRef: false,
   },
   {
-    code: "REQUIREMENT_MISMATCH",
-    label: "Requirement Mismatch",
-    description: "Deliverable meets requirement but was flagged.",
-    verificationResults: ["FAIL", "FLAGGED"],
+    code: "SCOPE_DISPUTE",
+    label: "Scope & Requirements",
+    description: "Disagreement over whether the delivered work matches the agreed contract or scope.",
+    verificationResults: ["PASS", "FAIL", "FLAGGED", "HUMAN_REVIEW"],
     statuses: [VaultStatus.FUNDED],
     requiresDeliverableRef: true,
   },
-  // Process & Security (any verification result)
   {
-    code: "PROCESS_BREACH",
-    label: "Process Breach",
-    description: "System process was circumvented.",
+    code: "COOPERATION_ISSUE",
+    label: "Bad Faith & Cooperation",
+    description: "The other party is unresponsive, ghosting, or maliciously withholding release/work.",
     verificationResults: ["PASS", "FAIL", "FLAGGED", "HUMAN_REVIEW"],
     statuses: [VaultStatus.FUNDED, VaultStatus.DISPUTED],
     requiresDeliverableRef: false,
   },
   {
-    code: "FRAUD",
-    label: "Fraudulent Activity",
-    description: "Evidence of fake data or bad faith.",
-    verificationResults: ["PASS", "FAIL", "FLAGGED", "HUMAN_REVIEW"],
-    statuses: [VaultStatus.FUNDED, VaultStatus.DISPUTED],
-    requiresDeliverableRef: false,
-  },
-  {
-    code: "SECURITY",
-    label: "Security Concern",
-    description: "Malicious code or security risk detected.",
-    verificationResults: ["PASS", "FAIL", "FLAGGED", "HUMAN_REVIEW"],
-    statuses: [VaultStatus.FUNDED, VaultStatus.DISPUTED],
-    requiresDeliverableRef: false,
-  },
-  // Client Approval Disputes (when AI passed but client rejected)
-  {
-    code: "BAD_FAITH",
-    label: "Bad Faith Rejection",
-    description: "Client rejected valid work repeatedly/maliciously.",
-    verificationResults: ["PASS"],
+    code: "TECHNICAL_ERROR",
+    label: "Protocol & Technical Error",
+    description: "The automated verification or protocol handler failed to process the work correctly.",
+    verificationResults: ["FAIL", "FLAGGED"],
     statuses: [VaultStatus.FUNDED],
-    requiresDeliverableRef: false,
-  },
-  {
-    code: "SCOPE_CHANGE",
-    label: "Scope Change",
-    description: "Rejection due to requirements not in original scope.",
-    verificationResults: ["PASS"],
-    statuses: [VaultStatus.FUNDED],
-    requiresDeliverableRef: false,
+    requiresDeliverableRef: true,
   },
 ];
 
@@ -80,24 +53,14 @@ export function getDisputeEligibility(vault: any, deliverableTitle?: string | nu
   // Simplified logic: If FUNDED or DISPUTED, it's generally eligible for specific codes
   if (status === VaultStatus.FUNDED || status === VaultStatus.DISPUTED) {
     if (verificationResult === "FAIL" || verificationResult === "FLAGGED") {
+      // System flagged it? Allow quality/integrity or technical error disputes
       allowedCodes = DISPUTE_REASON_CODES.filter((rc) =>
-        [
-          "VERIFICATION_ERROR",
-          "REQUIREMENT_MISMATCH",
-          "FRAUD",
-          "SECURITY",
-          "PROCESS_BREACH",
-        ].includes(rc.code)
+        ["INTEGRITY_VIOLATION", "SCOPE_DISPUTE", "TECHNICAL_ERROR", "COOPERATION_ISSUE"].includes(rc.code)
       );
     } else {
+      // Normal/Passed? Allow scope, cooperation, or integrity disputes
       allowedCodes = DISPUTE_REASON_CODES.filter((rc) =>
-        [
-          "BAD_FAITH",
-          "SCOPE_CHANGE",
-          "FRAUD",
-          "SECURITY",
-          "PROCESS_BREACH",
-        ].includes(rc.code)
+        ["INTEGRITY_VIOLATION", "SCOPE_DISPUTE", "COOPERATION_ISSUE"].includes(rc.code)
       );
     }
   }
