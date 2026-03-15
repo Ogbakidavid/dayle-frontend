@@ -11,9 +11,9 @@ import type { Vault } from "@/lib/store/vault-context";
 
 interface DisputeEvent {
   type: string;
-  timestamp: string;
-  actor: string;
-  payloadJson?: any;
+  createdAt: string;
+  actorRole: string;
+  actorId?: string;
   payload?: any;
   files?: Array<{ name: string; [key: string]: any }>;
   [key: string]: any;
@@ -23,7 +23,11 @@ interface Dispute {
   id: string;
   vaultId: string;
   status: string;
-  openedBy: string;
+  description: string;
+  openedBy: {
+    name: string;
+    email: string;
+  };
   requirementRef?: string;
   reasonCode?: string;
   reasonCodes?: string[];
@@ -145,27 +149,41 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                           {/* Header */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <span className="text-sm font-bold r text-emerald-600">
+                              <span className="text-sm font-bold text-emerald-600">
                                 {ev.type?.replace("_", " ").toLowerCase()}
                               </span>
                               <span className="text-xs text-slate-400 font-bold">
-                                {new Date(ev.timestamp).toLocaleString()}
+                                {new Date(ev.createdAt).toLocaleString()}
                               </span>
                             </div>
                             <span className="text-xs font-bold text-slate-300">
-                              {ev.actor}
+                              {ev.actorRole}
                             </span>
                           </div>
 
                           {/* Payload Content */}
-                          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100/50 text-sm text-slate-600 font-bold leading-relaxed shadow-inner">
-                            {ev.payloadJson?.notes ||
-                              ev.payload?.note ||
-                              ev.payload?.decision ||
-                              (typeof ev.payload === "string"
-                                ? ev.payload
-                                : JSON.stringify(ev.payload || {}))}
-                          </div>
+                            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100/50 text-sm text-slate-600 font-bold leading-relaxed shadow-inner">
+                              {ev.type === "OPENED" ? (
+                                <div className="space-y-1">
+                                  <p className="text-slate-900">
+                                    Dispute initiated for{" "}
+                                    <span className="text-emerald-600 underline">
+                                      {vault?.title}
+                                    </span>
+                                  </p>
+                                  <p className="text-xs text-slate-500 italic">
+                                    "{dispute.description}"
+                                  </p>
+                                </div>
+                              ) : (
+                                ev.payloadJson?.notes ||
+                                ev.payload?.note ||
+                                ev.payload?.decision ||
+                                (typeof ev.payload === "string"
+                                  ? ev.payload
+                                  : JSON.stringify(ev.payload || {}))
+                              )}
+                            </div>
 
                           {/* Reason Codes Badge */}
                           {(ev.payload?.reasonCode ||
@@ -224,7 +242,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
               <div className="space-y-1.5">
                 <p className=" text-slate-400 text-xs font-bold ">Opened by</p>
                 <p className="text-sm font-bold text-slate-900 truncate">
-                  {dispute.openedBy}
+                  {dispute.openedBy?.name || "Unknown"}
                 </p>
               </div>
               {dispute.requirementRef && (
