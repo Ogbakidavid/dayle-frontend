@@ -889,60 +889,21 @@ export default function ClientVaultDetailPage() {
                       </Button>
                     )}
 
-                    {/* Dispute — only available within 7 days of release */}
-                    {(() => {
-                      if (vault.status === VaultStatus.RELEASED) {
-                        const releaseEntry = vault.ledgerEntries?.find(
-                          (e: any) => e.type === LedgerEntryType.RELEASE && e.status === TransactionStatus.CONFIRMED
-                        );
-                        const releasedAt = releaseEntry?.completedAt
-                          ? new Date(releaseEntry.completedAt)
-                          : null;
-                        const sevenDaysAfterRelease = releasedAt
-                          ? new Date(releasedAt.getTime() + 7 * 24 * 60 * 60 * 1000)
-                          : null;
-                        const disputeOpen = sevenDaysAfterRelease
-                          ? new Date() < sevenDaysAfterRelease
-                          : false;
-                        const daysLeft = sevenDaysAfterRelease
-                          ? Math.ceil((sevenDaysAfterRelease.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-                          : 0;
-
-                        return disputeOpen ? (
-                          <Link href={`/client/disputes/create?vaultId=${vaultId}`} className="w-full">
-                            <Button
-                              variant="outline"
-                              className="w-full border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
-                            >
-                              <Gavel className="w-4 h-4 mr-2 text-amber-600" />
-                              Raise dispute ({daysLeft}d left)
-                            </Button>
-                          </Link>
-                        ) : (
-                          <div className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 text-center">
-                            <p className="text-slate-400 text-xs font-bold">Dispute window has closed</p>
-                          </div>
-                        );
-                      }
-
-                      // For FUNDED vaults — normal dispute button
-                      if (vault.status === VaultStatus.FUNDED) {
-                        return (
-                          <Link href={`/client/disputes/create?vaultId=${vaultId}`} className="w-full">
-                            <Button
-                              variant="outline"
-                              className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
-                            >
-                              <Gavel className="w-4 h-4 mr-2 text-amber-600" />
-                              Initiate dispute
-                            </Button>
-                          </Link>
-                        );
-                      }
-
-                      return null;
-                    })()
-                    }
+                    {/* Dispute — only available when FUNDED */}
+                    {vault.status === VaultStatus.FUNDED && (
+                      <Link
+                        href={`/client/disputes/create?vaultId=${vaultId}`}
+                        className="w-full"
+                      >
+                        <Button
+                          variant="outline"
+                          className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
+                        >
+                          <Gavel className="w-4 h-4 mr-2 text-amber-600" />
+                          Initiate dispute
+                        </Button>
+                      </Link>
+                    )}
 
                     {!vault.freelancerId && (
                       <Button
