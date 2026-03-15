@@ -260,13 +260,18 @@ export function CreateDisputeForm({
 
     setIsSubmitting(true);
 
+    const payload = {
+      vaultId: selectedVaultId,
+      deliverableTitle: selectedDeliverableTitle || undefined,
+      disputeType: selectedReasonCode as any,
+      reasonCode: selectedReasonCode,
+      description,
+    };
+
+    console.log("DEBUG: Sending dispute payload:", payload);
+
     try {
-      await api.disputes.create({
-        vaultId: selectedVaultId,
-        deliverableTitle: selectedDeliverableTitle || undefined,
-        reasonCode: selectedReasonCode,
-        description,
-      });
+      await api.disputes.create(payload);
 
       console.log("Submitted dispute", {
         selectedVaultId,
