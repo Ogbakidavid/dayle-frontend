@@ -23,6 +23,8 @@ import {
   X,
   MessageSquare,
   Phone,
+  Landmark,
+  Building,
 } from "lucide-react";
 import { useUser } from "@/lib/store/user-context";
 import { useLedger } from "@/lib/store/ledger-context";
@@ -39,6 +41,7 @@ export default function SettingsPageContent({ role = "client" }) {
   const [activeTab, setActiveTab] = useState("profile");
   const [isAddingBillingMethod, setIsAddingBillingMethod] = useState(false);
   const [selectedBillingMethod, setSelectedBillingMethod] = useState<string | null>(null);
+  const [billingStep, setBillingStep] = useState<"SELECTION" | "CARD" | "BANK">("SELECTION");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Profile Edit State
@@ -56,13 +59,23 @@ export default function SettingsPageContent({ role = "client" }) {
 
   // Notification center state
   const [notificationList, setNotificationList] = useState<any[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       const data = await api.notifications.list();
       setNotificationList(data);
     };
+    const fetchPaymentMethods = async () => {
+      try {
+        const data = await api.paymentMethods.list();
+        setPaymentMethods(data);
+      } catch (err) {
+        console.error("Failed to fetch payment methods", err);
+      }
+    };
     fetchNotifications();
+    fetchPaymentMethods();
   }, []);
 
   // Notification Preferences State
@@ -83,6 +96,175 @@ export default function SettingsPageContent({ role = "client" }) {
   const [whatsappStep, setWhatsappStep] = useState(1); // 1: phone, 2: verify
   const [loadingWhatsApp, setLoadingWhatsApp] = useState(false);
   const [whatsappError, setWhatsappError] = useState("");
+
+  // Billing Form States
+  const [cardData, setCardData] = useState({ number: "", expiry: "", cvv: "" });
+  const [bankData, setBankData] = useState({ bankCode: "", accountNumber: "", accountName: "" });
+  const [banksList, setBanksList] = useState<any[]>([]);
+  const [resolvingBank, setResolvingBank] = useState(false);
+  const [cardBrand, setCardBrand] = useState<string | null>(null);
+  const [billingError, setBillingError] = useState("");
+  const [isSavingBilling, setIsSavingBilling] = useState(false);
+
+  // Card brand detection helper
+  const detectBrand = (number: string) => {
+    const sanitized = number.replace(/\s+/g, "");
+    if (/^4/.test(sanitized)) return "VISA";
+    if (/^5[1-5]/.test(sanitized)) return "MASTERCARD";
+    if (/^(506|507|650|501)/.test(sanitized)) return "VERVE";
+    return null;
+  };
+
+  // Luhn algorithm for card validation
+  const validateLuhn = (number: string) => {
+    const sanitized = number.replace(/\s+/g, "");
+    let sum = 0;
+    let shouldDouble = false;
+    for (let i = sanitized.length - 1; i >= 0; i--) {
+      let digit = parseInt(sanitized.charAt(i));
+      if (shouldDouble) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      sum += digit;
+      shouldDouble = !shouldDouble;
+    }
+    return sum % 10 === 0;
+  };
+
+  useEffect(() => {
+    if (billingStep === "BANK" && banksList.length === 0) {
+      api.paymentMethods.getBanks().then(setBanksList).catch(console.error);
+    }
+  }, [billingStep, banksList.length]);
+
+  const handleResolveBank = async () => {
+    if (bankData.accountNumber.length === 10 && bankData.bankCode) {
+      setResolvingBank(true);
+      try {
+        const res = await api.paymentMethods.resolveBank(bankData.bankCode, bankData.accountNumber);
+        if (res && res.account_name) {
+          setBankData(prev => ({ ...prev, accountName: res.account_name }));
+        }
+      } catch (err: any) {
+        setBillingError("Could not resolve bank account. Please check details.");
+      } finally {
+        setResolvingBank(false);
+      }
+    }
+  };
+
+  const handleSaveCard = async () => {
+    // 1. Basic Format Validation
+    if (!validateLuhn(cardData.number)) {
+      setBillingError("Invalid card number format.");
+      return;
+    }
+    const expiryParts = cardData.expiry.split("/");
+    if (expiryParts.length !== 2) {
+      setBillingError("Invalid expiry date format (MM/YY).");
+      return;
+    }
+
+    // 2. Strict CVV Validation
+    if (cardData.cvv.length !== 3) {
+      setBillingError("Invalid CVV. Please enter a 3-digit number.");
+      return;
+    }
+    
+    setBillingError("");
+    setIsSavingBilling(true);
+    
+    try {
+      // 3. Authenticity Verification Simulation (How real apps do it)
+      // They use BIN (Bank Identification Number) checks and authorization charges.
+      const bin = cardData.number.replace(/\s+/g, "").slice(0, 6);
+      
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate authorization latency
+
+      // Simulate specific failure cases for "fake" or suspicious cards
+      if (bin.startsWith("000") || cardData.number.includes("000000")) {
+        throw new Error("Card authorization failed. This card appears to be invalid or blocked by the issuer.");
+      }
+
+      if (cardData.cvv === "000") {
+        throw new Error("Security code verification failed. Please check your CVC.");
+      }
+
+      const month = parseInt(expiryParts[0]);
+      const year = parseInt(expiryParts[1]);
+
+      // 4. Save to Backend (Standard practice: Backend only stores masked data)
+      await api.paymentMethods.addCard({
+        brand: cardBrand || "CARD",
+        last4: cardData.number.replace(/\s+/g, "").slice(-4),
+        expiryMonth: month,
+        expiryYear: year,
+        isDefault: true
+      });
+      
+      setIsAddingBillingMethod(false);
+      setBillingStep("SELECTION");
+      setSelectedBillingMethod(null);
+      
+      // Refresh local list
+      const updated = await api.paymentMethods.list();
+      setPaymentMethods(updated);
+      setBillingError(""); // Clear any errors on success
+    } catch (err: any) {
+      setBillingError(err.message || "Failed to verify payment method. Please try another card.");
+    } finally {
+      setIsSavingBilling(false);
+    }
+  };
+
+  const handleSaveBank = async () => {
+    if (!bankData.accountName) {
+      setBillingError("Please resolve the bank account first.");
+      return;
+    }
+    setIsSavingBilling(true);
+    try {
+      const selectedBank = banksList.find(b => b.code === bankData.bankCode);
+      await api.paymentMethods.addBank({
+        accountName: bankData.accountName,
+        accountNumber: `••••${bankData.accountNumber.slice(-4)}`,
+        bankName: selectedBank?.name || "Bank",
+        bankCode: bankData.bankCode,
+        isDefault: true
+      });
+      setIsAddingBillingMethod(false);
+      setBillingStep("SELECTION");
+      setSelectedBillingMethod(null);
+      // Refresh local list
+      const updated = await api.paymentMethods.list();
+      setPaymentMethods(updated);
+    } catch (err: any) {
+      setBillingError(err.message || "Failed to save bank account.");
+    } finally {
+      setIsSavingBilling(false);
+    }
+  };
+
+  const handleDeletePaymentMethod = async (id: string) => {
+    try {
+      await api.paymentMethods.remove(id);
+      setPaymentMethods((prev) => prev.filter((item) => String(item.id) !== String(id)));
+    } catch (err) {
+      console.error("Failed to delete payment method", err);
+    }
+  };
+
+  const handleSetDefaultPaymentMethod = async (id: string) => {
+    try {
+      await api.paymentMethods.setDefault(id);
+      setPaymentMethods((prev) =>
+        prev.map((item) => ({ ...item, isDefault: String(item.id) === String(id) })),
+      );
+    } catch (err) {
+      console.error("Failed to set default payment method", err);
+    }
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -626,81 +808,290 @@ export default function SettingsPageContent({ role = "client" }) {
 
                   {isAddingBillingMethod ? (
                     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
-                      <div 
-                        className="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:border-emerald-500/30 cursor-pointer transition-all group"
-                        onClick={() => setSelectedBillingMethod("card")}
-                      >
-                        <div className="relative flex items-center justify-center">
-                           <div className={cn(
-                             "w-5 h-5 rounded-full border-2 transition-all flex items-center justify-center",
-                             selectedBillingMethod === "card" ? "border-emerald-500" : "border-slate-300"
-                           )}>
-                             {selectedBillingMethod === "card" && (
-                               <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
-                             )}
+                      {billingStep === "SELECTION" && (
+                        <div className="space-y-4">
+                          <div 
+                            className={cn(
+                              "flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all group",
+                              selectedBillingMethod === "card" ? "border-emerald-500 bg-emerald-50/10" : "border-slate-200 hover:border-emerald-500/30"
+                            )}
+                            onClick={() => setSelectedBillingMethod("card")}
+                          >
+                            <div className="relative flex items-center justify-center">
+                               <div className={cn(
+                                 "w-5 h-5 rounded-full border-2 transition-all flex items-center justify-center",
+                                 selectedBillingMethod === "card" ? "border-emerald-500" : "border-slate-300"
+                               )}>
+                                 {selectedBillingMethod === "card" && (
+                                   <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
+                                 )}
+                               </div>
+                            </div>
+                            
+                            <span className="text-sm font-bold text-slate-900 flex-1">
+                              Debit or credit card
+                            </span>
+
+                            <div className="flex items-center gap-1.5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
+                              <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3 w-auto object-contain" />
+                              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5 w-auto object-contain" />
+                              <div className="bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded font-bold">VERVE</div>
+                            </div>
+                          </div>
+
+                          <div 
+                            className={cn(
+                              "flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all group",
+                              selectedBillingMethod === "bank" ? "border-emerald-500 bg-emerald-50/10" : "border-slate-200 hover:border-emerald-500/30"
+                            )}
+                            onClick={() => setSelectedBillingMethod("bank")}
+                          >
+                            <div className="relative flex items-center justify-center">
+                               <div className={cn(
+                                 "w-5 h-5 rounded-full border-2 transition-all flex items-center justify-center",
+                                 selectedBillingMethod === "bank" ? "border-emerald-500" : "border-slate-300"
+                               )}>
+                                 {selectedBillingMethod === "bank" && (
+                                   <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
+                                 )}
+                               </div>
+                            </div>
+                            
+                            <span className="text-sm font-bold text-slate-900 flex-1">
+                              Bank Transfer
+                            </span>
+
+                            <div className="flex items-center gap-1.5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all text-slate-400">
+                              <Building className="w-5 h-5" />
+                              <Landmark className="w-5 h-5" />
+                            </div>
+                          </div>
+
+                          <div className="mt-8 pt-8 border-t border-slate-100 flex justify-end">
+                            <Button 
+                              disabled={!selectedBillingMethod}
+                              onClick={() => setBillingStep(selectedBillingMethod === "card" ? "CARD" : "BANK")}
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 h-11 rounded-xl shadow-lg shadow-emerald-600/10"
+                            >
+                              Continue
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {billingStep === "CARD" && (
+                        <div className="space-y-6">
+                           <div className="flex items-center gap-2 mb-4">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => setBillingStep("SELECTION")}
+                                className="p-0 h-auto hover:bg-transparent text-slate-500 hover:text-slate-700"
+                              >
+                                <ChevronLeft className="w-4 h-4 mr-1" />
+                                Back
+                              </Button>
+                           </div>
+
+                           <div className="space-y-4 max-w-md">
+                              <div className="space-y-2">
+                                <Label className="text-xs font-bold text-slate-500 uppercase">Card Number</Label>
+                                <div className="relative">
+                                  <Input 
+                                    placeholder="0000 0000 0000 0000"
+                                    value={cardData.number}
+                                    onChange={(e) => {
+                                      const val = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+                                      setCardData({...cardData, number: val});
+                                      setCardBrand(detectBrand(val));
+                                    }}
+                                    className="h-12 bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl font-mono text-lg"
+                                  />
+                                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
+                                    {cardBrand === "VISA" && <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" className="h-4" />}
+                                    {cardBrand === "MASTERCARD" && <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" className="h-6" />}
+                                    {cardBrand === "VERVE" && <div className="bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded font-bold">VERVE</div>}
+                                    {!cardBrand && <CreditCard className="w-5 h-5 text-slate-300" />}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label className="text-xs font-bold text-slate-500 uppercase">Expiry (MM/YY)</Label>
+                                  <Input 
+                                    placeholder="MM/YY"
+                                    value={cardData.expiry}
+                                    onChange={(e) => {
+                                      let val = e.target.value.replace(/\D/g, '');
+                                      if (val.length > 2) val = val.slice(0,2) + '/' + val.slice(2,4);
+                                      setCardData({...cardData, expiry: val});
+                                    }}
+                                    maxLength={5}
+                                    className="h-12 bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label className="text-xs font-bold text-slate-500 uppercase">CVV</Label>
+                                  <Input 
+                                    placeholder="123"
+                                    type="password"
+                                    value={cardData.cvv}
+                                    onChange={(e) => setCardData({...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0,3)})}
+                                    maxLength={3}
+                                    className="h-12 bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl"
+                                  />
+                                </div>
+                              </div>
+
+                              {billingError && (
+                                <p className="text-sm text-red-600 font-bold bg-red-50 p-3 rounded-lg border border-red-100 italic">
+                                  {billingError}
+                                </p>
+                              )}
+
+                              <Button 
+                                onClick={handleSaveCard}
+                                disabled={isSavingBilling || !cardData.number || !cardData.expiry || !cardData.cvv}
+                                className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/10 mt-6"
+                              >
+                                {isSavingBilling ? "Verifying..." : "Save Card"}
+                              </Button>
                            </div>
                         </div>
-                        
-                        <span className="text-sm font-bold text-slate-900 flex-1">
-                          Debit or credit card
-                        </span>
+                      )}
 
-                        <div className="flex items-center gap-1.5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3 w-auto object-contain" />
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5 w-auto object-contain" />
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-3 w-auto object-contain" />
-                        </div>
-                      </div>
+                      {billingStep === "BANK" && (
+                        <div className="space-y-6">
+                           <div className="flex items-center gap-2 mb-4">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => setBillingStep("SELECTION")}
+                                className="p-0 h-auto hover:bg-transparent text-slate-500 hover:text-slate-700"
+                              >
+                                <ChevronLeft className="w-4 h-4 mr-1" />
+                                Back
+                              </Button>
+                           </div>
 
-                      {selectedBillingMethod === "card" && (
-                        <div className="mt-8 pt-8 border-t border-slate-100 flex justify-end">
-                          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 h-11 rounded-xl shadow-lg shadow-emerald-600/10">
-                            Continue
-                          </Button>
+                           <div className="space-y-4 max-w-md">
+                              <div className="space-y-2">
+                                <Label className="text-xs font-bold text-slate-500 uppercase">Select Bank</Label>
+                                <select 
+                                  value={bankData.bankCode}
+                                  onChange={(e) => setBankData({...bankData, bankCode: e.target.value, accountName: ""})}
+                                  className="w-full h-12 bg-slate-50 border border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl px-4 text-sm font-bold text-slate-900 appearance-none"
+                                >
+                                  <option value="">Select a bank</option>
+                                  {banksList.map(bank => (
+                                    <option key={bank.code} value={bank.code}>{bank.name}</option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label className="text-xs font-bold text-slate-500 uppercase">Account Number</Label>
+                                <div className="relative">
+                                  <Input 
+                                    placeholder="0123456789"
+                                    value={bankData.accountNumber}
+                                    onChange={(e) => {
+                                      const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                      setBankData({...bankData, accountNumber: val, accountName: ""});
+                                    }}
+                                    onBlur={handleResolveBank}
+                                    className="h-12 bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl text-lg tracking-widest"
+                                  />
+                                  {resolvingBank && (
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                      <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {bankData.accountName && (
+                                <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl animate-in fade-in zoom-in-95 duration-200">
+                                   <Label className="text-[10px] font-bold text-emerald-600 uppercase mb-1 block">Account Name</Label>
+                                   <p className="text-sm font-bold text-slate-900">{bankData.accountName}</p>
+                                </div>
+                              )}
+
+                              {billingError && (
+                                <p className="text-sm text-red-600 font-bold bg-red-50 p-3 rounded-lg border border-red-100 italic">
+                                  {billingError}
+                                </p>
+                              )}
+
+                              <Button 
+                                onClick={handleSaveBank}
+                                disabled={isSavingBilling || !bankData.accountName}
+                                className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/10 mt-6"
+                              >
+                                {isSavingBilling ? "Saving..." : "Save Bank Account"}
+                              </Button>
+                           </div>
                         </div>
                       )}
                     </div>
                   ) : (
                     <>
                       <div className="space-y-3">
-                        {([] as any[]).map((item, i) => (
+                        {paymentMethods.map((item) => (
                           <div
-                            key={i}
+                            key={item.id}
                             className="group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-emerald-500/20 transition-all shadow-sm"
                           >
                             <div className="flex items-center gap-4">
-                              <div className="w-10 h-7 bg-slate-50 border border-slate-200 rounded flex items-center justify-center text-sm font-bold text-slate-600">
-                                {item.type}
+                              <div className="w-10 h-7 bg-slate-50 border border-slate-200 rounded flex items-center justify-center text-[10px] font-bold text-slate-600 uppercase">
+                                {item.brand || (item.type === "BANK_TRANSFER" ? "BANK" : item.type)}
                               </div>
                               <div>
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm font-bold text-slate-900 tracking-tight ">
-                                    {isClient && "last4" in item
-                                      ? `•••• ${item.last4}`
-                                      : "label" in item
-                                        ? item.label
-                                        : ""}
+                                    {item.type === "CARD" 
+                                      ? `•••• ${item.last4}` 
+                                      : `${item.bankName} (${item.accountNumber})`}
                                   </p>
-                                  {item.primary && (
+                                  {item.isDefault && (
                                     <span className="text-sm px-1.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded font-bold tracking-tight">
-                                      Primary
+                                      Default
                                     </span>
                                   )}
                                 </div>
-                                {isClient && "exp" in item && (
+                                {item.type === "CARD" && (
                                   <p className="text-[11px] font-bold text-slate-600  mt-0.5">
-                                    Expires {item.exp}
+                                    Expires {item.expiryMonth}/{item.expiryYear}
+                                  </p>
+                                )}
+                                {item.type === "BANK_TRANSFER" && (
+                                  <p className="text-[11px] font-bold text-slate-600 mt-0.5 uppercase">
+                                    {item.accountName}
                                   </p>
                                 )}
                               </div>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-slate-300 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {!item.isDefault && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleSetDefaultPaymentMethod(item.id)}
+                                  className="text-slate-400 hover:text-emerald-600 text-[11px] font-bold"
+                                >
+                                  Set primary
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeletePaymentMethod(item.id)}
+                                className="text-slate-300 hover:text-red-600 hover:bg-red-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
                         ))}
                       </div>

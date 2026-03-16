@@ -93,7 +93,88 @@ async function request(endpoint: string, options: RequestOptions = {}) {
   }
 }
 
-export const api = {
+export interface ApiClient {
+  auth: {
+    updateProfile: (updates: any) => Promise<any>;
+    getCurrentUser: (token?: string) => Promise<any>;
+    logout: () => Promise<any>;
+    socialLogin: (dto: any) => Promise<any>;
+  };
+  security: {
+    getSessions: () => Promise<any>;
+    revokeSession: (sessionId: string) => Promise<any>;
+    revokeAllSessions: () => Promise<any>;
+  };
+  ledger: {
+    getBalance: () => Promise<any>;
+    withdraw: (amount: number, currency: string, bankDetails: any, opts?: any) => Promise<any>;
+    getTransactions: () => Promise<any>;
+  };
+  paymentMethods: {
+    list: () => Promise<any[]>;
+    addCard: (data: any) => Promise<any>;
+    addBank: (data: any) => Promise<any>;
+    remove: (id: string) => Promise<any>;
+    setDefault: (id: string) => Promise<any>;
+    getBanks: () => Promise<any[]>;
+    resolveBank: (bankCode: string, accountNumber: string) => Promise<any>;
+  };
+  vaults: {
+    list: () => Promise<any[]>;
+    create: (data: any) => Promise<any>;
+    fund: (vaultId: string, data: any) => Promise<any>;
+    release: (vaultId: string, opts?: any) => Promise<any>;
+    submit: (vaultId: string, opts?: any) => Promise<any>;
+    refund: (vaultId: string, opts?: any) => Promise<any>;
+    getById: (id: string) => Promise<any>;
+    updateStatus: (id: string, status: string) => Promise<any>;
+    requestRefund: (vaultId: string, data: any) => Promise<any>;
+    updateFreelancer: (vaultId: string, data: any) => Promise<any>;
+  };
+  disputes: {
+    list: () => Promise<any[]>;
+    listForVault: (vaultId: string) => Promise<any[]>;
+    getById: (id: string) => Promise<any>;
+    create: (payload: any) => Promise<any>;
+  };
+  invites: {
+    getByToken: (token: string) => Promise<any>;
+    getByVaultId: (vaultId: string) => Promise<any>;
+    listMyInvites: () => Promise<any[]>;
+    create: (payload: any) => Promise<any>;
+    respond: (token: string, data: { decision: string; reasonCode?: string }) => Promise<any>;
+  };
+  onboarding: {
+    setRole: (role: string) => Promise<any>;
+    submitKyc: (kycData: any) => Promise<any>;
+    getStatus: () => Promise<any>;
+    getDiditSession: () => Promise<{ sessionId: string; url: string }>;
+  };
+  evidence: {
+    list: (params?: { vaultId?: string; disputeId?: string }) => Promise<any[]>;
+    create: (payload: any) => Promise<any>;
+  };
+  notifications: {
+    list: () => Promise<any[]>;
+    markAllAsRead: () => Promise<any>;
+    markAsRead: (id: number | string) => Promise<any>;
+    getPreferences: () => Promise<any>;
+    updatePreferences: (prefs: any) => Promise<any>;
+    createTest: () => Promise<any>;
+  };
+  telegram: {
+    getLinkToken: () => Promise<any>;
+    simulateConnect: (username: string) => Promise<any>;
+    disconnect: () => Promise<any>;
+  };
+  whatsapp: {
+    startVerification: (phone: string) => Promise<any>;
+    confirmVerification: (code: string, consent: boolean) => Promise<any>;
+    disable: () => Promise<any>;
+  };
+}
+
+export const api: ApiClient = {
   auth: {
     updateProfile: async (updates: any): Promise<any> => {
       return await request("/auth/profile", {
@@ -175,6 +256,39 @@ export const api = {
     getTransactions: async (): Promise<any> => {
       const data = await request("/ledger/transactions");
       return data.transactions;
+    },
+  },
+
+  paymentMethods: {
+    list: async (): Promise<any[]> => {
+      return await request("/payment-methods");
+    },
+    addCard: async (data: any): Promise<any> => {
+      return await request("/payment-methods/card", {
+        method: "POST",
+        body: data,
+      });
+    },
+    addBank: async (data: any): Promise<any> => {
+      return await request("/payment-methods/bank", {
+        method: "POST",
+        body: data,
+      });
+    },
+    remove: async (id: string): Promise<any> => {
+      return await request(`/payment-methods/${id}`, { method: "DELETE" });
+    },
+    setDefault: async (id: string): Promise<any> => {
+      return await request(`/payment-methods/${id}/default`, { method: "POST" });
+    },
+    getBanks: async (): Promise<any[]> => {
+      return await request("/payment-methods/banks");
+    },
+    resolveBank: async (bankCode: string, accountNumber: string): Promise<any> => {
+      return await request("/payment-methods/resolve-bank", {
+        method: "POST",
+        body: { bankCode, accountNumber },
+      });
     },
   },
 
@@ -371,31 +485,31 @@ export const api = {
       return await request("/notifications/telegram/link-token");
     },
     simulateConnect: async (username: string): Promise<any> => {
-       return await request("/notifications/telegram/connect", {
-         method: "POST",
-         body: { username },
-       });
+      return await request("/notifications/telegram/connect", {
+        method: "POST",
+        body: { username },
+      });
     },
     disconnect: async (): Promise<any> => {
-       return await request("/notifications/telegram/disconnect", { method: "POST" });
+      return await request("/notifications/telegram/disconnect", { method: "POST" });
     },
   },
 
   whatsapp: {
     startVerification: async (phone: string): Promise<any> => {
       return await request("/notifications/whatsapp/start-verification", {
-         method: "POST",
-         body: { phone },
-       });
+        method: "POST",
+        body: { phone },
+      });
     },
     confirmVerification: async (code: string, consent: boolean): Promise<any> => {
       return await request("/notifications/whatsapp/confirm-verification", {
-         method: "POST",
-         body: { code, consent },
-       });
+        method: "POST",
+        body: { code, consent },
+      });
     },
     disable: async (): Promise<any> => {
-       return await request("/notifications/whatsapp/disable", { method: "POST" });
+      return await request("/notifications/whatsapp/disable", { method: "POST" });
     },
   },
 };
