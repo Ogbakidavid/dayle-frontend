@@ -100,9 +100,9 @@ export default function ClientDashboard() {
           className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-sm bg-[#F8F9FA] flex items-center justify-center">
+            {/* <div className="w-9 h-9 rounded-sm bg-[#F8F9FA] flex items-center justify-center">
               <Landmark className="w-4 h-4 text-slate-900" />
-            </div>
+            </div> */}
             <span className="text-sm font-bold  text-slate-900">
               Total investment
             </span>
@@ -123,16 +123,16 @@ export default function ClientDashboard() {
           className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-sm bg-emerald-50 flex items-center justify-center">
+            {/* <div className="w-9 h-9 rounded-sm bg-emerald-50 flex items-center justify-center">
               <Zap className="w-4 h-4 text-emerald-600" />
-            </div>
+            </div> */}
             <span className="text-sm font-bold  text-slate-900">
               Available balance
             </span>
           </div>
           <div className="space-y-2">
             <h2 className="text-3xl font-bold text-emerald-600 tracking-tighter ">
-              ${balance?.formattedAvailable || "0.00"}
+              ${(Number(balance?.formattedAvailable) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </h2>
             <Link 
               href="/client/settings?tab=payment"
@@ -149,9 +149,9 @@ export default function ClientDashboard() {
           className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-sm bg-[#F8F9FA] flex items-center justify-center">
+            {/* <div className="w-9 h-9 rounded-sm bg-[#F8F9FA] flex items-center justify-center">
               <Shield className="w-4 h-4 text-slate-900" />
-            </div>
+            </div> */}
             <span className="text-sm font-bold  text-slate-900">
               Secured in projects
             </span>
