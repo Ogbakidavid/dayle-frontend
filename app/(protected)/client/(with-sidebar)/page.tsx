@@ -93,8 +93,8 @@ export default function ClientDashboard() {
           </p>
         </motion.div>
       </header>
-      {/* Stats Cards - Cleaner */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+      {/* Stats Cards - Refined */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <motion.div
           variants={itemVariants}
           className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
@@ -104,17 +104,43 @@ export default function ClientDashboard() {
               <Landmark className="w-4 h-4 text-slate-900" />
             </div>
             <span className="text-sm font-bold  text-slate-900">
-              Available balance
+              Total investment
             </span>
           </div>
           <div className="space-y-2">
             <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
               ${totalInvestment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </h2>
-            <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold ">
-              <Activity className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+              <Activity className="w-3.5 h-3.5" />
               All-time project value
             </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={itemVariants}
+          className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-sm bg-emerald-50 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-emerald-600" />
+            </div>
+            <span className="text-sm font-bold  text-slate-900">
+              Available balance
+            </span>
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold text-emerald-600 tracking-tighter ">
+              ${balance?.formattedAvailable || "0.00"}
+            </h2>
+            <Link 
+              href="/client/settings?tab=payment"
+              className="flex items-center gap-2 text-blue-600 text-sm font-bold hover:underline"
+            >
+              Withdraw funds
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
           </div>
         </motion.div>
 
@@ -134,7 +160,7 @@ export default function ClientDashboard() {
             <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
               ${balance?.formattedSecured || "0"}
             </h2>
-            <p className="text-emerald-600 text-sm font-bold ">
+            <p className="text-emerald-600 text-[10px] font-bold uppercase tracking-wider">
               {securedVaults.length} active contracts
             </p>
           </div>
