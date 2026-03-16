@@ -57,12 +57,10 @@ export default function ClientDashboard() {
   );
 
   // Sync balance formatting
-  if (balance) {
-    (balance as any).formattedSecured = totalLocked.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }
+  const formattedSecured = totalLocked.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   const totalPages = Math.ceil(activeVaults.length / itemsPerPage);
   const paginatedVaults = activeVaults.slice(
@@ -158,7 +156,7 @@ export default function ClientDashboard() {
           </div>
           <div className="space-y-2">
             <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
-              ${balance?.formattedSecured || "0"}
+              ${formattedSecured}
             </h2>
             <p className="text-emerald-600 text-[10px] font-bold uppercase tracking-wider">
               {securedVaults.length} active contracts

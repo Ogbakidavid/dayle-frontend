@@ -172,7 +172,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                                     </span>
                                   </p>
                                   <p className="text-xs text-slate-500 italic">
-                                    "{dispute.description}"
+                                    &quot;{dispute.description}&quot;
                                   </p>
                                 </div>
                               ) : (

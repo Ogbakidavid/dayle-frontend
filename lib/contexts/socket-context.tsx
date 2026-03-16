@@ -44,7 +44,12 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setIsConnected(false);
     });
 
-    setSocket(newSocket);
+    // Use a microtask to avoid synchronous setState during effect run
+    Promise.resolve().then(() => {
+      if (newSocket.active) {
+        setSocket(newSocket);
+      }
+    });
 
     return () => {
       newSocket.close();
