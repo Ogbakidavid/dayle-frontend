@@ -37,6 +37,8 @@ export default function SettingsPageContent({ role = "client" }) {
   const { balance } = useLedger();
   const { showMfaEnrollmentModal } = useMfaEnrollment();
   const [activeTab, setActiveTab] = useState("profile");
+  const [isAddingBillingMethod, setIsAddingBillingMethod] = useState(false);
+  const [selectedBillingMethod, setSelectedBillingMethod] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Profile Edit State
@@ -600,63 +602,118 @@ export default function SettingsPageContent({ role = "client" }) {
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-bold text-slate-900  ">
-                      {isClient ? "Billing methods" : "Settlement methods"}
+                      {isAddingBillingMethod ? "Add a billing method" : (isClient ? "Billing methods" : "Settlement methods")}
                     </h3>
-                    <Button
-                      variant="link"
-                      className="text-emerald-600 text-sm font-bold  p-0 h-auto hover:text-emerald-700"
-                    >
-                      {isClient ? "View invoices" : "View statements"}
-                    </Button>
-                  </div>
-
-                  <div className="space-y-3">
-                    {([] as any[]).map((item, i) => (
-                      <div
-                        key={i}
-                        className="group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-emerald-500/20 transition-all shadow-sm"
+                    {!isAddingBillingMethod && (
+                      <Button
+                        variant="link"
+                        className="text-emerald-600 text-sm font-bold  p-0 h-auto hover:text-emerald-700"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-7 bg-slate-50 border border-slate-200 rounded flex items-center justify-center text-sm font-bold text-slate-600">
-                            {item.type}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-bold text-slate-900 tracking-tight ">
-                                {isClient && "last4" in item
-                                  ? `•••• ${item.last4}`
-                                  : "label" in item
-                                    ? item.label
-                                    : ""}
-                              </p>
-                              {item.primary && (
-                                <span className="text-sm px-1.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded font-bold tracking-tight">
-                                  Primary
-                                </span>
-                              )}
-                            </div>
-                            {isClient && "exp" in item && (
-                              <p className="text-[11px] font-bold text-slate-600  mt-0.5">
-                                Expires {item.exp}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-slate-300 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
+                        {isClient ? "View invoices" : "View statements"}
+                      </Button>
+                    )}
+                    {isAddingBillingMethod && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsAddingBillingMethod(false)}
+                        className="h-8 px-4 border-slate-200 text-emerald-600 hover:text-emerald-700 font-bold rounded-lg"
+                      >
+                        Cancel
+                      </Button>
+                    )}
                   </div>
 
-                  <Button className="w-full py-7 bg-white border border-dashed border-slate-200 hover:border-emerald-500/50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all rounded-xl font-bold  text-sm shadow-sm group mt-4">
-                    <Plus className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />{" "}
-                    {isClient ? "Add a billing method" : "Add settlement method"}
-                  </Button>
+                  {isAddingBillingMethod ? (
+                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div 
+                        className="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:border-emerald-500/30 cursor-pointer transition-all group"
+                        onClick={() => setSelectedBillingMethod("card")}
+                      >
+                        <div className="relative flex items-center justify-center">
+                           <div className={cn(
+                             "w-5 h-5 rounded-full border-2 transition-all flex items-center justify-center",
+                             selectedBillingMethod === "card" ? "border-emerald-500" : "border-slate-300"
+                           )}>
+                             {selectedBillingMethod === "card" && (
+                               <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
+                             )}
+                           </div>
+                        </div>
+                        
+                        <span className="text-sm font-bold text-slate-900 flex-1">
+                          Debit or credit card
+                        </span>
+
+                        <div className="flex items-center gap-1.5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3 w-auto object-contain" />
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5 w-auto object-contain" />
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-3 w-auto object-contain" />
+                        </div>
+                      </div>
+
+                      {selectedBillingMethod === "card" && (
+                        <div className="mt-8 pt-8 border-t border-slate-100 flex justify-end">
+                          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 h-11 rounded-xl shadow-lg shadow-emerald-600/10">
+                            Continue
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-3">
+                        {([] as any[]).map((item, i) => (
+                          <div
+                            key={i}
+                            className="group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-emerald-500/20 transition-all shadow-sm"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-7 bg-slate-50 border border-slate-200 rounded flex items-center justify-center text-sm font-bold text-slate-600">
+                                {item.type}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-bold text-slate-900 tracking-tight ">
+                                    {isClient && "last4" in item
+                                      ? `•••• ${item.last4}`
+                                      : "label" in item
+                                        ? item.label
+                                        : ""}
+                                  </p>
+                                  {item.primary && (
+                                    <span className="text-sm px-1.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded font-bold tracking-tight">
+                                      Primary
+                                    </span>
+                                  )}
+                                </div>
+                                {isClient && "exp" in item && (
+                                  <p className="text-[11px] font-bold text-slate-600  mt-0.5">
+                                    Expires {item.exp}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-slate-300 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+
+                      <Button 
+                        onClick={() => setIsAddingBillingMethod(true)}
+                        className="w-full py-7 bg-white border border-dashed border-slate-200 hover:border-emerald-500/50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all rounded-xl font-bold  text-sm shadow-sm group mt-4"
+                      >
+                        <Plus className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />{" "}
+                        {isClient ? "Add a billing method" : "Add settlement method"}
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             )}
