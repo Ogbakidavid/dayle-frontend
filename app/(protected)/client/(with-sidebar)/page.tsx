@@ -104,7 +104,7 @@ export default function ClientDashboard() {
               <Landmark className="w-4 h-4 text-slate-900" />
             </div>
             <span className="text-sm font-bold  text-slate-900">
-              Total investment
+              Available balance
             </span>
           </div>
           <div className="space-y-2">

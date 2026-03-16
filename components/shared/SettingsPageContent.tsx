@@ -25,6 +25,7 @@ import {
   Phone,
 } from "lucide-react";
 import { useUser } from "@/lib/store/user-context";
+import { useLedger } from "@/lib/store/ledger-context";
 import { cn } from "@/lib/utils";
 import UserAvatar from "@/components/shared/UserAvatar";
 import { api } from "@/lib/api-client";
@@ -33,6 +34,7 @@ import { useMfaEnrollment } from "@privy-io/react-auth";
 export default function SettingsPageContent({ role = "client" }) {
   const router = useRouter();
   const { user, logout, refreshUser } = useUser();
+  const { balance } = useLedger();
   const { showMfaEnrollmentModal } = useMfaEnrollment();
   const [activeTab, setActiveTab] = useState("profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -328,7 +330,7 @@ export default function SettingsPageContent({ role = "client" }) {
     { id: "profile", label: "Profile", icon: User },
     {
       id: "payment",
-      label: isClient ? "Billing" : "Payouts",
+      label: isClient ? "Billing & Payments" : "Payouts",
       icon: CreditCard,
     },
     { id: "channels", label: "Channels", icon: MessageSquare },
@@ -556,66 +558,106 @@ export default function SettingsPageContent({ role = "client" }) {
 
             {/* Payment Section */}
             {activeTab === "payment" && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-bold text-slate-900  ">
-                    {isClient ? "Cards on file" : "Settlement methods"}
-                  </h3>
-                  <Button
-                    variant="link"
-                    className="text-emerald-600 text-sm font-bold  p-0 h-auto hover:text-emerald-700"
-                  >
-                    {isClient ? "View invoices" : "View statements"}
-                  </Button>
-                </div>
-
-                <div className="space-y-3">
-                  {([] as any[]).map((item, i) => (
-                    <div
-                      key={i}
-                      className="group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-emerald-500/20 transition-all shadow-sm"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-7 bg-slate-50 border border-slate-200 rounded flex items-center justify-center text-sm font-bold text-slate-600">
-                          {item.type}
+              <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                {isClient && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Upwork-style Balance Card */}
+                    <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-500/10 transition-colors" />
+                      <div className="relative z-10 space-y-6">
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-bold text-slate-600 tracking-[0.1em] uppercase">
+                            Available items to withdraw
+                          </h4>
+                          <h2 className="text-4xl font-bold text-slate-900 tracking-tighter">
+                            ${(Number(balance?.formattedAvailable) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </h2>
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-bold text-slate-900 tracking-tight ">
-                              {isClient && "last4" in item
-                                ? `•••• ${item.last4}`
-                                : "label" in item
-                                  ? item.label
-                                  : ""}
-                            </p>
-                            {item.primary && (
-                              <span className="text-sm px-1.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded font-bold tracking-tight">
-                                Primary
-                              </span>
+                        <Button
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all"
+                          disabled={!balance?.formattedAvailable || Number(balance.formattedAvailable) <= 0}
+                          onClick={() => router.push(`/withdraw?amount=${balance?.formattedAvailable}`)}
+                        >
+                          Withdraw
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-50 border border-slate-200 p-8 rounded-2xl shadow-sm border-dashed flex flex-col justify-center">
+                      <h4 className="text-sm font-bold text-slate-600 mb-2">
+                        Billing cycle
+                      </h4>
+                      <p className="text-sm font-bold text-slate-900">
+                        Monthly billing
+                      </p>
+                      <p className="text-[11px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
+                        Next invoice: April 1, 2026
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-slate-900  ">
+                      {isClient ? "Billing methods" : "Settlement methods"}
+                    </h3>
+                    <Button
+                      variant="link"
+                      className="text-emerald-600 text-sm font-bold  p-0 h-auto hover:text-emerald-700"
+                    >
+                      {isClient ? "View invoices" : "View statements"}
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {([] as any[]).map((item, i) => (
+                      <div
+                        key={i}
+                        className="group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-emerald-500/20 transition-all shadow-sm"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-7 bg-slate-50 border border-slate-200 rounded flex items-center justify-center text-sm font-bold text-slate-600">
+                            {item.type}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-bold text-slate-900 tracking-tight ">
+                                {isClient && "last4" in item
+                                  ? `•••• ${item.last4}`
+                                  : "label" in item
+                                    ? item.label
+                                    : ""}
+                              </p>
+                              {item.primary && (
+                                <span className="text-sm px-1.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded font-bold tracking-tight">
+                                  Primary
+                                </span>
+                              )}
+                            </div>
+                            {isClient && "exp" in item && (
+                              <p className="text-[11px] font-bold text-slate-600  mt-0.5">
+                                Expires {item.exp}
+                              </p>
                             )}
                           </div>
-                          {isClient && "exp" in item && (
-                            <p className="text-[11px] font-bold text-slate-600  mt-0.5">
-                              Expires {item.exp}
-                            </p>
-                          )}
                         </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-slate-300 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-slate-300 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
 
-                <Button className="w-full py-6 bg-white border border-dashed border-slate-200 hover:border-emerald-500/50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all rounded-xl font-bold  text-sm shadow-sm group">
-                  <Plus className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />{" "}
-                  {isClient ? "Add payment method" : "Add settlement method"}
-                </Button>
+                  <Button className="w-full py-7 bg-white border border-dashed border-slate-200 hover:border-emerald-500/50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all rounded-xl font-bold  text-sm shadow-sm group mt-4">
+                    <Plus className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />{" "}
+                    {isClient ? "Add a billing method" : "Add settlement method"}
+                  </Button>
+                </div>
               </div>
             )}
 

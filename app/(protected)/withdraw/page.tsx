@@ -57,7 +57,7 @@ interface BankDetails {
   accountName: string;
 }
 
-export default function FreelancerWithdrawPage() {
+export default function WithdrawPage() {
   const router = useRouter();
   const { user } = useUser();
   const searchParams = useSearchParams();
@@ -300,7 +300,7 @@ export default function FreelancerWithdrawPage() {
             <div className="flex items-center gap-4">
               <div
                 className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(5,150,105,0.2)] active:scale-95 transition-all cursor-pointer group"
-                onClick={() => router.replace("/freelancer/balance")}
+                onClick={() => router.replace(user?.role === "CLIENT" ? "/client" : "/freelancer/balance")}
               >
                 <Lock className="w-5 h-5 text-white group-hover:rotate-12 transition-transform" />
               </div>
@@ -379,9 +379,11 @@ export default function FreelancerWithdrawPage() {
                   className="flex items-center gap-3 text-slate-600 hover:text-slate-900 transition-all  font-bold tracking-[0.2em] mb-12 group bg-white border border-slate-200 py-3 px-6 rounded-2xl shadow-sm hover:border-slate-300  uppercase"
                 >
                   <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                  {step === "verification"
-                    ? "Account Configuration"
-                    : "Method Selection"}
+                  {step === "method_selection"
+                    ? "Back to " + (user?.role === "CLIENT" ? "Dashboard" : "Balance")
+                    : step === "verification"
+                      ? "Account Configuration"
+                      : "Method Selection"}
                 </motion.button>
               )}
             </AnimatePresence>
