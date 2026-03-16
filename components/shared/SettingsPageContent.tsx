@@ -566,7 +566,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-500/10 transition-colors" />
                       <div className="relative z-10 space-y-6">
                         <div className="space-y-1">
-                          <h4 className="text-sm font-bold text-slate-600 tracking-[0.1em] uppercase">
+                          <h4 className="text-sm font-bold text-slate-600 tracking-widest uppercase">
                             Available items to withdraw
                           </h4>
                           <h2 className="text-4xl font-bold text-slate-900 tracking-tighter">
