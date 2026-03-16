@@ -392,13 +392,15 @@ export default function ClientVaultDetailPage() {
                       "w-1.5 h-1.5 rounded-full shadow-sm",
                       vault.status === VaultStatus.FUNDED
                         ? "bg-emerald-500 animate-pulse shadow-emerald-500/50"
-                        : vault.status === VaultStatus.RELEASED
-                        ? "bg-blue-500 shadow-blue-500/30"
-                        : vault.status === VaultStatus.REFUNDED
-                        ? "bg-slate-400 shadow-slate-400/30"
-                        : isSuccessReturn && vault.status === VaultStatus.DRAFT
+                      : vault.status === VaultStatus.DISPUTED
                         ? "bg-amber-500 animate-pulse shadow-amber-500/50"
-                        : "bg-slate-300 shadow-slate-300/30",
+                      : vault.status === VaultStatus.RELEASED
+                        ? "bg-blue-500 shadow-blue-500/30"
+                      : vault.status === VaultStatus.REFUNDED
+                        ? "bg-slate-400 shadow-slate-400/30"
+                      : isSuccessReturn && vault.status === VaultStatus.DRAFT
+                        ? "bg-amber-500 animate-pulse shadow-amber-500/50"
+                      : "bg-slate-300 shadow-slate-300/30",
                     )}
                   />
                   <p
@@ -406,24 +408,28 @@ export default function ClientVaultDetailPage() {
                       " font-bold  ",
                       vault.status === VaultStatus.FUNDED
                         ? "text-emerald-600"
-                        : vault.status === VaultStatus.RELEASED
-                        ? "text-blue-600"
-                        : vault.status === VaultStatus.REFUNDED
-                        ? "text-slate-500"
-                        : isSuccessReturn && vault.status === VaultStatus.DRAFT
+                      : vault.status === VaultStatus.DISPUTED
                         ? "text-amber-600"
-                        : "text-slate-400",
+                      : vault.status === VaultStatus.RELEASED
+                        ? "text-blue-600"
+                      : vault.status === VaultStatus.REFUNDED
+                        ? "text-slate-500"
+                      : isSuccessReturn && vault.status === VaultStatus.DRAFT
+                        ? "text-amber-600"
+                      : "text-slate-400",
                     )}
                   >
                     {vault.status === VaultStatus.FUNDED
                       ? "Funds secured in escrow"
-                      : vault.status === VaultStatus.RELEASED
+                    : vault.status === VaultStatus.DISPUTED
+                      ? "Funds locked in dispute"
+                    : vault.status === VaultStatus.RELEASED
                       ? "Payment released to freelancer"
-                      : vault.status === VaultStatus.REFUNDED
+                    : vault.status === VaultStatus.REFUNDED
                       ? "Funds refunded to client"
-                      : isSuccessReturn && vault.status === VaultStatus.DRAFT
+                    : isSuccessReturn && vault.status === VaultStatus.DRAFT
                       ? "Confirming on-chain deposit..."
-                      : "Awaiting deposit"}
+                    : "Awaiting deposit"}
                   </p>
                 </div>
               </div>
