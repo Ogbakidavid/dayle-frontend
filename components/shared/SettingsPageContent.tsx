@@ -834,9 +834,9 @@ export default function SettingsPageContent({ role = "client" }) {
                             </span>
 
                             <div className="flex items-center gap-1.5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
-                              <Image src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" width={40} height={12} className="h-3 w-auto object-contain" />
-                              <Image src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" width={32} height={20} className="h-5 w-auto object-contain" />
-                              <div className="bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded font-bold">VERVE</div>
+                              <Image src="/visa.svg" alt="Visa" width={40} height={12} className="h-3 w-auto object-contain" />
+                              <Image src="/mastercard.svg" alt="Mastercard" width={32} height={20} className="h-5 w-auto object-contain" />
+                              <Image src="/verve.svg" alt="Verve" width={32} height={20} className="h-5 w-auto object-contain" />
                             </div>
                           </div>
 
@@ -909,9 +909,9 @@ export default function SettingsPageContent({ role = "client" }) {
                                     className="h-12 bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl font-mono text-lg"
                                   />
                                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
-                                    {cardBrand === "VISA" && <Image src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" width={48} height={16} className="h-4 w-auto" />}
-                                    {cardBrand === "MASTERCARD" && <Image src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" width={40} height={24} className="h-6 w-auto" />}
-                                    {cardBrand === "VERVE" && <div className="bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded font-bold">VERVE</div>}
+                                    {cardBrand === "VISA" && <Image src="/visa.svg" alt="Visa" width={48} height={16} className="h-4 w-auto" />}
+                                    {cardBrand === "MASTERCARD" && <Image src="/mastercard.svg" alt="Mastercard" width={40} height={24} className="h-6 w-auto" />}
+                                    {cardBrand === "VERVE" && <Image src="/verve.svg" alt="Verve" width={40} height={24} className="h-6 w-auto" />}
                                     {!cardBrand && <CreditCard className="w-5 h-5 text-slate-300" />}
                                   </div>
                                 </div>
