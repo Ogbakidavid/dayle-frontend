@@ -64,12 +64,12 @@ export default function LandingPage() {
 
   const faqs: FAQItem[] = [
     {
-      q: "How does the 'Secure Escrow' actually work?",
-      a: "When a contract is initiated, funds are transferred into a secure escrow account. These funds are locked and can only be released when pre-defined project conditions are met or if both parties agree to a refund.",
+      q: "How does the 'Settlement' actually work?",
+      a: "When a contract is initiated, funds are locked into a secure vault. These funds are held until pre-defined project deliverables are met or if both parties agree to a return.",
     },
     {
       q: "What happens if a client refuses to approve the work?",
-      a: "Dayle includes a built-in Dispute Hub. If the payment release is contested, an independent reviewer evaluates the submitted work against the project scope to ensure a fair resolution.",
+      a: "Dayle includes a built-in Resolution Hub. If the payment release is contested, an independent reviewer evaluates the submitted work against the project scope to ensure a fair outcome.",
     },
     {
       q: "Are there any hidden fees for international transfers?",
@@ -101,7 +101,7 @@ export default function LandingPage() {
           <div className="relative backdrop-blur-2xl border transition-all rounded-2xl md:rounded-3xl h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/80 border-slate-200 shadow-sm">
             {/* Brand */}
             <div className="flex items-center gap-0">
-              <DayleLogo className="w-10 h-10 text-slate-900 transition-transform group-hover:scale-110" />
+              <DayleLogo className="w-10 h-10 text-emerald-500 transition-transform group-hover:scale-110" />
               <span className="font-bold tracking-tighter text-xl md:text-[22px] text-slate-900">
                 Dayle
               </span>
@@ -142,7 +142,7 @@ export default function LandingPage() {
               className="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-slate-200 bg-slate-50 text-[11px] md:text-sm font-bold  mb-7 md:mb-9 text-slate-900"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Automated escrow protection
+              Structured settlement layer
             </motion.div>
 
             {/* Headline */}
@@ -150,11 +150,10 @@ export default function LandingPage() {
               variants={fadeInUp}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[88px] font-bold tracking-tight leading-[1.05] md:leading-[1.09] mb-6 md:mb-8 text-slate-900"
             >
-              Lock funds.
+              Work starts when <br />
+              funds are <span className="italic">locked.</span>
               <br />
-              Approve work.
-              <br />
-              <span className="text-emerald-600 ">Release with certainty.</span>
+              <span className="text-emerald-600 ">Funds move when work is done.</span>
             </motion.h1>
 
             {/* Subcopy */}
@@ -162,9 +161,9 @@ export default function LandingPage() {
               variants={fadeInUp}
               className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-xl mb-8 md:mb-12 font-semibold leading-relaxed tracking-tight text-slate-900"
             >
-              Dayle replaces manual escrow with an automated workflow. Funds are
-              locked upfront, deliverables are reviewed against a clear
-              checklist, and releases happen only when conditions are met.
+              Dayle is the settlement layer for project-based work. Funds are
+              locked upfront, deliverables are defined clearly, and releases
+              happen in minutes—not days.
             </motion.p>
 
             {/* CTAs */}

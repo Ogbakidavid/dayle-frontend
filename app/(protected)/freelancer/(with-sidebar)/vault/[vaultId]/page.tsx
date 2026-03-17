@@ -203,7 +203,7 @@ export default function FreelancerVaultDetailPage() {
                   $
                   {vault.formattedPaidAmount ||
                     (vault.paidAmount || 0).toLocaleString()}{" "}
-                  capital distributed
+                  capital settled
                 </p>
               </div>
             </div>
@@ -225,7 +225,7 @@ export default function FreelancerVaultDetailPage() {
                       What was promised
                     </CardTitle>
                     <CardDescription className="text-slate-600 font-bold   mt-1">
-                      The specific items you committed to deliver
+                      The specific items you committed to settle
                     </CardDescription>
                   </div>
                 </div>
@@ -562,7 +562,7 @@ export default function FreelancerVaultDetailPage() {
                       className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold  h-12 rounded-xl transition-all shadow-sm active:scale-95"
                     >
                       <Gavel className="w-4 h-4 mr-2 text-amber-600" />
-                      Initiate dispute
+                      Initiate resolution
                     </Button>
                   </Link>
                 </div>
@@ -602,10 +602,10 @@ export default function FreelancerVaultDetailPage() {
                     <Link
                       href={`/freelancer/disputes/create?vaultId=${vaultId}`}
                     >
-                      Initiate dispute
+                      Initiate resolution
                     </Link>
                   ) : (
-                    <Link href="/freelancer/disputes">Escrow Timeline</Link>
+                    <Link href="/freelancer/disputes">Settlement Timeline</Link>
                   )}
                 </Button>
               </CardContent>

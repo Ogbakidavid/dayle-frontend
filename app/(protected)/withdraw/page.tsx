@@ -371,7 +371,7 @@ export default function WithdrawPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <p className=" font-bold text-slate-600 tracking-[0.4em]  leading-none uppercase">
-                    Total settlement
+                    Net settlement
                   </p>
                   <div className="flex bg-slate-200/50 p-1 rounded-lg">
                     <button
@@ -426,7 +426,7 @@ export default function WithdrawPage() {
                 <ShieldCheck className="w-4 h-4" /> Secure withdrawal
               </div>
               <p className=" text-slate-500 leading-relaxed font-bold st mt-2 text-[10px] uppercase">
-                Select your preferred method to bridge assets to your regional account.
+                Select your preferred method to settle funds to your regional account.
               </p>
             </div>
           </div>
@@ -769,7 +769,7 @@ export default function WithdrawPage() {
                         >
                           <div className="flex items-center justify-center gap-2">
                             <ShieldCheck className="w-4 h-4" />
-                            Confirm Withdrawal
+                            Confirm settlement
                           </div>
                         </Button>
                       </div>

@@ -135,7 +135,7 @@ export default function CheckoutSelectionPage() {
                 <ShieldCheck className="w-4 h-4" /> Secure checkout
               </div>
               <p className=" text-slate-600 leading-relaxed font-bold st mt-2  uppercase">
-                Select your preferred method to complete the escrow deposit.
+                Select your preferred method to complete the secure vault deposit.
               </p>
             </div>
           </div>
@@ -151,7 +151,7 @@ export default function CheckoutSelectionPage() {
             >
               <div className="text-center space-y-4">
                 <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter ">
-                  Authorize deposit
+                  Vault deposit
                 </h2>
                 <p className="text-sm font-bold text-slate-600 tracking-[0.3em] uppercase">
                   Select your preferred method
@@ -170,7 +170,7 @@ export default function CheckoutSelectionPage() {
                     <p className="text-sm text-slate-600 font-bold   leading-relaxed px-4">
                       To comply with security and regulatory standards, you need
                       to verify your identity before you can deposit funds into
-                      escrow.
+                      the project vault.
                     </p>
                   </div>
                   <button

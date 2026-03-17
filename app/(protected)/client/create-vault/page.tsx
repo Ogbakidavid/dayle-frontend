@@ -246,7 +246,7 @@ export default function CreateVaultPage() {
         <header className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
             <div className="inline-flex items-center gap-0 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500  font-bold tracking-[0.2em] mb-4">
-              <DayleLogo className="w-3 h-3 text-emerald-500" /> Secure project account
+              Secure project vault
             </div>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tighter ">
               New <span className="text-emerald-500">project</span>
@@ -593,7 +593,7 @@ export default function CreateVaultPage() {
                             </span>
                           </div>
                           <p className="text-[10px] text-slate-900 font-bold opacity-60">
-                            * Includes platform service fee for escrow & verification.
+                            * Includes platform service fee for settlement & verification.
                           </p>
                         </div>
                         <div className="p-5 bg-white/3 border border-white/5 rounded-2xl flex flex-col justify-center">
@@ -635,10 +635,10 @@ export default function CreateVaultPage() {
                         </div>
                         <div>
                           <h4 className="text-sm font-bold text-white st">
-                            Escrow verification system
+                            Secure settlement system
                           </h4>
                           <p className="text-sm text-slate-900 mt-1 leading-relaxed font-bold">
-                            Funds are locked in a secure project account.
+                            Funds are locked in a secure project vault.
                             Release requires{" "}
                             <span className="text-white">
                               Manual Client Sign-off
@@ -742,7 +742,7 @@ export default function CreateVaultPage() {
         <div className="mt-12 flex items-center justify-center gap-3 text-slate-900">
           <DayleLogo className="w-4 h-4" />
           <span className="text-sm tracking-[0.3em] font-bold">
-            Secured by Dayle escrow system
+            Secured by Dayle settlement layer
           </span>
         </div>
       </div>

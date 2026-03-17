@@ -19,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Dayle - Work with Certainty",
-  description: "Bank-grade infrastructure for secure escrow payments.",
+  description: "Bank-grade infrastructure for secure project settlement.",
 };
 
 export interface RootLayoutProps {

@@ -324,8 +324,8 @@ export default function ClientVaultDetailPage() {
                 <span className="text-red-600 underline">
                   ${vault.formattedTotalAmount || "0.00"}
                 </span>{" "}
-                was confirmed, but we encountered an error while depositing it
-                into the escrow contract.
+                was confirmed, but we encountered an error while updating the
+                project vault.
                 <div className="mt-4 flex items-center gap-4">
                   <Button
                     variant="outline"
@@ -443,15 +443,15 @@ export default function ClientVaultDetailPage() {
                     )}
                   >
                     {vault.status === VaultStatus.FUNDED
-                      ? "Funds secured in escrow"
+                      ? "Funds secured in vault"
                     : vault.status === VaultStatus.DISPUTED
-                      ? "Funds locked in dispute"
+                      ? "Funds locked in resolution"
                     : vault.status === VaultStatus.RELEASED
-                      ? "Payment released to freelancer"
+                      ? "Payment settled to freelancer"
                     : vault.status === VaultStatus.REFUNDED
-                      ? "Funds refunded to client"
+                      ? "Funds returned to client"
                     : isSuccessReturn && vault.status === VaultStatus.DRAFT
-                      ? "Confirming on-chain deposit..."
+                      ? "Confirming secure deposit..."
                     : "Awaiting deposit"}
                   </p>
                 </div>

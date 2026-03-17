@@ -353,7 +353,7 @@ export default function FreelancerVaultsPage() {
           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest ">
             Securing{" "}
             <span className="text-slate-900">{paginatedVaults.length}</span> /{" "}
-            {filteredVaults.length} Escrow Projects
+            {filteredVaults.length} Project Vaults
           </p>
           <div className="flex items-center gap-3">
             <Button
