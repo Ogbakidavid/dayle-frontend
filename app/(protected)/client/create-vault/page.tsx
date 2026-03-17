@@ -30,6 +30,7 @@ import { api } from "@/lib/api-client";
 import { useVault } from "@/lib/store/vault-context";
 import { SUPPORTED_TOKENS, CONTRACTS } from "@/lib/contracts";
 import { SubmissionType } from "@/lib/domain/enums";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 
 
 const variants: Variants = {
@@ -244,8 +245,8 @@ export default function CreateVaultPage() {
         {/* Header Section */}
         <header className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500  font-bold tracking-[0.2em] mb-4">
-              <Lock className="w-3 h-3" /> Secure project account
+            <div className="inline-flex items-center gap-0 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500  font-bold tracking-[0.2em] mb-4">
+              <DayleLogo className="w-3 h-3 text-emerald-500" /> Secure project account
             </div>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tighter ">
               New <span className="text-emerald-500">project</span>
@@ -739,7 +740,7 @@ export default function CreateVaultPage() {
 
         {/* Footer */}
         <div className="mt-12 flex items-center justify-center gap-3 text-slate-900">
-          <Lock className="w-3 h-3" />
+          <DayleLogo className="w-4 h-4" />
           <span className="text-sm tracking-[0.3em] font-bold">
             Secured by Dayle escrow system
           </span>

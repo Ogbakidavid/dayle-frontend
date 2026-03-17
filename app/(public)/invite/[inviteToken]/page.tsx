@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LogoLoader } from "@/components/ui/logo-loader";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 
 interface InviteData {
   invite: {
@@ -60,6 +61,7 @@ export default function InvitePage() {
   const [data, setData] = useState<InviteData | null>(null);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // For Decline Modal
   const [showDeclineModal, setShowDeclineModal] = useState(false);
@@ -214,12 +216,20 @@ export default function InvitePage() {
           {status === "ACCEPTED" && data?.vault && (
             <div className="pt-4">
               <Button
-                onClick={() =>
-                  router.push(`/freelancer/vault/${data.vault.id}`)
-                }
-                className="bg-emerald-600 text-white hover:bg-emerald-500 font-bold"
+                onClick={() => {
+                  setIsRedirecting(true);
+                  router.push(`/freelancer/vault/${data.vault.id}`);
+                }}
+                disabled={isRedirecting}
+                className="bg-emerald-600 text-white hover:bg-emerald-500 font-bold h-11 px-8 rounded-xl"
               >
-                View project
+                {isRedirecting ? (
+                  <div className="flex items-center gap-2">
+                    <DotLoader size="sm" />
+                  </div>
+                ) : (
+                  "View project"
+                )}
               </Button>
             </div>
           )}
@@ -238,10 +248,8 @@ export default function InvitePage() {
       {/* Simple Header */}
       <header className="border-b border-slate-200 bg-white">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white">
-              <Shield className="w-5 h-5 stroke-[3px]" />
-            </div>
+          <Link href="/" className="flex items-center gap-1 group">
+            <DayleLogo className="w-8 h-8 text-slate-900 transition-transform group-hover:scale-110" />
             <span className="font-bold tracking-tighter text-slate-900 text-xl">
               Dayle
             </span>
@@ -359,7 +367,7 @@ export default function InvitePage() {
                 <div className="flex items-center gap-3">
                   {vault.isFunded ? (
                     <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
-                      <Lock className="w-5 h-5" />
+                    <DayleLogo className="w-6 h-6 text-emerald-600" />
                     </div>
                   ) : (
                     <div className="p-2 bg-amber-50 rounded-lg text-amber-600 border border-amber-100">
@@ -464,7 +472,7 @@ export default function InvitePage() {
             ) : currentUser && currentUser.email !== invite.email ? (
               <div className="text-center space-y-6">
                 <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-2 border border-red-100">
-                  <Lock className="w-8 h-8 text-red-600" />
+                  <DayleLogo className="w-10 h-10 text-red-600" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold tracking-tight  text-red-600">
@@ -512,7 +520,13 @@ export default function InvitePage() {
                     disabled={processing}
                     className="w-full h-14 bg-emerald-600 text-white hover:bg-emerald-700 font-bold  rounded-xl shadow-lg shadow-emerald-600/20"
                   >
-                    {processing ? <DotLoader size="md" /> : "Accept invitation"}
+                    {processing ? (
+                      <div className="flex items-center gap-2">
+                        <DotLoader size="sm" />
+                      </div>
+                    ) : (
+                      "Accept invitation"
+                    )}
                   </Button>
 
                   <Button

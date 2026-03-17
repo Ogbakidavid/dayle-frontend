@@ -8,18 +8,23 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import {
-  Gavel,
-  ArrowUpRight,
-  Plus,
-  Clock,
-  CheckCircle2,
   AlertCircle,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  Activity,
+  Plus,
   Search,
   Filter,
   ArrowDownUp,
+  MoreVertical,
+  Check,
+  ChevronRight,
+  Gavel,
+  ArrowUpRight,
   X,
-  LucideIcon,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { motion, Variants } from "framer-motion";
 import type { Vault } from "@/lib/store/vault-context";
 
@@ -27,7 +32,7 @@ interface Dispute {
   id: string;
   vaultId: string;
   status: "open" | "resolved" | "investigating" | "closed" | string;
-  openedAt: string;
+  createdAt: string;
   openedBy: string;
   requirementRef?: string;
   description?: string;
@@ -59,33 +64,47 @@ interface StatusConfigItem {
 }
 
 const statusConfig: Record<string, StatusConfigItem> = {
-  open: {
+  OPEN: {
     label: "Open",
     pill: "bg-amber-50 text-amber-700 border-amber-200",
     iconWrap: "bg-amber-50 border-amber-100",
     icon: AlertCircle,
     iconColor: "text-amber-700",
   },
-  resolved: {
+  RESOLVED: {
     label: "Resolved",
     pill: "bg-emerald-50 text-emerald-700 border-emerald-200",
     iconWrap: "bg-emerald-50 border-emerald-100",
     icon: CheckCircle2,
     iconColor: "text-emerald-700",
   },
-  investigating: {
-    label: "Investigating",
+  REJECTED: {
+    label: "Rejected",
+    pill: "bg-slate-50 text-slate-600 border-slate-200",
+    iconWrap: "bg-slate-50 border-slate-100",
+    icon: XCircle,
+    iconColor: "text-slate-600",
+  },
+  UNDER_REVIEW: {
+    label: "In Review",
     pill: "bg-sky-50 text-sky-700 border-sky-200",
     iconWrap: "bg-sky-50 border-sky-100",
     icon: Clock,
     iconColor: "text-sky-700",
   },
-  closed: {
-    label: "Closed",
-    pill: "bg-slate-50 text-slate-600 border-slate-200",
-    iconWrap: "bg-slate-50 border-slate-100",
-    icon: CheckCircle2,
-    iconColor: "text-slate-600",
+  investigating: { // For backward compatibility if any old data exists
+    label: "In Review",
+    pill: "bg-sky-50 text-sky-700 border-sky-200",
+    iconWrap: "bg-sky-50 border-sky-100",
+    icon: Clock,
+    iconColor: "text-sky-700",
+  },
+  open: { // For backward compatibility
+    label: "Open",
+    pill: "bg-amber-50 text-amber-700 border-amber-200",
+    iconWrap: "bg-amber-50 border-amber-100",
+    icon: AlertCircle,
+    iconColor: "text-amber-700",
   },
 };
 
@@ -221,17 +240,18 @@ export function DisputeListView({ role }: DisputeListViewProps) {
   }, [role]);
 
   const counts = useMemo(() => {
-    const open = disputesData.filter((d) => d.status === "open").length;
-    const investigating = disputesData.filter(
-      (d) => d.status === "investigating",
+    const open = disputesData.filter((d) => d.status === "OPEN" || d.status === "open").length;
+    const review = disputesData.filter(
+      (d) => d.status === "UNDER_REVIEW" || d.status === "investigating",
     ).length;
-    const resolved = disputesData.filter((d) => d.status === "resolved").length;
-    const closed = disputesData.filter((d) => d.status === "closed").length;
+    const resolved = disputesData.filter((d) => d.status === "RESOLVED" || d.status === "resolved").length;
+    const rejected = disputesData.filter((d) => d.status === "REJECTED" || d.status === "rejected").length;
+    
     return {
       open,
-      investigating,
+      review,
       resolved,
-      closed,
+      rejected,
       total: disputesData.length,
     };
   }, [disputesData]);
@@ -248,7 +268,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
     });
 
     if (statusFilter !== "all") {
-      list = list.filter((d) => d.status === statusFilter);
+      list = list.filter((d) => d.status.toUpperCase() === statusFilter.toUpperCase());
     }
 
     if (q) {
@@ -267,8 +287,8 @@ export function DisputeListView({ role }: DisputeListViewProps) {
     }
 
     list.sort((a, b) => {
-      const aT = new Date(a.openedAt).getTime();
-      const bT = new Date(b.openedAt).getTime();
+      const aT = new Date(a.createdAt).getTime();
+      const bT = new Date(b.createdAt).getTime();
       return sortKey === "newest" ? bT - aT : aT - bT;
     });
 
@@ -277,14 +297,14 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
   const statusTabs = [
     { key: "all", label: "All", count: counts.total },
-    { key: "open", label: "Open", count: counts.open },
+    { key: "OPEN", label: "Open", count: counts.open },
     {
-      key: "investigating",
-      label: "Investigating",
-      count: counts.investigating,
+      key: "UNDER_REVIEW",
+      label: "In Review",
+      count: counts.review,
     },
-    { key: "resolved", label: "Resolved", count: counts.resolved },
-    { key: "closed", label: "Closed", count: counts.closed },
+    { key: "RESOLVED", label: "Resolved", count: counts.resolved },
+    { key: "REJECTED", label: "Closed", count: counts.rejected },
   ];
 
   return (
@@ -334,8 +354,8 @@ export function DisputeListView({ role }: DisputeListViewProps) {
           tone="amber"
         />
         <StatCard
-          title="Investigating"
-          value={counts.investigating}
+          title="In Review"
+          value={counts.review}
           hint="In review"
           icon={Clock}
           tone="sky"
@@ -375,7 +395,6 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                   focus:border-emerald-500/30 focus:ring-4 focus:ring-emerald-500/5 shadow-sm
                 "
                 />
-                {query ? (
                   <button
                     type="button"
                     onClick={() => setQuery("")}
@@ -384,7 +403,6 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                   >
                     <X className="h-4 w-4" />
                   </button>
-                ) : null}
               </div>
 
               {/* Sort */}
@@ -530,7 +548,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                                 </>
                               ) : null}
                               <span className="text-slate-600">
-                                {formatDate(dispute.openedAt)}
+                                {formatDate(dispute.createdAt)}
                               </span>
                             </div>
 

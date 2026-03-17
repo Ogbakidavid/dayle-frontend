@@ -46,7 +46,7 @@ const itemVariants = {
 const navigation = [
   { name: "Overview", href: "/freelancer", icon: LayoutDashboard, badge: null },
   {
-    name: "Active Work",
+    name: "Assignments",
     href: "/freelancer/active-work",
     icon: Briefcase,
     badge: null,

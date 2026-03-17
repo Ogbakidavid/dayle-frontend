@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Shield,
   ArrowRight,
   CheckCircle2,
   User,
   ArrowLeft,
 } from "lucide-react";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -45,9 +45,9 @@ export default function ForgotPasswordPage() {
         <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full"></div>
 
         <div className="relative z-10 w-full max-w-lg">
-          <Link href="/" className="flex items-center gap-4 mb-20 group">
-            <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-emerald-500/20 text-black">
-              <Shield className="w-7 h-7 stroke-[3px]" />
+          <Link href="/" className="flex items-center gap-0 mb-20 group">
+            <div className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-sm">
+              <DayleLogo className="w-8 h-8 text-slate-900" />
             </div>
             <span className="font-bold tracking-tighter text-slate-900 text-3xl">
               Dayle

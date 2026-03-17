@@ -258,6 +258,29 @@ export default function ClientVaultDetailPage() {
     );
   };
 
+  const handleDownload = async (file: { url: string; key?: string; name?: string; filename?: string }) => {
+    try {
+      const isS3 = file.key || file.url?.includes('s3.amazonaws.com') || file.url?.includes('digitaloceanspaces.com');
+      
+      if (!isS3) {
+        window.open(file.url, '_blank');
+        return;
+      }
+
+      const key = file.key || file.url.split('/').pop()?.split('?')[0];
+      if (!key) {
+        window.open(file.url, '_blank');
+        return;
+      }
+
+      const { url: presignedUrl } = await api.uploads.getDownloadUrl(key);
+      window.open(presignedUrl, '_blank');
+    } catch (err) {
+      console.error('Download failed:', err);
+      toast.error('Failed to generate secure download link');
+    }
+  };
+
   if (vaultsLoading || !vault) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -573,19 +596,17 @@ export default function ClientVaultDetailPage() {
                                       <div className="flex flex-wrap gap-2">
                                         {deliverableStatus.files.map(
                                           (file: any, fIdx: number) => (
-                                            <a
+                                            <button
                                               key={fIdx}
-                                              href={file.url}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="inline-flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg group/file transition-all shadow-sm"
+                                              onClick={() => handleDownload(file)}
+                                              className="inline-flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg group/file transition-all shadow-sm cursor-pointer"
                                             >
                                               <Download className="w-3 h-3 text-emerald-600" />
                                               <span className=" text-emerald-700 font-bold group-hover/file:text-emerald-900 ">
                                                 {file.filename ||
                                                   `File ${fIdx + 1}`}
                                               </span>
-                                            </a>
+                                            </button>
                                           ),
                                         )}
                                       </div>

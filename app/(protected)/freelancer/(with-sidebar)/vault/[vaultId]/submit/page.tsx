@@ -145,23 +145,75 @@ export default function SubmissionPage() {
 
     setIsSubmitting(true);
     try {
+      // 1. Upload all files to S3
+      const updatedDeliverableStatus = await Promise.all(
+        deliverableStatuses.map(async (d) => {
+          if (!d.included || d.files.length === 0) {
+            return {
+              deliverableId: d.deliverableId,
+              included: d.included,
+              notes: d.notes,
+              files: [],
+              link: d.link,
+            };
+          }
+
+          // Upload each file and get its key
+          const uploadedFiles = await Promise.all(
+            d.files.map(async (file) => {
+              // a. Request presigned URL
+              const { url, key } = await api.uploads.getPresignedUrl({
+                fileName: file.name,
+                fileType: file.type || 'application/octet-stream',
+                fileSize: file.size,
+                purpose: 'SUBMISSION',
+              });
+
+              // b. PUT file to S3
+              const uploadResponse = await fetch(url, {
+                method: 'PUT',
+                body: file,
+                headers: {
+                  'Content-Type': file.type || 'application/octet-stream',
+                },
+              });
+
+              if (!uploadResponse.ok) {
+                throw new Error(`Failed to upload ${file.name}`);
+              }
+
+              return {
+                filename: file.name,
+                url: url.split('?')[0], // Base S3 URL (though we use keys for downloads)
+                key: key,
+                size: file.size,
+                type: file.type,
+              };
+            })
+          );
+
+          return {
+            deliverableId: d.deliverableId,
+            included: d.included,
+            notes: d.notes,
+            files: uploadedFiles,
+            link: d.link,
+          };
+        })
+      );
+
+      // 2. Submit to backend with S3 keys
       await api.vaults.submit(vaultId, {
         comments: overallNotes,
-        deliverableStatus: deliverableStatuses.map((d) => ({
-          deliverableId: d.deliverableId,
-          included: d.included,
-          notes: d.notes,
-          files: d.files.map((f) => ({ name: f.name, size: f.size })), // Mock file upload
-          link: d.link,
-        })),
-
+        deliverableStatus: updatedDeliverableStatus,
         idempotencyKey: crypto.randomUUID(),
       });
+
       toast.success("Work submitted successfully");
       router.replace(`/freelancer/vault/${vaultId}`);
     } catch (err) {
       console.error("Submission failed:", err);
-      toast.error("Failed to submit work");
+      toast.error(err instanceof Error ? err.message : "Failed to submit work");
     } finally {
       setIsSubmitting(false);
     }

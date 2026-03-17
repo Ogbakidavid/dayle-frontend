@@ -12,6 +12,7 @@ import {
   Lock,
   Globe,
 } from "lucide-react";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 import { api } from "@/lib/api-client";
 import { VaultStatus, getVaultDerivedLabel } from "@/lib/domain/enums";
 import { Button } from "@/components/ui/button";
@@ -137,8 +138,8 @@ function VerificationStatusContent() {
               </>
             )}
           </h1>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-bold  text-white">
-            <Lock className="w-3 h-3 text-emerald-500" /> Account ID: {vault.id}
+          <div className="inline-flex items-center gap-0 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-bold  text-white">
+            <DayleLogo className="w-4 h-4 text-emerald-500" /> Account ID: {vault.id}
           </div>
         </div>
 
@@ -227,7 +228,7 @@ function VerificationStatusContent() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Lock className="w-3 h-3 text-white" />
+            <DayleLogo className="w-4 h-4 text-white" />
             <span className="text-sm font-bold  text-white">
               Audit-Proof Ledger
             </span>

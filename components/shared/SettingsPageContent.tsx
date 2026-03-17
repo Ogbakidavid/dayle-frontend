@@ -17,6 +17,8 @@ import {
   Shield,
   Mail,
   ChevronLeft,
+  ChevronRight,
+  ShieldCheck,
   Plus,
   Trash2,
   AlertTriangle,
@@ -33,6 +35,15 @@ import { cn } from "@/lib/utils";
 import UserAvatar from "@/components/shared/UserAvatar";
 import { api } from "@/lib/api-client";
 import { useMfaEnrollment } from "@privy-io/react-auth";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Zap } from "lucide-react";
 
 export default function SettingsPageContent({ role = "client" }) {
   const router = useRouter();
@@ -43,7 +54,13 @@ export default function SettingsPageContent({ role = "client" }) {
   const [isAddingBillingMethod, setIsAddingBillingMethod] = useState(false);
   const [selectedBillingMethod, setSelectedBillingMethod] = useState<string | null>(null);
   const [billingStep, setBillingStep] = useState<"SELECTION" | "CARD" | "BANK">("SELECTION");
+  const [billingSubStep, setBillingSubStep] = useState<"DETAILS" | "ADDRESS">("DETAILS");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Withdrawal Amount State
+  const [showWithdrawAmountDialog, setShowWithdrawAmountDialog] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [withdrawError, setWithdrawError] = useState("");
 
   // Profile Edit State
   const [profileName, setProfileName] = useState(user?.name || "");
@@ -99,7 +116,19 @@ export default function SettingsPageContent({ role = "client" }) {
   const [whatsappError, setWhatsappError] = useState("");
 
   // Billing Form States
-  const [cardData, setCardData] = useState({ number: "", expiry: "", cvv: "" });
+  const [cardData, setCardData] = useState({ 
+    number: "", 
+    expiry: "", 
+    cvv: "",
+    firstName: user?.name?.split(" ")[0] || "",
+    lastName: user?.name?.split(" ").slice(1).join(" ") || "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "Nigeria"
+  });
   const [bankData, setBankData] = useState({ bankCode: "", accountNumber: "", accountName: "" });
   const [banksList, setBanksList] = useState<any[]>([]);
   const [resolvingBank, setResolvingBank] = useState(false);
@@ -156,62 +185,59 @@ export default function SettingsPageContent({ role = "client" }) {
   };
 
   const handleSaveCard = async () => {
-    // 1. Basic Format Validation
-    if (!validateLuhn(cardData.number)) {
-      setBillingError("Invalid card number format.");
-      return;
-    }
-    const expiryParts = cardData.expiry.split("/");
-    if (expiryParts.length !== 2) {
-      setBillingError("Invalid expiry date format (MM/YY).");
+    // 1. Validate billing address fields
+    if (!cardData.addressLine1.trim() || !cardData.city.trim() || !cardData.country.trim()) {
+      setBillingError("Please fill in all required billing address fields.");
       return;
     }
 
-    // 2. Strict CVV Validation
-    if (cardData.cvv.length !== 3) {
-      setBillingError("Invalid CVV. Please enter a 3-digit number.");
-      return;
-    }
-    
     setBillingError("");
     setIsSavingBilling(true);
     
     try {
-      // 3. Authenticity Verification Simulation (How real apps do it)
-      // They use BIN (Bank Identification Number) checks and authorization charges.
+      const expiryParts = cardData.expiry.split("/");
+      const month = parseInt(expiryParts[0]);
+      const year = parseInt(expiryParts[1]);
       const bin = cardData.number.replace(/\s+/g, "").slice(0, 6);
-      
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate authorization latency
 
-      // Simulate specific failure cases for "fake" or suspicious cards
+      // Authenticity Verification Simulation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
       if (bin.startsWith("000") || cardData.number.includes("000000")) {
         throw new Error("Card authorization failed. This card appears to be invalid or blocked by the issuer.");
       }
-
       if (cardData.cvv === "000") {
         throw new Error("Security code verification failed. Please check your CVC.");
       }
 
-      const month = parseInt(expiryParts[0]);
-      const year = parseInt(expiryParts[1]);
-
-      // 4. Save to Backend (Standard practice: Backend only stores masked data)
+      // Save to backend (only masked data)
       await api.paymentMethods.addCard({
         brand: cardBrand || "CARD",
         last4: cardData.number.replace(/\s+/g, "").slice(-4),
         expiryMonth: month,
         expiryYear: year,
+        firstName: cardData.firstName,
+        lastName: cardData.lastName,
+        addressLine1: cardData.addressLine1,
+        addressLine2: cardData.addressLine2,
+        city: cardData.city,
+        state: cardData.state,
+        postalCode: cardData.postalCode,
+        country: cardData.country,
         isDefault: true
       });
       
       setIsAddingBillingMethod(false);
       setBillingStep("SELECTION");
+      setBillingSubStep("DETAILS");
       setSelectedBillingMethod(null);
+      setCardData({ number: "", expiry: "", cvv: "", firstName: user?.name?.split(" ")[0] || "", lastName: user?.name?.split(" ").slice(1).join(" ") || "", addressLine1: "", addressLine2: "", city: "", state: "", postalCode: "", country: "Nigeria" });
+      setCardBrand(null);
       
       // Refresh local list
       const updated = await api.paymentMethods.list();
       setPaymentMethods(updated);
-      setBillingError(""); // Clear any errors on success
+      setBillingError("");
     } catch (err: any) {
       setBillingError(err.message || "Failed to verify payment method. Please try another card.");
     } finally {
@@ -308,6 +334,29 @@ export default function SettingsPageContent({ role = "client" }) {
     } finally {
       setSavingProfile(false);
     }
+  };
+
+  const setPercentage = (percent: number) => {
+    const available = Number(balance?.formattedAvailable) || 0;
+    const amount = (available * percent).toFixed(2);
+    setWithdrawAmount(amount);
+    setWithdrawError("");
+  };
+
+  const handleProceedToWithdrawal = () => {
+    const amountNum = parseFloat(withdrawAmount);
+    const available = Number(balance?.formattedAvailable) || 0;
+
+    if (isNaN(amountNum) || amountNum <= 0) {
+      setWithdrawError("Please enter a valid amount");
+      return;
+    }
+    if (amountNum > available) {
+      setWithdrawError("Amount exceeds available balance");
+      return;
+    }
+
+    router.push(`/withdraw?amount=${withdrawAmount}`);
   };
 
   const isClient = role === "client";
@@ -761,7 +810,11 @@ export default function SettingsPageContent({ role = "client" }) {
                         <Button
                           className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all"
                           disabled={!balance?.formattedAvailable || Number(balance.formattedAvailable) <= 0}
-                          onClick={() => router.push(`/withdraw?amount=${balance?.formattedAvailable}`)}
+                          onClick={() => {
+                            setWithdrawAmount("");
+                            setWithdrawError("");
+                            setShowWithdrawAmountDialog(true);
+                          }}
                         >
                           Withdraw
                         </Button>
@@ -881,84 +934,294 @@ export default function SettingsPageContent({ role = "client" }) {
                       )}
 
                       {billingStep === "CARD" && (
-                        <div className="space-y-6">
-                           <div className="flex items-center gap-2 mb-4">
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={() => setBillingStep("SELECTION")}
-                                className="p-0 h-auto hover:bg-transparent text-slate-500 hover:text-slate-700"
-                              >
-                                <ChevronLeft className="w-4 h-4 mr-1" />
-                                Back
-                              </Button>
-                           </div>
+                        <div className="space-y-5">
+                          {/* Header Bar */}
+                          <div className="flex items-center justify-between">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (billingSubStep === "ADDRESS") {
+                                  setBillingSubStep("DETAILS");
+                                  setBillingError("");
+                                } else {
+                                  setBillingStep("SELECTION");
+                                  setBillingSubStep("DETAILS");
+                                  setBillingError("");
+                                }
+                              }}
+                              className="p-0 h-auto hover:bg-transparent text-emerald-600 hover:text-emerald-700 font-bold transition-colors"
+                            >
+                              <ChevronLeft className="w-4 h-4 mr-1" />
+                              {billingSubStep === "ADDRESS" ? "Card Details" : "Change Method"}
+                            </Button>
+                            <div className="flex items-center gap-2">
+                              {/* Step Indicator */}
+                              <div className="flex items-center gap-1.5">
+                                <div className={`h-1.5 w-6 rounded-full transition-colors ${billingSubStep === "DETAILS" ? "bg-emerald-500" : "bg-slate-200"}`} />
+                                <div className={`h-1.5 w-6 rounded-full transition-colors ${billingSubStep === "ADDRESS" ? "bg-emerald-500" : "bg-slate-200"}`} />
+                              </div>
+                              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+                                <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                                PCI-DSS
+                              </div>
+                            </div>
+                          </div>
 
-                           <div className="space-y-4 max-w-md">
-                              <div className="space-y-2">
-                                <Label className="text-xs font-bold text-slate-500 uppercase">Card Number</Label>
-                                <div className="relative">
-                                  <Input 
-                                    placeholder="0000 0000 0000 0000"
-                                    value={cardData.number}
-                                    onChange={(e) => {
-                                      const val = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
-                                      setCardData({...cardData, number: val});
-                                      setCardBrand(detectBrand(val));
-                                    }}
-                                    className="h-12 bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl font-mono text-lg"
-                                  />
-                                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
-                                    {cardBrand === "VISA" && <Image src="/visa.svg" alt="Visa" width={48} height={16} className="h-4 w-auto" />}
-                                    {cardBrand === "MASTERCARD" && <Image src="/mastercard.svg" alt="Mastercard" width={40} height={24} className="h-6 w-auto" />}
-                                    {cardBrand === "VERVE" && <Image src="/verve.svg" alt="Verve" width={40} height={24} className="h-6 w-auto" />}
-                                    {!cardBrand && <CreditCard className="w-5 h-5 text-slate-300" />}
+                          <div className="max-w-md overflow-hidden">
+                            {/* Supported Logos Row */}
+                            <div className="flex items-center gap-2 mb-4">
+                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">We accept</span>
+                              <Image src="/visa.svg" alt="Visa" width={40} height={14} className="h-3.5 w-auto opacity-80" />
+                              <Image src="/mastercard.svg" alt="Mastercard" width={30} height={18} className="h-4.5 w-auto opacity-80" />
+                              <Image src="/verve.svg" alt="Verve" width={30} height={18} className="h-4.5 w-auto opacity-80" />
+                            </div>
+
+                            {/* Two-step slider container */}
+                            <div className="relative overflow-hidden">
+                              <div
+                                className="flex transition-transform duration-400 ease-in-out"
+                                style={{ transform: billingSubStep === "ADDRESS" ? "translateX(-100%)" : "translateX(0%)" }}
+                              >
+                                {/* ── STEP 1: Card Details ── */}
+                                <div className="w-full shrink-0 space-y-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40">
+                                  {/* Name Row */}
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1.5">
+                                      <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">First Name</Label>
+                                      <Input
+                                        placeholder="John"
+                                        autoComplete="cc-given-name"
+                                        value={cardData.firstName}
+                                        onChange={(e) => setCardData({...cardData, firstName: e.target.value})}
+                                        className="h-11 bg-slate-50 border-slate-200 rounded-xl font-medium"
+                                      />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                      <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Last Name</Label>
+                                      <Input
+                                        placeholder="Doe"
+                                        autoComplete="cc-family-name"
+                                        value={cardData.lastName}
+                                        onChange={(e) => setCardData({...cardData, lastName: e.target.value})}
+                                        className="h-11 bg-slate-50 border-slate-200 rounded-xl font-medium"
+                                      />
+                                    </div>
                                   </div>
-                                </div>
-                              </div>
 
-                              <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-bold text-slate-500 uppercase">Expiry (MM/YY)</Label>
-                                  <Input 
-                                    placeholder="MM/YY"
-                                    value={cardData.expiry}
-                                    onChange={(e) => {
-                                      let val = e.target.value.replace(/\D/g, '');
-                                      if (val.length > 2) val = val.slice(0,2) + '/' + val.slice(2,4);
-                                      setCardData({...cardData, expiry: val});
+                                  {/* Unified Card Input */}
+                                  <div className="space-y-1.5">
+                                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Card Details</Label>
+                                    <div className="group relative">
+                                      <div className="relative overflow-hidden bg-slate-50 border border-slate-200 group-within:border-emerald-500/50 group-within:ring-4 group-within:ring-emerald-500/5 rounded-2xl transition-all duration-300">
+                                        <div className="relative">
+                                          <Input
+                                            placeholder="0000 0000 0000 0000"
+                                            autoComplete="cc-number"
+                                            inputMode="numeric"
+                                            value={cardData.number}
+                                            onChange={(e) => {
+                                              const val = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+                                              setCardData({...cardData, number: val});
+                                              setCardBrand(detectBrand(val));
+                                            }}
+                                            className="h-14 bg-transparent border-0 focus:ring-0 rounded-none font-mono text-xl tracking-wider placeholder:text-slate-300 pl-4"
+                                          />
+                                          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                            {cardBrand === "VISA" && <Image src="/visa.svg" alt="Visa" width={48} height={16} className="h-4 w-auto drop-shadow-sm" />}
+                                            {cardBrand === "MASTERCARD" && <Image src="/mastercard.svg" alt="Mastercard" width={40} height={24} className="h-6 w-auto drop-shadow-sm" />}
+                                            {cardBrand === "VERVE" && <Image src="/verve.svg" alt="Verve" width={40} height={24} className="h-6 w-auto drop-shadow-sm" />}
+                                            {!cardBrand && <CreditCard className="w-6 h-6 text-slate-300" />}
+                                          </div>
+                                        </div>
+                                        <div className="flex border-t border-slate-200 group-within:border-emerald-500/30">
+                                          <div className="flex-1 relative">
+                                            <Input
+                                              placeholder="MM/YY"
+                                              autoComplete="cc-exp"
+                                              inputMode="numeric"
+                                              value={cardData.expiry}
+                                              onChange={(e) => {
+                                                let val = e.target.value.replace(/\D/g, '');
+                                                if (val.length > 2) val = val.slice(0,2) + '/' + val.slice(2,4);
+                                                setCardData({...cardData, expiry: val});
+                                              }}
+                                              maxLength={5}
+                                              className="h-12 bg-transparent border-0 focus:ring-0 rounded-none text-center font-mono tracking-widest placeholder:text-slate-300"
+                                            />
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400">EXP</div>
+                                          </div>
+                                          <div className="w-px bg-slate-200 group-within:bg-emerald-500/30" />
+                                          <div className="flex-1 relative">
+                                            <Input
+                                              placeholder="123"
+                                              type="password"
+                                              autoComplete="cc-csc"
+                                              inputMode="numeric"
+                                              value={cardData.cvv}
+                                              onChange={(e) => setCardData({...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0,3)})}
+                                              maxLength={3}
+                                              className="h-12 bg-transparent border-0 focus:ring-0 rounded-none text-center font-mono tracking-widest placeholder:text-slate-300"
+                                            />
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400">CVV</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <Button
+                                    onClick={() => {
+                                      // Validate step 1
+                                      if (!cardData.firstName.trim() || !cardData.lastName.trim()) {
+                                        setBillingError("Please enter your full name as it appears on the card.");
+                                        return;
+                                      }
+                                      if (!validateLuhn(cardData.number)) {
+                                        setBillingError("Invalid card number.");
+                                        return;
+                                      }
+                                      if (cardData.expiry.length < 5) {
+                                        setBillingError("Invalid expiry date (MM/YY).");
+                                        return;
+                                      }
+                                      if (cardData.cvv.length < 3) {
+                                        setBillingError("CVV must be 3 digits.");
+                                        return;
+                                      }
+                                      setBillingError("");
+                                      setBillingSubStep("ADDRESS");
                                     }}
-                                    maxLength={5}
-                                    className="h-12 bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl"
-                                  />
+                                    disabled={
+                                      !cardData.firstName.trim() ||
+                                      !cardData.lastName.trim() ||
+                                      cardData.number.replace(/\s/g, "").length < 13 ||
+                                      cardData.expiry.length < 5 ||
+                                      cardData.cvv.length < 3
+                                    }
+                                    className="w-full h-12 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl shadow-xl shadow-slate-900/10 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 group"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      Continue to Billing Address
+                                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    </div>
+                                  </Button>
+
+                                  {billingError && (
+                                    <p className="text-sm text-red-600 font-bold bg-red-50 p-3 rounded-2xl border border-red-100 flex items-center gap-2">
+                                      <span className="h-1.5 w-1.5 bg-red-500 rounded-full animate-pulse" />
+                                      {billingError}
+                                    </p>
+                                  )}
                                 </div>
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-bold text-slate-500 uppercase">CVV</Label>
-                                  <Input 
-                                    placeholder="123"
-                                    type="password"
-                                    value={cardData.cvv}
-                                    onChange={(e) => setCardData({...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0,3)})}
-                                    maxLength={3}
-                                    className="h-12 bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl"
-                                  />
+
+                                {/* ── STEP 2: Billing Address ── */}
+                                <div className="w-full shrink-0 space-y-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 ml-4">
+                                  <div>
+                                    <h3 className="font-bold text-slate-800 text-sm">Billing Address</h3>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">Required for card verification and fraud prevention.</p>
+                                  </div>
+
+                                  <div className="space-y-3">
+                                    <div className="space-y-1.5">
+                                      <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Address Line 1 *</Label>
+                                      <Input
+                                        placeholder="123 Main Street"
+                                        value={cardData.addressLine1}
+                                        onChange={(e) => setCardData({...cardData, addressLine1: e.target.value})}
+                                        className="h-11 bg-slate-50 border-slate-200 rounded-xl"
+                                      />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                      <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Address Line 2 <span className="normal-case text-slate-300">(optional)</span></Label>
+                                      <Input
+                                        placeholder="Apt, Suite, etc."
+                                        value={cardData.addressLine2}
+                                        onChange={(e) => setCardData({...cardData, addressLine2: e.target.value})}
+                                        className="h-11 bg-slate-50 border-slate-200 rounded-xl"
+                                      />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">City *</Label>
+                                        <Input
+                                          placeholder="Lagos"
+                                          value={cardData.city}
+                                          onChange={(e) => setCardData({...cardData, city: e.target.value})}
+                                          className="h-11 bg-slate-50 border-slate-200 rounded-xl"
+                                        />
+                                      </div>
+                                      <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">State / Province</Label>
+                                        <Input
+                                          placeholder="Lagos"
+                                          value={cardData.state}
+                                          onChange={(e) => setCardData({...cardData, state: e.target.value})}
+                                          className="h-11 bg-slate-50 border-slate-200 rounded-xl"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Postal Code</Label>
+                                        <Input
+                                          placeholder="100001"
+                                          value={cardData.postalCode}
+                                          onChange={(e) => setCardData({...cardData, postalCode: e.target.value})}
+                                          className="h-11 bg-slate-50 border-slate-200 rounded-xl"
+                                        />
+                                      </div>
+                                      <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Country *</Label>
+                                        <select
+                                          value={cardData.country}
+                                          onChange={(e) => setCardData({...cardData, country: e.target.value})}
+                                          className="h-11 w-full bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/50"
+                                        >
+                                          <option>Nigeria</option>
+                                          <option>Ghana</option>
+                                          <option>Kenya</option>
+                                          <option>South Africa</option>
+                                          <option>United States</option>
+                                          <option>United Kingdom</option>
+                                          <option>Canada</option>
+                                          <option>Other</option>
+                                        </select>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {billingError && (
+                                    <p className="text-sm text-red-600 font-bold bg-red-50 p-3 rounded-2xl border border-red-100 flex items-center gap-2">
+                                      <span className="h-1.5 w-1.5 bg-red-500 rounded-full animate-pulse" />
+                                      {billingError}
+                                    </p>
+                                  )}
+
+                                  <Button
+                                    onClick={handleSaveCard}
+                                    disabled={isSavingBilling || !cardData.addressLine1 || !cardData.city || !cardData.country}
+                                    className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/10 transition-all active:scale-95 disabled:opacity-50 group"
+                                  >
+                                    {isSavingBilling ? (
+                                      <div className="flex items-center gap-2">
+                                        <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                        Verifying & Saving...
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center gap-2">
+                                        <ShieldCheck className="w-4 h-4" />
+                                        Save Payment Method
+                                      </div>
+                                    )}
+                                  </Button>
+                                  <p className="text-[11px] text-center text-slate-400 font-medium px-4">
+                                    Your card and address are encrypted and securely stored.
+                                  </p>
                                 </div>
                               </div>
-
-                              {billingError && (
-                                <p className="text-sm text-red-600 font-bold bg-red-50 p-3 rounded-lg border border-red-100 italic">
-                                  {billingError}
-                                </p>
-                              )}
-
-                              <Button 
-                                onClick={handleSaveCard}
-                                disabled={isSavingBilling || !cardData.number || !cardData.expiry || !cardData.cvv}
-                                className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/10 mt-6"
-                              >
-                                {isSavingBilling ? "Verifying..." : "Save Card"}
-                              </Button>
-                           </div>
+                            </div>
+                          </div>
                         </div>
                       )}
 
@@ -1679,6 +1942,101 @@ export default function SettingsPageContent({ role = "client" }) {
           </div>
         </div>
       )}
+
+      {/* Withdrawal Amount Selection Dialog */}
+      <Dialog open={showWithdrawAmountDialog} onOpenChange={setShowWithdrawAmountDialog}>
+        <DialogContent className="max-w-md bg-white border border-slate-200 rounded-2xl p-8 overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-2xl opacity-50" />
+          
+          <DialogHeader className="relative z-10 space-y-3">
+            <div className="space-y-1.5 mb-6 text-center">
+              <h2 className="text-2xl font-bold text-slate-900 tracking-tighter">
+                Withdrawal amount
+              </h2>
+              <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">
+                Specify how much you want to transfer
+              </p>
+            </div>
+          </DialogHeader>
+
+          <div className="mt-8 space-y-8 relative z-10">
+            <div className="space-y-4">
+              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 mb-6">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">
+                    Available Balance
+                  </label>
+                  <p className="text-2xl font-bold text-slate-900">
+                    ${(Number(balance?.formattedAvailable) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">
+                  Amount to Withdraw
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-slate-400">$</span>
+                  <input
+                    type="number"
+                    value={withdrawAmount}
+                    onChange={(e) => {
+                      setWithdrawAmount(e.target.value);
+                      setWithdrawError("");
+                    }}
+                    placeholder="0.00"
+                    className={cn(
+                      "w-full h-14 bg-white border rounded-xl pl-10 pr-4 text-lg font-bold tabular-nums text-slate-900 outline-none transition-all placeholder:text-slate-300",
+                      withdrawError ? "border-red-500/50 bg-red-50" : "border-slate-200 focus:border-emerald-500/30 focus:bg-white focus:shadow-sm"
+                    )}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between px-1">
+                <p className="text-[11px] font-bold text-slate-500">
+                  AVAILABLE LIMIT: <span className="text-emerald-600 ml-1">${(Number(balance?.formattedAvailable) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                </p>
+                {withdrawError && (
+                  <p className="text-[10px] font-bold text-red-500 uppercase tracking-tight">
+                    {withdrawError}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Select percentage chips */}
+            <div className="flex gap-2">
+              {[0.25, 0.5, 1.0].map((percent) => (
+                <button
+                  key={percent}
+                  onClick={() => setPercentage(percent)}
+                  className="flex-1 h-10 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold text-slate-600 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 transition-all active:scale-95"
+                >
+                  {percent === 1.0 ? "MAX" : `${percent * 100}%`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <DialogFooter className="mt-10 sm:justify-start gap-3 relative z-10">
+            <Button
+              onClick={() => setShowWithdrawAmountDialog(false)}
+              variant="outline"
+              className="flex-1 h-12 rounded-xl border-slate-200 text-slate-600 font-bold hover:bg-slate-50"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleProceedToWithdrawal}
+              disabled={!withdrawAmount || Number(withdrawAmount) <= 0 || Number(withdrawAmount) > Number(balance?.formattedAvailable)}
+              className="flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/10 active:scale-95 transition-all"
+            >
+              Proceed to Payout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

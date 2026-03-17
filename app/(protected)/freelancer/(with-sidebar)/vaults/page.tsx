@@ -54,25 +54,42 @@ export default function FreelancerVaultsPage() {
     currentPage * itemsPerPage,
   );
 
+  const totalEarnings = (vaults || [])
+    .filter((v: any) => v.status === "RELEASED" || v.status === "completed")
+    .reduce((acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0), 0);
+
+  const activeJobs = (vaults || [])
+    .filter((v: any) => v.status === "FUNDED" || v.status === "DISPUTED" || v.status === "active")
+    .length;
+
+  const releasedCount = (vaults || []).filter((v: any) => v.status === "RELEASED" || v.status === "completed").length;
+  const disputedCount = (vaults || []).filter((v: any) => v.status === "DISPUTED").length;
+  const refundedCount = (vaults || []).filter((v: any) => v.status === "REFUNDED").length;
+  
+  const totalClosed = releasedCount + disputedCount + refundedCount;
+  const successRate = totalClosed > 0 
+    ? Math.round((releasedCount / totalClosed) * 100) 
+    : 100;
+
   const stats = [
     {
       label: "Total Earnings",
-      value: "$45,000",
-      change: "+8.5%",
+      value: `$${totalEarnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      change: "+0%",
       icon: Shield,
       color: "text-emerald-500",
     },
     {
       label: "Active Jobs",
-      value: "5",
-      change: "+1",
+      value: activeJobs.toString(),
+      change: "+0",
       icon: Zap,
       color: "text-blue-500",
     },
     {
       label: "Success Rate",
-      value: "98%",
-      change: "+0.2%",
+      value: `${successRate}%`,
+      change: "+0%",
       icon: TrendingUp,
       color: "text-purple-500",
     },
@@ -218,8 +235,22 @@ export default function FreelancerVaultsPage() {
                                 : "Pending..."}
                             </p>
 
-                            <span className="sm:hidden text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100 font-bold whitespace-nowrap">
-                              {(vault.status || "Pending").toLowerCase()}
+                            <span className={cn(
+                              "sm:hidden text-[10px] px-2 py-0.5 rounded-full border font-bold whitespace-nowrap",
+                              vault.status === "FUNDED" || vault.status === "active"
+                                ? "bg-amber-50 border-amber-100 text-amber-700"
+                                : vault.status === "RELEASED" || vault.status === "completed"
+                                  ? "bg-emerald-50 border-emerald-100 text-emerald-700"
+                                  : vault.status === "DISPUTED"
+                                    ? "bg-red-50 border-red-100 text-red-700"
+                                    : vault.status === "INVITED"
+                                      ? "bg-blue-50 border-blue-100 text-blue-700"
+                                      : "bg-slate-50 border-slate-200 text-slate-400"
+                            )}>
+                              {vault.status === "FUNDED" || vault.status === "active" ? "Funded" : 
+                               vault.status === "RELEASED" || vault.status === "completed" ? "Released" :
+                               vault.status === "DISPUTED" ? "Disputed" : 
+                               vault.status === "INVITED" ? "Invited" : vault.status}
                             </span>
                           </div>
                           <p className="lg:hidden text-[10px] text-slate-400 font-medium mt-2 truncate">
@@ -251,27 +282,35 @@ export default function FreelancerVaultsPage() {
                       <div
                         className={cn(
                           "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-wider shadow-sm",
-                          vault.status === "active" || vault.status === "FUNDED"
-                            ? "bg-emerald-50 border-emerald-100 text-emerald-600"
-                            : vault.status === "completed" ||
-                                vault.status === "CLOSED"
-                              ? "bg-blue-50 border-blue-100 text-blue-600"
-                              : "bg-slate-50 border-slate-200 text-slate-400",
+                          vault.status === "FUNDED" || vault.status === "active"
+                            ? "bg-amber-50 border-amber-100 text-amber-600"
+                            : vault.status === "RELEASED" || vault.status === "completed"
+                              ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                              : vault.status === "DISPUTED"
+                                ? "bg-red-50 border-red-100 text-red-600"
+                                : vault.status === "INVITED"
+                                  ? "bg-blue-50 border-blue-100 text-blue-600"
+                                  : "bg-slate-50 border-slate-200 text-slate-400",
                         )}
                       >
                         <div
                           className={cn(
                             "w-1.5 h-1.5 rounded-full animate-pulse",
-                            vault.status === "active" ||
-                              vault.status === "FUNDED"
-                              ? "bg-emerald-500"
-                              : vault.status === "completed" ||
-                                  vault.status === "CLOSED"
-                                ? "bg-blue-500"
-                                : "bg-slate-300",
+                            vault.status === "FUNDED" || vault.status === "active"
+                              ? "bg-amber-500"
+                              : vault.status === "RELEASED" || vault.status === "completed"
+                                ? "bg-emerald-500"
+                                : vault.status === "DISPUTED"
+                                  ? "bg-red-500"
+                                  : vault.status === "INVITED"
+                                    ? "bg-blue-500"
+                                    : "bg-slate-300",
                           )}
                         />
-                        {(vault.status || "Pending").toLowerCase()}
+                        {vault.status === "FUNDED" || vault.status === "active" ? "Funded" : 
+                         vault.status === "RELEASED" || vault.status === "completed" ? "Released" :
+                         vault.status === "DISPUTED" ? "Disputed" : 
+                         vault.status === "INVITED" ? "Invited" : vault.status}
                       </div>
                     </td>
 

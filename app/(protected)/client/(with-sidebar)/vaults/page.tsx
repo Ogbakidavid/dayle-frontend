@@ -34,6 +34,42 @@ const itemVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
+const statusConfig: Record<string, { label: string; classes: string }> = {
+  FUNDED: {
+    label: "Funded",
+    classes: "bg-amber-50 border-amber-100 text-amber-700",
+  },
+  DISPUTED: {
+    label: "Disputed",
+    classes: "bg-red-50 border-red-100 text-red-700",
+  },
+  RELEASED: {
+    label: "Released",
+    classes: "bg-emerald-50 border-emerald-100 text-emerald-700",
+  },
+  REFUNDED: {
+    label: "Refunded",
+    classes: "bg-slate-50 border-slate-100 text-slate-700",
+  },
+  INVITED: {
+    label: "Invitation Sent",
+    classes: "bg-blue-50 border-blue-100 text-blue-700",
+  },
+  DRAFT: {
+    label: "Draft",
+    classes: "bg-slate-50 border-slate-100 text-slate-500",
+  },
+  // Backward compatibility
+  active: {
+    label: "Funded",
+    classes: "bg-amber-50 border-amber-100 text-amber-700",
+  },
+  completed: {
+    label: "Released",
+    classes: "bg-emerald-50 border-emerald-100 text-emerald-700",
+  },
+};
+
 export default function VaultsPage() {
   const { vaults, loading } = useVault();
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,12 +100,13 @@ export default function VaultsPage() {
   );
 
   const activeCount = (vaults || []).filter(
-    (v: any) => v.status === "active",
+    (v: any) => v.status === "FUNDED" || v.status === "DISPUTED" || v.status === "active",
   ).length;
+
   const completionRate =
     (vaults || []).length > 0
       ? Math.round(
-          ((vaults || []).filter((v: any) => v.status === "completed").length /
+          ((vaults || []).filter((v: any) => v.status === "RELEASED" || v.status === "REFUNDED" || v.status === "completed").length /
             (vaults || []).length) *
             100,
         )
@@ -252,15 +289,11 @@ export default function VaultsPage() {
                               </p>
                               <div
                                 className={cn(
-                                  "sm:hidden flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[10px] font-bold lowercase",
-                                  vault.status === "active"
-                                    ? "bg-blue-50 border-blue-100 text-blue-700"
-                                    : vault.status === "completed"
-                                      ? "bg-emerald-50 border-emerald-100 text-emerald-700"
-                                      : "bg-amber-50 border-amber-100 text-amber-700",
+                                  "sm:hidden flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[10px] font-bold",
+                                  statusConfig[vault.status as keyof typeof statusConfig]?.classes || "bg-slate-50 border-slate-100 text-slate-700"
                                 )}
                               >
-                                {vault.status}
+                                {statusConfig[vault.status as keyof typeof statusConfig]?.label || vault.status}
                               </div>
                             </div>
                             <p className="lg:hidden text-sm text-slate-600 font-bold mt-1 truncate">
@@ -299,25 +332,11 @@ export default function VaultsPage() {
                       <td className="hidden sm:table-cell px-6 py-5">
                         <div
                           className={cn(
-                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[11px] md:text-sm font-bold lowercase",
-                            vault.status === "active"
-                              ? "bg-blue-50 border-blue-100 text-blue-700"
-                              : vault.status === "completed"
-                                ? "bg-emerald-50 border-emerald-100 text-emerald-700"
-                                : "bg-amber-50 border-amber-100 text-amber-700",
+                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[11px] md:text-sm font-bold",
+                            statusConfig[vault.status as keyof typeof statusConfig]?.classes || "bg-slate-50 border-slate-100 text-slate-700"
                           )}
                         >
-                          {/* <div
-                            className={cn(
-                              "w-1 h-1 rounded-full",
-                              vault.status === "active"
-                                ? "bg-emerald-600"
-                                : vault.status === "completed"
-                                  ? "bg-blue-600"
-                                  : "bg-amber-600",
-                            )}
-                          /> */}
-                          {vault.status}
+                          {statusConfig[vault.status as keyof typeof statusConfig]?.label || vault.status}
                         </div>
                       </td>
                       <td className="hidden sm:table-cell px-4 md:px-6 py-5 text-right">

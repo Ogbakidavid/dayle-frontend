@@ -10,7 +10,10 @@ import {
   AlertCircle,
   Cpu,
   type LucideIcon,
+  Download,
 } from "lucide-react";
+import { api } from "@/lib/api-client";
+import { toast } from "sonner";
 
 export interface EvidencePayload {
   question?: string;
@@ -173,6 +176,22 @@ function EvidenceItem({
 }
 
 export function EvidencePanel({ vault, evidence }: EvidencePanelProps) {
+  const handleDownload = async (fileName?: string, key?: string) => {
+    if (!fileName && !key) return;
+
+    try {
+      // Use key if available, fallback to fileName as potential key
+      const s3Key = key || fileName || "";
+      if (!s3Key) return;
+
+      const { url } = await api.uploads.getDownloadUrl(s3Key);
+      window.open(url, "_blank");
+    } catch (err) {
+      console.error("Download failed:", err);
+      toast.error("Failed to generate secure download link");
+    }
+  };
+
   const clarifications = useMemo(
     () =>
       (Array.isArray(evidence) ? evidence : []).filter(
@@ -337,9 +356,19 @@ export function EvidencePanel({ vault, evidence }: EvidencePanelProps) {
                 <EvidenceItem
                   key={item.id}
                   topLeft={
-                    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-[11px] font-semibold text-white/70">
+                    <button
+                      onClick={() =>
+                        handleDownload(
+                          item.payloadJson?.fileName,
+                          (item.payloadJson as any)?.key,
+                        )
+                      }
+                      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-[11px] font-semibold text-white/70 hover:bg-white/5 hover:border-white/20 transition-all cursor-pointer"
+                    >
+                      <FileText className="h-3 w-3 text-emerald-400" />
                       {item.payloadJson?.fileName}
-                    </span>
+                      <Download className="h-3 w-3 text-white/30 ml-1" />
+                    </button>
                   }
                   topRight={
                     item.payloadJson?.requirementRef ? (

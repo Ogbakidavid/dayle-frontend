@@ -4,12 +4,12 @@ import * as React from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  Lock,
   ShieldCheck,
   CreditCard,
   Building2,
   ChevronRight,
 } from "lucide-react";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 
 import { useVault, Vault } from "@/lib/store/vault-context";
 import { useUser } from "@/lib/store/user-context";
@@ -66,12 +66,12 @@ export default function CheckoutSelectionPage() {
           <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
 
           <div className="space-y-16 relative z-10">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-0">
               <div
-                className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-600/10 active:scale-95 transition-transform cursor-pointer"
+                className="w-10 h-10 flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
                 onClick={() => router.push("/client")}
               >
-                <Lock className="w-5 h-5 text-white" />
+                <DayleLogo className="w-10 h-10 text-slate-900" />
               </div>
               <span className="text-slate-900 font-bold tracking-tighter text-2xl ">
                 Dayle

@@ -172,6 +172,10 @@ export interface ApiClient {
     confirmVerification: (code: string, consent: boolean) => Promise<any>;
     disable: () => Promise<any>;
   };
+  uploads: {
+    getPresignedUrl: (data: { fileName: string; fileType: string; fileSize: number; purpose: string }) => Promise<{ url: string; key: string }>;
+    getDownloadUrl: (key: string) => Promise<{ url: string }>;
+  };
 }
 
 export const api: ApiClient = {
@@ -510,6 +514,20 @@ export const api: ApiClient = {
     },
     disable: async (): Promise<any> => {
       return await request("/notifications/whatsapp/disable", { method: "POST" });
+    },
+  },
+  uploads: {
+    getPresignedUrl: async (data: { fileName: string; fileType: string; fileSize: number; purpose: string }): Promise<{ url: string; key: string }> => {
+      return await request("/uploads/presigned-url", {
+        method: "POST",
+        body: data,
+      });
+    },
+    getDownloadUrl: async (key: string): Promise<{ url: string }> => {
+      return await request("/uploads/download-url", {
+        method: "POST",
+        body: { key },
+      });
     },
   },
 };

@@ -34,35 +34,35 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       icon: FileText,
       className: "badge-neutral",
     },
+    FUNDED: {
+      label: "Funded",
+      icon: Shield,
+      className: "badge-success",
+    },
     INVITED: {
       label: "Invited",
       icon: Clock,
       className: "badge-warning",
     },
-    FUNDED_UNASSIGNED: {
-      label: "Funded",
-      icon: Shield,
+    RELEASED: {
+      label: "Released",
+      icon: CheckCircle2,
       className: "badge-success",
     },
-    FUNDED_ASSIGNED: {
-      label: "Funded & assigned",
-      icon: Shield,
-      className: "badge-success",
+    REFUNDED: {
+      label: "Refunded",
+      icon: XCircle,
+      className: "badge-neutral",
     },
-    ACTIVE: {
-      label: "Active",
-      icon: Activity,
-      className: "badge-info",
+    DISPUTED: {
+      label: "Disputed",
+      icon: AlertCircle,
+      className: "badge-error",
     },
-    IN_REVIEW: {
+    UNDER_REVIEW: {
       label: "In Review",
       icon: Eye,
       className: "badge-warning",
-    },
-    COMPLETED: {
-      label: "Completed",
-      icon: CheckCircle2,
-      className: "badge-success",
     },
     CANCELLED: {
       label: "Cancelled",
@@ -106,15 +106,25 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       icon: AlertCircle,
       className: "badge-warning",
     },
-    DISPUTED: {
-      label: "Disputed",
-      icon: AlertCircle,
-      className: "badge-error",
-    },
 
-    // Legacy fallbacks (lowercase)
+    // Legacy / Display fallbacks
+    ACTIVE: {
+      label: "Active",
+      icon: Activity,
+      className: "badge-info",
+    },
+    IN_REVIEW: {
+      label: "In Review",
+      icon: Eye,
+      className: "badge-warning",
+    },
+    COMPLETED: {
+      label: "Completed",
+      icon: CheckCircle2,
+      className: "badge-success",
+    },
     SECURED: {
-      label: "Secured",
+      label: "Funded",
       icon: Shield,
       className: "badge-success",
     },

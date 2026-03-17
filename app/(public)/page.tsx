@@ -100,8 +100,8 @@ export default function LandingPage() {
 
           <div className="relative backdrop-blur-2xl border transition-all rounded-2xl md:rounded-3xl h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/80 border-slate-200 shadow-sm">
             {/* Brand */}
-            <div className="flex items-center gap-1">
-              <DayleLogo className="w-10 h-10 text-emerald-500 transition-transform group-hover:scale-110" />
+            <div className="flex items-center gap-0">
+              <DayleLogo className="w-10 h-10 text-slate-900 transition-transform group-hover:scale-110" />
               <span className="font-bold tracking-tighter text-xl md:text-[22px] text-slate-900">
                 Dayle
               </span>
@@ -267,7 +267,7 @@ export default function LandingPage() {
                     </h4>
                   </div>
                   <div className="bg-black/10 p-3 rounded-2xl">
-                    <Lock className="w-8 h-8" />
+                    <DayleLogo className="w-10 h-10 text-emerald-500" />
                   </div>
                 </div>
                 <div className="bg-black/10 h-2 w-full rounded-full mb-6 overflow-hidden">

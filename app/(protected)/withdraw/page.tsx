@@ -19,11 +19,14 @@ import {
   CreditCard,
   Landmark,
   ArrowRight,
-  ArrowUpRight,
+  ShieldCheck,
   Info,
   ChevronDown,
+  ChevronRight,
   Clock,
 } from "lucide-react";
+import { DayleLogo } from "@/components/shared/DayleLogo";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/lib/store/user-context";
@@ -40,6 +43,7 @@ type Step =
   | "processing"
   | "success"
   | "failure";
+type CardStep = "DETAILS" | "ADDRESS";
 type Method = "bank" | "card" | null;
 type ProcessingStatus = "pending" | "processing" | "sent" | "completed";
 
@@ -48,7 +52,15 @@ interface CardDetails {
   expiry: string;
   cvc: string;
   name: string;
+  firstName: string;
+  lastName: string;
   type: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
 }
 
 interface BankDetails {
@@ -63,12 +75,33 @@ export default function WithdrawPage() {
   const searchParams = useSearchParams();
 
   // Get parameters from URL
-  const amount = parseFloat(searchParams.get("amount") || "0");
+  const amount = Number(searchParams.get("amount") || 0);
+  const [currency, setCurrency] = React.useState<"USD" | "NGN">("USD");
+  const EXCHANGE_RATE = 1500;
+  const PROVIDER_FEE_PERCENT = 0.01; // 1%
+  const APP_FEE_PERCENT = 0.005; // 0.5%
+
+  const providerFee = amount * PROVIDER_FEE_PERCENT;
+  const appFee = amount * APP_FEE_PERCENT;
+  const totalFees = providerFee + appFee;
+  const netSettlement = amount - totalFees;
+
+  const displayAmount =
+    currency === "USD" ? netSettlement : netSettlement * EXCHANGE_RATE;
+  const displayFees =
+    currency === "USD" ? totalFees : totalFees * EXCHANGE_RATE;
+  const displayProviderFee =
+    currency === "USD" ? providerFee : providerFee * EXCHANGE_RATE;
+  const displayAppFee = currency === "USD" ? appFee : appFee * EXCHANGE_RATE;
+
+  const currencyPrefix = currency === "USD" ? "$" : "₦";
 
   // Flow states
   const [step, setStep] = useState<Step>("method_selection");
+  const [cardStep, setCardStep] = useState<CardStep>("DETAILS");
   const [selectedMethod, setSelectedMethod] = useState<Method>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [successfulNetAmount, setSuccessfulNetAmount] = useState<string | null>(null);
 
   // Card Details State
   const [cardDetails, setCardDetails] = useState<CardDetails>({
@@ -76,7 +109,15 @@ export default function WithdrawPage() {
     expiry: "",
     cvc: "",
     name: "",
+    firstName: user?.name?.split(" ")[0] || "",
+    lastName: user?.name?.split(" ").slice(1).join(" ") || "",
     type: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "Nigeria",
   });
   const [cardErrors, setCardErrors] = useState<
     Partial<Record<keyof CardDetails, string>>
@@ -111,7 +152,9 @@ export default function WithdrawPage() {
   const detectCardType = (number: string) => {
     const clean = number.replace(/\D/g, "");
     if (clean.match(/^4/)) return "visa";
-    if (clean.match(/^5[1-5]/)) return "mastercard";
+    if (clean.match(/^(5[1-5]|222[1-9]|22[3-9]|2[3-6]|27[0-1]|2720)/))
+      return "mastercard";
+    if (clean.match(/^(506|507|650|501)/)) return "verve";
     return "";
   };
 
@@ -163,7 +206,8 @@ export default function WithdrawPage() {
     const newErrors: Partial<Record<keyof CardDetails, string>> = {};
 
     if (!validateCardNumber(cleanNum)) newErrors.number = "Invalid card number";
-    if (!cardDetails.name.trim()) newErrors.name = "Required";
+    if (!cardDetails.firstName.trim()) newErrors.firstName = "Required";
+    if (!cardDetails.lastName.trim()) newErrors.lastName = "Required";
     if (!cardDetails.expiry || cardDetails.expiry.length < 5)
       newErrors.expiry = "Invalid date";
     if (!cardDetails.cvc || cardDetails.cvc.length < 3)
@@ -175,6 +219,16 @@ export default function WithdrawPage() {
     }
 
     setCardErrors({});
+    setCardStep("ADDRESS");
+  };
+
+  const handleAddressSubmit = () => {
+    if (!cardDetails.addressLine1.trim() || !cardDetails.city.trim()) {
+      toast.error("Required fields missing", {
+        description: "Please fill in all required address fields.",
+      });
+      return;
+    }
     setStep("review");
   };
 
@@ -261,7 +315,7 @@ export default function WithdrawPage() {
               try {
                 // Call Backend to withdraw
                 const idempotencyKey = crypto.randomUUID();
-                await api.ledger.withdraw(
+                const response = await api.ledger.withdraw(
                   amount,
                   selectedCurrency,
                   {
@@ -272,6 +326,10 @@ export default function WithdrawPage() {
                   },
                   { idempotencyKey },
                 );
+
+                if (response && response.netAmount) {
+                  setSuccessfulNetAmount(response.netAmount);
+                }
 
                 setProcessingStatus("completed");
                 setTimeout(() => setStep("success"), 1000);
@@ -293,51 +351,69 @@ export default function WithdrawPage() {
 
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT SIDEBAR - Summary */}
-        <aside className="w-full lg:w-[400px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
+        <aside className="w-full lg:w-[340px] bg-slate-50 p-8 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
           <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
 
-          <div className="space-y-16 relative z-10">
-            <div className="flex items-center gap-4">
+          <div className="space-y-10 relative z-10">
+            <div className="flex items-center gap-0">
               <div
-                className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(5,150,105,0.2)] active:scale-95 transition-all cursor-pointer group"
-                onClick={() => router.replace(user?.role === "CLIENT" ? "/client" : "/freelancer/balance")}
+                className="w-10 h-10 flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
+                onClick={() => router.push("/freelancer")}
               >
-                <Lock className="w-5 h-5 text-white group-hover:rotate-12 transition-transform" />
+                <DayleLogo className="w-10 h-10 text-slate-900" />
               </div>
               <span className="text-slate-900 font-bold tracking-tighter text-2xl ">
                 Dayle
               </span>
             </div>
 
-            <div className="space-y-10">
+            <div className="space-y-8">
               <div className="space-y-3">
-                <p className=" font-bold text-slate-600 tracking-[0.4em]  leading-none uppercase">
-                  Withdrawal value
-                </p>
-                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-7xl  flex items-baseline gap-2">
-                  <span className="text-emerald-600 font-bold text-3xl">$</span>
-                  {amount.toLocaleString()}
+                <div className="flex justify-between items-center">
+                  <p className=" font-bold text-slate-600 tracking-[0.4em]  leading-none uppercase">
+                    Total settlement
+                  </p>
+                  <div className="flex bg-slate-200/50 p-1 rounded-lg">
+                    <button
+                      onClick={() => setCurrency("USD")}
+                      className={`px-3 py-1  font-bold r rounded-md transition-all uppercase ${currency === "USD" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                    >
+                      USD
+                    </button>
+                    <button
+                      onClick={() => setCurrency("NGN")}
+                      className={`px-3 py-1  font-bold r rounded-md transition-all uppercase ${currency === "NGN" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                    >
+                      NGN
+                    </button>
+                  </div>
+                </div>
+                <h1 className="text-4xl font-bold text-slate-900 tracking-tighter sm:text-3xl flex items-baseline gap-2">
+                  <span className="text-emerald-600 font-bold text-2xl">
+                    {currency === "USD" ? "$" : "₦"}
+                  </span>
+                  {(currency === "USD" ? amount : amount * EXCHANGE_RATE).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  <span className="text-emerald-600 font-bold text-xl ml-1">
+                    {currency}
+                  </span>
                 </h1>
               </div>
 
-              <div className="space-y-6 pt-10 border-t border-slate-100">
+              <div className="space-y-4 pt-8 border-t border-slate-100">
                 <SummaryItem
-                  label="Region / Currency"
-                  value={`${selectedCountry} / ${selectedCurrency}`}
-                />
-                <SummaryItem
-                  label="Exchange System"
-                  value={`1.00 USD = 1.00 ${selectedCurrency}`}
-                />
-                <SummaryItem
-                  label="Transfer Network"
-                  value="Partna High-Speed Rails"
-                  icon={<Shield className="w-3.5 h-3.5 text-emerald-500" />}
+                  label="Service Fees"
+                  value={`${currencyPrefix}${displayFees.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`}
                 />
                 <SummaryItem
                   label="Transaction ID"
                   value={transactionId}
-                  isMono
+                  valueClassName="text-emerald-600 tracking-normal text-[9px]"
                 />
               </div>
             </div>
@@ -347,18 +423,17 @@ export default function WithdrawPage() {
             <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <div className="relative z-10">
               <div className="flex items-center gap-3 text-emerald-600  font-bold tracking-[0.3em] mb-3  uppercase">
-                <Shield className="w-4 h-4" /> Secure transfer V2
+                <ShieldCheck className="w-4 h-4" /> Secure withdrawal
               </div>
-              <p className="text-sm text-slate-600 leading-relaxed font-bold st ">
-                Assets are migrated through high-speed bank-transfer rails with
-                encryption at every step.
+              <p className=" text-slate-500 leading-relaxed font-bold st mt-2 text-[10px] uppercase">
+                Select your preferred method to bridge assets to your regional account.
               </p>
             </div>
           </div>
         </aside>
 
         {/* MAIN CONTENT AREA */}
-        <main className="flex-1 p-8 lg:p-24 relative overflow-y-auto bg-slate-50/30">
+        <main className="flex-1 p-6 md:p-12 lg:p-16 relative overflow-y-auto bg-slate-50/30">
           <div className="max-w-4xl mx-auto w-full">
             {/* Navigation */}
             <AnimatePresence mode="wait">
@@ -367,23 +442,27 @@ export default function WithdrawPage() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
-                  onClick={() =>
+                  onClick={() => {
+                    if (step === "card") {
+                      if (cardStep === "ADDRESS") {
+                        setCardStep("DETAILS");
+                        return;
+                      }
+                    }
                     setStep(
                       step === "verification"
                         ? selectedMethod === "bank"
                           ? "initiation"
                           : "card"
                         : "method_selection",
-                    )
-                  }
-                  className="flex items-center gap-3 text-slate-600 hover:text-slate-900 transition-all  font-bold tracking-[0.2em] mb-12 group bg-white border border-slate-200 py-3 px-6 rounded-2xl shadow-sm hover:border-slate-300  uppercase"
+                    );
+                  }}
+                  className="flex items-center gap-3 text-slate-600 hover:text-slate-900 transition-all  font-bold tracking-wide mb-12 group bg-white border border-slate-200 py-3 px-6 rounded-2xl shadow-sm hover:border-slate-300"
                 >
                   <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                  {step === "method_selection"
-                    ? "Back to " + (user?.role === "CLIENT" ? "Dashboard" : "Balance")
-                    : step === "verification"
-                      ? "Account Configuration"
-                      : "Method Selection"}
+                  {step === "card" && cardStep === "ADDRESS"
+                    ? "Back to Card Details"
+                    : "Method Selection"}
                 </motion.button>
               )}
             </AnimatePresence>
@@ -396,36 +475,62 @@ export default function WithdrawPage() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="max-w-xl mx-auto w-full space-y-16 py-12"
+                  className="max-w-xl mx-auto w-full space-y-12 py-8"
                 >
                   <div className="text-center space-y-4">
-                    <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter ">
+                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
                       Withdrawal method
                     </h2>
-                    <p className="text-sm font-bold text-slate-600 tracking-[0.3em] uppercase">
+                    <p className="text-xs font-bold text-slate-600 tracking-[0.2em] uppercase">
                       Select your primary payout method
                     </p>
                   </div>
-                  <div className="grid gap-6">
-                    <MethodBtn
-                      icon={<CreditCard />}
-                      title="Card Payout"
-                      desc="Direct to Visa or Mastercard"
-                      onClick={() => {
-                        setSelectedMethod("card");
-                        setStep("card");
-                      }}
-                    />
-                    <MethodBtn
-                      icon={<Building2 />}
-                      title="Bank Transfer"
-                      desc="High-speed local bank transfer"
-                      onClick={() => {
-                        setSelectedMethod("bank");
-                        setStep("initiation");
-                      }}
-                    />
-                  </div>
+
+                  {user?.kycStatus !== KycStatus.VERIFIED ? (
+                    <div className="bg-amber-50 border border-amber-200 rounded-[2.5rem] p-10 space-y-6 text-center shadow-sm">
+                      <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 mx-auto">
+                        <ShieldCheck className="w-8 h-8" />
+                      </div>
+                      <div className="space-y-4">
+                        <h3 className="text-2xl font-bold text-slate-900  tracking-tighter">
+                          Identity Verification Required
+                        </h3>
+                        <p className="text-sm text-slate-600 font-bold   leading-relaxed px-4">
+                          To comply with security and regulatory standards, you need
+                          to verify your identity before you can withdraw funds from
+                          your balance.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => router.push("/onboarding")}
+                        className="w-full h-16 bg-slate-900 hover:bg-black text-white font-bold text-sm rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-[0.2em] "
+                      >
+                        Verify Identity Now
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid gap-6">
+                      <MethodBtn
+                        icon={<CreditCard />}
+                        title="Card Payout"
+                        desc="Direct to Visa or Mastercard"
+                        onClick={() => {
+                          setSelectedMethod("card");
+                          setStep("card");
+                        }}
+                      />
+                      <MethodBtn
+                        icon={<Building2 />}
+                        title="Bank Transfer"
+                        desc="High-speed local bank transfer"
+                        variant="blue"
+                        onClick={() => {
+                          setSelectedMethod("bank");
+                          setStep("initiation");
+                        }}
+                      />
+                    </div>
+                  )}
                 </motion.div>
               )}
 
@@ -433,76 +538,247 @@ export default function WithdrawPage() {
               {step === "card" && (
                 <motion.div
                   key="card"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="grid lg:grid-cols-2 gap-20 items-center"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-8"
                 >
-                  <div className="perspective-[2000px]">
-                    <CardPreview details={cardDetails} />
+                  <div className="text-center space-y-2">
+                    <h2 className="text-3xl font-bold text-slate-900 tracking-tighter">
+                      Card Authorization
+                    </h2>
+                    <p className="text-slate-400 font-bold tracking-[0.2em] uppercase text-xs">
+                      {cardStep === "ADDRESS"
+                        ? "Step 2 · Billing Address"
+                        : "Step 1 · Card Details"}
+                    </p>
+                    <div className="flex items-center justify-center gap-2 mt-2">
+                      <div
+                        className={`h-1.5 w-8 rounded-full transition-colors ${cardStep === "DETAILS" ? "bg-emerald-500" : "bg-slate-200"}`}
+                      />
+                      <div
+                        className={`h-1.5 w-8 rounded-full transition-colors ${cardStep === "ADDRESS" ? "bg-emerald-500" : "bg-slate-200"}`}
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-10 bg-white border border-slate-200 p-10 rounded-3xl shadow-xl relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
-                    <div className="space-y-3 relative z-10">
-                      <h2 className="text-3xl font-bold text-slate-900 tracking-tight  flex items-center gap-3">
-                        <Zap className="w-6 h-6 text-emerald-600" />
-                        Card data
-                      </h2>
-                      <p className=" font-bold text-slate-600 tracking-[0.2em] uppercase">
-                        Pushed via real-time visa/mastercard networks.
-                      </p>
-                    </div>
-                    <div className="space-y-6 relative z-10">
-                      <WithdrawInputField
-                        label="Card Number"
-                        value={cardDetails.number}
-                        error={cardErrors.number}
-                        onChange={(e) =>
-                          handleCardInputChange("number", e.target.value)
-                        }
-                        placeholder="0000 0000 0000 0000"
-                      />
-                      <WithdrawInputField
-                        label="Account Name"
-                        value={cardDetails.name}
-                        error={cardErrors.name}
-                        onChange={(e) =>
-                          handleCardInputChange(
-                            "name",
-                            e.target.value.toUpperCase(),
-                          )
-                        }
-                        placeholder="Holder name"
-                      />
-                      <div className="grid grid-cols-2 gap-6">
-                        <WithdrawInputField
-                          label="Validity"
-                          value={cardDetails.expiry}
-                          error={cardErrors.expiry}
-                          onChange={(e) =>
-                            handleCardInputChange("expiry", e.target.value)
-                          }
-                          placeholder="MM/YY"
-                        />
-                        <WithdrawInputField
-                          label="Security Key"
-                          type="password"
-                          value={cardDetails.cvc}
-                          error={cardErrors.cvc}
-                          onChange={(e) =>
-                            handleCardInputChange("cvc", e.target.value)
-                          }
-                          placeholder="•••"
-                        />
+                  <div className="bg-white border border-slate-200 rounded-3xl p-8 lg:p-10 shadow-xl space-y-6 relative overflow-hidden max-w-2xl mx-auto w-full">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -mr-32 -mt-32" />
+
+                    {cardStep === "DETAILS" ? (
+                      <div className="space-y-6 relative z-10">
+                        <div className="grid grid-cols-2 gap-4">
+                          <WithdrawInputField
+                            label="First Name"
+                            placeholder="John"
+                            value={cardDetails.firstName}
+                            onChange={(e) =>
+                              handleCardInputChange("firstName", e.target.value)
+                            }
+                          />
+                          <WithdrawInputField
+                            label="Last Name"
+                            placeholder="Doe"
+                            value={cardDetails.lastName}
+                            onChange={(e) =>
+                              handleCardInputChange("lastName", e.target.value)
+                            }
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="font-bold text-slate-400 tracking-[0.3em] uppercase text-xs ml-1">
+                              Card Number
+                            </label>
+                            <div className="flex gap-2 h-5 items-center">
+                              {cardDetails.type === "visa" && (
+                                <Image
+                                  src="/visa.svg"
+                                  alt="Visa"
+                                  width={40}
+                                  height={14}
+                                  className="h-4 w-auto"
+                                />
+                              )}
+                              {cardDetails.type === "mastercard" && (
+                                <Image
+                                  src="/mastercard.svg"
+                                  alt="Mastercard"
+                                  width={34}
+                                  height={20}
+                                  className="h-5 w-auto"
+                                />
+                              )}
+                              {cardDetails.type === "verve" && (
+                                <Image
+                                  src="/verve.svg"
+                                  alt="Verve"
+                                  width={34}
+                                  height={20}
+                                  className="h-5 w-auto"
+                                />
+                              )}
+                              {!cardDetails.type && (
+                                <CreditCard className="w-5 h-5 text-slate-300" />
+                              )}
+                            </div>
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="0000 0000 0000 0000"
+                            value={cardDetails.number}
+                            onChange={(e) =>
+                              handleCardInputChange("number", e.target.value)
+                            }
+                            className={`w-full h-14 bg-slate-50 border ${cardErrors.number ? "border-red-500" : "border-slate-100"} rounded-2xl px-5 text-slate-900 font-bold font-mono focus:border-emerald-500/30 outline-none transition-all`}
+                          />
+                          {cardErrors.number && (
+                            <p className="text-xs text-red-500 font-bold ml-1">
+                              {cardErrors.number}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <WithdrawInputField
+                            label="Expiry"
+                            placeholder="MM/YY"
+                            value={cardDetails.expiry}
+                            error={cardErrors.expiry}
+                            onChange={(e) =>
+                              handleCardInputChange("expiry", e.target.value)
+                            }
+                          />
+                          <WithdrawInputField
+                            label="CVC"
+                            placeholder="123"
+                            type="password"
+                            value={cardDetails.cvc}
+                            error={cardErrors.cvc}
+                            onChange={(e) =>
+                              handleCardInputChange("cvc", e.target.value)
+                            }
+                          />
+                        </div>
+
+                        <Button
+                          onClick={handleCardSubmit}
+                          className="w-full h-14 bg-slate-900 hover:bg-black text-white font-bold text-sm rounded-2xl shadow-xl shadow-slate-900/10 transition-all active:scale-[0.98] uppercase tracking-widest"
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            Continue to Billing Address
+                            <ChevronRight className="w-4 h-4" />
+                          </div>
+                        </Button>
                       </div>
+                    ) : (
+                      <div className="space-y-5 relative z-10">
+                        <div>
+                          <h3 className="font-bold text-slate-800">
+                            Billing Address
+                          </h3>
+                          <p className="text-xs text-slate-400 mt-0.5">
+                            Required for card verification and fraud prevention.
+                          </p>
+                        </div>
+
+                        <div className="space-y-4">
+                          <WithdrawInputField
+                            label="Address Line 1 *"
+                            placeholder="123 Main Street"
+                            value={cardDetails.addressLine1}
+                            onChange={(e) =>
+                              handleCardInputChange(
+                                "addressLine1",
+                                e.target.value,
+                              )
+                            }
+                          />
+                          <WithdrawInputField
+                            label="Address Line 2 (Optional)"
+                            placeholder="Apt, Suite, etc."
+                            value={cardDetails.addressLine2}
+                            onChange={(e) =>
+                              handleCardInputChange(
+                                "addressLine2",
+                                e.target.value,
+                              )
+                            }
+                          />
+                          <div className="grid grid-cols-2 gap-4">
+                            <WithdrawInputField
+                              label="City *"
+                              placeholder="Lagos"
+                              value={cardDetails.city}
+                              onChange={(e) =>
+                                handleCardInputChange("city", e.target.value)
+                              }
+                            />
+                            <WithdrawInputField
+                              label="State"
+                              placeholder="Lagos"
+                              value={cardDetails.state}
+                              onChange={(e) =>
+                                handleCardInputChange("state", e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <WithdrawInputField
+                              label="Postal Code"
+                              placeholder="100001"
+                              value={cardDetails.postalCode}
+                              onChange={(e) =>
+                                handleCardInputChange(
+                                  "postalCode",
+                                  e.target.value,
+                                )
+                              }
+                            />
+                            <div className="space-y-2">
+                              <label className="font-bold text-slate-400 tracking-[0.3em] uppercase text-xs ml-1">
+                                Country *
+                              </label>
+                              <select
+                                value={cardDetails.country}
+                                onChange={(e) =>
+                                  handleCardInputChange(
+                                    "country",
+                                    e.target.value,
+                                  )
+                                }
+                                className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 text-slate-900 font-bold focus:border-emerald-500/30 outline-none transition-all"
+                              >
+                                <option>Nigeria</option>
+                                <option>Ghana</option>
+                                <option>Kenya</option>
+                                <option>South Africa</option>
+                                <option>United States</option>
+                                <option>United Kingdom</option>
+                                <option>Canada</option>
+                                <option>Other</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        <Button
+                          onClick={handleAddressSubmit}
+                          className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-3xl shadow-xl shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.2em]"
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            <ShieldCheck className="w-4 h-4" />
+                            Confirm Withdrawal
+                          </div>
+                        </Button>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-center gap-4 text-[9px] font-bold text-slate-400 tracking-[0.3em] uppercase">
+                      <DayleLogo className="w-4 h-4 text-emerald-500" /> Level 1 PCI
+                      Compliance
                     </div>
-                    <Button
-                      onClick={handleCardSubmit}
-                      className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm st rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 "
-                    >
-                      Proceed{" "}
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
                   </div>
                 </motion.div>
               )}
@@ -521,16 +797,16 @@ export default function WithdrawPage() {
                       <Globe className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter ">
+                      <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
                         Regional settings
                       </h2>
-                      <p className="text-sm font-bold text-slate-600 tracking-[0.3em] uppercase">
+                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">
                         Configure your payout account and currency
                       </p>
                     </div>
                   </div>
 
-                  <div className="w-full max-w-lg space-y-10 bg-white border border-slate-200 p-12 rounded-[40px] shadow-xl relative">
+                   <div className="w-full max-w-lg space-y-8 bg-white border border-slate-200 p-8 lg:p-10 rounded-3xl shadow-xl relative">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
 
                     <div className="space-y-8 relative z-10">
@@ -601,7 +877,7 @@ export default function WithdrawPage() {
 
                     <Button
                       onClick={() => setStep("verification")}
-                      className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 "
+                      className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 "
                     >
                       Continue{" "}
                       <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
@@ -624,17 +900,17 @@ export default function WithdrawPage() {
                       <Landmark className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter ">
+                      <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
                         Recipient details
                       </h2>
-                      <p className="text-sm font-bold text-slate-600 tracking-[0.3em] uppercase">
+                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase text-center">
                         Configure final destination for this transfer
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid lg:grid-cols-2 gap-12 w-full max-w-5xl">
-                    <div className="space-y-10 bg-white border border-slate-200 p-10 rounded-[32px] shadow-xl relative">
+                  <div className="grid lg:grid-cols-2 gap-8 w-full max-w-5xl">
+                    <div className="space-y-8 bg-white border border-slate-200 p-8 rounded-3xl shadow-xl relative">
                       <div className="space-y-8 relative z-10">
                         <div className="space-y-3">
                           <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
@@ -725,7 +1001,7 @@ export default function WithdrawPage() {
                           isResolving ||
                           showOtp
                         }
-                        className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm st rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 "
+                        className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm st rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 "
                       >
                         {isResolving ? (
                           <div className="flex items-center gap-3">
@@ -746,7 +1022,7 @@ export default function WithdrawPage() {
                           <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            className="space-y-8 bg-white border border-slate-200 p-10 rounded-[32px] shadow-xl h-full flex flex-col justify-center"
+                            className="space-y-6 bg-white border border-slate-200 p-8 rounded-3xl shadow-xl h-full flex flex-col justify-center"
                           >
                             <div className="space-y-3">
                               <h3 className="text-2xl font-bold text-slate-900 tracking-tight ">
@@ -819,24 +1095,24 @@ export default function WithdrawPage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="max-w-2xl mx-auto space-y-12 py-12"
+                  className="max-w-2xl mx-auto space-y-10 py-8"
                 >
                   <div className="text-center space-y-5">
                     <div className="w-20 h-20 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center mx-auto border border-emerald-100 shadow-sm">
                       <Info className="w-10 h-10 text-emerald-600" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter ">
+                      <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
                         Final manifest
                       </h2>
-                      <p className="text-sm font-bold text-slate-600 tracking-[0.3em] px-10 leading-relaxed uppercase">
+                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] px-10 leading-relaxed uppercase text-center">
                         Confirm the settlement event below. Transactions are
                         irreversible once broadcast to the network.
                       </p>
                     </div>
                   </div>
 
-                  <div className="bg-white border border-slate-200 rounded-[40px] overflow-hidden shadow-xl relative">
+                  <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl relative">
                     <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-600 to-emerald-500/0 opacity-20" />
                     <div className="divide-y divide-slate-100">
                       {selectedMethod === "bank" ? (
@@ -862,32 +1138,47 @@ export default function WithdrawPage() {
                           />
                           <ReviewItem
                             label="Registry Holder"
-                            value={cardDetails.name}
+                            value={`${cardDetails.firstName} ${cardDetails.lastName}`}
+                          />
+                          <ReviewItem
+                            label="Billing Node"
+                            value={`${cardDetails.city}, ${cardDetails.country}`}
+                            subValue={cardDetails.addressLine1}
                           />
                         </>
                       )}
-                      <ReviewItem
-                        label="Gross Migration"
-                        value={`$${amount.toLocaleString()}`}
-                      />
-                      <ReviewItem
-                        label="Gas / Network Fee"
-                        value="$0.00"
-                        subValue="Dayle Pro active"
-                        highlight="text-emerald-600"
-                      />
-                      <div className="p-8 bg-slate-50 flex justify-between items-center relative overflow-hidden group">
-                        <div className="absolute inset-x-0 bottom-0 h-0.5 bg-emerald-500/20 translate-y-full group-hover:translate-y-0 transition-transform" />
-                        <span className="text-sm font-bold text-slate-600 tracking-[0.3em]  uppercase">
-                          Net settlement
-                        </span>
-                        <div className="text-right">
-                          <span className="text-4xl font-bold text-slate-900 st ">
-                            ${amount.toLocaleString()}
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center py-4 border-b border-slate-100">
+                          <span className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                            Gross Withdrawal
                           </span>
-                          <p className=" text-slate-600 font-black st mt-1">
-                            {selectedCurrency}
-                          </p>
+                          <span className="text-slate-900 font-bold">
+                            ${amount.toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-4 border-b border-slate-100">
+                          <span className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                            Total Fees (1.5%)
+                          </span>
+                          <span className="text-emerald-600 font-bold">
+                            -${totalFees.toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-8">
+                          <span className="text-slate-900 font-bold uppercase tracking-wider text-sm">
+                            Net Settlement
+                          </span>
+                          <div className="text-right">
+                            <span className="text-4xl font-bold text-slate-900 st ">
+                              ${netSettlement.toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </span>
+                            <p className=" text-slate-600 font-black st mt-1">
+                              {selectedCurrency}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -913,13 +1204,13 @@ export default function WithdrawPage() {
                     <Button
                       variant="ghost"
                       onClick={() => setStep("verification")}
-                      className="h-16 font-black  tracking-[0.3em] text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-2xl transition-all  uppercase"
+                      className="h-14 font-black  tracking-widest text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-2xl transition-all  uppercase"
                     >
                       Go back
                     </Button>
                     <Button
                       onClick={handleConfirmWithdrawal}
-                      className="h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95  uppercase"
+                      className="h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95  uppercase"
                     >
                       Confirm & execute
                     </Button>
@@ -957,7 +1248,7 @@ export default function WithdrawPage() {
                     />
                   </div>
                   <div className="space-y-4">
-                    <h2 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tighter  leading-none">
+                    <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter  leading-none">
                       Broadcasting!
                     </h2>
                     <p className="text-sm font-bold text-slate-600 tracking-[0.4em] leading-relaxed uppercase">
@@ -965,14 +1256,14 @@ export default function WithdrawPage() {
                     </p>
                   </div>
 
-                  <div className="bg-white border border-slate-200 rounded-[40px] p-10 space-y-8 relative overflow-hidden group shadow-xl">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-8 space-y-6 relative overflow-hidden group shadow-xl">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
                     <div className="flex justify-between items-center">
                       <span className=" font-bold tracking-[0.3em] text-slate-600 uppercase ">
                         Asset released
                       </span>
                       <span className="text-3xl font-bold text-emerald-600  tracking-tighter">
-                        ${amount.toLocaleString()}
+                        {currencyPrefix}{Number(successfulNetAmount || netSettlement).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="pt-8 border-t border-slate-100 flex justify-between items-center">
@@ -987,7 +1278,7 @@ export default function WithdrawPage() {
 
                   <Button
                     onClick={() => router.replace("/freelancer/balance")}
-                    className="w-full h-18 bg-slate-900 text-white font-bold text-sm tracking-[0.3em] rounded-4xl hover:bg-slate-800 transition-all shadow-xl active:scale-95  uppercase"
+                    className="w-full h-14 bg-slate-900 text-white font-bold text-sm tracking-widest rounded-3xl hover:bg-slate-800 transition-all shadow-xl active:scale-95  uppercase"
                   >
                     Exit to overview
                   </Button>
@@ -1009,10 +1300,10 @@ export default function WithdrawPage() {
                     />
                   </div>
                   <div className="space-y-4">
-                    <h2 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tighter  leading-none">
+                    <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter  leading-none">
                       Rejection
                     </h2>
-                    <p className="text-sm font-bold text-slate-600 tracking-[0.4em] leading-relaxed uppercase">
+                    <p className="text-xs font-bold text-slate-400 tracking-[0.2em] leading-relaxed uppercase">
                       The bank network rejected the settlement or connection
                       timed out.
                     </p>
@@ -1040,13 +1331,13 @@ export default function WithdrawPage() {
                         setShowOtp(false);
                         setOtp(["", "", "", "", "", ""]);
                       }}
-                      className="h-16 font-bold  tracking-[0.3em] border-slate-200 bg-white hover:bg-slate-50 rounded-2xl transition-all  uppercase text-slate-600"
+                      className="h-14 font-bold  tracking-widest border-slate-200 bg-white hover:bg-slate-50 rounded-2xl transition-all  uppercase text-slate-600"
                     >
                       Try again
                     </Button>
                     <Button
                       onClick={() => router.replace("/freelancer/balance")}
-                      className="h-16 bg-slate-900 text-white font-bold  tracking-[0.3em] rounded-2xl transition-all shadow-xl active:scale-95  text-sm uppercase"
+                      className="h-14 bg-slate-900 text-white font-bold  tracking-widest rounded-2xl transition-all shadow-xl active:scale-95  text-sm uppercase"
                     >
                       Return to origin
                     </Button>
@@ -1067,19 +1358,19 @@ function SummaryItem({
   label,
   value,
   icon,
-  isMono,
+  valueClassName,
 }: {
   label: string;
   value: string;
   icon?: React.ReactNode;
-  isMono?: boolean;
+  valueClassName?: string;
 }) {
   return (
-    <div className="flex justify-between items-center  font-bold tracking-[0.2em] text-slate-900 uppercase">
+    <div className="flex justify-between items-center  font-bold tracking-tight text-slate-900 uppercase">
       <span className="text-slate-600 ">{label}</span>
       <div className="flex items-center gap-2">
         {icon}
-        <span className={cn("text-slate-600 ", isMono && " tracking-normal")}>
+        <span className={cn("text-slate-900 ", valueClassName)}>
           {value}
         </span>
       </div>
@@ -1092,83 +1383,93 @@ function MethodBtn({
   title,
   desc,
   onClick,
+  variant = "emerald",
 }: {
   icon: React.ReactElement;
   title: string;
   desc: string;
   onClick: () => void;
+  variant?: "emerald" | "blue";
 }) {
+  const colors = {
+    emerald: {
+      hoverBorder: "hover:border-emerald-200",
+      hoverShadow: "hover:shadow-emerald-600/5",
+      bgCircle: "bg-emerald-50",
+      iconActive: "group-hover:bg-emerald-600",
+      iconBorder: "group-hover:border-emerald-500",
+      textActive: "group-hover:text-emerald-950",
+      subActive: "group-hover:text-emerald-600",
+      chevron: "group-hover:text-emerald-500",
+    },
+    blue: {
+      hoverBorder: "hover:border-blue-200",
+      hoverShadow: "hover:shadow-blue-600/5",
+      bgCircle: "bg-blue-50",
+      iconActive: "group-hover:bg-blue-600",
+      iconBorder: "group-hover:border-blue-500",
+      textActive: "group-hover:text-blue-950",
+      subActive: "group-hover:text-blue-600",
+      chevron: "group-hover:text-blue-500",
+    },
+  }[variant];
+
   return (
     <button
       onClick={onClick}
-      className="w-full p-8 bg-white border border-slate-200 rounded-[2.5rem] flex items-center gap-8 group hover:bg-emerald-50/50 hover:border-emerald-500/30 transition-all text-left shadow-lg relative overflow-hidden"
+      className={cn(
+        "w-full p-6 bg-white border border-slate-200 rounded-2xl flex items-center gap-4 group transition-all relative overflow-hidden",
+        colors.hoverBorder,
+        colors.hoverShadow,
+      )}
     >
-      <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-600 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
-        {React.cloneElement(icon, { className: "w-8 h-8" } as any)}
+      <div
+        className={cn(
+          "absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity",
+          colors.bgCircle,
+        )}
+      />
+
+      <div
+        className={cn(
+          "w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 transition-all shrink-0",
+          colors.iconActive,
+          "group-hover:text-white",
+          colors.iconBorder,
+        )}
+      >
+        {React.cloneElement(icon, { className: "w-5 h-5" } as any)}
       </div>
 
-      <div className="flex-1">
-        <p className="text-slate-900 font-bold text-xl tracking-tighter  group-hover:text-emerald-700 transition-colors">
+      <div className="text-left relative z-10 flex-1">
+        <p
+          className={cn(
+            "text-slate-900 font-bold text-lg tracking-tight transition-colors",
+            colors.textActive,
+          )}
+        >
           {title}
         </p>
-        <p className=" font-bold text-slate-600 tracking-[0.2em] mt-2 group-hover:text-slate-600 transition-colors uppercase">
+        <p
+          className={cn(
+            "font-bold text-slate-400 st transition-colors uppercase mt-0.5 text-[10px]",
+            colors.subActive,
+          )}
+        >
           {desc}
         </p>
       </div>
-      <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:border-emerald-500/20 transition-all shadow-sm">
-        <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
-      </div>
+
+      <ChevronRight
+        className={cn(
+          "w-5 h-5 ml-auto text-slate-300 transition-all group-hover:translate-x-1",
+          colors.chevron,
+        )}
+      />
     </button>
   );
 }
 
-function CardPreview({ details }: { details: CardDetails }) {
-  return (
-    <div className="relative aspect-[1.586/1] w-full rounded-[40px] bg-muted p-10 text-white shadow-[0_50px_100px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden group">
-      <div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 to-emerald-900/10 opacity-50 group-hover:opacity-60 transition-opacity" />
-      <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform">
-        <CreditCard className="w-48 h-48 rotate-12" />
-      </div>
-      <div className="relative h-full flex flex-col justify-between z-10">
-        <div className="flex justify-between items-start">
-          <div className="w-16 h-12 bg-white/10 rounded-xl backdrop-blur-3xl border border-white/20 shadow-inner" />
-          <div className="flex flex-col items-end">
-            {details.type === "visa" && (
-              <div className="font-black  text-3xl tracking-tighter">VISA</div>
-            )}
-            {details.type === "mastercard" && (
-              <div className="flex gap-1">
-                <div className="w-8 h-8 rounded-full bg-red-500/90 shadow-[0_0_15px_rgba(239,68,68,0.4)]" />
-                <div className="w-8 h-8 rounded-full bg-amber-500/90 -ml-4 shadow-[0_0_15px_rgba(245,158,11,0.4)]" />
-              </div>
-            )}
-            {!details.type && (
-              <span className="font-black  text-xl text-white/20 tracking-[0.2em]">
-                External axis
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="space-y-8">
-          <p className="text-3xl tracking-[0.15em]  font-bold text-white shadow-sm">
-            {details.number || "•••• •••• •••• ••••"}
-          </p>
-          <div className="flex justify-between text-[11px] font-bold tracking-[0.3em] ">
-            <div>
-              <p className="text-white/20 mb-2">Holder signature</p>
-              <p className="text-white st">{details.name || "UNREGISTERED"}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-white/20 mb-2">Valid thru</p>
-              <p className="text-white st">{details.expiry || "MM/YY"}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function WithdrawInputField({
   label,
@@ -1179,15 +1480,15 @@ function WithdrawInputField({
   error?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <div className="space-y-3">
-      <label className=" font-bold text-slate-600 tracking-[0.3em] ml-1  uppercase">
+    <div className="space-y-1.5 min-w-0">
+      <label className=" font-bold text-slate-500 tracking-[0.2em] ml-0.5 uppercase text-[10px]">
         {label}
       </label>
       <input
         {...props}
         className={cn(
-          "w-full bg-slate-50 border h-16 rounded-2xl px-6 text-slate-900 focus:border-emerald-500/30 outline-none transition-all font-bold st text-sm placeholder:text-slate-300 shadow-sm ",
-          error ? "border-red-500/50 bg-red-50" : "border-slate-200",
+          "w-full bg-slate-50 border h-12 rounded-xl px-4 text-slate-900 focus:border-emerald-500/30 outline-none transition-all font-bold st text-sm placeholder:text-slate-300 shadow-sm ",
+          error ? "border-red-500/50 bg-red-50" : "border-slate-100",
         )}
       />
       {error && (
@@ -1211,7 +1512,7 @@ function ReviewItem({
   highlight?: string;
 }) {
   return (
-    <div className="p-8 flex justify-between items-center group hover:bg-slate-50 transition-colors">
+    <div className="p-6 flex justify-between items-center group hover:bg-slate-50 transition-colors">
       <span className=" font-bold text-slate-600 tracking-[0.3em]  uppercase">
         {label}
       </span>
@@ -1274,7 +1575,7 @@ function ProcessingStatusScreen({
   ];
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-12">
       <div className="text-center space-y-8">
         <div className="relative inline-flex items-center justify-center w-28 h-28">
           <motion.div
@@ -1285,7 +1586,7 @@ function ProcessingStatusScreen({
           <Zap className="w-12 h-12 text-emerald-600" />
         </div>
         <div className="space-y-3">
-          <h2 className="text-4xl font-bold text-slate-900 tracking-tighter ">
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
             Executing link
           </h2>
           <p className=" font-bold text-slate-600 tracking-[0.4em]  uppercase">
@@ -1294,7 +1595,7 @@ function ProcessingStatusScreen({
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-[40px] p-12 space-y-12 shadow-xl relative overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-3xl p-8 lg:p-10 space-y-10 shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
         {steps.map((step, idx) => (
           <div key={step.id} className="flex gap-8 relative group">
@@ -1369,7 +1670,7 @@ function ProcessingOverlay() {
         />
         <Fingerprint className="w-14 h-14 text-emerald-600 absolute inset-0 m-auto" />
       </div>
-      <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tighter ">
+      <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tighter ">
         Authorizing port
       </h3>
       <p className=" font-bold tracking-[0.6em] text-emerald-600/40  uppercase">

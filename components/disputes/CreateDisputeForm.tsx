@@ -260,31 +260,63 @@ export function CreateDisputeForm({
 
     setIsSubmitting(true);
 
-    const payload = {
-      vaultId: selectedVaultId,
-      deliverableTitle: selectedDeliverableTitle || undefined,
-      disputeType: selectedReasonCode as any,
-      reasonCode: selectedReasonCode,
-      description,
-    };
-
-    console.log("DEBUG: Sending dispute payload:", payload);
-
     try {
-      await api.disputes.create(payload);
+      // 1. Upload evidence to S3
+      const uploadedEvidence = await Promise.all(
+        files.map(async (file) => {
+          // a. Request presigned URL
+          const { url, key } = await api.uploads.getPresignedUrl({
+            fileName: file.name,
+            fileType: file.type || "application/octet-stream",
+            fileSize: file.size,
+            purpose: "EVIDENCE",
+          });
 
-      console.log("Submitted dispute", {
-        selectedVaultId,
-        selectedDeliverableTitle,
-        selectedReasonCode,
+          // b. PUT file to S3
+          const uploadResponse = await fetch(url, {
+            method: "PUT",
+            body: file,
+            headers: {
+              "Content-Type": file.type || "application/octet-stream",
+            },
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error(`Failed to upload ${file.name}`);
+          }
+
+          return {
+            filename: file.name,
+            key: key,
+            size: file.size,
+            type: file.type || "application/octet-stream",
+          };
+        }),
+      );
+
+      // 2. Submit dispute with S3 keys
+      const payload = {
+        vaultId: selectedVaultId,
+        deliverableTitle: selectedDeliverableTitle || undefined,
+        disputeType: selectedReasonCode as any,
+        reasonCode: selectedReasonCode,
         description,
-        files,
-      });
+        evidence: uploadedEvidence,
+      };
+
+      console.log("DEBUG: Sending dispute payload:", payload);
+
+      await api.disputes.create(payload);
 
       router.push(`/${role}/disputes`);
       router.refresh();
     } catch (err) {
-      setFormError("Something went wrong. Please try again.");
+      console.error("Dispute submission failed:", err);
+      setFormError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }

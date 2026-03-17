@@ -24,6 +24,7 @@ import {
   Users,
   FileIcon,
   LinkIcon,
+  Download,
 } from "lucide-react";
 
 import {
@@ -38,6 +39,7 @@ import { getDisputeEligibility } from "@/lib/rules/disputes";
 import { VaultStatus } from "@/lib/domain/enums";
 import { getVaultDerivedLabel } from "@/lib/domain/enums";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "sonner";
 
 export default function FreelancerVaultDetailPage() {
   const params = useParams();
@@ -103,6 +105,29 @@ export default function FreelancerVaultDetailPage() {
     setExpandedSubmissions((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
+  };
+
+  const handleDownload = async (file: { url: string; key?: string; name?: string; filename?: string }) => {
+    try {
+      const isS3 = file.key || file.url?.includes('s3.amazonaws.com') || file.url?.includes('digitaloceanspaces.com');
+      
+      if (!isS3) {
+        window.open(file.url, '_blank');
+        return;
+      }
+
+      const key = file.key || file.url.split('/').pop()?.split('?')[0];
+      if (!key) {
+        window.open(file.url, '_blank');
+        return;
+      }
+
+      const { url: presignedUrl } = await api.uploads.getDownloadUrl(key);
+      window.open(presignedUrl, '_blank');
+    } catch (err) {
+      console.error('Download failed:', err);
+      toast.error('Failed to generate secure download link');
+    }
   };
 
   const isEligibleForDispute = getDisputeEligibility(vault).eligible;
@@ -234,35 +259,74 @@ export default function FreelancerVaultDetailPage() {
                                 <Square className="w-5 h-5 text-slate-100 group-hover:text-slate-200" />
                               )}
                             </div>
-                            <div className="flex-1 space-y-1">
-                              <h4 className="text-sm font-bold text-slate-900 ">
-                                {item.title}
-                              </h4>
-                              {item.description && (
-                                <p className="text-sm text-slate-600 leading-relaxed max-w-2xl">
-                                  {item.description}
-                                </p>
-                              )}
-                              <div className="flex gap-2 pt-1">
-                                {item.submissionType === 'FILE' && (
-                                  <Badge variant="outline" className="text-[9px] bg-slate-50 text-slate-400 border-slate-200 flex items-center gap-1">
-                                    <FileIcon className="w-2.5 h-2.5" /> File required
-                                  </Badge>
+                            <div className="flex-1 space-y-3">
+                              <div>
+                                <h4 className="text-sm font-bold text-slate-900 ">
+                                  {item.title}
+                                </h4>
+                                {item.description && (
+                                  <p className="text-sm text-slate-600 leading-relaxed max-w-2xl mt-1">
+                                    {item.description}
+                                  </p>
                                 )}
-                                {item.submissionType === 'LINK' && (
-                                  <Badge variant="outline" className="text-[9px] bg-slate-50 text-slate-400 border-slate-200 flex items-center gap-1">
-                                    <LinkIcon className="w-2.5 h-2.5" /> Link required
-                                  </Badge>
-                                )}
-                                {item.submissionType === 'BOTH' && (
-                                  <Badge variant="outline" className="text-[9px] bg-emerald-50 text-emerald-600 border-emerald-100 flex items-center gap-1">
-                                    <ShieldCheck className="w-2.5 h-2.5" /> File & Link
-                                  </Badge>
+                                <div className="flex gap-2 pt-1">
+                                  {item.submissionType === 'FILE' && (
+                                    <Badge variant="outline" className="text-[9px] bg-slate-50 text-slate-400 border-slate-200 flex items-center gap-1">
+                                      <FileIcon className="w-2.5 h-2.5" /> File required
+                                    </Badge>
+                                  )}
+                                  {item.submissionType === 'LINK' && (
+                                    <Badge variant="outline" className="text-[9px] bg-slate-50 text-slate-400 border-slate-200 flex items-center gap-1">
+                                      <LinkIcon className="w-2.5 h-2.5" /> Link required
+                                    </Badge>
+                                  )}
+                                  {item.submissionType === 'BOTH' && (
+                                    <Badge variant="outline" className="text-[9px] bg-emerald-50 text-emerald-600 border-emerald-100 flex items-center gap-1">
+                                      <ShieldCheck className="w-2.5 h-2.5" /> File & Link
+                                    </Badge>
+                                  )}
+                                </div>
+
+                                {submissionWithThis && (
+                                  <div className="mt-3 space-y-3 pt-3 border-t border-slate-100 animate-in fade-in slide-in-from-top-1 duration-300">
+                                    {submissionWithThis.deliverableStatus?.find((ds: any) => ds.deliverableId === item.id || ds.deliverableTitle === item.title)?.notes && (
+                                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 italic">
+                                        <p className="text-sm text-slate-600 leading-relaxed">
+                                          &quot;{submissionWithThis.deliverableStatus.find((ds: any) => ds.deliverableId === item.id || ds.deliverableTitle === item.title).notes}&quot;
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    <div className="flex flex-wrap gap-2">
+                                      {submissionWithThis.deliverableStatus?.find((ds: any) => ds.deliverableId === item.id || ds.deliverableTitle === item.title)?.link && (
+                                        <a 
+                                          href={submissionWithThis.deliverableStatus.find((ds: any) => ds.deliverableId === item.id || ds.deliverableTitle === item.title).link.startsWith('http') ? submissionWithThis.deliverableStatus.find((ds: any) => ds.deliverableId === item.id || ds.deliverableTitle === item.title).link : `https://${submissionWithThis.deliverableStatus.find((ds: any) => ds.deliverableId === item.id || ds.deliverableTitle === item.title).link}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm"
+                                        >
+                                          <LinkIcon className="w-3 h-3" />
+                                          View Link
+                                        </a>
+                                      )}
+
+                                      {submissionWithThis.deliverableStatus?.find((ds: any) => ds.deliverableId === item.id || ds.deliverableTitle === item.title)?.files?.map((file: any, fIdx: number) => (
+                                        <button
+                                          key={fIdx}
+                                          onClick={() => handleDownload(file)}
+                                          className="inline-flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                        >
+                                          <Download className="w-3 h-3" />
+                                          {file.filename || `File ${fIdx + 1}`}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
                                 )}
                               </div>
 
                               <div className="pt-2 flex items-center gap-2">
-                                <span className="text-[9px] font-bold 00">
+                                <span className="text-[9px] font-bold">
                                   Status:
                                 </span>
                                 <Badge
@@ -270,7 +334,7 @@ export default function FreelancerVaultDetailPage() {
                                   className={cn(
                                     "text-[9px]  border-none px-0",
                                     submissionWithThis
-                                      ? "text-emerald-700"
+                                      ? "text-emerald-700 font-bold"
                                       : "text-amber-600/50",
                                   )}
                                 >
@@ -408,6 +472,36 @@ export default function FreelancerVaultDetailPage() {
                                             <p className=" text-slate-600  ml-5">
                                               - {d.notes}
                                             </p>
+                                          )}
+
+                                          {d.included && (d.link || (d.files && d.files.length > 0)) && (
+                                            <div className="flex flex-wrap gap-2 ml-5 mt-1">
+                                              {d.link && (
+                                                <a
+                                                  href={d.link.startsWith('http') ? d.link : `https://${d.link}`}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 px-2 py-1 rounded-[6px] text-[10px] font-bold transition-all shadow-sm"
+                                                  onClick={(e) => e.stopPropagation()}
+                                                >
+                                                  <LinkIcon className="w-2.5 h-2.5" />
+                                                  View Link
+                                                </a>
+                                              )}
+                                              {d.files?.map((file: any, fileIdx: number) => (
+                                                <button
+                                                  key={fileIdx}
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDownload(file);
+                                                  }}
+                                                  className="inline-flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 px-2 py-1 rounded-[6px] text-[10px] font-bold transition-all shadow-sm cursor-pointer"
+                                                >
+                                                  <Download className="w-2.5 h-2.5" />
+                                                  {file.filename || `File ${fileIdx + 1}`}
+                                                </button>
+                                              ))}
+                                            </div>
                                           )}
                                         </div>
                                       ),
