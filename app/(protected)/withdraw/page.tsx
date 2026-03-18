@@ -419,7 +419,7 @@ export default function WithdrawPage() {
             </div>
           </div>
 
-          <div className="p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
+          <div className="hidden lg:block p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
             <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <div className="relative z-10">
               <div className="flex items-center gap-3 text-emerald-600  font-bold tracking-[0.3em] mb-3  uppercase">

@@ -72,21 +72,40 @@ const statusConfig: Record<string, { label: string; classes: string }> = {
 
 export default function VaultsPage() {
   const { vaults, loading } = useVault();
+  const [activeTab, setActiveTab] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const filteredVaults = (vaults || []).filter((vault: any) => {
-    const counterparty =
-      vault.freelancerName ||
-      vault.freelancerEmail ||
-      vault.freelancer?.email ||
-      "";
-    return (
-      vault.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      counterparty.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
+  const filteredVaults = (vaults || [])
+    .filter((vault: any) => {
+      if (activeTab === "ACTIVE") {
+        return (
+          vault.status === "FUNDED" ||
+          vault.status === "DISPUTED" ||
+          vault.status === "active"
+        );
+      }
+      if (activeTab === "COMPLETED") {
+        return (
+          vault.status === "RELEASED" ||
+          vault.status === "REFUNDED" ||
+          vault.status === "completed"
+        );
+      }
+      return true;
+    })
+    .filter((vault: any) => {
+      const counterparty =
+        vault.freelancerName ||
+        vault.freelancerEmail ||
+        vault.freelancer?.email ||
+        "";
+      return (
+        vault.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        counterparty.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    });
 
   const totalPages = Math.ceil(filteredVaults.length / itemsPerPage);
   const paginatedVaults = filteredVaults.slice(
@@ -94,45 +113,86 @@ export default function VaultsPage() {
     currentPage * itemsPerPage,
   );
 
-  const totalValue = (vaults || []).reduce(
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const currentVaults = vaults || [];
+  const previousVaults = currentVaults.filter(
+    (v: any) => v.createdAt && new Date(v.createdAt) < thirtyDaysAgo,
+  );
+
+  // Total Value
+  const totalValue = currentVaults.reduce(
     (acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0),
     0,
   );
+  const prevTotalValue = previousVaults.reduce(
+    (acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0),
+    0,
+  );
+  const valueChange =
+    prevTotalValue === 0
+      ? totalValue > 0
+        ? 100
+        : 0
+      : Math.round(((totalValue - prevTotalValue) / prevTotalValue) * 100);
 
-  const activeCount = (vaults || []).filter(
-    (v: any) => v.status === "FUNDED" || v.status === "DISPUTED" || v.status === "active",
+  // Active Projects
+  const activeCount = currentVaults.filter(
+    (v: any) =>
+      v.status === "FUNDED" || v.status === "DISPUTED" || v.status === "active",
   ).length;
+  const prevActiveCount = previousVaults.filter(
+    (v: any) =>
+      v.status === "FUNDED" || v.status === "DISPUTED" || v.status === "active",
+  ).length;
+  const activeChange = activeCount - prevActiveCount;
 
-  const completionRate =
-    (vaults || []).length > 0
-      ? Math.round(
-          ((vaults || []).filter((v: any) => v.status === "RELEASED" || v.status === "REFUNDED" || v.status === "completed").length /
-            (vaults || []).length) *
-            100,
-        )
+  // Completion Rate
+  const currentCompleted = currentVaults.filter(
+    (v: any) =>
+      v.status === "RELEASED" ||
+      v.status === "REFUNDED" ||
+      v.status === "completed",
+  ).length;
+  const currentRate =
+    currentVaults.length > 0
+      ? Math.round((currentCompleted / currentVaults.length) * 100)
       : 0;
+
+  const prevCompleted = previousVaults.filter(
+    (v: any) =>
+      v.status === "RELEASED" ||
+      v.status === "REFUNDED" ||
+      v.status === "completed",
+  ).length;
+  const prevRate =
+    previousVaults.length > 0
+      ? Math.round((prevCompleted / previousVaults.length) * 100)
+      : 0;
+  const rateChange = currentRate - prevRate;
 
   const stats = [
     {
       label: "Total Value",
       value: `$${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      change: "+0%",
-      icon: Shield,
+      change: `+${valueChange}%`,
       color: "text-slate-900",
+      trend: valueChange >= 0 ? "up" : "down",
     },
     {
       label: "Active Projects",
       value: activeCount.toString(),
-      change: "+0",
-      icon: Zap,
+      change: `${activeChange >= 0 ? "+" : ""}${activeChange}`,
       color: "text-slate-900",
+      trend: activeChange >= 0 ? "up" : "down",
     },
     {
       label: "Completion Rate",
-      value: `${completionRate}%`,
-      change: "+0%",
-      icon: TrendingUp,
+      value: `${currentRate}%`,
+      change: `${rateChange >= 0 ? "+" : ""}${rateChange}%`,
       color: "text-slate-900",
+      trend: rateChange >= 0 ? "up" : "down",
     },
   ];
 
@@ -158,13 +218,6 @@ export default function VaultsPage() {
             variants={itemVariants}
             className="flex items-start gap-3 sm:flex-row flex-col sm:items-center"
           >
-            <Button
-              variant="outline"
-              className="bg-white border-slate-200 hover:bg-slate-50 text-slate-600 h-11 px-5 rounded-xl transition-all font-bold  shadow-sm"
-            >
-              <Filter className="w-4 h-4 mr-2 text-slate-600" />
-              Filters
-            </Button>
             <Link href="/client/create-vault" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 h-11 px-6 rounded-xl font-bold  shadow-md shadow-emerald-500/20 transition-all">
                 <Plus className="w-4 h-4 mr-2" strokeWidth={3} />
@@ -173,6 +226,34 @@ export default function VaultsPage() {
             </Link>
           </motion.div>
         </header>
+
+        {/* Status Tabs */}
+        <motion.div variants={itemVariants} className="flex border-b border-slate-200">
+          {[
+            { id: "ALL", label: "All projects" },
+            { id: "ACTIVE", label: "Active" },
+            { id: "COMPLETED", label: "Completed" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={cn(
+                "px-6 py-4 text-sm font-bold transition-all relative",
+                activeTab === tab.id
+                  ? "text-emerald-600"
+                  : "text-slate-500 hover:text-slate-700",
+              )}
+            >
+              {tab.label}
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="activeTabClient"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600"
+                />
+              )}
+            </button>
+          ))}
+        </motion.div>
 
         {/* 2. ANALYTICS GRID */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -183,16 +264,15 @@ export default function VaultsPage() {
               className="relative group bg-white border border-slate-200 p-6 rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-sm"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-100 transition-all" />
-              <div className="flex justify-between items-start mb-4">
-                <div
+              <div className="flex justify-end items-start mb-4">
+                <span
                   className={cn(
-                    "p-2.5 rounded-xl bg-[#F8F9FA] border border-slate-100",
-                    stat.color.replace("text-", "text-").replace("500", "600"),
+                    "text-sm font-bold px-2 py-1 rounded-full transition-colors",
+                    stat.trend === "up"
+                      ? "text-emerald-600 bg-emerald-50"
+                      : "text-amber-600 bg-amber-50",
                   )}
                 >
-                  <stat.icon className="w-5 h-5" />
-                </div>
-                <span className="text-sm font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full ">
                   {stat.change}
                 </span>
               </div>
@@ -376,7 +456,7 @@ export default function VaultsPage() {
           <footer className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-slate-200 font-primary">
             <p className="text-sm md:text-sm font-bold text-slate-600  text-center sm:text-left">
               Displaying {paginatedVaults.length} of {filteredVaults.length}{" "}
-              escrow projects
+              project vaults
             </p>
             <div className="flex gap-2">
                 <Button

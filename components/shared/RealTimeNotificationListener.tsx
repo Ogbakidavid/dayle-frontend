@@ -24,8 +24,11 @@ const getNotificationIcon = (type: string) => {
   }
 };
 
+import { useNotifications } from "@/lib/store/notification-context";
+
 export function RealTimeNotificationListener() {
   const { socket } = useSocket();
+  const { addNotification } = useNotifications();
   const router = useRouter();
 
   useEffect(() => {
@@ -43,7 +46,8 @@ export function RealTimeNotificationListener() {
         } : undefined,
       });
 
-      // Optional: Refresh local state if we had a global notification store
+      // Update local state in store
+      addNotification(data);
     });
 
     return () => {

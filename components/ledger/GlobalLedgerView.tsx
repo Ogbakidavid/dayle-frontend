@@ -267,7 +267,10 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                                 )}
                               </div>
                               <div className="min-w-0 flex-1">
-                                <p className="text-sm text-slate-900 font-bold tracking-tight truncate group-hover:text-emerald-700 transition-colors ">
+                                <p 
+                                  className="text-sm text-slate-900 font-bold tracking-tight line-clamp-1 max-w-[400px] group-hover:text-emerald-700 transition-colors"
+                                  title={entry.description || entry.id}
+                                >
                                   {entry.description || entry.id}
                                 </p>
                                 <p className="text-[10px] sm:text-xs font-bold  text-slate-600 mt-1 ">

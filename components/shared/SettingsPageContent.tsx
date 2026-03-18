@@ -1950,9 +1950,9 @@ export default function SettingsPageContent({ role = "client" }) {
           
           <DialogHeader className="relative z-10 space-y-3">
             <div className="space-y-1.5 mb-6 text-center">
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tighter">
+              <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tighter">
                 Withdrawal amount
-              </h2>
+              </DialogTitle>
               <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">
                 Specify how much you want to transfer
               </p>

@@ -127,7 +127,12 @@ export default function SubmissionPage() {
       return;
     }
 
-    // Validation for mandatory attachments
+    if (!overallNotes.trim()) {
+      toast.error("Please provide general notes about this submission");
+      return;
+    }
+
+    // Validation for mandatory attachments and per-deliverable notes
     for (const d of includedDeliverables) {
       const needsFile = d.submissionType === SubmissionType.FILE || d.submissionType === SubmissionType.BOTH;
       const needsLink = d.submissionType === SubmissionType.LINK || d.submissionType === SubmissionType.BOTH;
@@ -138,6 +143,10 @@ export default function SubmissionPage() {
       }
       if (needsLink && !d.link.trim()) {
         toast.error(`A link/URL is mandatory for: ${d.deliverableTitle}`);
+        return;
+      }
+      if (!d.notes.trim()) {
+        toast.error(`Notes are mandatory for: ${d.deliverableTitle}`);
         return;
       }
     }
@@ -306,7 +315,7 @@ export default function SubmissionPage() {
                       <div className="p-6 border-t border-slate-100 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="space-y-3">
                           <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                            Notes about this deliverable (optional)
+                            Notes about this deliverable (required)
                           </Label>
                           <Textarea
                             placeholder="Briefly describe what's included for this specific goal..."
@@ -399,8 +408,8 @@ export default function SubmissionPage() {
 
           <Card className="bg-white border-slate-200 shadow-sm relative overflow-hidden">
             <CardContent className="p-8 space-y-4">
-              <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider block">
-                General notes about this submission
+              <Label className="text-xs font-bold text-emerald-600 uppercase tracking-wider block">
+                General notes about this submission (required)
               </Label>
               <Textarea
                 placeholder="Overall summary of the work provided in this update..."

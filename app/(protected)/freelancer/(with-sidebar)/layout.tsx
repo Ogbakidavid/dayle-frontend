@@ -17,6 +17,7 @@ import {
   Landmark,
 } from "lucide-react";
 import { useUser } from "@/lib/store/user-context";
+import { useNotifications } from "@/lib/store/notification-context";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -68,6 +69,7 @@ interface FreelancerLayoutProps {
 export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
   const pathname = usePathname();
   const { user, logout } = useUser();
+  const { hasUnread } = useNotifications();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -184,7 +186,8 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
               </Button>
-              {(user?.kycStatus === "NONE" ||
+              {(hasUnread || 
+                user?.kycStatus === "NONE" ||
                 user?.kycStatus === "REJECTED") && (
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>

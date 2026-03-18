@@ -351,21 +351,21 @@ export function DisputeListView({ role }: DisputeListViewProps) {
           value={counts.open}
           hint="Needs attention"
           icon={AlertCircle}
-          tone="amber"
+          tone="neutral"
         />
         <StatCard
           title="In Review"
           value={counts.review}
           hint="In review"
           icon={Clock}
-          tone="sky"
+          tone="neutral"
         />
         <StatCard
           title="Resolved"
           value={counts.resolved}
           hint="Completed cases"
           icon={CheckCircle2}
-          tone="emerald"
+          tone="neutral"
         />
         <StatCard
           title="Total"
@@ -468,7 +468,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
           <CardHeader className="border-b border-slate-100 bg-slate-50">
             <CardTitle className="flex items-center justify-between gap-3 text-slate-900">
               <div className="flex items-center gap-2">
-                <Gavel className="h-5 w-5 text-amber-600" />
+                <Gavel className="h-5 w-5 text-slate-900" />
                 <span className="text-lg font-bold  ">Cases</span>
                 <span className="text-[11px] font-bold text-slate-600 font-mono st mt-0.5">
                   ({filtered.length})
@@ -522,7 +522,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
                           <div className="min-w-0 space-y-2">
                             {/* Primary line: Vault title */}
-                            <p className="truncate text-lg font-bold tracking-tighter leading-none text-slate-900 group-hover:text-amber-700 transition-colors ">
+                            <p className="truncate text-lg font-bold tracking-tighter leading-none text-slate-900 group-hover:text-slate-700 transition-colors ">
                               {dispute.vaultTitle}
                             </p>
 
