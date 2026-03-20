@@ -37,14 +37,15 @@ export default function BankTransferPage() {
 
   const searchParams = useSearchParams();
   const currency = searchParams.get("currency") || "USD";
-  const EXCHANGE_RATE = 1500;
+  const EXCHANGE_RATES = { USD: 1, NGN: 1500, GHS: 12.5, KES: 135 };
 
   const vault = (vaults || []).find((v) => v.id === vaultId);
   const amount = vault?.formattedTotalAmount
     ? Number(vault.formattedTotalAmount)
     : 0;
-  const displayAmount = currency === "USD" ? amount : amount * EXCHANGE_RATE;
-  const currencyPrefix = currency === "USD" ? "$" : "₦";
+  const displayAmount = amount * EXCHANGE_RATES[currency as keyof typeof EXCHANGE_RATES];
+  const currencyPrefixes = { USD: "$", NGN: "₦", GHS: "GH₵", KES: "KSh" };
+  const currencyPrefix = currencyPrefixes[currency as keyof typeof currencyPrefixes];
 
   const [bankDetails, setBankDetails] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);

@@ -129,7 +129,7 @@ export default function SettingsPageContent({ role = "client" }) {
     postalCode: "",
     country: "Nigeria"
   });
-  const [bankData, setBankData] = useState({ bankCode: "", accountNumber: "", accountName: "" });
+  const [bankData, setBankData] = useState({ bankCode: "", accountNumber: "", accountName: "", currency: "NGN", country: "Nigeria" });
   const [banksList, setBanksList] = useState<any[]>([]);
   const [resolvingBank, setResolvingBank] = useState(false);
   const [cardBrand, setCardBrand] = useState<string | null>(null);
@@ -163,16 +163,16 @@ export default function SettingsPageContent({ role = "client" }) {
   };
 
   useEffect(() => {
-    if (billingStep === "BANK" && banksList.length === 0) {
-      api.paymentMethods.getBanks().then(setBanksList).catch(console.error);
+    if (billingStep === "BANK") {
+      api.paymentMethods.getBanks(bankData.currency).then(setBanksList).catch(console.error);
     }
-  }, [billingStep, banksList.length]);
+  }, [billingStep, bankData.currency]);
 
   const handleResolveBank = async () => {
-    if (bankData.accountNumber.length === 10 && bankData.bankCode) {
+    if (bankData.accountNumber.length >= 8 && bankData.bankCode) {
       setResolvingBank(true);
       try {
-        const res = await api.paymentMethods.resolveBank(bankData.bankCode, bankData.accountNumber);
+        const res = await api.paymentMethods.resolveBank(bankData.bankCode, bankData.accountNumber, bankData.currency);
         if (res && res.account_name) {
           setBankData(prev => ({ ...prev, accountName: res.account_name }));
         }
@@ -619,7 +619,7 @@ export default function SettingsPageContent({ role = "client" }) {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
         <div className="flex flex-col md:flex-row gap-16">
           {/* Sidebar: Clean & Floating */}
           <aside className="md:w-64 shrink-0">
@@ -796,7 +796,7 @@ export default function SettingsPageContent({ role = "client" }) {
                 {isClient && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Upwork-style Balance Card */}
-                    <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm relative overflow-hidden group">
+                    <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-500/10 transition-colors" />
                       <div className="relative z-10 space-y-6">
                         <div className="space-y-1">
@@ -821,7 +821,7 @@ export default function SettingsPageContent({ role = "client" }) {
                       </div>
                     </div>
 
-                    <div className="bg-slate-50 border border-slate-200 p-8 rounded-2xl shadow-sm border-dashed flex flex-col justify-center">
+                    <div className="bg-slate-50 border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm border-dashed flex flex-col justify-center">
                       <h4 className="text-sm font-bold text-slate-600 mb-2">
                         Billing cycle
                       </h4>
@@ -861,7 +861,7 @@ export default function SettingsPageContent({ role = "client" }) {
                   </div>
 
                   {isAddingBillingMethod ? (
-                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
                       {billingStep === "SELECTION" && (
                         <div className="space-y-4">
                           <div 
@@ -984,7 +984,7 @@ export default function SettingsPageContent({ role = "client" }) {
                                 style={{ transform: billingSubStep === "ADDRESS" ? "translateX(-100%)" : "translateX(0%)" }}
                               >
                                 {/* ── STEP 1: Card Details ── */}
-                                <div className="w-full shrink-0 space-y-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40">
+                                <div className="w-full shrink-0 space-y-4 bg-white p-4 sm:p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40">
                                   {/* Name Row */}
                                   <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
@@ -1116,7 +1116,7 @@ export default function SettingsPageContent({ role = "client" }) {
                                 </div>
 
                                 {/* ── STEP 2: Billing Address ── */}
-                                <div className="w-full shrink-0 space-y-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 ml-4">
+                                <div className="w-full shrink-0 space-y-4 bg-white p-4 sm:p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 ml-4">
                                   <div>
                                     <h3 className="font-bold text-slate-800 text-sm">Billing Address</h3>
                                     <p className="text-[11px] text-slate-400 mt-0.5">Required for card verification and fraud prevention.</p>
@@ -1237,9 +1237,34 @@ export default function SettingsPageContent({ role = "client" }) {
                                 <ChevronLeft className="w-4 h-4 mr-1" />
                                 Back
                               </Button>
-                           </div>
+                          </div>
 
-                           <div className="space-y-4 max-w-md">
+                          <div className="space-y-4 max-w-md">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label className="text-xs font-bold text-slate-500 uppercase">Country</Label>
+                                  <select 
+                                    value={bankData.country}
+                                    onChange={(e) => {
+                                      const country = e.target.value;
+                                      const currency = country === "Nigeria" ? "NGN" : country === "Ghana" ? "GHS" : "KES";
+                                      setBankData({...bankData, country, currency, bankCode: "", accountName: ""});
+                                    }}
+                                    className="w-full h-12 bg-slate-50 border border-slate-200 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl px-4 text-sm font-bold text-slate-900 appearance-none"
+                                  >
+                                    <option>Nigeria</option>
+                                    <option>Ghana</option>
+                                    <option>Kenya</option>
+                                  </select>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label className="text-xs font-bold text-slate-500 uppercase">Currency</Label>
+                                  <div className="w-full h-12 bg-slate-100 border border-slate-200 rounded-xl px-4 flex items-center text-sm font-bold text-slate-500">
+                                    {bankData.currency}
+                                  </div>
+                                </div>
+                              </div>
+
                               <div className="space-y-2">
                                 <Label className="text-xs font-bold text-slate-500 uppercase">Select Bank</Label>
                                 <select 
@@ -2019,18 +2044,18 @@ export default function SettingsPageContent({ role = "client" }) {
             </div>
           </div>
 
-          <DialogFooter className="mt-10 sm:justify-start gap-3 relative z-10">
+          <DialogFooter className="mt-10 flex flex-col sm:flex-row gap-3 relative z-10">
             <Button
               onClick={() => setShowWithdrawAmountDialog(false)}
               variant="outline"
-              className="flex-1 h-12 rounded-xl border-slate-200 text-slate-600 font-bold hover:bg-slate-50"
+              className="w-full sm:flex-1 h-12 rounded-xl border-slate-200 text-slate-600 font-bold hover:bg-slate-50"
             >
               Cancel
             </Button>
             <Button
               onClick={handleProceedToWithdrawal}
               disabled={!withdrawAmount || Number(withdrawAmount) <= 0 || Number(withdrawAmount) > Number(balance?.formattedAvailable)}
-              className="flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/10 active:scale-95 transition-all"
+              className="w-full sm:flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/10 active:scale-95 transition-all"
             >
               Proceed to Payout
             </Button>

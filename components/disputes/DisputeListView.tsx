@@ -23,6 +23,7 @@ import {
   Gavel,
   ArrowUpRight,
   X,
+  Handshake,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { motion, Variants } from "framer-motion";
@@ -70,6 +71,13 @@ const statusConfig: Record<string, StatusConfigItem> = {
     iconWrap: "bg-amber-50 border-amber-100",
     icon: AlertCircle,
     iconColor: "text-amber-700",
+  },
+  MUTUAL_RESOLUTION: {
+    label: "Mediation",
+    pill: "bg-amber-50 text-amber-900 border-amber-200 font-black",
+    iconWrap: "bg-amber-100 border-amber-200",
+    icon: Handshake,
+    iconColor: "text-amber-600",
   },
   RESOLVED: {
     label: "Resolved",
@@ -240,7 +248,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
   }, [role]);
 
   const counts = useMemo(() => {
-    const open = disputesData.filter((d) => d.status === "OPEN" || d.status === "open").length;
+    const open = disputesData.filter((d) => d.status === "OPEN" || d.status === "open" || d.status === "MUTUAL_RESOLUTION").length;
     const review = disputesData.filter(
       (d) => d.status === "UNDER_REVIEW" || d.status === "investigating",
     ).length;

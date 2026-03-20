@@ -39,65 +39,9 @@ const DATA: CountryNode[] = [
     chs: ["Bank Transfer", "Mobile Money"],
     region: "Africa",
   },
-  {
-    id: "ug",
-    country: "Uganda",
-    code: "UGX",
-    flag: "🇺🇬",
-    chs: ["Bank Transfer", "Mobile Money"],
-    region: "Africa",
-  },
-  {
-    id: "tz",
-    country: "Tanzania",
-    code: "TZS",
-    flag: "🇹🇿",
-    chs: ["Bank Transfer", "Mobile Money"],
-    region: "Africa",
-  },
-  {
-    id: "mw",
-    country: "Malawi",
-    code: "MWK",
-    flag: "🇲🇼",
-    chs: ["Bank Transfer", "Mobile Money"],
-    region: "Africa",
-  },
-  {
-    id: "bj",
-    country: "Benin",
-    code: "XOF",
-    flag: "🇧🇯",
-    chs: ["Mobile Money"],
-    region: "Africa",
-  },
-  {
-    id: "ci",
-    country: "Côte d'Ivoire",
-    code: "XOF",
-    flag: "🇨🇮",
-    chs: ["Mobile Money"],
-    region: "Africa",
-  },
-  {
-    id: "br",
-    country: "Brazil",
-    code: "BRL",
-    flag: "🇧🇷",
-    chs: ["Mobile (PIX)"],
-    region: "Americas",
-  },
-  {
-    id: "in",
-    country: "India",
-    code: "INR",
-    flag: "🇮🇳",
-    chs: ["Bank Transfer", "Mobile (UPI)"],
-    region: "Asia",
-  },
 ];
 
-const REGION_ORDER = ["Africa", "Asia", "Americas"];
+const REGION_ORDER = ["Africa"];
 
 export default function CoverageByRegion() {
   const grouped = useMemo(() => {
@@ -156,7 +100,7 @@ export default function CoverageByRegion() {
 
             <div className="mt-7 flex gap-8">
               <MiniStat label="Countries" value={stats.countries} />
-              <MiniStat label="Regions" value={stats.regions} />
+              <MiniStat label="Region" value={stats.regions} />
               <MiniStat label="Methods" value={stats.methods} />
             </div>
           </div>

@@ -250,7 +250,7 @@ export default function ClientDashboard() {
                             vault.freelancer?.email ||
                             "Unassigned freelancer"}
                         </p>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <span className=" font-bold  text-slate-600">
                             {vault.deliverables?.length || 0} deliverables
                           </span>

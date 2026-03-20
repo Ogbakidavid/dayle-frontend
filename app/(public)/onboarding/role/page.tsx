@@ -72,7 +72,7 @@ export default function RoleSelectionPage() {
                 !loading && handleSelect(UserRole.CLIENT);
               }
             }}
-            className={`group relative p-10 rounded-[40px] border transition-all cursor-pointer overflow-hidden ${
+            className={`group relative p-6 md:p-10 rounded-[24px] md:rounded-[40px] border transition-all cursor-pointer overflow-hidden ${
               loading === UserRole.CLIENT
                 ? "border-emerald-600 bg-emerald-50"
                 : "border-slate-200 bg-slate-50 hover:border-emerald-500/50 hover:bg-slate-100 shadow-sm hover:shadow-md"
@@ -82,11 +82,11 @@ export default function RoleSelectionPage() {
               <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-8 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all">
                 <Users className="w-8 h-8 text-emerald-600" />
               </div>
-              <h3 className="text-3xl font-bold text-slate-900 tracking-tight mb-4">
+              <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-4">
                 I&apos;m a client
               </h3>
 
-              <p className="text-slate-600 text-lg font-bold leading-relaxed mb-10 tracking-tight">
+              <p className="text-slate-600 text-base md:text-lg font-bold leading-relaxed mb-10 tracking-tight">
                 I want to hire contractors, create secure payment projects, and
                 release funds only after work is verified.
               </p>
@@ -115,7 +115,7 @@ export default function RoleSelectionPage() {
                 !loading && handleSelect(UserRole.FREELANCER);
               }
             }}
-            className={`group relative p-10 rounded-[40px] border transition-all cursor-pointer overflow-hidden ${
+            className={`group relative p-6 md:p-10 rounded-[24px] md:rounded-[40px] border transition-all cursor-pointer overflow-hidden ${
               loading === UserRole.FREELANCER
                 ? "border-emerald-600 bg-emerald-50"
                 : "border-slate-200 bg-slate-50 hover:border-emerald-500/50 hover:bg-slate-100 shadow-sm hover:shadow-md"
@@ -125,11 +125,11 @@ export default function RoleSelectionPage() {
               <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-8 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all">
                 <Briefcase className="w-8 h-8 text-emerald-600" />
               </div>
-              <h3 className="text-3xl font-bold text-slate-900 tracking-tight mb-4">
+              <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-4">
                 I&apos;m a contractor
               </h3>
 
-              <p className="text-slate-600 text-lg font-bold leading-relaxed mb-10 tracking-tight">
+              <p className="text-slate-600 text-base md:text-lg font-bold leading-relaxed mb-10 tracking-tight">
                 I want to work with verified clients and receive guaranteed,
                 escrow-protected payouts for my projects.
               </p>

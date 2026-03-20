@@ -241,7 +241,7 @@ export default function CreateVaultPage() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative w-full max-w-[95%] mx-auto px-6 py-12 lg:py-20">
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-20">
         {/* Header Section */}
         <header className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
@@ -287,8 +287,8 @@ export default function CreateVaultPage() {
 
         {/* Main Interface */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <main className="lg:col-span-8">
-            <div className="relative min-h-[500px] bg-background border border-white/5 rounded-3xl p-8 shadow-2xl backdrop-blur-xl overflow-hidden">
+          <main className="lg:col-span-8 w-full">
+            <div className="relative min-h-[400px] sm:min-h-[500px] bg-background border border-white/5 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-xl overflow-hidden">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={page}
@@ -436,9 +436,9 @@ export default function CreateVaultPage() {
                                     onClick={() =>
                                       handleRemoveDeliverable(deliverable.id)
                                     }
-                                    className="absolute -top-2 -right-2 p-1.5 bg-red-500/20 border border-red-500/30 rounded-lg text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white z-10"
+                                    className="absolute -top-2 -right-2 p-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-500 sm:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white z-10 shadow-lg"
                                   >
-                                    <Trash2 className="w-3 h-3" />
+                                    <Trash2 className="w-4 h-4" />
                                   </button>
                                 )}
 
@@ -466,6 +466,12 @@ export default function CreateVaultPage() {
                                         placeholder="Deliverable Title (e.g. Frontend UI Components)"
                                         className="bg-transparent! border-none! h-8 p-2 text-slate-900 text-sm font-medium st placeholder:text-slate-600/40 focus:ring-0! rounded-none"
                                       />
+                                      {deliverable.title.length > 0 && deliverable.title.length < 5 && (
+                                        <p className="text-[10px] text-amber-600 font-bold mt-1 flex items-center gap-1 px-2 animate-in fade-in slide-in-from-top-1">
+                                          <AlertCircle className="w-3 h-3" />
+                                          Add more detail — this helps protect you if a dispute arises.
+                                        </p>
+                                      )}
                                       <Textarea
                                         value={deliverable.description}
                                         onChange={(e) =>
@@ -479,11 +485,17 @@ export default function CreateVaultPage() {
                                         placeholder="Brief description of requirements... (Optional)"
                                         className="bg-transparent! border-white/5! min-h-[60px] p-3 text-sm text-slate-900 focus:border-emerald-500/30 rounded-xl leading-relaxed transition-all placeholder:text-slate-600/40"
                                       />
-                                      <div className="flex gap-2">
+                                      {deliverable.description.length > 0 && deliverable.description.length < 20 && (
+                                        <p className="text-[10px] text-amber-600 font-bold mt-1 flex items-center gap-1 px-2 animate-in fade-in slide-in-from-top-1">
+                                          <AlertCircle className="w-3 h-3" />
+                                          Add more detail — this helps protect you if a dispute arises.
+                                        </p>
+                                      )}
+                                      <div className="flex flex-wrap gap-2">
                                         {[
                                           { id: SubmissionType.FILE, label: "File Upload" },
                                           { id: SubmissionType.LINK, label: "Link/URL" },
-                                          { id: SubmissionType.BOTH, label: "Both Required" }
+                                          { id: SubmissionType.BOTH, label: "Both" }
                                         ].map((opt) => (
                                           <button
                                             key={opt.id}
@@ -572,9 +584,9 @@ export default function CreateVaultPage() {
                             <Label className="text-[12px] font-bold text-slate-900 st block">
                               Budget
                             </Label>
-                            <span className="text-xl font-bold text-slate-900 ">
-                              ${budget.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </span>
+                            <span className="text-lg sm:text-xl font-bold text-slate-900 ">
+                                  ${budget.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </span>
                           </div>
                           <div className="flex justify-between items-center">
                             <Label className="text-[12px] font-bold text-emerald-500 st block">
@@ -588,9 +600,9 @@ export default function CreateVaultPage() {
                             <Label className="text-[12px] font-bold text-slate-900 st block">
                               Total investment
                             </Label>
-                            <span className="text-2xl font-bold text-emerald-500 ">
-                              ${(budget / 0.97).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </span>
+                            <span className="text-xl sm:text-2xl font-bold text-emerald-500 ">
+                                  ${(budget / 0.97).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </span>
                           </div>
                           <p className="text-[10px] text-slate-900 font-bold opacity-60">
                             * Includes platform service fee for settlement & verification.

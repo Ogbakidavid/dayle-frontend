@@ -116,8 +116,8 @@ export interface ApiClient {
     addBank: (data: any) => Promise<any>;
     remove: (id: string) => Promise<any>;
     setDefault: (id: string) => Promise<any>;
-    getBanks: () => Promise<any[]>;
-    resolveBank: (bankCode: string, accountNumber: string) => Promise<any>;
+    getBanks: (currency?: string) => Promise<any[]>;
+    resolveBank: (bankCode: string, accountNumber: string, currency?: string) => Promise<any>;
   };
   vaults: {
     list: () => Promise<any[]>;
@@ -136,6 +136,10 @@ export interface ApiClient {
     listForVault: (vaultId: string) => Promise<any[]>;
     getById: (id: string) => Promise<any>;
     create: (payload: any) => Promise<any>;
+    proposeSettlement: (id: string, data: { amountToFreelancer: number; notes: string }) => Promise<any>;
+    acceptSettlement: (id: string) => Promise<any>;
+    requestTotalRefund: (id: string, data: { notes: string }) => Promise<any>;
+    requestTotalRelease: (id: string, data: { notes: string }) => Promise<any>;
   };
   invites: {
     getByToken: (token: string) => Promise<any>;
@@ -285,13 +289,14 @@ export const api: ApiClient = {
     setDefault: async (id: string): Promise<any> => {
       return await request(`/payment-methods/${id}/default`, { method: "POST" });
     },
-    getBanks: async (): Promise<any[]> => {
-      return await request("/payment-methods/banks");
+    getBanks: async (currency?: string): Promise<any[]> => {
+      const q = currency ? `?currency=${currency}` : "";
+      return await request(`/payment-methods/banks${q}`);
     },
-    resolveBank: async (bankCode: string, accountNumber: string): Promise<any> => {
+    resolveBank: async (bankCode: string, accountNumber: string, currency?: string): Promise<any> => {
       return await request("/payment-methods/resolve-bank", {
         method: "POST",
-        body: { bankCode, accountNumber },
+        body: { bankCode, accountNumber, currency },
       });
     },
   },
@@ -382,6 +387,31 @@ export const api: ApiClient = {
       return await request("/disputes", {
         method: "POST",
         body: payload,
+      });
+    },
+
+    proposeSettlement: async (id: string, data: { amountToFreelancer: number; notes: string }): Promise<any> => {
+      return await request(`/disputes/${id}/propose-settlement`, {
+        method: "POST",
+        body: data,
+      });
+    },
+
+    acceptSettlement: async (id: string): Promise<any> => {
+      return await request(`/disputes/${id}/accept-settlement`, {
+        method: "POST",
+      });
+    },
+    requestTotalRefund: async (id: string, data: { notes: string }): Promise<any> => {
+      return await request(`/disputes/${id}/request-total-refund`, {
+        method: "POST",
+        body: data,
+      });
+    },
+    requestTotalRelease: async (id: string, data: { notes: string }): Promise<any> => {
+      return await request(`/disputes/${id}/request-total-release`, {
+        method: "POST",
+        body: data,
       });
     },
   },

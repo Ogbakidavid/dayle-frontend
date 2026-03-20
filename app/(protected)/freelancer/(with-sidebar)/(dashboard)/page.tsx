@@ -243,9 +243,9 @@ export default function FreelancerDashboard() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1">
+                <div className="flex flex-col xs:flex-row items-center gap-4 sm:gap-6 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                  <div className="text-center sm:text-right">
+                    <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1 uppercase">
                       Project value
                     </p>
                     <p className="text-xl font-bold text-slate-900 tracking-tight ">
@@ -253,8 +253,8 @@ export default function FreelancerDashboard() {
                       {invite.vault?.formattedTotalAmount || "0.00"}
                     </p>
                   </div>
-                  <Link href={`/invite/${invite.token}`}>
-                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] h-10 px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/10">
+                  <Link href={`/invite/${invite.token}`} className="w-full xs:w-auto">
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] h-10 px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/10">
                       View invitation
                     </Button>
                   </Link>
@@ -357,7 +357,7 @@ export default function FreelancerDashboard() {
                             </span>
                           </p>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <span
                             className={cn(
                               "text-[10px] font-bold tracking-wide px-2 py-0.5 rounded-md",

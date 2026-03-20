@@ -76,8 +76,8 @@ export default function WithdrawPage() {
 
   // Get parameters from URL
   const amount = Number(searchParams.get("amount") || 0);
-  const [currency, setCurrency] = React.useState<"USD" | "NGN">("USD");
-  const EXCHANGE_RATE = 1500;
+  const [currency, setCurrency] = React.useState<"USD" | "NGN" | "GHS" | "KES">("USD");
+  const EXCHANGE_RATES = { USD: 1, NGN: 1500, GHS: 12.5, KES: 135 };
   const PROVIDER_FEE_PERCENT = 0.01; // 1%
   const APP_FEE_PERCENT = 0.005; // 0.5%
 
@@ -86,15 +86,14 @@ export default function WithdrawPage() {
   const totalFees = providerFee + appFee;
   const netSettlement = amount - totalFees;
 
-  const displayAmount =
-    currency === "USD" ? netSettlement : netSettlement * EXCHANGE_RATE;
-  const displayFees =
-    currency === "USD" ? totalFees : totalFees * EXCHANGE_RATE;
-  const displayProviderFee =
-    currency === "USD" ? providerFee : providerFee * EXCHANGE_RATE;
-  const displayAppFee = currency === "USD" ? appFee : appFee * EXCHANGE_RATE;
+  const currentRate = EXCHANGE_RATES[currency as keyof typeof EXCHANGE_RATES];
+  const displayAmount = netSettlement * currentRate;
+  const displayFees = totalFees * currentRate;
+  const displayProviderFee = providerFee * currentRate;
+  const displayAppFee = appFee * currentRate;
 
-  const currencyPrefix = currency === "USD" ? "$" : "₦";
+  const currencyPrefixes = { USD: "$", NGN: "₦", GHS: "GH₵", KES: "KSh" };
+  const currencyPrefix = currencyPrefixes[currency as keyof typeof currencyPrefixes];
 
   // Flow states
   const [step, setStep] = useState<Step>("method_selection");
@@ -131,16 +130,50 @@ export default function WithdrawPage() {
     { code: "NGA", name: "Nigeria", currencies: ["NGN", "USD"] },
     { code: "GHA", name: "Ghana", currencies: ["GHS", "USD"] },
     { code: "KEN", name: "Kenya", currencies: ["KES"] },
-    { code: "ZAF", name: "South Africa", currencies: ["ZAR"] },
   ];
   const currentCountryObj = countries.find((c) => c.code === selectedCountry);
 
   // Bank Details State
+  const [banks, setBanks] = useState<{ name: string; code: string }[]>([]);
   const [bankDetails, setBankDetails] = useState<BankDetails>({
     bankName: "",
     accountNumber: "",
     accountName: "",
   });
+
+  // Sync global currency with withdrawal selectedCurrency
+  useEffect(() => {
+    if (currency !== "USD") {
+      setSelectedCurrency(currency);
+      // Auto-update country based on currency
+      if (currency === "NGN") setSelectedCountry("NGA");
+      if (currency === "GHS") setSelectedCountry("GHA");
+      if (currency === "KES") setSelectedCountry("KEN");
+    }
+  }, [currency]);
+
+  const [isLoadingBanks, setIsLoadingBanks] = useState(false);
+
+  useEffect(() => {
+    async function fetchBanks() {
+      setIsLoadingBanks(true);
+      setBanks([]); // Clear previous banks to avoid "same listing" perception
+      try {
+        const data = await api.paymentMethods.getBanks(selectedCurrency);
+        setBanks(data);
+        // Reset bank details when currency/banks change
+        setBankDetails({ bankName: "", accountNumber: "", accountName: "" });
+      } catch (err) {
+        console.error("Failed to fetch banks:", err);
+      } finally {
+        setIsLoadingBanks(false);
+      }
+    }
+    if (step === "verification") {
+      fetchBanks();
+    }
+  }, [selectedCurrency, step]);
+
   const [isResolving, setIsResolving] = useState(false);
 
   // OTP State
@@ -242,18 +275,32 @@ export default function WithdrawPage() {
     useState<ProcessingStatus>("pending");
 
   // --- Verification Logic ---
-  const handleResolveAccount = () => {
+  const handleResolveAccount = async () => {
     if (!bankDetails.accountNumber || !bankDetails.bankName) return;
+    const selectedBank = banks.find((b) => b.name === bankDetails.bankName);
+    if (!selectedBank) return;
+
     setIsResolving(true);
-    // Simulate account resolution
-    setTimeout(() => {
-      setBankDetails((prev) => ({
-        ...prev,
-        accountName: "DEMILADE A. SKENOS",
-      }));
+    try {
+      const res = await api.paymentMethods.resolveBank(
+        selectedBank.code,
+        bankDetails.accountNumber,
+        selectedCurrency,
+      );
+      if (res && res.account_name) {
+        setBankDetails((prev) => ({
+          ...prev,
+          accountName: res.account_name,
+        }));
+        setShowOtp(true);
+      }
+    } catch (err: any) {
+      toast.error("Resolution Failed", {
+        description: err.message || "Could not resolve bank account details.",
+      });
+    } finally {
       setIsResolving(false);
-      setShowOtp(true);
-    }, 1500);
+    }
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -369,30 +416,27 @@ export default function WithdrawPage() {
 
             <div className="space-y-8">
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <p className=" font-bold text-slate-600 tracking-[0.4em]  leading-none uppercase">
-                    Net settlement
+                <div className="flex flex-col justify-between gap-2 items-start">
+                  <p className=" font-bold text-slate-600 tracking-wide leading-none ">
+                    Net Settlement
                   </p>
-                  <div className="flex bg-slate-200/50 p-1 rounded-lg">
-                    <button
-                      onClick={() => setCurrency("USD")}
-                      className={`px-3 py-1  font-bold r rounded-md transition-all uppercase ${currency === "USD" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-                    >
-                      USD
-                    </button>
-                    <button
-                      onClick={() => setCurrency("NGN")}
-                      className={`px-3 py-1  font-bold r rounded-md transition-all uppercase ${currency === "NGN" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-                    >
-                      NGN
-                    </button>
+                  <div className="flex bg-slate-200/50 p-1 rounded-lg gap-1">
+                    {["USD", "NGN", "GHS", "KES"].map((curr) => (
+                      <button
+                        key={curr}
+                        onClick={() => setCurrency(curr as any)}
+                        className={`px-3 py-1 text-[10px] sm:text-sm font-bold rounded-md transition-all uppercase ${currency === curr ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                      >
+                        {curr}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 <h1 className="text-4xl font-bold text-slate-900 tracking-tighter sm:text-3xl flex items-baseline gap-2">
                   <span className="text-emerald-600 font-bold text-2xl">
-                    {currency === "USD" ? "$" : "₦"}
+                    {currencyPrefix}
                   </span>
-                  {(currency === "USD" ? amount : amount * EXCHANGE_RATE).toLocaleString(undefined, {
+                  {(currency === "USD" ? amount : amount * EXCHANGE_RATES[currency as keyof typeof EXCHANGE_RATES]).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -419,7 +463,7 @@ export default function WithdrawPage() {
             </div>
           </div>
 
-          <div className="hidden lg:block p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
+          {/* <div className="hidden lg:block p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
             <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <div className="relative z-10">
               <div className="flex items-center gap-3 text-emerald-600  font-bold tracking-[0.3em] mb-3  uppercase">
@@ -429,7 +473,7 @@ export default function WithdrawPage() {
                 Select your preferred method to settle funds to your regional account.
               </p>
             </div>
-          </div>
+          </div> */}
         </aside>
 
         {/* MAIN CONTENT AREA */}
@@ -927,49 +971,28 @@ export default function WithdrawPage() {
                               }
                               className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all appearance-none cursor-pointer text-sm shadow-sm mt-2 "
                             >
-                              <option
-                                value=""
-                                disabled
-                                className="bg-white text-slate-400"
-                              >
-
-                                Select Provider
-                              </option>
-                              {[
-                                "Access Bank",
-                                "Fidelity Bank",
-                                "First Bank",
-                                "FCMB",
-                                "GTBank",
-                                "Heritage Bank",
-                                "Keystone Bank",
-                                "Opay",
-                                "Palmpay",
-                                "Polaris Bank",
-                                "Providus Bank",
-                                "Stanbic IBTC",
-                                "Standard Chartered",
-                                "Sterling Bank",
-                                "SunTrust Bank",
-                                "Union Bank",
-                                "UBA",
-                                "Unity Bank",
-                                "Wema Bank",
-                                "Zenith Bank",
-                                "Kuda Bank",
-                                "Moniepoint",
-                              ]
-                                .sort()
-                                .map((bank) => (
-                                  <option
-                                    key={bank}
-                                    value={bank}
-                                    className="bg-white font-sans text-slate-900"
-                                  >
-
-                                    {bank}
-                                  </option>
-                                ))}
+                                <option
+                                  value=""
+                                  disabled
+                                  className="bg-white text-slate-400"
+                                >
+                                  {isLoadingBanks ? "Loading Providers..." : "Select Provider"}
+                                </option>
+                              {banks?.length > 0 ? (
+                                banks
+                                  .sort((a, b) => a.name.localeCompare(b.name))
+                                  .map((bank) => (
+                                    <option
+                                      key={`${bank.code}-${bank.name}`}
+                                      value={bank.name}
+                                      className="bg-white font-sans text-slate-900"
+                                    >
+                                      {bank.name}
+                                    </option>
+                                  ))
+                              ) : (
+                                <option disabled>No banks found</option>
+                              )}
                             </select>
                             <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 pointer-events-none" />
                           </div>
@@ -1147,35 +1170,35 @@ export default function WithdrawPage() {
                           />
                         </>
                       )}
-                      <div className="space-y-4">
+                      <div className="space-y-4 px-6 pb-2">
                         <div className="flex justify-between items-center py-4 border-b border-slate-100">
-                          <span className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                          <span className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">
                             Gross Withdrawal
                           </span>
-                          <span className="text-slate-900 font-bold">
-                            ${amount.toFixed(2)}
+                          <span className="text-slate-900 font-bold text-sm">
+                            {currencyPrefix}{displayAmount.toFixed(2)}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-4 border-b border-slate-100">
-                          <span className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                          <span className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">
                             Total Fees (1.5%)
                           </span>
-                          <span className="text-emerald-600 font-bold">
-                            -${totalFees.toFixed(2)}
+                          <span className="text-emerald-600 font-bold text-sm">
+                            -{currencyPrefix}{displayFees.toFixed(2)}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-8">
-                          <span className="text-slate-900 font-bold uppercase tracking-wider text-sm">
+                          <span className="text-slate-900 font-bold uppercase tracking-[0.2em] text-xs">
                             Net Settlement
                           </span>
                           <div className="text-right">
                             <span className="text-4xl font-bold text-slate-900 st ">
-                              ${netSettlement.toLocaleString(undefined, {
+                              {currencyPrefix}{displayAmount.toLocaleString(undefined, {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               })}
                             </span>
-                            <p className=" text-slate-600 font-black st mt-1">
+                            <p className=" text-slate-400 font-black st mt-1 tracking-widest text-[10px] uppercase">
                               {selectedCurrency}
                             </p>
                           </div>
@@ -1366,7 +1389,7 @@ function SummaryItem({
   valueClassName?: string;
 }) {
   return (
-    <div className="flex justify-between items-center  font-bold tracking-tight text-slate-900 uppercase">
+    <div className="flex justify-between items-center  font-bold tracking-wide text-slate-900">
       <span className="text-slate-600 ">{label}</span>
       <div className="flex items-center gap-2">
         {icon}
@@ -1512,16 +1535,16 @@ function ReviewItem({
   highlight?: string;
 }) {
   return (
-    <div className="p-6 flex justify-between items-center group hover:bg-slate-50 transition-colors">
-      <span className=" font-bold text-slate-600 tracking-[0.3em]  uppercase">
+    <div className="p-6 flex justify-between items-start group hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
+      <span className=" font-bold text-slate-400 tracking-[0.2em]  uppercase text-[10px] mt-1 shrink-0">
         {label}
       </span>
-      <div className="text-right">
-        <p className={cn("font-bold text-slate-900 text-sm st ", highlight)}>
+      <div className="text-right max-w-[60%]">
+        <p className={cn("font-bold text-slate-900 text-sm st leading-snug ", highlight)}>
           {value}
         </p>
         {subValue && (
-          <p className="text-[9px] text-slate-600 font-bold mt-1.5 st  uppercase">
+          <p className="text-[10px] text-slate-400 font-bold mt-1.5 st  uppercase tracking-wider">
             {subValue}
           </p>
         )}

@@ -148,7 +148,7 @@ export default function LandingPage() {
             {/* Headline */}
             <motion.h1
               variants={fadeInUp}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[88px] font-bold tracking-tight leading-[1.05] md:leading-[1.09] mb-6 md:mb-8 text-slate-900"
+              className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[88px] font-bold tracking-tight leading-[1.05] md:leading-[1.09] mb-6 md:mb-8 text-slate-900"
             >
               Work starts when <br />
               funds are <span className="italic">locked.</span>
@@ -178,10 +178,10 @@ export default function LandingPage() {
                 >
                   <Button
                     size="lg"
-                    className="rounded-2xl px-8 md:px-12 h-14 md:h-20 font-bold text-base md:text-xl w-full shadow-xl group transition-all bg-emerald-600 text-white hover:bg-emerald-700"
+                    className="rounded-2xl px-6 sm:px-12 h-14 md:h-20 font-bold text-sm sm:text-base md:text-xl w-full shadow-xl group transition-all bg-emerald-600 text-white hover:bg-emerald-700"
                   >
-                    <span className="hidden sm:inline">Start a project</span>
-                    <span className="sm:hidden">Start project</span>
+                    <span className="hidden xs:inline">Start a project</span>
+                    <span className="xs:hidden">Start</span>
                     <ArrowRight className="ml-2 w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </motion.div>
@@ -194,9 +194,9 @@ export default function LandingPage() {
                 >
                   <Button
                     variant="ghost"
-                    className="rounded-2xl px-6 md:px-8 h-14 md:h-20 font-bold text-sm md:text-lg w-full sm:w-auto tracking-tight flex items-center justify-center gap-3 text-slate-900 hover:bg-white/5 border border-white/10"
+                    className="rounded-2xl px-4 sm:px-8 h-14 md:h-20 font-bold text-xs sm:text-sm md:text-lg w-full sm:w-auto tracking-tight flex items-center justify-center gap-3 text-slate-900 hover:bg-white/5 border border-white/10"
                   >
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-emerald-500/15 border border-emerald-500/20">
+                    <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-emerald-50/15 border border-emerald-50/20">
                       <Play className="w-4 h-4 md:w-5 md:h-5 text-emerald-500 fill-emerald-500" />
                     </div>
                     <span className="hidden sm:inline">Watch the demo</span>
@@ -266,7 +266,7 @@ export default function LandingPage() {
                     </h4>
                   </div>
                   <div className="bg-black/10 p-3 rounded-2xl">
-                    <DayleLogo className="w-10 h-10 text-emerald-500" />
+                    <DayleLogo className="w-10 h-10 text-white" />
                   </div>
                 </div>
                 <div className="bg-black/10 h-2 w-full rounded-full mb-6 overflow-hidden">
@@ -325,7 +325,7 @@ export default function LandingPage() {
               you.
             </h2>
             <p className="text-slate-900/80 font-semibold  text-sm">
-              A three-step workflow that creates payment certainty.
+              A four-step workflow that creates payment certainty.
             </p>
           </motion.div>
 
@@ -334,26 +334,32 @@ export default function LandingPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
-            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-14"
           >
             {[
               {
                 step: "01",
-                title: "Secured Funding",
-                desc: "The client locks the project budget upfront before work begins.",
-                icon: Box,
+                title: "Define the work",
+                desc: "A client creates a vault for a project. Before any money moves, they must define what 'done' looks like by creating a deliverables checklist (1-10 items).",
+                icon: ListChecks,
               },
               {
                 step: "02",
-                title: "Proof + Review",
-                desc: "Work is submitted against your deliverables checklist. You see exactly what was promised vs what was delivered — then you approve or request changes.",
-                icon: ShieldCheck,
+                title: "Lock Funds",
+                desc: "The client funds the vault. The fund is held in the settlement vault. Work starts only when funds are locked.",
+                icon: Lock,
               },
               {
                 step: "03",
-                title: "Controlled Release",
-                desc: "Once approved, funds are released from escrow to the contractor’s payout method.",
-                icon: Zap,
+                title: "Deliver the Work",
+                desc: "The freelancer submits work against the checklist. Each submission creates an immutable record with files and notes attached.",
+                icon: Rocket,
+              },
+              {
+                step: "04",
+                title: "Review & Settle",
+                desc: "The client reviews the submission. If satisfied, they release funds. Freelancer withdraws and funds arrive in their bank account in minutes.",
+                icon: CheckCircle2,
               },
             ].map((item, i) => (
               <motion.div
@@ -418,12 +424,12 @@ export default function LandingPage() {
       </section>
 
       {/* Who It's For */}
-      <section
+      {/* <section
         id="who"
         className="py-24 md:py-32 px-4 md:px-6 border-t border-slate-100 bg-white"
       >
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
+          Header
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -451,7 +457,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Right-side micro-proof */}
+            Right-side micro-proof
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 self-start lg:self-end">
               <div className="text-[11px] font-bold  text-slate-900">
                 Best for
@@ -462,7 +468,7 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          {/* Cards */}
+          Cards
           <motion.div
             variants={staggerContainer}
             initial="hidden"
@@ -495,7 +501,7 @@ export default function LandingPage() {
                 title: "Platforms (API)",
                 icon: Blocks,
                 bullets: [
-                  "Embed escrow logic",
+                  "Embed settlement logic",
                   "Automated payouts",
                   "Audit trail by default",
                 ],
@@ -507,7 +513,7 @@ export default function LandingPage() {
                 variants={fadeInUp}
                 className="group relative rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-white hover:border-emerald-500/20 transition-all shadow-sm hover:shadow-md"
               >
-                {/* subtle top accent */}
+                subtle top accent
                 <div className="absolute inset-x-0 top-0 h-[2px] bg-linear-to-r from-transparent via-emerald-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div className="p-6 md:p-8">
@@ -552,9 +558,71 @@ export default function LandingPage() {
             ))}
           </motion.div>
         </div>
-      </section>
+      </section> */}
 
       <Countries />
+
+      {/* Troubleshooting Section */}
+      <section className="py-24 md:py-32 px-4 md:px-6 bg-slate-50 border-t border-slate-100 overflow-hidden">
+        <div className="max-w-7xl mx-auto relative">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="rounded-[48px] bg-white border border-slate-200 p-8 md:p-16 lg:p-24 relative z-10"
+          >
+            <div className="flex flex-col xl:flex-row items-start gap-12 lg:gap-24">
+              <div className="flex-1 max-w-xl">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/10 bg-red-50 mb-6 font-bold text-red-600 text-[11px] md:text-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                  Protection Layer
+                </div>
+                <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight mb-8">
+                  What Happens When <br />
+                  <span className="text-red-500 italic">Things Go Wrong</span>
+                </h2>
+                <div className="space-y-10">
+                  <div>
+                    <h4 className="text-xl font-bold text-slate-900 mb-2 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm">A</div>
+                      Client requests changes
+                    </h4>
+                    <p className="text-slate-600 text-sm md:text-base font-medium leading-relaxed">
+                      Communicate refinements offline (no built-in chat). Once ready, the freelancer submits a new collection of work for review.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-slate-900 mb-2 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm">B</div>
+                      Disagreement about scope
+                    </h4>
+                    <p className="text-slate-600 text-sm md:text-base font-medium leading-relaxed">
+                      Either party can open a dispute. A human mediator reviews the deliverables checklist and submission timeline to make an evidence-based decision.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="lg:w-[400px] shrink-0">
+                <div className="p-8 rounded-[40px] bg-slate-50 border border-slate-200 space-y-6">
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Dispute Grounds</div>
+                  {[
+                    "Integrity & Security",
+                    "Scope & Requirements",
+                    "Bad Faith & Cooperation",
+                    "Protocol & Technical Error"
+                  ].map((ground) => (
+                    <div key={ground} className="flex items-center gap-3 py-2 border-b border-slate-200 last:border-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                      <span className="text-sm font-bold text-slate-700">{ground}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
       {/* Feature Matrix */}
       <section className="py-24 md:py-32 px-4 md:px-6 border-t border-slate-100 bg-slate-50">
         <div className="max-w-7xl mx-auto">
@@ -563,11 +631,11 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14 md:mb-20"
+            className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14 md:mb-20"
           >
             <div className="max-w-2xl">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-none mb-5 text-slate-900">
-                Escrow that works <br />
+                Settlement that works <br />
                 <span className="text-emerald-500"> the way you expect.</span>
               </h2>
               <p className="text-slate-600 text-sm md:text-base font-medium leading-relaxed">
@@ -589,7 +657,7 @@ export default function LandingPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
+            className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6"
           >
             {[
               {
@@ -598,7 +666,7 @@ export default function LandingPage() {
                 icon: Layers,
               },
               {
-                title: "Escrow Controls",
+                title: "Settlement Controls",
                 desc: "Release capital only after objective proof and client approval.",
                 icon: ListChecks,
               },
@@ -691,7 +759,7 @@ export default function LandingPage() {
             <div className="space-y-4">
               {[
                 {
-                  title: "Escrow-Locked Settlement",
+                  title: "Vault-Locked Settlement",
                   icon: Layers,
                   desc: "Funds remain isolated until predefined approval conditions are met.",
                 },
@@ -755,7 +823,7 @@ export default function LandingPage() {
                   Common <span className="text-emerald-600">questions.</span>
                 </h2>
                 <p className="mt-3 text-slate-600 text-sm md:text-base leading-relaxed max-w-2xl">
-                  Everything you need to know about how Dayle’s escrow workflow
+                  Everything you need to know about how Dayle’s settlement workflow
                   works — funding, approvals, payouts, and disputes.
                 </p>
               </div>

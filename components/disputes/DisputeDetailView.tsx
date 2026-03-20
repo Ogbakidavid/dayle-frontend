@@ -9,6 +9,8 @@ import { DISPUTE_REASON_CODES } from "@/lib/rules/disputes";
 import { ChevronLeft, Gavel, FileText, Link2, MessageSquare, X, CheckCircle2, Loader2, ShieldAlert, User, AlertCircle } from "lucide-react";
 import type { Vault } from "@/lib/store/vault-context";
 import { toast } from "sonner";
+import { MediationRoom } from "./MediationRoom";
+import { DisputeStatus } from "@/lib/domain/enums";
 
 interface DisputeEvent {
   type: string;
@@ -70,22 +72,23 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
     }
   }
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const d = await api.disputes.getById(disputeId);
-        setDispute(d);
-        if (d) {
-          const v = await api.vaults.getById(d.vaultId);
-          setVault(v);
-          await loadEvidence(d.vaultId, d.id);
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
+  async function load() {
+    try {
+      const d = await api.disputes.getById(disputeId);
+      setDispute(d);
+      if (d) {
+        const v = await api.vaults.getById(d.vaultId);
+        setVault(v);
+        await loadEvidence(d.vaultId, d.id);
       }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
     load();
   }, [disputeId]);
 
@@ -286,7 +289,16 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
         </div>
       )}
 
-      {/* Back */}
+      {/* Mediation Room */}
+      {dispute.status === DisputeStatus.MUTUAL_RESOLUTION && (
+        <MediationRoom 
+          dispute={dispute} 
+          vault={vault} 
+          role={role} 
+          onUpdate={load} 
+        />
+      )}
+
       <div>
         <Link
           href={`/${role}/disputes`}

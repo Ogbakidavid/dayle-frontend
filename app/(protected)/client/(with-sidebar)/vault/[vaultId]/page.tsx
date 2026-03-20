@@ -294,7 +294,7 @@ export default function ClientVaultDetailPage() {
   return (
     <>
       <div className="min-h-screen bg-white text-slate-600 font-sans selection:bg-emerald-500/30 pb-20">
-        <div className="max-w-6xl mx-auto px-6 space-y-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
           {/* SUCCESS ALERT */}
           {showSuccess && (
             <div className="fixed top-8 right-8 z-50 animate-in slide-in-from-right-10 fade-in duration-300">
@@ -358,7 +358,7 @@ export default function ClientVaultDetailPage() {
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-4xl font-bold text-slate-900 tracking-tighter ">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
                     {vault.title}
                   </h1>
                   <Badge
@@ -402,14 +402,14 @@ export default function ClientVaultDetailPage() {
                 </div>
               </div>
 
-              <div className="text-right p-6 rounded-2xl bg-slate-50 border border-slate-200 shadow-xl min-w-[240px]">
+              <div className="text-left md:text-right p-4 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 shadow-xl min-w-0 sm:min-w-[240px]">
                 <p className="text-sm text-slate-600 font-bold  mb-1 uppercase">
                   Total secured value
                 </p>
                 <p className="text-4xl font-bold text-slate-900 st ">
                   ${vault.formattedTotalAmount || "0.00"}
                 </p>
-                <div className="mt-2 flex items-center justify-end gap-2">
+                <div className="mt-2 flex items-center justify-start md:justify-end gap-2">
                   <div
                     className={cn(
                       "w-1.5 h-1.5 rounded-full shadow-sm",
@@ -539,7 +539,7 @@ export default function ClientVaultDetailPage() {
                                       {item.description}
                                     </p>
                                   )}
-                                  <div className="flex gap-2 mt-2">
+                                  <div className="flex flex-wrap gap-2 mt-2">
                                     {item.submissionType === 'FILE' && (
                                       <Badge variant="outline" className="text-[9px] bg-slate-50 text-slate-400 border-slate-200 flex items-center gap-1">
                                         <FileIcon className="w-2.5 h-2.5" /> File required
@@ -667,7 +667,7 @@ export default function ClientVaultDetailPage() {
                             key={sub.id}
                             onClick={() => toggleSubmission(sub.id)}
                             className={cn(
-                              "relative p-6 rounded-2xl border transition-all duration-500 cursor-pointer group overflow-hidden shadow-sm",
+                              "relative p-4 sm:p-6 rounded-2xl border transition-all duration-500 cursor-pointer group overflow-hidden shadow-sm",
                               isSelected
                                 ? "bg-emerald-50 border-emerald-200 ring-1 ring-emerald-500/10"
                                 : "bg-slate-50/50 border-slate-100 hover:border-slate-200 hover:bg-slate-50",
@@ -1017,7 +1017,7 @@ export default function ClientVaultDetailPage() {
       <Sheet open={showRefundModal} onOpenChange={setShowRefundModal}>
         <SheetContent
           side="right"
-          className="bg-white border-slate-200 text-slate-900 w-[400px] sm:w-[540px] shadow-2xl"
+          className="bg-white border-slate-200 text-slate-900 w-full sm:w-[540px] shadow-2xl"
         >
           <SheetHeader>
             <SheetTitle className="text-2xl font-bold tracking-tighter text-slate-900 ">

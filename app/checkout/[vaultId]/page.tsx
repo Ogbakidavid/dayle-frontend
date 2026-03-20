@@ -27,8 +27,8 @@ export default function CheckoutSelectionPage() {
 
   const [localVault, setLocalVault] = React.useState<Vault | null>(null);
   const [fetching, setFetching] = React.useState(false);
-  const [currency, setCurrency] = React.useState<"USD" | "NGN">("USD");
-  const EXCHANGE_RATE = 1500;
+  const [currency, setCurrency] = React.useState<"USD" | "NGN" | "GHS" | "KES">("USD");
+  const EXCHANGE_RATES = { USD: 1, NGN: 1500, GHS: 12.5, KES: 135 };
 
   const fetchVault = React.useCallback(async () => {
     setFetching(true);
@@ -55,8 +55,9 @@ export default function CheckoutSelectionPage() {
   const amount = vault?.formattedTotalAmount
     ? Number(vault.formattedTotalAmount)
     : 0;
-  const displayAmount = currency === "USD" ? amount : amount * EXCHANGE_RATE;
-  const currencyPrefix = currency === "USD" ? "$" : "₦";
+  const displayAmount = amount * EXCHANGE_RATES[currency as keyof typeof EXCHANGE_RATES];
+  const currencyPrefixes = { USD: "$", NGN: "₦", GHS: "GH₵", KES: "KSh" };
+  const currencyPrefix = currencyPrefixes[currency as keyof typeof currencyPrefixes];
 
   return (
     <div className="min-h-screen bg-white text-slate-600 font-primary antialiased">
@@ -80,25 +81,22 @@ export default function CheckoutSelectionPage() {
 
             <div className="space-y-10">
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <p className=" font-bold text-slate-600 tracking-[0.4em]  leading-none uppercase">
-                    Total settlement
-                  </p>
-                  <div className="flex bg-slate-200/50 p-1 rounded-lg">
-                    <button
-                      onClick={() => setCurrency("USD")}
-                      className={`px-3 py-1  font-bold r rounded-md transition-all uppercase ${currency === "USD" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-                    >
-                      USD
-                    </button>
-                    <button
-                      onClick={() => setCurrency("NGN")}
-                      className={`px-3 py-1  font-bold r rounded-md transition-all uppercase ${currency === "NGN" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-                    >
-                      NGN
-                    </button>
+                <div className="flex flex-col gap-2 justify-between items-start">
+                    <p className=" font-bold text-slate-600 tracking-wide leading-none uppercase">
+                      Total settlement
+                    </p>
+                    <div className="flex bg-slate-200/50 p-1 rounded-lg flex-wrap gap-1">
+                      {["USD", "NGN", "GHS", "KES"].map((curr) => (
+                        <button
+                          key={curr}
+                          onClick={() => setCurrency(curr as any)}
+                          className={`px-3 py-1 text-[10px] font-bold r rounded-md transition-all uppercase ${currency === curr ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                        >
+                          {curr}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
                 <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-4xl  flex items-baseline gap-2">
                   <span className="text-emerald-600 font-bold text-2xl">
                     {currencyPrefix}
@@ -125,18 +123,6 @@ export default function CheckoutSelectionPage() {
                   <span className="text-emerald-600 ">Sponsored</span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
-            <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 text-emerald-600  font-bold tracking-[0.3em] mb-3  uppercase">
-                <ShieldCheck className="w-4 h-4" /> Secure checkout
-              </div>
-              <p className=" text-slate-600 leading-relaxed font-bold st mt-2  uppercase">
-                Select your preferred method to complete the secure vault deposit.
-              </p>
             </div>
           </div>
         </section>
