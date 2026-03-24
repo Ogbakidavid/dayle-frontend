@@ -59,9 +59,9 @@ function KYCPageContent() {
               Verify your identity
             </h1>
             <p className="text-sm text-slate-600 font-medium">
-              We&apos;ve partnered with Didit to provide bank-grade identity
-              verification. Unlock full access to funding and withdrawals in
-              under 60 seconds.
+              We&apos;ve partnered with Didit for bank-grade identity verification. 
+              Submit your BVN/Phone (Tier 1) to fund projects. Complete full 
+              identity verification (Tier 2) to unlock fund releases and withdrawals.
             </p>
           </div>
 

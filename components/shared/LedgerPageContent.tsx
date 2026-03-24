@@ -16,6 +16,7 @@ import { LedgerBalance } from "./LedgerBalance";
 import { Transaction, useLedger } from "@/lib/store/ledger-context";
 import { TransactionStatus } from "@/lib/domain/enums";
 import { cn } from "@/lib/utils";
+import { CurrencyEstimate } from "./currency-estimate";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -162,11 +163,11 @@ export default function LedgerPageContent() {
                   <form onSubmit={handleWithdraw} className="space-y-8">
                     <div>
                       <label className="text-sm font-bold text-slate-900  mb-4 block">
-                        Amount (USD)
+                        Withdrawal amount
                       </label>
                       <div className="relative group">
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-bold text-slate-900 group-focus-within:text-emerald-600 transition-colors">
-                          $
+                          ≈
                         </span>
                         <input
                           type="number"
@@ -178,11 +179,22 @@ export default function LedgerPageContent() {
                           step="0.01"
                         />
                       </div>
+                      {parseFloat(withdrawAmount) > 0 && (
+                        <div className="mt-2 text-sm font-bold">
+                          <CurrencyEstimate 
+                            usdAmount={parseFloat(withdrawAmount)} 
+                            className="text-slate-900" 
+                            showNote={false}
+                          />
+                        </div>
+                      )}
                       <div className="mt-4 flex items-center justify-between text-sm font-bold ">
                         <span className="text-slate-600">Available Limit</span>
-                        <span className="text-emerald-600">
-                          ${parseFloat(balance?.formattedAvailable || balance?.available || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
+                        <CurrencyEstimate 
+                          usdAmount={parseFloat(balance?.formattedAvailable || balance?.available || "0")} 
+                          className="text-emerald-600 text-sm font-bold"
+                          showNote={false}
+                        />
                       </div>
                     </div>
 
@@ -326,14 +338,18 @@ export default function LedgerPageContent() {
                         <td className="px-4 md:px-6 py-6 text-right">
                           <div
                             className={cn(
-                              "text-base md:text-lg font-bold tracking-tight",
+                              "text-base md:text-lg font-bold tracking-tight flex items-center justify-end gap-1",
                               tx.amount < 0
                                 ? "text-slate-900"
                                 : "text-emerald-600",
                             )}
                           >
-                            {tx.amount < 0 ? "-" : "+"}$
-                            {Math.abs(formatAmount(tx.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            <span>{tx.amount < 0 ? "-" : "+"}</span>
+                            <CurrencyEstimate 
+                              usdAmount={Math.abs(formatAmount(tx.amount))} 
+                              className={tx.amount < 0 ? "text-slate-900" : "text-emerald-600"} 
+                              showNote={false}
+                            />
                           </div>
                         </td>
                       </tr>

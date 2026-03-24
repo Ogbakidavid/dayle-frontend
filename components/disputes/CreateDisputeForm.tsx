@@ -29,6 +29,8 @@ import {
 
 import { getDisputeEligibility } from "@/lib/rules/disputes";
 import { api } from "@/lib/api-client";
+import { useUser } from "@/lib/store/user-context";
+import { KycStatus } from "@/lib/domain/enums";
 import type { Vault } from "@/lib/store/vault-context";
 
 const MAX_FILE_MB = 10;
@@ -112,6 +114,7 @@ export function CreateDisputeForm({
   initialVaultId,
 }: CreateDisputeFormProps) {
   const router = useRouter();
+  const { user } = useUser();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [selectedVaultId, setSelectedVaultId] = useState(initialVaultId || "");
@@ -174,6 +177,7 @@ export function CreateDisputeForm({
     Boolean(selectedReasonCode) &&
     Boolean(description.trim()) &&
     (!requiresDeliverableRef || Boolean(selectedDeliverableTitle)) &&
+    user?.kycStatus === KycStatus.VERIFIED &&
     !isSubmitting;
 
   const resetDownstream = useCallback(() => {
@@ -497,6 +501,29 @@ export function CreateDisputeForm({
                   eligibility?.reason || "Eligibility could not be determined."
                 }
               />
+
+              {user?.kycStatus !== KycStatus.VERIFIED && (
+                <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-amber-900">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="mt-0.5 h-4 w-4 text-amber-600" />
+                    <div className="space-y-1">
+                      <p className="font-bold">Tier 2 Verification Required</p>
+                      <p className="text-amber-700/80 leading-relaxed font-bold">
+                        To maintain project security, you must complete full identity 
+                        verification (Tier 2) before initiating a dispute.
+                      </p>
+                      <Button 
+                        variant="link" 
+                        size="sm" 
+                        className="h-auto p-0 text-amber-600 font-bold hover:text-amber-700"
+                        onClick={() => router.push('/onboarding/kyc')}
+                      >
+                        Complete Verification
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Requirement (conditional: depends on selected reason code) */}
               {eligibility?.eligible &&

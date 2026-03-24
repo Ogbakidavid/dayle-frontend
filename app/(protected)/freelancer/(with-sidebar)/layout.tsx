@@ -149,7 +149,6 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
           })}
         </nav>
 
-
         <div className="p-4 border-t border-slate-200 mt-auto">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
             <div className="relative group">
@@ -186,7 +185,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
               </Button>
-              {(hasUnread || 
+              {(hasUnread ||
                 user?.kycStatus === "NONE" ||
                 user?.kycStatus === "REJECTED") && (
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -220,9 +219,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
           >
             <Menu className="w-5 h-5" />
           </Button>
-          <h1 className="text-lg font-bold font-primary">
-            Dayle
-          </h1>
+          <h1 className="text-lg font-bold font-primary">Dayle</h1>
           <div className="w-9" /> {/* Spacer for centering */}
         </div>
 
@@ -230,7 +227,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
         <main className="flex-1 overflow-y-auto bg-[#F8F9FA] relative">
           {/* Subtle Noise Texture for Premium Feel */}
           <div className="absolute inset-0 z-0 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02]"></div>
-          
+
           <div className="relative z-10 p-4 lg:p-8">
             <div className="max-w-7xl mx-auto">{children}</div>
           </div>

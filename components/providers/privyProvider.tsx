@@ -16,6 +16,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       }
       config={{
         defaultChain: celoSepolia,
+        // Celo Sepolia is our primary testnet for identity-linked payments
         supportedChains: [celoSepolia],
         // Disable auto-creation of embedded wallets to hide the modal.
         // We will manually trigger creation in the background (silent).

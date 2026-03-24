@@ -13,6 +13,7 @@ import {
   User,
   Mail,
   Lock,
+  Globe,
 } from "lucide-react";
 import { DayleLogo } from "@/components/shared/DayleLogo";
 import { Label } from "@/components/ui/label";
@@ -91,7 +92,7 @@ export default function SignupPage() {
   const { refreshUser, user: backendUser } = useUser();
   const returnTo = searchParams.get("returnTo");
 
-  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [formData, setFormData] = useState({ name: "", email: "", country: "NG" });
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false); // General loading state for UI
@@ -181,7 +182,8 @@ export default function SignupPage() {
         const freshRole = freshUser?.role;
 
         if (freshRole && freshRole !== UserRole.NONE) {
-          router.push(freshRole === "CLIENT" ? "/client" : "/freelancer");
+          // Check if identity is set (we can assume if they just signed up, it's not)
+          router.push("/onboarding/identity");
         } else {
           router.push("/onboarding/role");
         }
@@ -221,8 +223,13 @@ export default function SignupPage() {
     e.preventDefault();
     setError("");
 
-    if (!formData.email || !formData.name) {
+    if (!formData.email || !formData.name || !formData.country) {
       setError("Please fill in all fields.");
+      return;
+    }
+
+    if (formData.country !== "NG" && formData.country !== "KE") {
+      setError("Dayle is currently available in Nigeria and Kenya. We're expanding soon.");
       return;
     }
 
@@ -296,11 +303,11 @@ export default function SignupPage() {
             {[
               {
                 title: "Capital Security",
-                text: "Funds are held in isolated, insured escrow accounts.",
+                text: "Funds are held in isolated, insured vault accounts.",
               },
               {
                 title: "Automated Payouts",
-                text: "Escrow-based fund release upon completion.",
+                text: "Settlement-based release upon completion.",
               },
               {
                 title: "Verified Solvency",
@@ -390,6 +397,40 @@ export default function SignupPage() {
                       className="bg-slate-50! border-slate-200 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-600"
                     />
                     <Mail className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="country"
+                    className="text-sm font-bold  text-slate-700 ml-1"
+                  >
+                    Country
+                  </Label>
+                  <div className="relative group">
+                    <select
+                      id="country"
+                      name="country"
+                      value={formData.country}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData({ ...formData, country: val });
+                        if (val !== "NG" && val !== "KE") {
+                          setError("Dayle is currently available in Nigeria and Kenya. We're expanding soon.");
+                        } else {
+                          setError("");
+                        }
+                      }}
+                      required
+                      className="w-full bg-slate-50! border-slate-200 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg appearance-none outline-none"
+                    >
+                      <option value="NG">Nigeria</option>
+                      <option value="KE">Kenya</option>
+                      <option value="GH">Ghana</option>
+                      <option value="ZA">South Africa</option>
+                      <option value="OTHER">Other</option>
+                    </select>
+                    <Globe className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                   </div>
                 </div>
 

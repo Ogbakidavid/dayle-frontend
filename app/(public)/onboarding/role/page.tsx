@@ -27,7 +27,8 @@ export default function RoleSelectionPage() {
         if (token) {
           await api.onboarding.setRole(role);
           await refreshUser(token);
-          router.push(role === UserRole.CLIENT ? "/client" : "/freelancer");
+          // Redirect to identity verification step before dashboard
+          router.push("/onboarding/identity");
           return;
         }
       }
@@ -131,7 +132,7 @@ export default function RoleSelectionPage() {
 
               <p className="text-slate-600 text-base md:text-lg font-bold leading-relaxed mb-10 tracking-tight">
                 I want to work with verified clients and receive guaranteed,
-                escrow-protected payouts for my projects.
+                settlement-protected payouts for my projects.
               </p>
               <Button
                 variant="ghost"

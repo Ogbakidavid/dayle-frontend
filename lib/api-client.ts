@@ -112,7 +112,6 @@ export interface ApiClient {
   };
   paymentMethods: {
     list: () => Promise<any[]>;
-    addCard: (data: any) => Promise<any>;
     addBank: (data: any) => Promise<any>;
     remove: (id: string) => Promise<any>;
     setDefault: (id: string) => Promise<any>;
@@ -130,6 +129,9 @@ export interface ApiClient {
     updateStatus: (id: string, status: string) => Promise<any>;
     requestRefund: (vaultId: string, data: any) => Promise<any>;
     updateFreelancer: (vaultId: string, data: any) => Promise<any>;
+    getStatus: (id: string) => Promise<any>;
+    withdraw: (vaultId: string, data: { accountNumber: string, bankCode: string, accountName: string }) => Promise<any>;
+    mockDeposit: (vaultId: string, data: { amount?: number, accountName?: string }) => Promise<any>;
   };
   disputes: {
     list: () => Promise<any[]>;
@@ -150,9 +152,16 @@ export interface ApiClient {
   };
   onboarding: {
     setRole: (role: string) => Promise<any>;
+    submitIdentity: (data: any) => Promise<any>;
+    verifyIdentity: (data: any) => Promise<any>;
     submitKyc: (kycData: any) => Promise<any>;
     getStatus: () => Promise<any>;
     getDiditSession: () => Promise<{ sessionId: string; url: string }>;
+    devBypassIdentity: () => Promise<any>;
+  };
+  rates: {
+    getDisplayRate: (currency: string, amount: number) => Promise<any>;
+    getTransactionRate: (currency: string, amount: number, vaultId: string, type: 'funding' | 'withdrawal') => Promise<any>;
   };
   evidence: {
     list: (params?: { vaultId?: string; disputeId?: string }) => Promise<any[]>;
@@ -181,6 +190,8 @@ export interface ApiClient {
     getDownloadUrl: (key: string) => Promise<{ url: string }>;
   };
 }
+
+const pendingRateRequests = new Map<string, Promise<any>>();
 
 export const api: ApiClient = {
   auth: {
@@ -271,12 +282,6 @@ export const api: ApiClient = {
     list: async (): Promise<any[]> => {
       return await request("/payment-methods");
     },
-    addCard: async (data: any): Promise<any> => {
-      return await request("/payment-methods/card", {
-        method: "POST",
-        body: data,
-      });
-    },
     addBank: async (data: any): Promise<any> => {
       return await request("/payment-methods/bank", {
         method: "POST",
@@ -363,6 +368,21 @@ export const api: ApiClient = {
     updateFreelancer: async (vaultId: string, data: any): Promise<any> => {
       return await request(`/vaults/${vaultId}/update-freelancer`, {
         method: "PATCH",
+        body: data,
+      });
+    },
+    getStatus: async (id: string): Promise<any> => {
+      return await request(`/vaults/${id}/status`);
+    },
+    withdraw: async (vaultId: string, data: any): Promise<any> => {
+      return await request(`/vaults/${vaultId}/withdraw`, {
+        method: "POST",
+        body: data,
+      });
+    },
+    mockDeposit: async (vaultId: string, data: any): Promise<any> => {
+      return await request(`/vaults/${vaultId}/mock-deposit`, {
+        method: "POST",
         body: data,
       });
     },
@@ -456,6 +476,26 @@ export const api: ApiClient = {
       });
     },
 
+    submitIdentity: async (data: any): Promise<any> => {
+      return await request("/onboarding/identity", {
+        method: "POST",
+        body: data,
+      });
+    },
+    
+    verifyIdentity: async (data: any): Promise<any> => {
+      return await request("/onboarding/verify-identity", {
+        method: "POST",
+        body: data,
+      });
+    },
+
+    devBypassIdentity: async (): Promise<any> => {
+      return await request("/onboarding/dev-bypass-identity", {
+        method: "POST",
+      });
+    },
+
     submitKyc: async (kycData: any): Promise<any> => {
       return await request("/onboarding/kyc", {
         method: "POST",
@@ -469,6 +509,29 @@ export const api: ApiClient = {
 
     getDiditSession: async (): Promise<{ sessionId: string; url: string }> => {
       return await request("/onboarding/didit/session");
+    },
+  },
+  rates: {
+    getDisplayRate: async (currency: string, amount: number): Promise<any> => {
+      const cacheKey = currency.toUpperCase();
+      
+      // If a request for this currency is already pending, reuse that promise
+      if (pendingRateRequests.has(cacheKey)) {
+        return pendingRateRequests.get(cacheKey);
+      }
+
+      const q = `?currency=${currency}&amount=${amount}`;
+      const promise = request(`/rates/display${q}`).finally(() => {
+        // Remove from pending map once resolved or rejected
+        pendingRateRequests.delete(cacheKey);
+      });
+
+      pendingRateRequests.set(cacheKey, promise);
+      return promise;
+    },
+    getTransactionRate: async (currency: string, amount: number, vaultId: string, type: 'funding' | 'withdrawal'): Promise<any> => {
+      const q = `?currency=${currency}&amount=${amount}&vaultId=${vaultId}&type=${type}`;
+      return await request(`/rates/transaction${q}`);
     },
   },
 

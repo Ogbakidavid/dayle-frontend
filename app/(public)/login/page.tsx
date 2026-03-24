@@ -203,11 +203,11 @@ export default function LoginPage() {
             {[
               {
                 title: "Capital Security",
-                text: "Funds are held in isolated, insured escrow accounts.",
+                text: "Funds are held in isolated, insured vault accounts.",
               },
               {
                 title: "Automated Payouts",
-                text: "Escrow-based fund release upon completion.",
+                text: "Settlement-based release upon completion.",
               },
               {
                 title: "Verified Solvency",

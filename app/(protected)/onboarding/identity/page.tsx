@@ -1,0 +1,339 @@
+"use client";
+
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { api } from "@/lib/api-client";
+import { useUser } from "@/lib/store/user-context";
+import { DayleLogo } from "@/components/shared/DayleLogo";
+import { DotLoader } from "@/components/ui/dot-loader";
+import { ShieldCheck, Phone, Info, ArrowRight, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
+
+export default function IdentityOnboardingPage() {
+  const router = useRouter();
+  const { user, refreshUser, loading: authLoading } = useUser();
+  const [step, setStep] = useState<"country" | "form" | "success">(user?.country ? "form" : "country");
+  const [selectedCountry, setSelectedCountry] = useState(user?.country || "");
+  const [loading, setLoading] = useState(false);
+  const [val, setVal] = useState("");
+  const [error, setError] = useState("");
+  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login");
+    }
+    // If identity is already set, skip this page
+    if ((user?.bvn || user?.phoneNumber) && step !== "success") {
+        router.push(user.role === "CLIENT" ? "/client" : "/freelancer");
+    }
+  }, [user, authLoading, router, step]);
+
+  const handleCountrySelect = async (c: string) => {
+    setLoading(true);
+    try {
+        await api.auth.updateProfile({ country: c });
+        await refreshUser();
+        setSelectedCountry(c);
+        setStep("form");
+        setLoading(false);
+    } catch (err: any) {
+        console.error(err);
+        toast.error("Failed to set country. Please try again.");
+        setLoading(false);
+    }
+  };
+
+  const validate = (value: string) => {
+    const c = selectedCountry || user?.country;
+    if (c === "Nigeria" || c === "NG") {
+      if (!/^\d{11}$/.test(value)) {
+        return "BVN must be exactly 11 digits.";
+      }
+    } else if (c === "Kenya" || c === "KE") {
+      if (!/^\d{9}$/.test(value)) {
+        return "Phone number must be exactly 9 digits after +254.";
+      }
+    }
+    return "";
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    const validationError = validate(val);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const c = selectedCountry || user?.country;
+      const payload: any = { country: c };
+      if (c === "Nigeria" || c === "NG") {
+        payload.bvn = val;
+      } else {
+        payload.phoneNumber = `+254${val}`;
+      }
+
+      await api.onboarding.submitIdentity(payload);
+      await refreshUser();
+      
+      setStep("success");
+    } catch (err: any) {
+      console.error(err);
+      if (err.data?.attemptsRemaining !== undefined) {
+          setAttemptsRemaining(err.data.attemptsRemaining);
+      }
+      setError(err.message || "Failed to submit identity. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const currentCountry = selectedCountry || user?.country;
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ""); // Only numeric
+    if (currentCountry === "Nigeria" || currentCountry === "NG") {
+      if (value.length <= 11) setVal(value);
+    } else {
+      if (value.length <= 9) setVal(value);
+    }
+  };
+
+  if (authLoading) return <div className="min-h-screen flex items-center justify-center"><DotLoader /></div>;
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 font-primary">
+      {/* Background Decor */}
+      <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+
+      <div className="relative z-10 w-full max-w-xl">
+        <div className="flex justify-center mb-12">
+          <DayleLogo className="w-16 h-16 text-emerald-500" />
+        </div>
+
+        <div className="bg-white border border-slate-200 p-8 sm:p-12 rounded-[40px] shadow-sm relative overflow-hidden">
+          {/* Suble glow inside card */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/5 blur-[60px] rounded-full pointer-events-none"></div>
+
+          {loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center"
+            >
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, -5, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <DayleLogo className="w-16 h-16 text-emerald-500" />
+              </motion.div>
+            </motion.div>
+          )}
+
+          {step === "country" ? (
+            <>
+              <div className="mb-10 text-center text-slate-900">
+                <h1 className="text-3xl font-bold tracking-tight leading-none mb-4">
+                  Select your <span className="text-emerald-600">country.</span>
+                </h1>
+                <p className="text-slate-600 text-base font-bold leading-relaxed">
+                  We need this to ensure we use the correct payment rails for your region.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <Button
+                  variant="outline"
+                  onClick={() => handleCountrySelect("NG")}
+                  disabled={loading}
+                  className="h-20 rounded-2xl border-slate-200 flex items-center justify-between px-8 hover:border-emerald-500/50 hover:bg-slate-50 group"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">🇳🇬</span>
+                    <span className="text-lg font-bold text-slate-900">Nigeria</span>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => handleCountrySelect("KE")}
+                  disabled={loading}
+                  className="h-20 rounded-2xl border-slate-200 flex items-center justify-between px-8 hover:border-emerald-500/50 hover:bg-slate-50 group"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">🇰🇪</span>
+                    <span className="text-lg font-bold text-slate-900">Kenya</span>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                </Button> 
+              </div>
+            </>
+          ) : step === "form" ? (
+            <>
+              <div className="mb-10 text-center">
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
+                  One last <span className="text-emerald-600">step.</span>
+                </h1>
+                <p className="text-slate-600 text-base font-bold leading-relaxed px-4">
+                  {(currentCountry === "NG" || currentCountry === "Nigeria")
+                    ? "To receive and send payments, we need your Bank Verification Number (BVN). This is used to set up your payment account."
+                    : "To receive and send payments in Kenya, we need your M-Pesa phone number."}
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="space-y-3">
+                  <Label htmlFor="identity" className="text-sm font-bold text-slate-700 block ml-1 text-center font-primary uppercase tracking-wider">
+                    {(currentCountry === "NG" || currentCountry === "Nigeria") ? "Bank Verification Number (BVN)" : "M-Pesa Phone Number"}
+                  </Label>
+
+                  <div className="relative group">
+                    {(currentCountry === "KE" || currentCountry === "Kenya") && (
+                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-900 font-bold text-lg select-none">
+                        +254
+                      </div>
+                    )}
+                    <Input
+                      id="identity"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder={(currentCountry === "NG" || currentCountry === "Nigeria") ? "11 digits" : "9 digits"}
+                      value={val}
+                      onChange={handleInputChange}
+                      required
+                      className={`bg-slate-50! border-slate-200 h-16 rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${(currentCountry === "KE" || currentCountry === "Kenya") ? "pl-20" : "px-6"}`}
+                    />
+                    {(currentCountry === "NG" || currentCountry === "Nigeria") ? (
+                      <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />
+                    ) : (
+                      <Phone className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />
+                    )}
+                  </div>
+
+                  <div className="flex items-start gap-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                    <Info className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
+                    <p className="text-sm font-bold text-slate-600 leading-snug">
+                      {(currentCountry === "NG" || currentCountry === "Nigeria")
+                        ? "Dial *565*0# on any phone to retrieve your BVN. This is a one-time setup step."
+                        : "Ensure this is the phone number registered with M-Pesa to avoid payment delays."}
+                    </p>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center gap-3 text-red-500 bg-red-50 p-4 rounded-2xl border border-red-200">
+                        <p className="text-sm font-bold leading-relaxed">{error}</p>
+                    </div>
+                    {attemptsRemaining !== null && (
+                        <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
+                            {attemptsRemaining} {attemptsRemaining === 1 ? "attempt" : "attempts"} remaining
+                        </p>
+                    )}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={loading || !val}
+                  className="w-full h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-[0.98] group"
+                >
+                  {loading ? (
+                    <DotLoader size="sm" color="white" />
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      Complete Setup <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  )}
+                </Button>
+
+                {process.env.NEXT_PUBLIC_NODE_ENV === "development" && (
+                  <div className="mt-4 text-center">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await api.onboarding.devBypassIdentity();
+                          await refreshUser();
+                          setStep("success");
+                        } catch (err: any) {
+                          toast.error("Bypass failed: " + err.message);
+                        }
+                      }}
+                      className="text-xs text-slate-400 hover:text-slate-600 underline transition-colors"
+                      title="Development only — not available in production"
+                    >
+                      {/* DEV ONLY - Remove before production deployment */}
+                      Skip for development
+                    </button>
+                  </div>
+                )}
+              </form>
+
+              <div className="mt-10 flex items-center justify-center gap-6">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Encrypted</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Secure</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="py-8 text-center animate-in fade-in zoom-in-95 duration-500">
+                <div className="mb-8 flex justify-center">
+                  <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center relative border border-emerald-100 shadow-sm">
+                    <div className="absolute inset-0 border border-emerald-500/20 rounded-full animate-ping opacity-20"></div>
+                    <CheckCircle2 className="w-12 h-12 text-emerald-600" />
+                  </div>
+                </div>
+
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
+                  Payment account <span className="text-emerald-600">ready.</span>
+                </h1>
+                
+                <p className="text-slate-600 text-base font-bold leading-relaxed px-4 mb-10">
+                  Your payment account has been set up. Complete identity verification in Settings to unlock withdrawals.
+                </p>
+
+                <Button
+                  onClick={() => router.push(user?.role === "CLIENT" ? "/client" : "/freelancer")}
+                  className="w-full h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-[0.98] group"
+                >
+                  <span className="flex items-center gap-2 text-white">
+                    Continue to Dashboard <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Button>
+            </div>
+          )}
+        </div>
+
+        <p className="mt-8 text-center text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">
+          Identity verification is mandatory for financial compliance
+        </p>
+      </div>
+    </div>
+  );
+}

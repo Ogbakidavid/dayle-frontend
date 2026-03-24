@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useUser } from "@/lib/store/user-context";
 
 export interface AmountDisplayProps {
     amount: number;
@@ -7,7 +8,10 @@ export interface AmountDisplayProps {
     className?: string;
 }
 
-export function AmountDisplay({ amount, size = "medium", currency = "USD", className }: AmountDisplayProps) {
+export function AmountDisplay({ amount, size = "medium", currency: manualCurrency, className }: AmountDisplayProps) {
+    const { user } = useUser();
+    const currency = manualCurrency || (user?.country === "Kenya" ? "KES" : "NGN");
+    
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: currency,

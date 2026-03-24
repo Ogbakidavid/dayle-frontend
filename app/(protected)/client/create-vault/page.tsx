@@ -31,6 +31,9 @@ import { useVault } from "@/lib/store/vault-context";
 import { SUPPORTED_TOKENS, CONTRACTS } from "@/lib/contracts";
 import { SubmissionType } from "@/lib/domain/enums";
 import { DayleLogo } from "@/components/shared/DayleLogo";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
+import { useUser } from "@/lib/store/user-context";
+import { useRates } from "@/lib/store/rates-context"
 
 
 const variants: Variants = {
@@ -71,7 +74,7 @@ export default function CreateVaultPage() {
   const [budgetAmount, setBudgetAmount] = useState("");
   const [freelancerEmail, setFreelancerEmail] = useState("");
   const [freelancerName, setFreelancerName] = useState("");
-  // Default to USDC
+  // Default to stable currency
   const [deliverables, setDeliverables] = useState<
     { title: string; description: string; id: string; submissionType: SubmissionType }[]
   >([{ title: "", description: "", id: crypto.randomUUID(), submissionType: SubmissionType.FILE }]);
@@ -104,51 +107,6 @@ export default function CreateVaultPage() {
   };
 
 
-  const STORAGE_KEY = "dayle_create_vault_draft";
-
-  // Load state on mount
-  React.useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        if (data.vaultPurpose) setVaultPurpose(data.vaultPurpose);
-        if (data.vaultTitle) setVaultTitle(data.vaultTitle);
-        if (data.vaultDescription) setVaultDescription(data.vaultDescription);
-        if (data.budgetAmount) setBudgetAmount(data.budgetAmount);
-        if (data.freelancerEmail) setFreelancerEmail(data.freelancerEmail);
-        if (data.freelancerName) setFreelancerName(data.freelancerName);
-        if (data.deliverables) setDeliverables(data.deliverables);
-        if (data.page) setPage([data.page, 0]);
-      } catch (e) {
-        console.error("Failed to load saved vault draft:", e);
-      }
-    }
-  }, []);
-
-  // Save state on change
-  React.useEffect(() => {
-    const state = {
-      vaultPurpose,
-      vaultTitle,
-      vaultDescription,
-      budgetAmount,
-      freelancerEmail,
-      freelancerName,
-      deliverables,
-      page,
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [
-    vaultPurpose,
-    vaultTitle,
-    vaultDescription,
-    budgetAmount,
-    freelancerEmail,
-    freelancerName,
-    deliverables,
-    page,
-  ]);
 
   const steps = [
     { id: 1, name: "Basics", icon: Info },
@@ -156,7 +114,26 @@ export default function CreateVaultPage() {
     { id: 3, name: "Review", icon: ShieldCheck },
   ];
 
+  const { user } = useUser();
+  const { rates } = useRates();
+  const currencySymbol = user?.country === "Kenya" ? "KSh" : "₦";
+  const currencyCode = user?.country === "Kenya" ? "KES" : "NGN";
+
   const budget = Number(budgetAmount) || 0;
+  
+  // Calculate USD equivalent for backend/fees
+  const rate = rates[currencyCode] || (currencyCode === "KES" ? 0.0076 : 0.00066); 
+  const budgetUSD = budget * rate;
+
+  const fees = {
+    settlementPercent:
+      budgetUSD <= 500 ? 5 : budgetUSD <= 2000 ? 4 : budgetUSD <= 10000 ? 3 : 2.5,
+    processingPercent: 0.5,
+  };
+  const depositFeeUSD = (budgetUSD * fees.processingPercent) / 100;
+  const settlementFeeUSD = (budgetUSD * fees.settlementPercent) / 100;
+  const freelancerReceives = budgetUSD - settlementFeeUSD;
+  const totalClientPays = budgetUSD + depositFeeUSD;
 
   const getDeliverableLabel = (deliverableId: string) => {
     const purposeData = (VAULT_PURPOSE_MAPPING as any)[vaultPurpose];
@@ -170,7 +147,7 @@ export default function CreateVaultPage() {
   const isStep1Complete =
     vaultTitle.trim() !== "" &&
     vaultPurpose !== "" &&
-    budget > 0 &&
+    budgetUSD > 0 &&
     deliverables.every((d) => d.title.trim() !== "");
   const isStep2Complete =
     freelancerEmail.trim() !== "" &&
@@ -192,11 +169,13 @@ export default function CreateVaultPage() {
         title: vaultTitle,
         type: vaultPurpose.toUpperCase(),
         description: vaultDescription,
-        totalAmount: budget,
-        // Defaulting to USDC for Fiat abstraction under the hood
+        totalAmount: budgetUSD,
+        localAmount: budget,
+        localCurrency: currencyCode,
+        // Defaulting to digital dollar for Fiat abstraction under the hood
         tokenAddress: CONTRACTS.usdcToken,
         tokenSymbol: "USDC",
-        tokenDecimals: 6, // USDC uses 6 decimals
+        tokenDecimals: 6, // digital dollar uses 6 decimals
         chainId: 11142220, // Celo Sepolia
         idempotencyKey,
         deliverables: deliverables.map(({ title, description, submissionType }) => ({
@@ -208,9 +187,6 @@ export default function CreateVaultPage() {
 
 
       const newVault = await createVault(payload);
-
-      // Clear draft since it was deployed successfully
-      localStorage.removeItem(STORAGE_KEY);
 
       // 2. Send invitation to freelancer if email provided
       if (freelancerEmail) {
@@ -246,7 +222,7 @@ export default function CreateVaultPage() {
         <header className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
             <div className="inline-flex items-center gap-0 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500  font-bold tracking-[0.2em] mb-4">
-              Secure project vault
+              Secure project settlement
             </div>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tighter ">
               New <span className="text-emerald-500">project</span>
@@ -286,8 +262,8 @@ export default function CreateVaultPage() {
         </header>
 
         {/* Main Interface */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <main className="lg:col-span-8 w-full">
+        <div className="max-w-3xl mx-auto">
+          <main className="w-full">
             <div className="relative min-h-[400px] sm:min-h-[500px] bg-background border border-white/5 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-xl overflow-hidden">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
@@ -306,7 +282,7 @@ export default function CreateVaultPage() {
                         <Label className="text-sm md:text-sm r text-slate-900 font-bold">
                           1. Select project type
                         </Label>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                           {Object.entries(VAULT_PURPOSE_MAPPING).map(
                             ([key, value]) => {
                               const Icon = value.icon;
@@ -362,18 +338,28 @@ export default function CreateVaultPage() {
 
                         <div className="space-y-2">
                           <Label className="text-sm md:text-sm r text-slate-900 font-bold">
-                            4. Total allocation (USD)
+                            4. Total allocation ({currencyCode})
                           </Label>
                           <div className="relative group">
-                            <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500 group-focus-within:animate-pulse" />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 font-bold group-focus-within:animate-pulse">
+                              {currencySymbol}
+                            </div>
                             <Input
                               type="number"
                               value={budgetAmount}
                               onChange={(e) => setBudgetAmount(e.target.value)}
                               placeholder="0.00"
-                              className="bg-muted! border-white/10! h-14 pl-12 text-xl  text-slate-900 font-medium focus:border-emerald-500/50 rounded-xl"
+                              className="bg-muted! border-white/10! h-14 pl-14 text-xl  text-slate-900 font-medium focus:border-emerald-500/50 rounded-xl"
                             />
                           </div>
+                          {budget > 0 && (
+                            <div className="mt-2 px-1 flex items-center gap-2">
+                              <span className="text-slate-500 text-xs font-bold">Estimated:</span>
+                              <div className="bg-slate-100 rounded-md px-2 py-0.5 text-slate-900 text-xs font-bold">
+                                ${budgetUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         <div className="space-y-2">
@@ -392,7 +378,7 @@ export default function CreateVaultPage() {
 
                         {/* DELIVERABLES CHECKLIST */}
                         <div className="space-y-4 pt-4 border-t border-white/5">
-                          <div className="flex items-center justify-between">
+                          <div className="flex flex-col items-start md:flex-row md:items-center justify-between gap-4">
                             <div className="space-y-1">
                               <Label className="text-sm md:text-sm r text-emerald-500 font-bold">
                                 Deliverables checklist (Required)
@@ -565,97 +551,133 @@ export default function CreateVaultPage() {
 
                   {/* STEP 3: REVIEW */}
                   {step === 3 && (
-                    <div className="space-y-8">
-                      <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold tracking-tighter ">
-                          Confirm project
-                        </h2>
-                        <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                          <span className="text-emerald-500  font-bold st">
-                            System verified
+                    <div className="space-y-6">
+                      {/* Invoice Header */}
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h2 className="text-2xl font-bold tracking-tighter text-slate-900">
+                            Project Summary
+                          </h2>
+                          <p className="text-sm text-slate-500 font-medium mt-1">
+                            Review your project before funding
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full">
+                          <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                          <span className="text-emerald-600 text-xs font-bold tracking-wide uppercase">
+                            Ready
                           </span>
                         </div>
                       </div>
 
-                      {/* Header Summary */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-5 bg-white/3 border border-white/5 rounded-2xl space-y-3">
-                          <div className="flex justify-between items-center group/tooltip relative">
-                            <Label className="text-[12px] font-bold text-slate-900 st block">
-                              Budget
-                            </Label>
-                            <span className="text-lg sm:text-xl font-bold text-slate-900 ">
-                                  ${budget.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <Label className="text-[12px] font-bold text-emerald-500 st block">
-                              Service Fee (3%)
-                            </Label>
-                            <span className="text-sm font-bold text-emerald-500 ">
-                              +${(budget / 0.97 - budget).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </span>
-                          </div>
-                          <div className="pt-3 border-t border-white/5 flex justify-between items-center">
-                            <Label className="text-[12px] font-bold text-slate-900 st block">
-                              Total investment
-                            </Label>
-                            <span className="text-xl sm:text-2xl font-bold text-emerald-500 ">
-                                  ${(budget / 0.97).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                </span>
-                          </div>
-                          <p className="text-[10px] text-slate-900 font-bold opacity-60">
-                            * Includes platform service fee for settlement & verification.
-                          </p>
-                        </div>
-                        <div className="p-5 bg-white/3 border border-white/5 rounded-2xl flex flex-col justify-center">
-                          <Label className="text-[12px] font-bold text-slate-900 st block mb-1">
-                            Beneficiary
-                          </Label>
-                          <p className="text-sm font-bold truncate text-slate-600 r">
-                            {freelancerEmail}
-                          </p>
-                          <p className="text-[10px] text-slate-900 font-bold opacity-60 mt-2">
-                             Full budget will be delivered to the freelancer upon release.
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Single Deliverable Info */}
-                      <div className="bg-black/80 border border-white/5 p-4 rounded-xl flex items-center justify-between group">
+                      {/* Project Identity Card */}
+                      <div className="bg-slate-900 rounded-2xl p-6 flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-sm text-white  border border-white/5">
-                            01
+                          <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                            <ListChecks className="w-6 h-6 text-emerald-400" />
                           </div>
                           <div>
-                            <p className="text-sm font-bold st text-white">
+                            <p className="text-white font-bold text-base tracking-tight">
                               {vaultTitle || "Untitled project"}
                             </p>
-                            <div className="flex items-center gap-3 mt-1">
-                              <span className="text-[12px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold uppercase tracking-wider">
+                                {vaultPurpose || "Project"}
+                              </span>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/60 font-bold uppercase tracking-wider">
                                 Single release
                               </span>
                             </div>
                           </div>
                         </div>
+                        <div className="text-right">
+                          <CurrencyEstimate 
+                            usdAmount={budgetUSD} 
+                            className="text-white text-2xl font-bold"
+                            showNote={false}
+                          />
+                        </div>
                       </div>
 
-                      {/* Final Security Disclaimer */}
-                      <div className="bg-emerald-500/80 border border-emerald-500/10 p-5 rounded-2xl flex gap-4">
-                        <div className="p-2 bg-slate-900/30 rounded-lg h-fit">
-                          <ShieldCheck className="w-5 h-5 text-white" />
+                      {/* Fee Breakdown — Invoice Table */}
+                      <div className="border border-slate-200 rounded-2xl overflow-hidden">
+                        {/* Table Header */}
+                        <div className="bg-slate-50 px-6 py-3 border-b border-slate-200">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Description</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Amount</span>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-white st">
-                            Secure settlement system
+
+                        {/* Line Items */}
+                        <div className="divide-y divide-slate-100">
+                          <div className="px-6 py-4 flex justify-between items-center">
+                            <div>
+                              <p className="text-sm font-bold text-slate-900">Project Budget</p>
+                              <p className="text-[11px] text-slate-400 mt-0.5">Held in secure vault until release</p>
+                            </div>
+                            <CurrencyEstimate usdAmount={budgetUSD} className="text-slate-900 text-sm font-bold" showNote={false} />
+                          </div>
+
+                          <div className="px-6 py-4 flex justify-between items-center bg-blue-50/50">
+                            <div>
+                              <p className="text-sm font-bold text-blue-600">Deposit Processing Fee</p>
+                              <p className="text-[11px] text-blue-400 mt-0.5">0.5% — collected at funding</p>
+                            </div>
+                            <CurrencyEstimate usdAmount={depositFeeUSD} prefix="+" className="text-blue-600 text-sm font-bold" showNote={false} />
+                          </div>
+
+                          <div className="px-6 py-4 flex justify-between items-center">
+                            <div>
+                              <p className="text-sm font-bold text-slate-900">Settlement Fee</p>
+                              <p className="text-[11px] text-slate-600 mt-0.5">{fees.settlementPercent}% — deducted at release</p>
+                            </div>
+                            <CurrencyEstimate usdAmount={settlementFeeUSD} prefix="-" className="text-slate-900 text-sm font-bold" showNote={false} />
+                          </div>
+                        </div>
+
+                        {/* Totals */}
+                        <div className="border-t-2 border-slate-900 bg-slate-50">
+                          <div className="px-6 py-4 flex justify-between items-center">
+                            <p className="text-sm font-bold text-slate-900 uppercase tracking-wider">You pay today</p>
+                            <CurrencyEstimate usdAmount={totalClientPays} className="text-emerald-600 text-xl font-bold" />
+                          </div>
+                          <div className="px-6 pb-4 flex justify-between items-center">
+                            <p className="text-xs text-slate-500 font-medium">Freelancer receives at release</p>
+                            <CurrencyEstimate usdAmount={freelancerReceives} className="text-emerald-600 text-sm font-bold" showNote={false} />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Beneficiary Card */}
+                      <div className="flex items-center gap-4 p-5 bg-white border border-slate-200 rounded-2xl">
+                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                          <Users className="w-5 h-5 text-slate-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.15em]">Beneficiary</p>
+                          <p className="text-sm font-bold text-slate-900 truncate">{freelancerEmail}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 rounded-lg border border-emerald-100">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                          <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Verified on accept</span>
+                        </div>
+                      </div>
+
+                      {/* Security Banner */}
+                      <div className="relative bg-gradient-linear-r from-slate-900 to-slate-800 rounded-2xl p-5 flex gap-4 overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10" />
+                        <div className="relative p-2.5 bg-emerald-500/20 rounded-xl h-fit border border-emerald-500/20">
+                          <Lock className="w-4 h-4 text-emerald-400" />
+                        </div>
+                        <div className="relative">
+                          <h4 className="text-sm font-bold text-slate-900">
+                            Protected by Dayle Settlement
                           </h4>
-                          <p className="text-sm text-slate-900 mt-1 leading-relaxed font-bold">
-                            Funds are locked in a secure project vault.
-                            Release requires{" "}
-                            <span className="text-white">
-                              Manual Client Sign-off
-                            </span>
-                            .
+                          <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                            Funds are locked in a secure vault. Release requires
+                            {" "}<span className="text-emerald-400 font-semibold">manual client sign-off</span>. 
+                            Disputes are resolved through our mediation process.
                           </p>
                         </div>
                       </div>
@@ -722,39 +744,13 @@ export default function CreateVaultPage() {
               )}
             </div>
           </main>
-
-          {/* Sidebar Info */}
-          <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-12">
-            <div className="bg-white/2 border border-white/5 rounded-3xl p-6">
-              <h3 className="text-md font-bold text-slate-900 mb-6 ">
-                Project configuration
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-end border-b border-white/5 pb-4">
-                  <span className="text-slate-900 font-bold text-sm">Budget</span>
-                  <span className="text-xl text-slate-900 font-bold ">
-                    ${budget.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-end">
-                  <span className="text-slate-900 font-bold text-sm">Total investment</span>
-                  <div className="text-right">
-                    <span className="text-2xl text-emerald-500 font-bold block">
-                      ${(budget / 0.97).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </span>
-                    <span className="text-[10px] text-slate-900/50 font-bold">Incl. 3% fee</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </aside>
         </div>
 
         {/* Footer */}
         <div className="mt-12 flex items-center justify-center gap-3 text-slate-900">
           <DayleLogo className="w-4 h-4" />
           <span className="text-sm tracking-[0.3em] font-bold">
-            Secured by Dayle settlement layer
+            Secured by Dayle settlement protocol
           </span>
         </div>
       </div>

@@ -31,14 +31,6 @@ const DATA: CountryNode[] = [
     chs: ["Bank Transfer", "Mobile Money"],
     region: "Africa",
   },
-  {
-    id: "gh",
-    country: "Ghana",
-    code: "GHS",
-    flag: "🇬🇭",
-    chs: ["Bank Transfer", "Mobile Money"],
-    region: "Africa",
-  },
 ];
 
 const REGION_ORDER = ["Africa"];

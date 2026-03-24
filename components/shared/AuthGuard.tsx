@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import { useUser } from "@/lib/store/user-context";
-import { DotLoader } from "@/components/ui/dot-loader";
+import { KycStatus } from "@/lib/domain/enums";
 import { LogoLoader } from "@/components/ui/logo-loader";
 
 interface AuthGuardProps {
@@ -24,9 +24,15 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   // Track if we're already attempting to refresh or redirect to prevent loops
   const isRefreshingRef = useRef(false);
   const hasRedirectedRef = useRef(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     if (!privyReady || userLoading) return;
+
+    // Reset redirecting state if we've reached a stable protected route
+    if (redirecting) {
+      setRedirecting(false);
+    }
 
     if (!authenticated) {
       // Not logged in with Privy, redirect to login
@@ -66,6 +72,36 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           }
         });
     }
+
+    // 1. Country Selection Intercept: If user is authenticated but country is missing
+    // 2. Post-KYC Intercept: If KYC is VERIFIED but payment account is not ready
+    if (user) {
+      // New: Force country selection if missing
+      if (!user.country && !pathname.startsWith('/onboarding/identity')) {
+        console.log('[AuthGuard] Country missing, redirecting to onboarding/identity');
+        setRedirecting(true);
+        router.push('/onboarding/identity');
+        return;
+      }
+
+      console.log("[AuthGuard] Checking user state:", {
+        kycStatus: user.kycStatus,
+        paymentAccountReady: user.paymentAccountReady,
+        pathname,
+      });
+
+      if (
+        user.kycStatus === KycStatus.VERIFIED &&
+        user.country && // Ensure country is set before proceeding to confirmation
+        !user.paymentAccountReady &&
+        !pathname.startsWith("/onboarding/identity-confirmation")
+      ) {
+        console.log("[AuthGuard] Redirecting to identity confirmation...");
+        setRedirecting(true);
+        router.push("/onboarding/identity-confirmation");
+        return;
+      }
+    }
   }, [
     authenticated,
     privyReady,
@@ -76,23 +112,16 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     refreshUser,
   ]);
 
-  // Show loading state while determining auth status
+  // Show loading state while determining auth status or redirecting
   if (
     !privyReady ||
     (authenticated && userLoading) ||
-    (authenticated && !user)
+    (authenticated && !user) ||
+    redirecting
   ) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-4">
         <LogoLoader size="lg" />
-        {/* <div className="text-center space-y-1">
-          <p className="text-sm font-bold text-emerald-600 tracking-[0.2em] animate-pulse">
-            Authenticating
-          </p>
-          <p className=" font-medium text-slate-600 r">
-            Establishing secure session
-          </p>
-        </div> */}
       </div>
     );
   }

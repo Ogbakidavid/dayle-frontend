@@ -178,7 +178,7 @@ export default function LandingPage() {
                 >
                   <Button
                     size="lg"
-                    className="rounded-2xl px-6 sm:px-12 h-14 md:h-20 font-bold text-sm sm:text-base md:text-xl w-full shadow-xl group transition-all bg-emerald-600 text-white hover:bg-emerald-700"
+                    className="rounded-2xl px-6 sm:px-12 h-14 font-bold text-sm sm:text-base md:text-xl w-full shadow-xl group transition-all bg-emerald-600 text-white hover:bg-emerald-700"
                   >
                     <span className="hidden xs:inline">Start a project</span>
                     <span className="xs:hidden">Start</span>

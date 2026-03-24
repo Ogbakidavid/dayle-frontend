@@ -37,20 +37,21 @@ export default function BankTransferPage() {
 
   const searchParams = useSearchParams();
   const currency = searchParams.get("currency") || "USD";
-  const EXCHANGE_RATES = { USD: 1, NGN: 1500, GHS: 12.5, KES: 135 };
+  const EXCHANGE_RATES = { USD: 1, NGN: 1500, KES: 135 };
 
   const vault = (vaults || []).find((v) => v.id === vaultId);
   const amount = vault?.formattedTotalAmount
     ? Number(vault.formattedTotalAmount)
     : 0;
   const displayAmount = amount * EXCHANGE_RATES[currency as keyof typeof EXCHANGE_RATES];
-  const currencyPrefixes = { USD: "$", NGN: "₦", GHS: "GH₵", KES: "KSh" };
+  const currencyPrefixes = { USD: "$", NGN: "₦", KES: "KSh" };
   const currencyPrefix = currencyPrefixes[currency as keyof typeof currencyPrefixes];
 
   const [bankDetails, setBankDetails] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState("");
   const [step, setStep] = useState<"form" | "success">("form");
+  const [isWaitingForConfirmation, setIsWaitingForConfirmation] = useState(false);
 
   // Fetch bank details on mount
   useEffect(() => {
@@ -89,6 +90,29 @@ export default function BankTransferPage() {
     fetchBankDetails();
   }, [vaultId, router, currency]);
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isWaitingForConfirmation) {
+      interval = setInterval(async () => {
+        try {
+          const res = await api.vaults.getStatus(vaultId);
+          if (res.status === "FUNDED") {
+            setIsWaitingForConfirmation(false);
+            setIsProcessing(false);
+            setStep("success");
+            toast.success("Payment detected and confirmed!");
+            setTimeout(() => {
+              router.push(`/client/vault/${vaultId}?success=true`);
+            }, 3000);
+          }
+        } catch (err) {
+          console.error("Polling error", err);
+        }
+      }, 10000);
+    }
+    return () => clearInterval(interval);
+  }, [isWaitingForConfirmation, vaultId, router]);
+
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopied(field);
@@ -99,29 +123,15 @@ export default function BankTransferPage() {
   const handleConfirmTransfer = async () => {
     setIsProcessing(true);
     try {
-      // Simulate the Partna Webhook for automated settlement
-      const backendUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-      const response = await fetch(`${backendUrl}/api/webhooks/partna`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          reference: bankDetails?.providerRef || `vault_fund_${vaultId}`,
-          status: "success",
-          amount: String(vault?.totalAmount || amount),
-          type: "collection",
-        }),
+      setIsWaitingForConfirmation(true);
+      toast.info("Waiting for payment confirmation...", {
+        description: "Your bank transfer is being verified. Please stay on this page.",
       });
-
-      if (!response.ok) {
-        throw new Error("On-chain settlement failed. Please try again.");
-      }
 
       setIsProcessing(false);
       setStep("success");
       toast.success("Payment detected!", {
-        description: "Your funds are being secured in the escrow account.",
+        description: "Your funds are being secured in the settlement vault.",
       });
 
       setTimeout(() => {
@@ -192,8 +202,7 @@ export default function BankTransferPage() {
                 <Shield className="w-4 h-4" /> Secure Funding
               </div>
               <p className=" text-slate-600 leading-relaxed font-bold st  uppercase">
-                Bank-verified secure funding. Assets are protected in escrow via
-                Partna.
+                Bank-verified secure funding. Assets are protected in a secure vault via Partna.
               </p>
             </div>
           </div>
@@ -233,7 +242,7 @@ export default function BankTransferPage() {
                       <p className="text-[11px] text-slate-600 leading-relaxed font-bold st ">
                         Please transfer the exact amount to the virtual bank
                         account below. Your funds will be automatically
-                        detected and secured in the escrow contract upon bank
+                        detected and secured in the settlement vault upon bank
                         confirmation.
                       </p>
                     </div>
@@ -300,7 +309,7 @@ export default function BankTransferPage() {
                         disabled={isProcessing}
                         className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-3xl shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.2em]  disabled:opacity-50"
                       >
-                        {isProcessing
+                        {isProcessing || isWaitingForConfirmation
                           ? "Processing..."
                           : "I've sent the transfer"}
                       </button>

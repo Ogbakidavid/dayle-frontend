@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 import { VaultStatus } from "@/lib/domain/enums";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -98,7 +99,7 @@ export default function AssignmentsPage() {
             <div className="flex gap-4">
               <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm min-w-[140px]">
                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Earnings</p>
-                <p className="text-xl font-bold text-slate-900">${totalEarnings.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                <CurrencyEstimate usdAmount={totalEarnings} showNote={false} className="text-xl font-bold text-slate-900" />
               </div>
               <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm min-w-[140px]">
                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Active Nodes</p>
@@ -183,14 +184,16 @@ export default function AssignmentsPage() {
                                 [VaultStatus.FUNDED, VaultStatus.DISPUTED].includes(vault.status) ? "bg-amber-50 text-amber-700 border-amber-100" :
                                 "bg-slate-50 text-slate-600 border-slate-100"
                               )}>
-                                {vault.status === VaultStatus.RELEASED ? "Paid" : 
-                                 vault.status === VaultStatus.FUNDED ? "In Progress" : 
-                                 vault.status}
+                                {
+                                  vault.status === VaultStatus.RELEASED ? "Paid" : 
+                                  vault.status === VaultStatus.FUNDED ? "In Progress" : 
+                                  vault.status
+                                }
                               </Badge>
                             </div>
                             <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 max-w-2xl font-bold tracking-wide ">
                               {vault.description ||
-                                "Standard contractual engagement through the Dayle escrow protocol."}
+                                "Standard contractual engagement through the Dayle settlement protocol."}
                             </p>
                           </div>
 

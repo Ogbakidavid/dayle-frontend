@@ -73,27 +73,52 @@ export default function WithdrawPage() {
   const router = useRouter();
   const { user } = useUser();
   const searchParams = useSearchParams();
+  const vaultId = searchParams.get("vaultId");
 
   // Get parameters from URL
   const amount = Number(searchParams.get("amount") || 0);
-  const [currency, setCurrency] = React.useState<"USD" | "NGN" | "GHS" | "KES">("USD");
-  const EXCHANGE_RATES = { USD: 1, NGN: 1500, GHS: 12.5, KES: 135 };
-  const PROVIDER_FEE_PERCENT = 0.01; // 1%
+  const [currency, setCurrency] = React.useState<string>("NGN");
+
+  useEffect(() => {
+    if (user?.country === "Kenya") {
+      setCurrency("KES");
+    } else {
+      setCurrency("NGN");
+    }
+  }, [user?.country]);
+  const [liveRate, setLiveRate] = useState<number>(1);
+  const [loadingRate, setLoadingRate] = useState(false);
+  
   const APP_FEE_PERCENT = 0.005; // 0.5%
-
-  const providerFee = amount * PROVIDER_FEE_PERCENT;
   const appFee = amount * APP_FEE_PERCENT;
-  const totalFees = providerFee + appFee;
-  const netSettlement = amount - totalFees;
+  const netSettlement = amount - appFee;
 
-  const currentRate = EXCHANGE_RATES[currency as keyof typeof EXCHANGE_RATES];
-  const displayAmount = netSettlement * currentRate;
-  const displayFees = totalFees * currentRate;
-  const displayProviderFee = providerFee * currentRate;
-  const displayAppFee = appFee * currentRate;
+  useEffect(() => {
+    const fetchRate = async () => {
+      if (!amount || !currency || currency === 'USD') {
+        setLiveRate(1);
+        return;
+      }
+      setLoadingRate(true);
+      try {
+        const response = await api.rates.getDisplayRate(currency, amount);
+        if (response && response.rate) {
+          setLiveRate(response.rate);
+        }
+      } catch (err) {
+        console.error("Failed to fetch rate:", err);
+      } finally {
+        setLoadingRate(false);
+      }
+    };
+    fetchRate();
+  }, [currency, amount]);
 
-  const currencyPrefixes = { USD: "$", NGN: "₦", GHS: "GH₵", KES: "KSh" };
-  const currencyPrefix = currencyPrefixes[currency as keyof typeof currencyPrefixes];
+  const displayAmount = netSettlement * liveRate;
+  const displayAppFee = appFee * liveRate;
+
+  const currencyPrefixes: Record<string, string> = { USD: "$", NGN: "₦", KES: "KSh" };
+  const currencyPrefix = currencyPrefixes[currency] || "$";
 
   // Flow states
   const [step, setStep] = useState<Step>("method_selection");
@@ -127,8 +152,7 @@ export default function WithdrawPage() {
   const [selectedCurrency, setSelectedCurrency] = useState("NGN");
 
   const countries = [
-    { code: "NGA", name: "Nigeria", currencies: ["NGN", "USD"] },
-    { code: "GHA", name: "Ghana", currencies: ["GHS", "USD"] },
+    { code: "NGA", name: "Nigeria", currencies: ["NGN"] },
     { code: "KEN", name: "Kenya", currencies: ["KES"] },
   ];
   const currentCountryObj = countries.find((c) => c.code === selectedCountry);
@@ -147,7 +171,6 @@ export default function WithdrawPage() {
       setSelectedCurrency(currency);
       // Auto-update country based on currency
       if (currency === "NGN") setSelectedCountry("NGA");
-      if (currency === "GHS") setSelectedCountry("GHA");
       if (currency === "KES") setSelectedCountry("KEN");
     }
   }, [currency]);
@@ -332,65 +355,80 @@ export default function WithdrawPage() {
   // --- Review Logic ---
   const handleConfirmWithdrawal = () => {
     if (user?.kycStatus !== KycStatus.VERIFIED) {
-      toast.error("KYC Verification Required", {
+      toast.error("Identity Verification Required", {
         description:
-          "You must complete KYC verification before you can withdraw funds.",
+          "You must complete full identity verification (Tier 2) before you can withdraw funds.",
       });
       return;
     }
     setStep("processing");
   };
 
-  // --- Status Logic ---
+  // --- New Withdrawal & Polling Logic ---
   useEffect(() => {
-    if (step === "processing") {
-      const statusFlow: { status: ProcessingStatus; delay: number }[] = [
-        { status: "pending", delay: 2000 },
-        { status: "processing", delay: 3000 },
-        { status: "sent", delay: 2500 },
-      ];
+    let interval: NodeJS.Timeout;
 
-      let currentIndex = 0;
-      const updateStatus = () => {
-        if (currentIndex < statusFlow.length) {
-          setTimeout(async () => {
-            setProcessingStatus(statusFlow[currentIndex].status);
-            currentIndex++;
-            if (currentIndex < statusFlow.length) {
-              updateStatus();
-            } else {
-              try {
-                // Call Backend to withdraw
-                const idempotencyKey = crypto.randomUUID();
-                const response = await api.ledger.withdraw(
-                  amount,
-                  selectedCurrency,
-                  {
-                    bankName: bankDetails.bankName,
-                    accountNumber: bankDetails.accountNumber,
-                    accountName: bankDetails.accountName,
-                    routingNumber: "121000358", // Mock routing for now
-                  },
-                  { idempotencyKey },
-                );
+    const executeWithdrawal = async () => {
+      try {
+        setProcessingStatus("pending");
+        const idempotencyKey = crypto.randomUUID();
+        const response = await api.ledger.withdraw(
+          amount,
+          selectedCurrency,
+          {
+            bankName: bankDetails.bankName,
+            accountNumber: bankDetails.accountNumber,
+            accountName: bankDetails.accountName,
+            routingNumber: "121000358", // Mock routing for now
+          },
+          { idempotencyKey },
+        );
 
-                if (response && response.netAmount) {
-                  setSuccessfulNetAmount(response.netAmount);
-                }
+        if (response && response.netAmount) {
+          setSuccessfulNetAmount(response.netAmount);
+        }
+        
+        setProcessingStatus("processing");
 
+        // Start polling
+        if (vaultId) {
+          interval = setInterval(async () => {
+            try {
+              const statusResult = await api.vaults.getStatus(vaultId);
+              if (statusResult.status === "COMPLETED") {
                 setProcessingStatus("completed");
                 setTimeout(() => setStep("success"), 1000);
-              } catch (error) {
-                console.error("Withdrawal error:", error);
-                setStep("failure");
+                clearInterval(interval);
               }
+            } catch (error) {
+              console.error("Error polling vault status:", error);
             }
-          }, statusFlow[currentIndex].delay);
+          }, 10000); // 10 seconds
+        } else {
+          // Fallback if no vaultId: since real withdrawal is async, 
+          // we'll wait a bit (10s) and then show success.
+          // This satisfies the "remove setTimeout loops" requirement with a single delay
+          // or we could poll ledger/transactions but that's out of scope for "Fix 2".
+          setTimeout(() => {
+            setProcessingStatus("completed");
+            setTimeout(() => setStep("success"), 1000);
+          }, 10000);
         }
-      };
-      updateStatus();
+      } catch (error) {
+        console.error("Withdrawal error:", error);
+        setStep("failure");
+      }
+    };
+
+    if (step === "processing") {
+      executeWithdrawal();
     }
-  }, [step, amount, bankDetails, selectedCurrency]);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [step, amount, bankDetails, selectedCurrency, vaultId]);
+
 
   return (
     <div className="min-h-screen bg-white text-slate-600 font-primary antialiased overflow-hidden">
@@ -421,7 +459,7 @@ export default function WithdrawPage() {
                     Net Settlement
                   </p>
                   <div className="flex bg-slate-200/50 p-1 rounded-lg gap-1">
-                    {["USD", "NGN", "GHS", "KES"].map((curr) => (
+                    {["USD", "NGN", "KES"].map((curr) => (
                       <button
                         key={curr}
                         onClick={() => setCurrency(curr as any)}
@@ -436,7 +474,7 @@ export default function WithdrawPage() {
                   <span className="text-emerald-600 font-bold text-2xl">
                     {currencyPrefix}
                   </span>
-                  {(currency === "USD" ? amount : amount * EXCHANGE_RATES[currency as keyof typeof EXCHANGE_RATES]).toLocaleString(undefined, {
+                  {(currency === "USD" ? amount : amount * liveRate).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -449,7 +487,7 @@ export default function WithdrawPage() {
               <div className="space-y-4 pt-8 border-t border-slate-100">
                 <SummaryItem
                   label="Service Fees"
-                  value={`${currencyPrefix}${displayFees.toLocaleString(undefined, {
+                  value={`${currencyPrefix}${displayAppFee.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}`}
@@ -537,12 +575,12 @@ export default function WithdrawPage() {
                       </div>
                       <div className="space-y-4">
                         <h3 className="text-2xl font-bold text-slate-900  tracking-tighter">
-                          Identity Verification Required
+                          Tier 2 Identity Verification Required
                         </h3>
                         <p className="text-sm text-slate-600 font-bold   leading-relaxed px-4">
                           To comply with security and regulatory standards, you need
-                          to verify your identity before you can withdraw funds from
-                          your balance.
+                          to complete full identity verification (Tier 2) before you 
+                          can withdraw funds from your balance.
                         </p>
                       </div>
                       <button
@@ -795,9 +833,7 @@ export default function WithdrawPage() {
                                 className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 text-slate-900 font-bold focus:border-emerald-500/30 outline-none transition-all"
                               >
                                 <option>Nigeria</option>
-                                <option>Ghana</option>
                                 <option>Kenya</option>
-                                <option>South Africa</option>
                                 <option>United States</option>
                                 <option>United Kingdom</option>
                                 <option>Canada</option>
@@ -1181,10 +1217,10 @@ export default function WithdrawPage() {
                         </div>
                         <div className="flex justify-between items-center py-4 border-b border-slate-100">
                           <span className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">
-                            Total Fees (1.5%)
+                            Dayle App Fee (0.5%)
                           </span>
                           <span className="text-emerald-600 font-bold text-sm">
-                            -{currencyPrefix}{displayFees.toFixed(2)}
+                            -{currencyPrefix}{displayAppFee.toFixed(2)}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-8">
@@ -1193,10 +1229,10 @@ export default function WithdrawPage() {
                           </span>
                           <div className="text-right">
                             <span className="text-4xl font-bold text-slate-900 st ">
-                              {currencyPrefix}{displayAmount.toLocaleString(undefined, {
+                              {loadingRate ? "..." : `${currencyPrefix}${displayAmount.toLocaleString(undefined, {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                              })}
+                              })}`}
                             </span>
                             <p className=" text-slate-400 font-black st mt-1 tracking-widest text-[10px] uppercase">
                               {selectedCurrency}

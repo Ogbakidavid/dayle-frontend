@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Input, type InputProps } from "@/components/ui/input";
 
 import { Label } from "@/components/ui/label";
+import { useUser } from "@/lib/store/user-context";
 
 export interface AmountInputProps extends Omit<
   InputProps,
@@ -66,13 +67,16 @@ const AmountInput = React.forwardRef<HTMLInputElement, AmountInputProps>(
       }
     };
 
+    const { user } = useUser();
+    const currencySymbol = user?.country === "Kenya" ? "KSh" : "₦";
+
     return (
       <div className="relative">
         {label && <Label className="block mb-2 text-white">{label}</Label>}
         <Input
           ref={ref}
           className={cn(
-            "pl-8 tabular-nums h-12 text-lg font-semibold",
+            "pl-12 tabular-nums h-12 text-lg font-semibold",
             className,
           )}
           value={displayValue}
@@ -82,7 +86,7 @@ const AmountInput = React.forwardRef<HTMLInputElement, AmountInputProps>(
           placeholder="0.00"
           {...props}
         />
-        <div className="absolute left-3 top-[38px] text-white font-bold">$</div>
+        <div className="absolute left-3 top-[38px] text-white font-bold">{currencySymbol}</div>
       </div>
     );
   },

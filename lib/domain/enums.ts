@@ -23,6 +23,9 @@ export enum VaultType {
 
 export enum VaultStatus {
   DRAFT = "DRAFT",
+  AWAITING_PAYMENT = "AWAITING_PAYMENT",
+  PROCESSING_PAYMENT = "PROCESSING_PAYMENT",
+  WITHDRAWAL_PENDING = "WITHDRAWAL_PENDING",
   FUNDED = "FUNDED",
   RELEASED = "RELEASED",
   REFUNDED = "REFUNDED",
@@ -162,7 +165,7 @@ export enum EvidenceType {
   RELEASE_CONFIRMED = "RELEASE_CONFIRMED",
   REFUND_INITIATED = "REFUND_INITIATED",
   REFUND_CONFIRMED = "REFUND_CONFIRMED",
- 
+  
   // Communication
   MESSAGE_SENT = "MESSAGE_SENT",
   MESSAGE_EDITED = "MESSAGE_EDITED",
@@ -199,6 +202,10 @@ export const getVaultDerivedLabel = (status: string | undefined): string => {
   switch (status?.toUpperCase()) {
     case VaultStatus.DRAFT:
       return "DRAFT";
+    case VaultStatus.AWAITING_PAYMENT:
+      return "AWAITING PAYMENT";
+    case VaultStatus.WITHDRAWAL_PENDING:
+      return "WITHDRAWAL PENDING";
     case VaultStatus.FUNDED:
       return "IN PROGRESS";
     case VaultStatus.RELEASED:
@@ -209,6 +216,8 @@ export const getVaultDerivedLabel = (status: string | undefined): string => {
       return "IN DISPUTE";
     case VaultStatus.CANCELLED:
       return "CANCELLED";
+    case VaultStatus.PROCESSING_PAYMENT:
+      return "PROCESSING PAYMENT";
     default:
       return status || "UNKNOWN";
   }
@@ -220,6 +229,10 @@ export const getVaultStatusDisplay = (vault: any): { label: string; color: strin
   switch (status) {
     case VaultStatus.RELEASED:
       return { label: "PAID", color: "text-emerald-500" };
+    case VaultStatus.AWAITING_PAYMENT:
+      return { label: "AWAITING PAYMENT", color: "text-amber-500" };
+    case VaultStatus.WITHDRAWAL_PENDING:
+      return { label: "WITHDRAWAL PENDING", color: "text-amber-500" };
     case VaultStatus.FUNDED:
       return { label: "IN PROGRESS", color: "text-amber-500" };
     case VaultStatus.DISPUTED:
@@ -228,6 +241,8 @@ export const getVaultStatusDisplay = (vault: any): { label: string; color: strin
       return { label: "REFUNDED", color: "text-gray-400" };
     case VaultStatus.CANCELLED:
       return { label: "CANCELLED", color: "text-gray-500" };
+    case VaultStatus.PROCESSING_PAYMENT:
+      return { label: "PROCESSING", color: "text-amber-500" };
     case VaultStatus.DRAFT:
     default:
       return { label: "DRAFT", color: "text-gray-400" };

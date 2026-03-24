@@ -12,19 +12,22 @@ import PrivyProviderWrapper from "@/components/providers/privyProvider";
 import { SocketProvider } from "@/lib/contexts/socket-context";
 import { RealTimeNotificationListener } from "@/components/shared/RealTimeNotificationListener";
 import { NotificationProvider } from "@/lib/store/notification-context";
+import { RatesProvider } from "@/lib/store/rates-context";
 
 export function Providers({ children }: ProvidersProps) {
   return (
     <PrivyProviderWrapper>
       <UserProvider>
-        <NotificationProvider>
-          <SocketProvider>
-            <RealTimeNotificationListener />
-            <LedgerProvider>
-              <VaultProvider>{children}</VaultProvider>
-            </LedgerProvider>
-          </SocketProvider>
-        </NotificationProvider>
+        <RatesProvider>
+          <NotificationProvider>
+            <SocketProvider>
+              <RealTimeNotificationListener />
+              <LedgerProvider>
+                <VaultProvider>{children}</VaultProvider>
+              </LedgerProvider>
+            </SocketProvider>
+          </NotificationProvider>
+        </RatesProvider>
       </UserProvider>
     </PrivyProviderWrapper>
   );

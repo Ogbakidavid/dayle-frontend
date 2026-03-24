@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Landmark, Clock, ShieldCheck, Zap } from "lucide-react";
+import { CurrencyEstimate } from "./currency-estimate";
 import type { LedgerBalance as LedgerBalanceType } from "@/lib/store/ledger-context";
 
 export interface LedgerBalanceProps {
@@ -26,13 +27,10 @@ export function LedgerBalance({
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
             {role === "client" ? "Total investment" : "Available balance"}
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-light text-slate-900">$</span>
-            <span className="text-5xl font-bold text-slate-900 tracking-tighter ">
-              {Number(balance?.formattedAvailable || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
-            <span className="text-sm font-bold text-slate-900 ml-1">USD</span>
-          </div>
+          <CurrencyEstimate 
+            usdAmount={Number(balance?.formattedAvailable || "0")} 
+            className="text-slate-900 text-5xl font-bold"
+          />
           <div className="mt-8 flex items-center gap-3">
             <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-sm font-bold text-emerald-500  border border-emerald-500/20 flex items-center gap-2">
               <Zap size={10} /> {role === "client" ? "All-time project worth" : "Fully liquid"}
@@ -51,12 +49,10 @@ export function LedgerBalance({
             <ShieldCheck size={14} className="text-emerald-500/50" />
             Pending settlement
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-light text-slate-900">$</span>
-            <span className="text-5xl font-bold text-slate-900 tracking-tighter ">
-              {Number(balance?.formattedPending || "0").toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
-          </div>
+          <CurrencyEstimate 
+            usdAmount={Number(balance?.formattedPending || "0")} 
+            className="text-slate-900 text-5xl font-bold"
+          />
           <div className="mt-8 flex items-center gap-2">
             <span className="text-sm font-bold text-slate-900  flex items-center gap-2">
               <span className="w-1 h-1 rounded-full bg-white/10" />

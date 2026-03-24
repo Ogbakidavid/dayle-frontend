@@ -18,6 +18,16 @@ export interface Vault {
   amount?: string | number;
   totalAmount?: string | number;
   submission?: any;
+  clientId: string;
+  freelancerId?: string;
+  client?: any;
+  freelancer?: any;
+  partnaRampReference?: string;
+  partnaAccountNumber?: string;
+  partnaAccountName?: string;
+  partnaBankName?: string;
+  partnaExpiryDate?: string;
+  partnaExpectedAmount?: number | string;
   [key: string]: any;
 }
 

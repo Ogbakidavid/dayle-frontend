@@ -38,9 +38,9 @@ export function KYCAlert() {
             </h3>
 
             <p className="text-amber-200/60 text-sm font-medium leading-relaxed max-w-2xl">
-              To unlock full platform capabilities including withdrawals and
-              vault creation, please complete your identity verification. This
-              helps us ensure a secure environment for all users.
+              Submit your BVN/Phone (Tier 1) to fund projects. Complete full 
+              identity verification (Tier 2) to unlock fund releases and 
+              withdrawals.
             </p>
           </div>
         </div>

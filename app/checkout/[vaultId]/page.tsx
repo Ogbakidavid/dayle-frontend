@@ -27,8 +27,8 @@ export default function CheckoutSelectionPage() {
 
   const [localVault, setLocalVault] = React.useState<Vault | null>(null);
   const [fetching, setFetching] = React.useState(false);
-  const [currency, setCurrency] = React.useState<"USD" | "NGN" | "GHS" | "KES">("USD");
-  const EXCHANGE_RATES = { USD: 1, NGN: 1500, GHS: 12.5, KES: 135 };
+  const [currency, setCurrency] = React.useState<"USD" | "NGN" | "KES">("USD");
+  const EXCHANGE_RATES = { USD: 1, NGN: 1500, KES: 135 };
 
   const fetchVault = React.useCallback(async () => {
     setFetching(true);
@@ -56,7 +56,7 @@ export default function CheckoutSelectionPage() {
     ? Number(vault.formattedTotalAmount)
     : 0;
   const displayAmount = amount * EXCHANGE_RATES[currency as keyof typeof EXCHANGE_RATES];
-  const currencyPrefixes = { USD: "$", NGN: "₦", GHS: "GH₵", KES: "KSh" };
+  const currencyPrefixes = { USD: "$", NGN: "₦", KES: "KSh" };
   const currencyPrefix = currencyPrefixes[currency as keyof typeof currencyPrefixes];
 
   return (
@@ -86,7 +86,7 @@ export default function CheckoutSelectionPage() {
                       Total settlement
                     </p>
                     <div className="flex bg-slate-200/50 p-1 rounded-lg flex-wrap gap-1">
-                      {["USD", "NGN", "GHS", "KES"].map((curr) => (
+                      {["USD", "NGN", "KES"].map((curr) => (
                         <button
                           key={curr}
                           onClick={() => setCurrency(curr as any)}
@@ -168,30 +168,6 @@ export default function CheckoutSelectionPage() {
                 </div>
               ) : (
                 <div className="grid gap-6">
-                  {/* Card Payment Selection */}
-                  <button
-                    onClick={() =>
-                      router.push(
-                        `/checkout/${vaultId}/card?currency=${currency}`,
-                      )
-                    }
-                    className="w-full p-8 bg-white border border-slate-200 rounded-[2.5rem] flex items-center gap-6 group hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-600/5 transition-all relative overflow-hidden"
-                  >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                    <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-500 transition-all shrink-0">
-                      <CreditCard className="w-6 h-6" />
-                    </div>
-                    <div className="text-left relative z-10">
-                      <p className="text-slate-900 font-bold text-xl tracking-tight  group-hover:text-emerald-950 transition-colors">
-                        Credit / Debit Card
-                      </p>
-                      <p className=" font-bold text-slate-400 st group-hover:text-emerald-600 transition-colors uppercase  mt-1">
-                        Instant payment via Partna Link
-                      </p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 ml-auto text-slate-300 group-hover:text-emerald-500 transition-all group-hover:translate-x-1" />
-                  </button>
 
                   {/* Bank Transfer Selection */}
                   <button

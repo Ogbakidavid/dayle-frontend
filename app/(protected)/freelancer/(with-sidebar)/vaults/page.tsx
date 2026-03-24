@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -56,25 +57,35 @@ export default function FreelancerVaultsPage() {
 
   const totalEarnings = (vaults || [])
     .filter((v: any) => v.status === "RELEASED" || v.status === "completed")
-    .reduce((acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0), 0);
+    .reduce(
+      (acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0),
+      0,
+    );
 
-  const activeJobs = (vaults || [])
-    .filter((v: any) => v.status === "FUNDED" || v.status === "DISPUTED" || v.status === "active")
-    .length;
+  const activeJobs = (vaults || []).filter(
+    (v: any) =>
+      v.status === "FUNDED" || v.status === "DISPUTED" || v.status === "active",
+  ).length;
 
-  const releasedCount = (vaults || []).filter((v: any) => v.status === "RELEASED" || v.status === "completed").length;
-  const disputedCount = (vaults || []).filter((v: any) => v.status === "DISPUTED").length;
-  const refundedCount = (vaults || []).filter((v: any) => v.status === "REFUNDED").length;
-  
+  const releasedCount = (vaults || []).filter(
+    (v: any) => v.status === "RELEASED" || v.status === "completed",
+  ).length;
+  const disputedCount = (vaults || []).filter(
+    (v: any) => v.status === "DISPUTED",
+  ).length;
+  const refundedCount = (vaults || []).filter(
+    (v: any) => v.status === "REFUNDED",
+  ).length;
+
   const totalClosed = releasedCount + disputedCount + refundedCount;
-  const successRate = totalClosed > 0 
-    ? Math.round((releasedCount / totalClosed) * 100) 
-    : 100;
+  const successRate =
+    totalClosed > 0 ? Math.round((releasedCount / totalClosed) * 100) : 100;
 
   const stats = [
     {
       label: "Total Earnings",
-      value: `$${totalEarnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: totalEarnings,
+      isAmount: true,
       change: "+0%",
       icon: Shield,
       color: "text-emerald-500",
@@ -102,7 +113,6 @@ export default function FreelancerVaultsPage() {
       animate="visible"
       className="min-h-screen text-slate-600 font-sans selection:bg-emerald-500/30"
     >
-
       <div className="max-w-7xl mx-auto px-6 space-y-10">
         {/* 1. TOP NAVIGATION / HEADER */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -127,7 +137,6 @@ export default function FreelancerVaultsPage() {
               Filters
             </Button>
           </motion.div>
-
         </header>
 
         {/* 2. ANALYTICS GRID */}
@@ -157,11 +166,17 @@ export default function FreelancerVaultsPage() {
                 {stat.label}
               </p>
               <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-                {stat.value}
+                {(stat as any).isAmount ? (
+                  <CurrencyEstimate
+                    usdAmount={stat.value as number}
+                    showNote={false}
+                  />
+                ) : (
+                  stat.value
+                )}
               </h2>
             </motion.div>
           ))}
-
         </section>
 
         {/* 3. SEARCH & TOOLS */}
@@ -176,13 +191,11 @@ export default function FreelancerVaultsPage() {
           />
         </motion.div>
 
-
         {/* 4. DATA TABLE (LIST) */}
         <motion.div
           variants={itemVariants}
           className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm"
         >
-
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
@@ -203,7 +216,6 @@ export default function FreelancerVaultsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-
                 {paginatedVaults.map((vault: any) => (
                   <tr
                     key={vault.id}
@@ -235,22 +247,33 @@ export default function FreelancerVaultsPage() {
                                 : "Pending..."}
                             </p>
 
-                            <span className={cn(
-                              "sm:hidden text-[10px] px-2 py-0.5 rounded-full border font-bold whitespace-nowrap",
-                              vault.status === "FUNDED" || vault.status === "active"
-                                ? "bg-amber-50 border-amber-100 text-amber-700"
-                                : vault.status === "RELEASED" || vault.status === "completed"
-                                  ? "bg-emerald-50 border-emerald-100 text-emerald-700"
+                            <span
+                              className={cn(
+                                "sm:hidden text-[10px] px-2 py-0.5 rounded-full border font-bold whitespace-nowrap",
+                                vault.status === "FUNDED" ||
+                                  vault.status === "active"
+                                  ? "bg-amber-50 border-amber-100 text-amber-700"
+                                  : vault.status === "RELEASED" ||
+                                      vault.status === "completed"
+                                    ? "bg-emerald-50 border-emerald-100 text-emerald-700"
+                                    : vault.status === "DISPUTED"
+                                      ? "bg-red-50 border-red-100 text-red-700"
+                                      : vault.status === "INVITED"
+                                        ? "bg-blue-50 border-blue-100 text-blue-700"
+                                        : "bg-slate-50 border-slate-200 text-slate-400",
+                              )}
+                            >
+                              {vault.status === "FUNDED" ||
+                              vault.status === "active"
+                                ? "Funded"
+                                : vault.status === "RELEASED" ||
+                                    vault.status === "completed"
+                                  ? "Released"
                                   : vault.status === "DISPUTED"
-                                    ? "bg-red-50 border-red-100 text-red-700"
+                                    ? "Disputed"
                                     : vault.status === "INVITED"
-                                      ? "bg-blue-50 border-blue-100 text-blue-700"
-                                      : "bg-slate-50 border-slate-200 text-slate-400"
-                            )}>
-                              {vault.status === "FUNDED" || vault.status === "active" ? "Funded" : 
-                               vault.status === "RELEASED" || vault.status === "completed" ? "Released" :
-                               vault.status === "DISPUTED" ? "Disputed" : 
-                               vault.status === "INVITED" ? "Invited" : vault.status}
+                                      ? "Invited"
+                                      : vault.status}
                             </span>
                           </div>
                           <p className="lg:hidden text-[10px] text-slate-400 font-medium mt-2 truncate">
@@ -262,7 +285,6 @@ export default function FreelancerVaultsPage() {
                         </div>
                       </div>
                     </td>
-
                     <td className="hidden lg:table-cell px-6 py-6">
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center font-bold text-emerald-600 shadow-sm text-[10px]">
@@ -277,14 +299,14 @@ export default function FreelancerVaultsPage() {
                         </span>
                       </div>
                     </td>
-
                     <td className="hidden sm:table-cell px-6 py-6">
                       <div
                         className={cn(
                           "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-wider shadow-sm",
                           vault.status === "FUNDED" || vault.status === "active"
                             ? "bg-amber-50 border-amber-100 text-amber-600"
-                            : vault.status === "RELEASED" || vault.status === "completed"
+                            : vault.status === "RELEASED" ||
+                                vault.status === "completed"
                               ? "bg-emerald-50 border-emerald-100 text-emerald-600"
                               : vault.status === "DISPUTED"
                                 ? "bg-red-50 border-red-100 text-red-600"
@@ -296,9 +318,11 @@ export default function FreelancerVaultsPage() {
                         <div
                           className={cn(
                             "w-1.5 h-1.5 rounded-full animate-pulse",
-                            vault.status === "FUNDED" || vault.status === "active"
+                            vault.status === "FUNDED" ||
+                              vault.status === "active"
                               ? "bg-amber-500"
-                              : vault.status === "RELEASED" || vault.status === "completed"
+                              : vault.status === "RELEASED" ||
+                                  vault.status === "completed"
                                 ? "bg-emerald-500"
                                 : vault.status === "DISPUTED"
                                   ? "bg-red-500"
@@ -307,23 +331,28 @@ export default function FreelancerVaultsPage() {
                                     : "bg-slate-300",
                           )}
                         />
-                        {vault.status === "FUNDED" || vault.status === "active" ? "Funded" : 
-                         vault.status === "RELEASED" || vault.status === "completed" ? "Released" :
-                         vault.status === "DISPUTED" ? "Disputed" : 
-                         vault.status === "INVITED" ? "Invited" : vault.status}
+                        {vault.status === "FUNDED" || vault.status === "active"
+                          ? "Funded"
+                          : vault.status === "RELEASED" ||
+                              vault.status === "completed"
+                            ? "Released"
+                            : vault.status === "DISPUTED"
+                              ? "Disputed"
+                              : vault.status === "INVITED"
+                                ? "Invited"
+                                : vault.status}
                       </div>
                     </td>
-
                     <td className="px-6 py-6 text-right">
-                      <p className="text-base font-bold text-slate-900 tracking-tight">
-                        ${vault.formattedTotalAmount || vault.totalAmount}
-                      </p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1 ">
-                        Secured
-                      </p>
+                      <CurrencyEstimate
+                        usdAmount={Number(
+                          vault.formattedTotalAmount || vault.totalAmount,
+                        )}
+                        showNote={false}
+                        className="text-base font-bold text-slate-900"
+                      />
                     </td>
- Broadway: 
-
+                    Broadway:
                     <td className="px-6 py-6 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
                         <Link
@@ -340,7 +369,6 @@ export default function FreelancerVaultsPage() {
                         </Link>
                       </div>
                     </td>
-
                   </tr>
                 ))}
               </tbody>
@@ -400,7 +428,6 @@ export default function FreelancerVaultsPage() {
             >
               Next
             </Button>
-
           </div>
         </footer>
       </div>

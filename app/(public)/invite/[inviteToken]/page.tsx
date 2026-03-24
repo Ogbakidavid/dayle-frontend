@@ -21,6 +21,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { LogoLoader } from "@/components/ui/logo-loader";
 import { DayleLogo } from "@/components/shared/DayleLogo";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 interface InviteData {
   invite: {
@@ -313,10 +314,10 @@ export default function InvitePage() {
                   <p className="text-slate-600 text-xs md:text-sm font-bold mb-1">
                     Total value
                   </p>
-                  <div className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight flex items-baseline gap-1">
-                    <span className="text-base text-emerald-600">$</span>
-                    {vault.formattedTotalAmount || "0.00"}
-                  </div>
+                  <CurrencyEstimate 
+                    usdAmount={Number(vault.formattedTotalAmount || vault.amount || 0)} 
+                    className="text-slate-900 text-2xl md:text-3xl font-bold"
+                  />
                 </div>
               </div>
 
@@ -382,7 +383,7 @@ export default function InvitePage() {
                     </p>
                     <p className="text-slate-600 text-sm font-medium mt-0.5">
                       {vault.isFunded
-                        ? "Capital is held in a secure escrow account."
+                        ? "Capital is held in a secure settlement account."
                         : "Funds must be secured before work begins."}
                     </p>
                   </div>

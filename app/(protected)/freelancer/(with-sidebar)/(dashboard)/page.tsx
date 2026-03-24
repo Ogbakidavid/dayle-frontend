@@ -22,6 +22,7 @@ import { VaultStatus } from "@/lib/domain/enums";
 import { getVaultDerivedLabel } from "@/lib/domain/enums";
 import { api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -122,9 +123,10 @@ export default function FreelancerDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tighter ">
-              ${balance?.formattedAvailable || "0.00"}
-            </h2>
+            <CurrencyEstimate
+              usdAmount={Number(balance?.formattedAvailable) || 0}
+              className="text-slate-900 text-4xl font-bold"
+            />
             <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-bold tracking-wide">
               <Zap className="w-3.5 h-3.5" />
               Funds liquid
@@ -145,19 +147,14 @@ export default function FreelancerDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tighter ">
-              $
-              {activeVaults
-                .reduce(
-                  (acc: number, v: any) =>
-                    acc + (Number(v.formattedTotalAmount) || 0),
-                  0,
-                )
-                .toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-            </h2>
+            <CurrencyEstimate
+              usdAmount={activeVaults.reduce(
+                (acc: number, v: any) =>
+                  acc + (Number(v.formattedTotalAmount) || 0),
+                0,
+              )}
+              className="text-slate-900 text-4xl font-bold"
+            />
             <p className="text-blue-400 text-[10px] font-bold tracking-wide">
               {activeVaults.length} active assignments
             </p>
@@ -248,12 +245,17 @@ export default function FreelancerDashboard() {
                     <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1 uppercase">
                       Project value
                     </p>
-                    <p className="text-xl font-bold text-slate-900 tracking-tight ">
-                      $
-                      {invite.vault?.formattedTotalAmount || "0.00"}
-                    </p>
+                    <CurrencyEstimate
+                      usdAmount={Number(
+                        invite.vault?.formattedTotalAmount || "0.00",
+                      )}
+                      className="text-slate-900 text-xl font-bold"
+                    />
                   </div>
-                  <Link href={`/invite/${invite.token}`} className="w-full xs:w-auto">
+                  <Link
+                    href={`/invite/${invite.token}`}
+                    className="w-full xs:w-auto"
+                  >
                     <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] h-10 px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/10">
                       View invitation
                     </Button>
@@ -381,9 +383,12 @@ export default function FreelancerDashboard() {
                         <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1">
                           Project value
                         </p>
-                        <p className="text-2xl font-bold text-slate-900 tracking-tight ">
-                          ${vault.formattedTotalAmount || "0.00"}
-                        </p>
+                        <CurrencyEstimate
+                          usdAmount={Number(
+                            vault.formattedTotalAmount || "0.00",
+                          )}
+                          className="text-slate-900 text-2xl font-bold"
+                        />
                       </div>
                       <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">
                         <ArrowUpRight className="w-5 h-5 text-slate-600 group-hover:text-white transition-colors" />

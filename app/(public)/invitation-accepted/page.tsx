@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, AlertTriangle } from "lucide-react";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 interface Vault {
   id: string;
@@ -102,9 +103,11 @@ export default function InvitationAcceptedPage() {
             </div>
             <div className="flex justify-between items-center py-2">
               <span className="text-slate-500 text-sm ">Total Value</span>
-              <span className="text-slate-900 font-bold">
-                ${vault.formattedTotalAmount || vault.amount}
-              </span>
+              <CurrencyEstimate 
+                usdAmount={Number(vault.formattedTotalAmount || vault.amount)} 
+                showNote={false}
+                className="text-slate-900 font-bold"
+              />
             </div>
           </CardContent>
         </Card>

@@ -13,6 +13,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Lock, TrendingUp } from "lucide-react";
 import type { Vault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 export interface VaultCardProps {
   vault: Vault;
@@ -33,12 +34,10 @@ export function VaultCard({ vault, isClient }: VaultCardProps) {
         {/* Value */}
         <div>
           <p className=" font-bold st text-white/30 mb-1">Project value</p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-bold text-white">$</span>
-            <h2 className="text-3xl font-bold text-white tracking-tighter ">
-              {(vault.totalAmount || vault.amount || 0).toLocaleString()}
-            </h2>
-          </div>
+          <CurrencyEstimate 
+            usdAmount={Number(vault.totalAmount || vault.amount || 0)} 
+            className="text-white"
+          />
         </div>
 
         {/* Stakeholders */}

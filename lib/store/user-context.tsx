@@ -20,6 +20,8 @@ interface User {
   role: UserRole;
   emailVerified: boolean;
   kycStatus?: KycStatus;
+  paymentAccountReady?: boolean;
+  country?: string;
   wallet?: {
     address: string;
   };

@@ -9,6 +9,7 @@ import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 import { Search, ArrowUpRight, ArrowDownLeft, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 // Helper: format a raw USDC/USDT amount stored in 6-decimal base units
 const formatAmount = (raw: bigint | number | string): number => {
@@ -114,21 +115,24 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
         {[
           {
             label: "In Transit",
-            value: `$${processingTotal.toLocaleString()}`,
+            value: processingTotal,
+            isAmount: true,
             color: "text-slate-900",
             bg: "bg-amber-50",
             border: "border-amber-100",
           },
           {
             label: "Distributed",
-            value: `$${completedTotal.toLocaleString()}`,
+            value: completedTotal,
+            isAmount: true,
             color: "text-slate-900",
             bg: "bg-emerald-50",
             border: "border-emerald-100",
           },
           {
             label: "Total Events",
-            value: `${(entries || []).length}`,
+            value: (entries || []).length,
+            isAmount: false,
             color: "text-slate-900",
             bg: "bg-blue-50",
             border: "border-blue-100",
@@ -154,14 +158,16 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                 <p className="text-sm font-bold  text-slate-600 mb-2 group-hover:text-slate-600 transition-colors ">
                   {stat.label}
                 </p>
-                <p
+                <div
                   className={cn(
                     "text-3xl font-bold text-slate-900 tracking-tighter ",
                     stat.color,
                   )}
                 >
-                  {stat.value}
-                </p>
+                  {stat.isAmount ? (
+                    <CurrencyEstimate usdAmount={stat.value as number} showNote={false} />
+                  ) : stat.value}
+                </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -206,7 +212,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                         State
                       </th>
                       <th className="px-6 py-4 text-[11px] font-bold text-slate-600  uppercase text-right">
-                        Value (USD)
+                        Value
                       </th>
                     </tr>
                   </thead>
@@ -287,9 +293,11 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                                 </div>
                               </div>
                               <div className="sm:hidden text-right shrink-0">
-                                <p className="text-sm font-bold text-slate-900">
-                                  ${Math.abs(formatAmount(entry.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </p>
+                                <CurrencyEstimate 
+                                  usdAmount={Math.abs(formatAmount(entry.amount))} 
+                                  showNote={false}
+                                  className="text-sm font-bold text-slate-900"
+                                />
                                 <p className={cn(
                                   "text-[10px] font-bold mt-0.5",
                                   entry.amount < 0 ? "text-amber-600" : "text-emerald-600"
@@ -329,9 +337,11 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             </div>
                           </td>
                           <td className="hidden sm:table-cell px-6 py-6 text-right">
-                            <p className="text-base font-bold text-slate-900 leading-none">
-                              ${Math.abs(formatAmount(entry.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </p>
+                            <CurrencyEstimate 
+                              usdAmount={Math.abs(formatAmount(entry.amount))} 
+                              showNote={false}
+                              className="text-base font-bold text-slate-900"
+                            />
                             <p className="text-sm text-slate-600 font-bold mt-1">
                               {entry.amount < 0 ? "Debit" : "Credit"}
                             </p>

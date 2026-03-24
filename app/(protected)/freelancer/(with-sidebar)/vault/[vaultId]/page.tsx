@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Gavel,
   ShieldCheck,
+  CreditCard,
   ListChecks,
   Square,
   CheckSquare,
@@ -40,6 +41,9 @@ import { VaultStatus } from "@/lib/domain/enums";
 import { getVaultDerivedLabel } from "@/lib/domain/enums";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
+import { calculateDayleFee } from "@/lib/utils/fee";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
+
 
 export default function FreelancerVaultDetailPage() {
   const params = useParams();
@@ -194,21 +198,85 @@ export default function FreelancerVaultDetailPage() {
               <p className="text-[9px] md:text-[11px] text-slate-600 font-bold  mb-1 ">
                 Secured contract value
               </p>
-              <p className="text-4xl md:text-6xl font-bold text-slate-900 st  leading-none">
-                ${vault.formattedTotalAmount || "0.00"}
-              </p>
+              <CurrencyEstimate 
+                usdAmount={Number(vault.formattedTotalAmount || "0.00")} 
+                className="text-slate-900 text-4xl md:text-6xl font-bold"
+              />
               <div className="mt-4 inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <p className=" md:text-sm text-emerald-700 font-bold  ">
-                  $
-                  {vault.formattedPaidAmount ||
-                    (vault.paidAmount || 0).toLocaleString()}{" "}
-                  capital settled
+                <p className=" md:text-sm text-emerald-700 font-bold  flex items-center gap-1">
+                  <CurrencyEstimate 
+                    usdAmount={Number(vault.formattedPaidAmount || vault.paidAmount || 0)} 
+                    className="text-emerald-700" 
+                    showNote={false}
+                  />
+                  <span>capital settled</span>
                 </p>
               </div>
             </div>
           </div>
         </header>
+
+        {/* SECTION: FEE BREAKDOWN (ONLY IF RELEASED) */}
+        {vault.status === VaultStatus.RELEASED && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="md:col-span-2 bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-emerald-100/50 border border-emerald-200">
+                      <CreditCard className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900">Fee Breakdown</h3>
+                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Disbursement deductions</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="text-right">
+                      <p className="text-[10px] text-slate-500 font-bold uppercase">Settlement ({calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent}%)</p>
+                      <CurrencyEstimate 
+                        usdAmount={vault.settlementFeeUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
+                        className="text-slate-900 text-sm font-bold"
+                      />
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] text-amber-500 font-bold uppercase">Withdrawal fee (0.5%)</p>
+                      <CurrencyEstimate 
+                        usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).withdrawalFeeUSD} 
+                        className="text-amber-600 text-sm font-bold"
+                      />
+                    </div>
+                    <div className="text-right border-l border-emerald-200 pl-6">
+                      <p className="text-[10px] text-emerald-600 font-bold uppercase">Total Charges</p>
+                      <CurrencyEstimate 
+                        usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).totalFeeUSD} 
+                        className="text-emerald-700 text-lg font-black"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-slate-900 text-white border-none shadow-xl overflow-hidden relative">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <ShieldCheck className="w-16 h-16" />
+              </div>
+              <CardContent className="p-6">
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-1">Your Net Receipt</p>
+                <CurrencyEstimate 
+                  usdAmount={vault.freelancerReceivesUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).freelancerReceivesUSD} 
+                  className="text-white text-3xl font-black"
+                />
+                <div className="mt-2 flex items-center gap-1.5">
+                  <CheckCircle className="w-3 h-3 text-emerald-400" />
+                  <p className="text-[10px] font-bold text-emerald-400/80">Funds released via Dayle Settlement</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* LEFT COLUMN: SECTIONS B & C */}

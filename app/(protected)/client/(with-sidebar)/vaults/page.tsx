@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -72,7 +73,9 @@ const statusConfig: Record<string, { label: string; classes: string }> = {
 
 export default function VaultsPage() {
   const { vaults, loading } = useVault();
-  const [activeTab, setActiveTab] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
+  const [activeTab, setActiveTab] = useState<"ALL" | "ACTIVE" | "COMPLETED">(
+    "ALL",
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -175,7 +178,7 @@ export default function VaultsPage() {
   const stats = [
     {
       label: "Total Value",
-      value: `$${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: totalValue,
       change: `+${valueChange}%`,
       color: "text-slate-900",
       trend: valueChange >= 0 ? "up" : "down",
@@ -228,7 +231,10 @@ export default function VaultsPage() {
         </header>
 
         {/* Status Tabs */}
-        <motion.div variants={itemVariants} className="flex border-b border-slate-200">
+        <motion.div
+          variants={itemVariants}
+          className="flex border-b border-slate-200"
+        >
           {[
             { id: "ALL", label: "All projects" },
             { id: "ACTIVE", label: "Active" },
@@ -280,7 +286,11 @@ export default function VaultsPage() {
                 {stat.label}
               </p>
               <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
-                {stat.value}
+                {typeof stat.value === "number" ? (
+                  <CurrencyEstimate usdAmount={stat.value} showNote={false} />
+                ) : (
+                  stat.value
+                )}
               </h2>
             </motion.div>
           ))}
@@ -370,10 +380,15 @@ export default function VaultsPage() {
                               <div
                                 className={cn(
                                   "sm:hidden flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[10px] font-bold",
-                                  statusConfig[vault.status as keyof typeof statusConfig]?.classes || "bg-slate-50 border-slate-100 text-slate-700"
+                                  statusConfig[
+                                    vault.status as keyof typeof statusConfig
+                                  ]?.classes ||
+                                    "bg-slate-50 border-slate-100 text-slate-700",
                                 )}
                               >
-                                {statusConfig[vault.status as keyof typeof statusConfig]?.label || vault.status}
+                                {statusConfig[
+                                  vault.status as keyof typeof statusConfig
+                                ]?.label || vault.status}
                               </div>
                             </div>
                             <p className="lg:hidden text-sm text-slate-600 font-bold mt-1 truncate">
@@ -384,12 +399,13 @@ export default function VaultsPage() {
                             </p>
                           </div>
                           <div className="sm:hidden text-right shrink-0">
-                            <p className="text-sm font-bold text-slate-900">
-                              ${vault.formattedTotalAmount || vault.totalAmount}
-                            </p>
-                            <p className="text-[10px] text-slate-600 font-bold">
-                              USD
-                            </p>
+                            <CurrencyEstimate
+                              usdAmount={Number(
+                                vault.formattedTotalAmount || vault.totalAmount,
+                              )}
+                              showNote={false}
+                              className="text-sm font-bold text-slate-900"
+                            />
                           </div>
                         </div>
                       </td>
@@ -413,19 +429,25 @@ export default function VaultsPage() {
                         <div
                           className={cn(
                             "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[11px] md:text-sm font-bold",
-                            statusConfig[vault.status as keyof typeof statusConfig]?.classes || "bg-slate-50 border-slate-100 text-slate-700"
+                            statusConfig[
+                              vault.status as keyof typeof statusConfig
+                            ]?.classes ||
+                              "bg-slate-50 border-slate-100 text-slate-700",
                           )}
                         >
-                          {statusConfig[vault.status as keyof typeof statusConfig]?.label || vault.status}
+                          {statusConfig[
+                            vault.status as keyof typeof statusConfig
+                          ]?.label || vault.status}
                         </div>
                       </td>
                       <td className="hidden sm:table-cell px-4 md:px-6 py-5 text-right">
-                        <p className="text-sm md:text-base font-bold text-slate-900  ">
-                          ${vault.formattedTotalAmount || vault.totalAmount}
-                        </p>
-                        <p className=" md:text-sm text-slate-600 font-bold ">
-                          USD
-                        </p>
+                        <CurrencyEstimate
+                          usdAmount={Number(
+                            vault.formattedTotalAmount || vault.totalAmount,
+                          )}
+                          showNote={false}
+                          className="text-sm md:text-base font-bold text-slate-900"
+                        />
                       </td>
                       <td className="hidden sm:table-cell px-4 md:px-6 py-5 text-right">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -459,18 +481,18 @@ export default function VaultsPage() {
               project vaults
             </p>
             <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={currentPage === 1}
-                  onClick={() => {
-                    setCurrentPage((prev) => Math.max(1, prev - 1));
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  className="h-9 px-4 text-xs sm:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-all font-bold shadow-sm"
-                >
-                  Previous
-                </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage === 1}
+                onClick={() => {
+                  setCurrentPage((prev) => Math.max(1, prev - 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="h-9 px-4 text-xs sm:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-all font-bold shadow-sm"
+              >
+                Previous
+              </Button>
               <div className="hidden sm:flex items-center gap-1 px-2">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (p) => (
@@ -495,18 +517,18 @@ export default function VaultsPage() {
               <div className="sm:hidden text-sm font-bold text-slate-900">
                 {currentPage} / {totalPages}
               </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={currentPage === totalPages}
-                  onClick={() => {
-                    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  className="h-9 px-4 text-xs sm:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-all font-bold shadow-sm"
-                >
-                  Next
-                </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage === totalPages}
+                onClick={() => {
+                  setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="h-9 px-4 text-xs sm:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-all font-bold shadow-sm"
+              >
+                Next
+              </Button>
             </div>
           </footer>
         )}

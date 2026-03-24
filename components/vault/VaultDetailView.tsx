@@ -164,6 +164,52 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
         </div>
 
         <div className="space-y-6">
+          {vault.status === "AWAITING_PAYMENT" && role === "client" && (
+            <Card className="bg-emerald-500/10 border-emerald-500/20 overflow-hidden relative">
+              <div className="absolute top-0 right-0 p-3 opacity-10">
+                <ShieldCheck className="w-12 h-12 text-emerald-500" />
+              </div>
+              <CardHeader>
+                <CardTitle className="text-emerald-400 text-lg flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5" />
+                  Payment Required
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-white/80">
+                  To fund this project, please make a bank transfer using the details below. The project status will update automatically once payment is verified.
+                </p>
+                <div className="bg-black/40 rounded-lg p-4 space-y-3 border border-white/5">
+                  <div className="grid grid-cols-[1fr_2fr] gap-y-3 text-sm">
+                    <span className="text-white/40 font-bold uppercase text-[10px] tracking-widest self-center">Amount</span>
+                    <span className="text-white font-mono text-lg font-bold">
+                      {vault.partnaExpectedAmount?.toLocaleString()} {vault.client?.country === 'Kenya' ? 'KES' : 'NGN'}
+                    </span>
+                    
+                    <span className="text-white/40 font-bold uppercase text-[10px] tracking-widest self-center">Bank Name</span>
+                    <span className="text-white font-semibold">{vault.partnaBankName}</span>
+                    
+                    <span className="text-white/40 font-bold uppercase text-[10px] tracking-widest self-center">Account Number</span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-white font-mono text-base tracking-[0.2em]">{vault.partnaAccountNumber}</span>
+                    </div>
+                    
+                    <span className="text-white/40 font-bold uppercase text-[10px] tracking-widest self-center">Account Name</span>
+                    <span className="text-white font-semibold">{vault.partnaAccountName}</span>
+                  </div>
+                </div>
+                
+                <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-lg">
+                  <div className="flex gap-3">
+                      <ClipboardList className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-amber-200/70 leading-relaxed">
+                        <strong>Important:</strong> Ensure the amount matches exactly. Transfers usually settle within 5-15 minutes.
+                      </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
           <EvidencePanel vault={vault} evidence={evidence || []} />
         </div>
       </div>

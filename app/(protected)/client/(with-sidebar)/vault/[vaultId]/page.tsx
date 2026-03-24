@@ -83,6 +83,8 @@ import {
 } from "@/lib/domain/enums";
 import { useUser } from "@/lib/store/user-context";
 import { motion, AnimatePresence } from "framer-motion";
+import { calculateDayleFee } from "@/lib/utils/fee";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 export default function ClientVaultDetailPage() {
   const params = useParams();
@@ -116,6 +118,15 @@ export default function ClientVaultDetailPage() {
   const [reassigningLoading, setReassigningLoading] = useState(false);
   const [requestingRefund, setRequestingRefund] = useState(false);
 
+  // Onramp State
+  const [showFundModal, setShowFundModal] = useState(false);
+  const [fundingStep, setFundingStep] = useState<"confirm" | "instructions">("confirm");
+  const [rateData, setRateData] = useState<any>(null);
+  const [loadingRate, setLoadingRate] = useState(false);
+  const [countdown, setCountdown] = useState(600); // 10 minutes
+  const [initiatingRamp, setInitiatingRamp] = useState(false);
+  const [mockingDeposit, setMockingDeposit] = useState(false);
+
   // Refund Form State
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [payoutMethod, setPayoutMethod] = useState<"bank" | "card">("bank");
@@ -140,23 +151,60 @@ export default function ClientVaultDetailPage() {
     fetchInviteStatus();
   }, [vault]);
 
-  // Poll for status update after returning from checkout
+  // Poll for status update after returning from checkout or while in AWAITING_PAYMENT
   useEffect(() => {
-    if (isSuccessReturn && vault?.status === VaultStatus.DRAFT) {
+    const isProcessing = vault?.status === VaultStatus.PROCESSING_PAYMENT;
+    const isAwaiting = vault?.status === VaultStatus.AWAITING_PAYMENT;
+
+    if ((isSuccessReturn && vault?.status === VaultStatus.DRAFT) || isProcessing || isAwaiting) {
       const intervalId = setInterval(() => {
         refreshVaults();
-      }, 3000); // Poll every 3 seconds
+      }, 5000); // Poll every 5 seconds
       
       return () => clearInterval(intervalId);
     } else if (isSuccessReturn && vault?.status === VaultStatus.FUNDED) {
       // Clear the query param so we don't keep polling or showing success unnecessarily on refresh
       const newUrl = window.location.pathname;
       window.history.replaceState({}, '', newUrl);
-      toast.success("Deposit confirmed!", { description: "Funds are now secured in the escrow contract." });
+      toast.success("Deposit confirmed!", { description: "Funds are now secured in the settlement vault." });
     }
   }, [isSuccessReturn, vault?.status, refreshVaults]);
 
+  // Rate Timer Countdown
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (showFundModal && fundingStep === "confirm" && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [showFundModal, fundingStep, countdown]);
+
+  const fetchRate = async () => {
+    if (!user || !vault) return;
+    setLoadingRate(true);
+    try {
+      const currency = user.country === "Kenya" ? "KES" : "NGN";
+      const budgetUSD = parseFloat(vault.formattedTotalAmount);
+      const data = await api.rates.getTransactionRate(currency, budgetUSD, vault.id, "funding");
+      setRateData(data);
+      setCountdown(600);
+    } catch (err: any) {
+      toast.error("Failed to fetch current rate");
+    } finally {
+      setLoadingRate(false);
+    }
+  };
+
   const handleApprove = async () => {
+    if (user?.kycStatus !== KycStatus.VERIFIED) {
+      toast.error("Identity Verification Required", {
+        description: "You must complete full identity verification (Tier 2) to release funds."
+      });
+      return;
+    }
+    setShowApproveDialog(false);
     try {
       await api.vaults.release(vault.id, {
         idempotencyKey: crypto.randomUUID(),
@@ -172,25 +220,48 @@ export default function ClientVaultDetailPage() {
   };
 
   const handleFund = async () => {
-    if (user?.kycStatus !== KycStatus.VERIFIED) {
-      toast.error("KYC Verification Required", {
+    if (!user?.paymentAccountReady) {
+      toast.error("Onboarding Required", {
         description:
-          "You must complete KYC verification before you can fund projects.",
+          "Please complete your BVN verification (Tier 1) before you can fund projects.",
       });
       return;
     }
 
+    if (vault.status === VaultStatus.AWAITING_PAYMENT) {
+      setFundingStep("instructions");
+      setShowFundModal(true);
+      return;
+    }
+
+    setFundingStep("confirm");
+    setShowFundModal(true);
+    fetchRate();
+  };
+
+  const proceedToPayment = async () => {
+    if (!rateData) return;
+    setInitiatingRamp(true);
     try {
-      await api.vaults.fund(vault.id, {
+      const response = await api.vaults.fund(vault.id, {
         paymentMethod: "bank",
-        paymentDetails: {},
+        currency: rateData.currency,
+        rateKey: rateData.rateKey, // Assuming backend returns rateKey from transaction-rate API
+        amount: rateData.convertedAmount,
         idempotencyKey: crypto.randomUUID(),
       });
-      await refreshVaults();
-      toast.success("Project successfully funded!");
+
+      // If bank info returned directly
+      if (response.accountNumber) {
+        await refreshVaults();
+        setFundingStep("instructions");
+      } else if (response.redirectUrl) {
+        window.location.href = response.redirectUrl;
+      }
     } catch (err: any) {
-      console.error("Funding failed:", err);
-      toast.error(err.message || "Failed to fund vault.");
+      toast.error(err.message || "Failed to initiate payment");
+    } finally {
+      setInitiatingRamp(false);
     }
   };
 
@@ -237,6 +308,27 @@ export default function ClientVaultDetailPage() {
       setReassigningLoading(false);
     }
   };
+
+  const handleMockDeposit = async () => {
+    if (!vault) return;
+    setMockingDeposit(true);
+    try {
+      await api.vaults.mockDeposit(vault.id, {
+        amount: vault.partnaFromAmount,
+        accountName: vault.partnaAccountName || user?.name
+      });
+      toast.success("Mock deposit triggered!", { 
+        description: "The payment should be confirmed shortly. Please wait a few moments for the vault to update." 
+      });
+      // Start polling immediately
+      refreshVaults();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to trigger mock deposit");
+    } finally {
+      setMockingDeposit(false);
+    }
+  };
+
   const [expandedSubmissions, setExpandedSubmissions] = useState<string[]>([]);
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<
     string | null
@@ -322,7 +414,7 @@ export default function ClientVaultDetailPage() {
               <AlertDescription className="text-sm font-bold mt-2 leading-relaxed ">
                 Your fiat payment of{" "}
                 <span className="text-red-600 underline">
-                  ${vault.formattedTotalAmount || "0.00"}
+                  {vault.formattedTotalAmount || "0.00"}
                 </span>{" "}
                 was confirmed, but we encountered an error while updating the
                 project vault.
@@ -346,6 +438,81 @@ export default function ClientVaultDetailPage() {
             </Alert>
           )}
 
+          {/* BANK INSTRUCTIONS ALERT (AWAITING PAYMENT) */}
+          {vault.status === VaultStatus.AWAITING_PAYMENT && (
+            <Alert className="bg-emerald-600 border-none text-white shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
+                <CreditCard className="w-32 h-32" />
+              </div>
+              <div className="relative z-10">
+                <AlertTitle className="text-xl font-black flex items-center gap-2 mb-2">
+                  <Clock className="w-5 h-5 animate-pulse" />
+                  Awaiting Bank Transfer
+                </AlertTitle>
+                <AlertDescription className="space-y-4">
+                  <p className="font-bold opacity-90 max-w-2xl">
+                    Please complete your transfer to secure the funds. Once received, the project will automatically move to "Funded".
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
+                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
+                      <p className="text-[10px] font-bold uppercase opacity-60">Bank Name</p>
+                      <p className="text-lg font-black">{vault.partnaBankName || "Processing..."}</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20 relative group">
+                      <p className="text-[10px] font-bold uppercase opacity-60">Account Number</p>
+                      <p className="text-lg font-black">{vault.partnaAccountNumber || "..."}</p>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute top-2 right-2 text-white/40 hover:text-white"
+                        onClick={() => {
+                          navigator.clipboard.writeText(vault.partnaAccountNumber);
+                          toast.success("Copied to clipboard");
+                        }}
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
+                      <p className="text-[10px] font-bold uppercase opacity-60">Beneficiary</p>
+                      <p className="text-sm font-bold">{vault.partnaAccountName || "..."}</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
+                      <p className="text-[10px] font-bold uppercase opacity-60">Amount to Transfer</p>
+                      <p className="text-lg font-black">
+                        {vault.partnaFromAmount?.toLocaleString()} {vault.partnaFromCurrency}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 pt-2">
+                    {user?.kycStatus === "VERIFIED" && process.env.NEXT_PUBLIC_NODE_ENV === "development" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleMockDeposit}
+                        disabled={mockingDeposit}
+                        className="bg-white/20 border-white/40 text-white hover:bg-white/30 font-bold shadow-lg"
+                      >
+                        {mockingDeposit ? <RefreshCcw className="w-4 h-4 animate-spin mr-2" /> : <Zap className="w-4 h-4 mr-2" />}
+                        Trigger Mock Deposit (Dev Only)
+                      </Button>
+                    )}
+                    <div className="flex items-center gap-2 text-xs font-bold bg-white/20 px-3 py-1.5 rounded-full">
+                      <ShieldCheck className="w-3 h-3" />
+                      Secured by Partna
+                    </div>
+                    <p className="text-xs font-bold opacity-60 flex items-center gap-1.5">
+                      <RefreshCcw className="w-3 h-3 animate-spin" />
+                      Polling for payment confirmation...
+                    </p>
+                  </div>
+                </AlertDescription>
+              </div>
+            </Alert>
+          )}
+
           {/* SECTION A: HEADER */}
           <header className="pt-8">
             <button
@@ -363,7 +530,12 @@ export default function ClientVaultDetailPage() {
                   </h1>
                   <Badge
                     variant="outline"
-                    className="bg-emerald-50 text-emerald-700 border-emerald-200   h-6 px-3 rounded-full font-bold shadow-sm shadow-emerald-500/5"
+                    className={cn(
+                      "h-6 px-3 rounded-full font-bold shadow-sm",
+                      vault.status === VaultStatus.PROCESSING_PAYMENT 
+                        ? "bg-amber-50 text-amber-700 border-amber-200 animate-pulse"
+                        : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    )}
                   >
                     {isSuccessReturn && vault.status === VaultStatus.DRAFT 
                       ? "CONFIRMING DEPOSIT" 
@@ -406,9 +578,10 @@ export default function ClientVaultDetailPage() {
                 <p className="text-sm text-slate-600 font-bold  mb-1 uppercase">
                   Total secured value
                 </p>
-                <p className="text-4xl font-bold text-slate-900 st ">
-                  ${vault.formattedTotalAmount || "0.00"}
-                </p>
+                <CurrencyEstimate 
+                  usdAmount={Number(vault.formattedTotalAmount || "0.00")} 
+                  className="text-slate-900 text-4xl font-bold"
+                />
                 <div className="mt-2 flex items-center justify-start md:justify-end gap-2">
                   <div
                     className={cn(
@@ -450,6 +623,8 @@ export default function ClientVaultDetailPage() {
                       ? "Payment settled to freelancer"
                     : vault.status === VaultStatus.REFUNDED
                       ? "Funds returned to client"
+                    : vault.status === VaultStatus.PROCESSING_PAYMENT
+                      ? "Verifying payment result..."
                     : isSuccessReturn && vault.status === VaultStatus.DRAFT
                       ? "Confirming secure deposit..."
                     : "Awaiting deposit"}
@@ -458,6 +633,67 @@ export default function ClientVaultDetailPage() {
               </div>
             </div>
           </header>
+
+          {/* SECTION: FEE BREAKDOWN (ONLY IF FUNDED OR RELEASED) */}
+          {(vault.status === VaultStatus.FUNDED || vault.status === VaultStatus.RELEASED) && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="md:col-span-2 bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
+                <CardContent className="p-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-emerald-100/50 border border-emerald-200">
+                        <CreditCard className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-slate-900">Fee Breakdown</h3>
+                        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Transparent platform costs</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6">
+                        <div className="text-right">
+                          <p className="text-[10px] text-slate-500 font-bold uppercase">Settlement ({calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent}%)</p>
+                          <CurrencyEstimate 
+                            usdAmount={vault.settlementFeeUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
+                            className="text-slate-900 text-sm font-bold"
+                          />
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] text-blue-500 font-bold uppercase">Deposit fee (0.5%)</p>
+                          <CurrencyEstimate 
+                            usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).depositFeeUSD} 
+                            className="text-blue-600 text-sm font-bold"
+                          />
+                        </div>
+                        <div className="text-right border-l border-emerald-200 pl-6">
+                          <p className="text-[10px] text-emerald-600 font-bold uppercase">Total you paid</p>
+                          <CurrencyEstimate 
+                            usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).totalClientPaysUSD} 
+                            className="text-emerald-700 text-lg font-black"
+                          />
+                        </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-slate-900 text-white border-none shadow-xl overflow-hidden relative">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                  <ShieldCheck className="w-16 h-16" />
+                </div>
+                <CardContent className="p-6">
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-1">Freelancer receives</p>
+                  <CurrencyEstimate 
+                    usdAmount={vault.freelancerReceivesUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).freelancerReceivesUSD} 
+                    className="text-white text-3xl font-black"
+                  />
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <CheckCircle className="w-3 h-3 text-emerald-400" />
+                    <p className="text-[10px] font-bold text-emerald-400/80">Net after settlement & withdrawal fees</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* LEFT COLUMN: SECTIONS B & C */}
@@ -824,79 +1060,17 @@ export default function ClientVaultDetailPage() {
 
                     {/* Approve & Release — only show when FUNDED */}
                     {vault.status === VaultStatus.FUNDED && (
-                      <Dialog
-                        open={showApproveDialog}
-                        onOpenChange={setShowApproveDialog}
+                      <Button
+                        onClick={() => setShowApproveDialog(true)}
+                        className="w-full bg-slate-900 text-white hover:bg-slate-800 font-bold h-12 rounded-xl shadow-xl active:scale-95 transition-all text-sm "
+                        disabled={
+                          !vault.submissions?.length ||
+                          vault.isFrozen
+                        }
                       >
-                        <Button
-                          asChild
-                          disabled={
-                            !vault.submissions?.length ||
-                            vault.isFrozen
-                          }
-                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm "
-                        >
-                          <button onClick={() => setShowApproveDialog(true)}>
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Approve & release
-                          </button>
-                        </Button>
-                        <DialogContent className="bg-white border-slate-200 text-slate-900 shadow-2xl">
-                          <DialogHeader>
-                            <DialogTitle className="text-xl font-bold tracking-tight  flex items-center gap-2">
-                              <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                              Confirm release
-                            </DialogTitle>
-                            <DialogDescription className="text-slate-600 text-sm leading-relaxed pt-2 font-bold">
-                              You are about to release{" "}
-                              <span className="text-slate-900 font-bold">
-                                ${vault.formattedTotalAmount || "0.00"}
-                              </span>{" "}
-                              to the freelancer. This action is{" "}
-                              <span className="text-emerald-700 font-bold uppercase">
-                                irreversible
-                              </span>{" "}
-                              and marks the project as completed.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="py-6 space-y-4">
-                            <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl space-y-2 shadow-sm">
-                              <p className=" font-bold  text-emerald-600/50 uppercase">
-                                Selected submission
-                              </p>
-                              <p className="text-sm font-bold text-slate-900 ">
-                                {new Date(
-                                  vault.submissions?.find(
-                                    (s: any) => s.id === selectedSubmissionId,
-                                  )?.submittedAt || Date.now(),
-                                ).toLocaleDateString("en-US", {
-                                  month: "long",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })}
-                              </p>
-                            </div>
-                          </div>
-                          <DialogFooter className="gap-3 sm:gap-0">
-                            <Button
-                              variant="ghost"
-                              onClick={() => setShowApproveDialog(false)}
-                              className="hover:bg-slate-50 text-slate-600 font-bold hover:text-slate-900 "
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              onClick={() => {
-                                setShowApproveDialog(false);
-                                handleApprove();
-                              }}
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-black  shadow-md shadow-emerald-600/10"
-                            >
-                              Yes, Release Funds
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
+                        <CheckCircle className="w-4 h-4 mr-2 text-emerald-400" />
+                        Approve & Release Funds
+                      </Button>
                     )}
 
                     {/* Request Changes — only show when FUNDED */}
@@ -950,7 +1124,7 @@ export default function ClientVaultDetailPage() {
                         Project logic:
                       </span>
                       <span className="text-emerald-700 font-bold text-[10px] uppercase">
-                        Standard escrow
+                        Standard settlement
                       </span>
                     </div>
                   </div>
@@ -1013,6 +1187,73 @@ export default function ClientVaultDetailPage() {
         </div>
       </div>
 
+      {/* APPROVE/RELEASE DIALOG */}
+      <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
+        <DialogContent className="sm:max-w-[480px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+          <DialogHeader className="p-8 bg-slate-900 text-white relative">
+            <div className="absolute top-0 right-0 p-8 opacity-10">
+              <Zap className="w-24 h-24" />
+            </div>
+            <DialogTitle className="text-2xl font-black tracking-tighter">Release Funds?</DialogTitle>
+            <DialogDescription className="text-slate-400 font-bold mt-2">
+              This will settle the payment to the freelancer and deduct platform fees.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="p-8 space-y-6 bg-white">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center py-2 border-b border-dashed border-slate-100">
+                <span className="text-sm font-bold text-slate-500">Vault Total</span>
+                <CurrencyEstimate 
+                  usdAmount={parseFloat(vault.formattedTotalAmount)} 
+                  className="text-slate-900 text-sm font-black"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-500 font-bold uppercase">Settlement fee ({calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent}%)</span>
+                  <CurrencyEstimate 
+                    usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
+                    className="text-slate-900 text-sm font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 mt-6 group transition-all hover:bg-emerald-100/50">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1">Freelancer receives</p>
+                    <CurrencyEstimate 
+                      usdAmount={parseFloat(vault.formattedTotalAmount) - calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
+                      className="text-emerald-900 text-2xl font-black"
+                    />
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-white border border-emerald-200 flex items-center justify-center shadow-sm">
+                    <ArrowLeft className="w-5 h-5 text-emerald-600 rotate-180" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-8">
+              <Button
+                variant="outline"
+                onClick={() => setShowApproveDialog(false)}
+                className="flex-1 h-12 rounded-xl font-bold border-slate-200 text-slate-600 hover:bg-slate-50"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleApprove}
+                className="flex-1 h-12 rounded-xl font-black bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-500/20"
+              >
+                Confirm Release
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
       {/* REFUND REQUEST MODAL */}
       <Sheet open={showRefundModal} onOpenChange={setShowRefundModal}>
         <SheetContent
@@ -1125,6 +1366,130 @@ export default function ClientVaultDetailPage() {
           </div>
         </SheetContent>
       </Sheet>
+      {/* FUNDING CONFIRMATION MODAL */}
+      <Dialog open={showFundModal} onOpenChange={setShowFundModal}>
+        <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border-none shadow-2xl">
+          <div className="p-8 space-y-6">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black text-slate-900 tracking-tight">
+                {fundingStep === "confirm" ? "Confirm Funding" : "Payment Instructions"}
+              </DialogTitle>
+              <DialogDescription className="font-bold text-slate-500">
+                {fundingStep === "confirm" 
+                  ? "Review the final amount and exchange rate before proceeding." 
+                  : "Complete the bank transfer using the details below."}
+              </DialogDescription>
+            </DialogHeader>
+
+            {fundingStep === "confirm" ? (
+              <div className="space-y-6">
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm font-bold text-slate-500 uppercase">Project Value</p>
+                    <CurrencyEstimate usdAmount={Number(vault?.formattedTotalAmount || 0)} showNote={false} className="text-lg font-black text-slate-900" />
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-bold text-slate-500 uppercase">You will transfer</p>
+                      <p className="text-2xl font-black text-emerald-600">
+                        {loadingRate ? "..." : `${rateData?.convertedAmount?.toLocaleString()} ${rateData?.currency}`}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="bg-white font-bold text-[10px]">
+                      {rateData?.currency} Rate
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-bold text-slate-400 px-2">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3 h-3" />
+                    Rate valid for: {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
+                  </div>
+                  <button onClick={fetchRate} className="text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
+                    <RefreshCcw className={cn("w-3 h-3", loadingRate && "animate-spin")} />
+                    Refresh Rate
+                  </button>
+                </div>
+
+                <Alert className="bg-amber-50 border-amber-100 text-amber-900 p-4">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-xs font-bold opacity-80 leading-relaxed">
+                    Rate expires in 10 minutes. The final amount may vary slightly depending on market conditions at time of transfer.
+                  </AlertDescription>
+                </Alert>
+
+                <Button 
+                  className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-lg rounded-xl shadow-lg shadow-emerald-500/20"
+                  onClick={proceedToPayment}
+                  disabled={initiatingRamp || loadingRate}
+                >
+                  {initiatingRamp ? (
+                    <RefreshCcw className="w-5 h-5 animate-spin" />
+                  ) : (
+                    "Proceed to Payment"
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                 <div className="space-y-4">
+                   <div className="bg-slate-900 text-white p-6 rounded-2xl space-y-4 shadow-xl">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase opacity-40 mb-1">Bank Name</p>
+                        <p className="text-lg font-black">{vault.partnaBankName}</p>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <div className="flex-1">
+                          <p className="text-[10px] font-bold uppercase opacity-40 mb-1">Account Number</p>
+                          <p className="text-2xl font-black tracking-wider">{vault.partnaAccountNumber}</p>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-white/40 hover:text-white"
+                          onClick={() => {
+                            navigator.clipboard.writeText(vault.partnaAccountNumber);
+                            toast.success("Copied to clipboard");
+                          }}
+                        >
+                          <Copy className="w-5 h-5" />
+                        </Button>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase opacity-40 mb-1">Beneficiary Name</p>
+                        <p className="text-sm font-bold">{vault.partnaAccountName}</p>
+                      </div>
+                   </div>
+
+                   <Card className="bg-emerald-50 border-emerald-100">
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-600 uppercase">Total to send</p>
+                        <p className="text-xl font-black text-emerald-700">
+                          {vault.partnaFromAmount?.toLocaleString()} {vault.partnaFromCurrency}
+                        </p>
+                      </div>
+                      <Badge className="bg-emerald-600 text-white border-none font-bold">EXACT AMOUNT</Badge>
+                    </CardContent>
+                   </Card>
+                 </div>
+
+                 <p className="text-xs text-center font-bold text-slate-400">
+                   After transfer, please wait 2-5 minutes for confirmation. This page will update automatically.
+                 </p>
+
+                 <Button 
+                   className="w-full h-12 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold rounded-xl"
+                   onClick={() => setShowFundModal(false)}
+                 >
+                   I've made the transfer
+                 </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

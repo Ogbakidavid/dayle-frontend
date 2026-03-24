@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { VaultStatus, getVaultDerivedLabel } from "@/lib/domain/enums";
 import { cn } from "@/lib/utils";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -106,9 +107,10 @@ export default function ClientDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
-              ${totalInvestment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </h2>
+            <CurrencyEstimate
+              usdAmount={totalInvestment}
+              className="text-slate-900"
+            />
             <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
               <Activity className="w-3.5 h-3.5" />
               All-time project value
@@ -129,10 +131,11 @@ export default function ClientDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-emerald-600 tracking-tighter ">
-              ${(Number(balance?.formattedAvailable) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </h2>
-            <Link 
+            <CurrencyEstimate
+              usdAmount={Number(balance?.formattedAvailable) || 0}
+              className="text-emerald-600"
+            />
+            <Link
               href="/client/settings?tab=payment"
               className="flex items-center gap-2 text-blue-600 text-sm font-bold hover:underline"
             >
@@ -155,9 +158,10 @@ export default function ClientDashboard() {
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
-              ${formattedSecured}
-            </h2>
+            <CurrencyEstimate
+              usdAmount={totalLocked}
+              className="text-slate-900"
+            />
             <p className="text-emerald-600 text-[10px] font-bold uppercase tracking-wider">
               {securedVaults.length} active contracts
             </p>
@@ -276,9 +280,12 @@ export default function ClientDashboard() {
                         <p className="text-[10px] text-slate-600 font-bold mb-1">
                           Project value
                         </p>
-                        <p className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight ">
-                          ${vault.formattedTotalAmount || vault.totalAmount}
-                        </p>
+                        <CurrencyEstimate
+                          usdAmount={Number(
+                            vault.formattedTotalAmount || vault.totalAmount,
+                          )}
+                          className="text-slate-900"
+                        />
                       </div>
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">
                         <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 group-hover:text-white transition-colors" />
