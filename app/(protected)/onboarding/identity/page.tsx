@@ -46,6 +46,9 @@ export default function IdentityOnboardingPage() {
   >("none");
   const [confirmPhoneVal, setConfirmPhoneVal] = useState("");
 
+  const isDev =
+    process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
+    process.env.NODE_ENV === "development";
   const currentCountry = selectedCountry || user?.country;
 
   useEffect(() => {
@@ -151,8 +154,14 @@ export default function IdentityOnboardingPage() {
     setLoadingMessage("Confirming phone number...");
     try {
       await api.onboarding.confirmKycPhone(confirmPhoneVal);
-      // Step 3 Success -> Proceed to Step 4 (Method Selection)
-      setOtpStep("method");
+      // Rahman's Step 3: Auto-trigger OTP with 'sendotp'
+      setLoadingMessage("Triggering verification code...");
+      await api.onboarding.selectKycMethod("sendotp");
+      
+      setOtpStep("otp");
+      if (isDev) {
+        setOtp("123456"); // Pre-fill staging OTP
+      }
     } catch (err: any) {
       toast.error(
         err.message ||
@@ -306,86 +315,6 @@ export default function IdentityOnboardingPage() {
                 </Button>
               </div>
             </>
-          ) : step === "form" && otpStep === "method" ? (
-            <>
-              <div className="mb-10 text-center">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
-                  Verify your <span className="text-emerald-600">contact.</span>
-                </h1>
-                <p className="text-slate-600 text-base font-bold leading-relaxed px-4">
-                  Partna needs to send a verification code to complete your
-                  identity setup. Choose where to receive it:
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                {otpMethods.map((m, i) => {
-                  const isEmail = m.method.toLowerCase().includes("email");
-                  const isPrimaryPhone = m.method.toLowerCase() === "phone";
-                  const isAltPhone = m.method
-                    .toLowerCase()
-                    .includes("alternate");
-
-                  return (
-                    <Button
-                      key={i}
-                      variant="outline"
-                      disabled={loading}
-                      onClick={() => handleSelectMethod(m.method)}
-                      className="h-24 rounded-2xl border-slate-100 flex items-center justify-between px-8 hover:border-emerald-500/30 hover:bg-emerald-50/20 group transition-all shadow-sm"
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-emerald-100/50 transition-colors">
-                          {isEmail ? (
-                            <Mail className="w-6 h-6 text-slate-400 group-hover:text-emerald-600" />
-                          ) : (
-                            <Smartphone className="w-6 h-6 text-slate-400 group-hover:text-emerald-600" />
-                          )}
-                        </div>
-                        <div className="text-left">
-                          <p className="text-sm font-bold text-slate-900 mb-1 group-hover:text-emerald-700">
-                            {isEmail
-                              ? "Email Verification"
-                              : isPrimaryPhone
-                                ? "Phone Verification"
-                                : isAltPhone
-                                  ? "Phone Verification (Alternate)"
-                                  : `Verify via ${m.method.replace("_", " ")}`}
-                          </p>
-                          <p className="text-xs font-medium text-slate-400 group-hover:text-slate-500 truncate max-w-[200px] sm:max-w-xs transition-colors">
-                            {m.hint ||
-                              `A verification code will be sent to your ${m.method.replace("_", " ")}`}
-                          </p>
-                        </div>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-emerald-500 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                    </Button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-8 text-center flex flex-col gap-4">
-                <button
-                  onClick={() => {
-                    setOtpStep("none");
-                    setOtpMethods([]);
-                    setStep("form");
-                  }}
-                  className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors decoration-slate-300 underline-offset-4 hover:underline"
-                >
-                  Back to identity details
-                </button>
-                <button
-                  onClick={() => {
-                    setStep("country");
-                    setOtpStep("none");
-                  }}
-                  className="text-sm font-bold text-emerald-600/60 hover:text-emerald-600 transition-colors uppercase tracking-widest"
-                >
-                  Back to country selection
-                </button>
-              </div>
-            </>
           ) : step === "form" && otpStep === "phone_confirm" ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -412,6 +341,11 @@ export default function IdentityOnboardingPage() {
                     className="w-full h-14 px-6 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-center tracking-[0.2em] text-lg"
                     required
                   />
+                  {isDev && (
+                    <p className="mt-2 text-[10px] text-slate-400 font-bold float-left ml-2">
+                       Staging: use 08032043843
+                    </p>
+                  )}
                 </div>
 
                 <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 mb-6">
@@ -469,6 +403,11 @@ export default function IdentityOnboardingPage() {
                     required
                     className="bg-slate-50! border-slate-200 h-20 rounded-3xl focus:border-emerald-500 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-4xl font-bold tracking-[0.4em] text-center"
                   />
+                  {isDev && (
+                    <p className="mt-2 text-center text-[10px] text-slate-400 font-bold">
+                       Staging: OTP is always 123456
+                    </p>
+                  )}
                 </div>
 
                 <Button
@@ -539,6 +478,11 @@ export default function IdentityOnboardingPage() {
                       required
                       className={`bg-slate-50! border-slate-200 h-16 rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${currentCountry === "KE" || currentCountry === "Kenya" ? "pl-20" : "px-6"}`}
                     />
+                    {isDev && currentCountry === "NG" && (
+                      <p className="mt-2 text-[10px] text-slate-400 font-bold text-left ml-2">
+                         Staging: use any 11-digit number e.g. 12345678901
+                      </p>
+                    )}
                     {currentCountry === "NG" || currentCountry === "Nigeria" ? (
                       <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />
                     ) : (
