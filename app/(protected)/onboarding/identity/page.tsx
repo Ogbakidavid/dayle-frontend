@@ -10,42 +10,70 @@ import { api } from "@/lib/api-client";
 import { useUser } from "@/lib/store/user-context";
 import { DayleLogo } from "@/components/shared/DayleLogo";
 import { DotLoader } from "@/components/ui/dot-loader";
-import { ShieldCheck, Phone, Info, ArrowRight, CheckCircle2 } from "lucide-react";
+import {
+  ShieldCheck,
+  Phone,
+  Info,
+  ArrowRight,
+  CheckCircle2,
+  Mail,
+  Smartphone,
+} from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
 export default function IdentityOnboardingPage() {
   const router = useRouter();
   const { user, refreshUser, loading: authLoading } = useUser();
-  const [step, setStep] = useState<"country" | "form" | "success">(user?.country ? "form" : "country");
+  const [step, setStep] = useState<"country" | "form" | "success">(
+    user?.country ? "form" : "country",
+  );
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(user?.country || "");
   const [loading, setLoading] = useState(false);
   const [val, setVal] = useState("");
   const [error, setError] = useState("");
-  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
+  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(
+    null,
+  );
+
+  // OTP Flow states
+  const [otpMethods, setOtpMethods] = useState<any[]>([]);
+  const [selectedMethod, setSelectedMethod] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpStep, setOtpStep] = useState<
+    "none" | "method" | "otp" | "phone_confirm"
+  >("none");
+  const [confirmPhoneVal, setConfirmPhoneVal] = useState("");
+
+  const currentCountry = selectedCountry || user?.country;
 
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/login");
     }
     // If identity is already set, skip this page
-    if ((user?.bvn || user?.phoneNumber) && step !== "success") {
-        router.push(user.role === "CLIENT" ? "/client" : "/freelancer");
+    if ((user?.bvn || user?.phoneNumber) && step !== "success" && !otpStep) {
+      router.push(user.role === "CLIENT" ? "/client" : "/freelancer");
     }
-  }, [user, authLoading, router, step]);
+  }, [user, authLoading, router, step, otpStep]);
 
   const handleCountrySelect = async (c: string) => {
     setLoading(true);
+    setLoadingMessage("Setting up your payment profile...");
     try {
-        await api.auth.updateProfile({ country: c });
-        await refreshUser();
-        setSelectedCountry(c);
-        setStep("form");
-        setLoading(false);
+      await api.auth.updateProfile({ country: c });
+      await api.onboarding.initialize();
+      await refreshUser();
+      setSelectedCountry(c);
+      setStep("form");
+      setLoading(false);
+      setLoadingMessage("");
     } catch (err: any) {
-        console.error(err);
-        toast.error("Failed to set country. Please try again.");
-        setLoading(false);
+      console.error(err);
+      toast.error("Failed to initialize account. Please try again.");
+      setLoading(false);
+      setLoadingMessage("");
     }
   };
 
@@ -74,6 +102,7 @@ export default function IdentityOnboardingPage() {
     }
 
     setLoading(true);
+    setLoadingMessage("Verifying your identity and linking account...");
     try {
       const c = selectedCountry || user?.country;
       const payload: any = { country: c };
@@ -83,22 +112,92 @@ export default function IdentityOnboardingPage() {
         payload.phoneNumber = `+254${val}`;
       }
 
-      await api.onboarding.submitIdentity(payload);
+      const res = await api.onboarding.submitIdentity(payload);
+
+      if (res.requiresOtp) {
+        setOtpMethods(res.methods);
+        // Force Step 3 (Phone Confirm) as a mandatory prerequisite for Nigeria (BVN)
+        if (currentCountry === "Nigeria" || currentCountry === "NG") {
+           setOtpStep("phone_confirm");
+        } else {
+           setOtpStep("method");
+        }
+        setLoading(false);
+        setLoadingMessage("");
+        return;
+      }
+
       await refreshUser();
-      
       setStep("success");
     } catch (err: any) {
       console.error(err);
       if (err.data?.attemptsRemaining !== undefined) {
-          setAttemptsRemaining(err.data.attemptsRemaining);
+        setAttemptsRemaining(err.data.attemptsRemaining);
       }
       setError(err.message || "Failed to submit identity. Please try again.");
     } finally {
       setLoading(false);
+      setLoadingMessage("");
     }
   };
 
-  const currentCountry = selectedCountry || user?.country;
+  const handlePhoneConfirm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!confirmPhoneVal || confirmPhoneVal.length < 10) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+    setLoading(true);
+    setLoadingMessage("Confirming phone number...");
+    try {
+      await api.onboarding.confirmKycPhone(confirmPhoneVal);
+      // Step 3 Success -> Proceed to Step 4 (Method Selection)
+      setOtpStep("method");
+    } catch (err: any) {
+      toast.error(
+        err.message ||
+          "Confirmation failed. Please check the number and try again.",
+      );
+    } finally {
+      setLoading(false);
+      setLoadingMessage("");
+    }
+  };
+
+  const handleSelectMethod = async (method: string) => {
+    setSelectedMethod(method);
+    setLoading(true);
+    setLoadingMessage("Preparing verification...");
+    try {
+      await api.onboarding.selectKycMethod(method);
+      setOtpStep("otp");
+    } catch (err: any) {
+      toast.error(
+        err.message || "Failed to trigger verification. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+      setLoadingMessage("");
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp) return;
+
+    setLoading(true);
+    setLoadingMessage("Verifying code and completing setup...");
+    try {
+      await api.onboarding.verifyOtp(otp);
+      await refreshUser();
+      setStep("success");
+    } catch (err: any) {
+      toast.error(err.message || "Invalid code. Please try again.");
+    } finally {
+      setLoading(false);
+      setLoadingMessage("");
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, ""); // Only numeric
@@ -109,7 +208,12 @@ export default function IdentityOnboardingPage() {
     }
   };
 
-  if (authLoading) return <div className="min-h-screen flex items-center justify-center"><DotLoader /></div>;
+  if (authLoading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <DotLoader />
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 font-primary">
@@ -146,6 +250,15 @@ export default function IdentityOnboardingPage() {
               >
                 <DayleLogo className="w-16 h-16 text-emerald-500" />
               </motion.div>
+              {loadingMessage && (
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 text-slate-600 font-bold text-sm tracking-wide"
+                >
+                  {loadingMessage}
+                </motion.p>
+              )}
             </motion.div>
           )}
 
@@ -156,7 +269,8 @@ export default function IdentityOnboardingPage() {
                   Select your <span className="text-emerald-600">country.</span>
                 </h1>
                 <p className="text-slate-600 text-base font-bold leading-relaxed">
-                  We need this to ensure we use the correct payment rails for your region.
+                  We need this to ensure we use the correct payment rails for
+                  your region.
                 </p>
               </div>
 
@@ -169,7 +283,9 @@ export default function IdentityOnboardingPage() {
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-3xl">🇳🇬</span>
-                    <span className="text-lg font-bold text-slate-900">Nigeria</span>
+                    <span className="text-lg font-bold text-slate-900">
+                      Nigeria
+                    </span>
                   </div>
                   <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
                 </Button>
@@ -182,11 +298,201 @@ export default function IdentityOnboardingPage() {
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-3xl">🇰🇪</span>
-                    <span className="text-lg font-bold text-slate-900">Kenya</span>
+                    <span className="text-lg font-bold text-slate-900">
+                      Kenya
+                    </span>
                   </div>
                   <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
-                </Button> 
+                </Button>
               </div>
+            </>
+          ) : step === "form" && otpStep === "method" ? (
+            <>
+              <div className="mb-10 text-center">
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
+                  Verify your <span className="text-emerald-600">contact.</span>
+                </h1>
+                <p className="text-slate-600 text-base font-bold leading-relaxed px-4">
+                  Partna needs to send a verification code to complete your
+                  identity setup. Choose where to receive it:
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                {otpMethods.map((m, i) => {
+                  const isEmail = m.method.toLowerCase().includes("email");
+                  const isPrimaryPhone = m.method.toLowerCase() === "phone";
+                  const isAltPhone = m.method
+                    .toLowerCase()
+                    .includes("alternate");
+
+                  return (
+                    <Button
+                      key={i}
+                      variant="outline"
+                      disabled={loading}
+                      onClick={() => handleSelectMethod(m.method)}
+                      className="h-24 rounded-2xl border-slate-100 flex items-center justify-between px-8 hover:border-emerald-500/30 hover:bg-emerald-50/20 group transition-all shadow-sm"
+                    >
+                      <div className="flex items-center gap-6">
+                        <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-emerald-100/50 transition-colors">
+                          {isEmail ? (
+                            <Mail className="w-6 h-6 text-slate-400 group-hover:text-emerald-600" />
+                          ) : (
+                            <Smartphone className="w-6 h-6 text-slate-400 group-hover:text-emerald-600" />
+                          )}
+                        </div>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-slate-900 mb-1 group-hover:text-emerald-700">
+                            {isEmail
+                              ? "Email Verification"
+                              : isPrimaryPhone
+                                ? "Phone Verification"
+                                : isAltPhone
+                                  ? "Phone Verification (Alternate)"
+                                  : `Verify via ${m.method.replace("_", " ")}`}
+                          </p>
+                          <p className="text-xs font-medium text-slate-400 group-hover:text-slate-500 truncate max-w-[200px] sm:max-w-xs transition-colors">
+                            {m.hint ||
+                              `A verification code will be sent to your ${m.method.replace("_", " ")}`}
+                          </p>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-emerald-500 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-8 text-center flex flex-col gap-4">
+                <button
+                  onClick={() => {
+                    setOtpStep("none");
+                    setOtpMethods([]);
+                    setStep("form");
+                  }}
+                  className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors decoration-slate-300 underline-offset-4 hover:underline"
+                >
+                  Back to identity details
+                </button>
+                <button
+                  onClick={() => {
+                    setStep("country");
+                    setOtpStep("none");
+                  }}
+                  className="text-sm font-bold text-emerald-600/60 hover:text-emerald-600 transition-colors uppercase tracking-widest"
+                >
+                  Back to country selection
+                </button>
+              </div>
+            </>
+          ) : step === "form" && otpStep === "phone_confirm" ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center"
+            >
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Smartphone className="w-8 h-8" />
+                </div>
+                <h1 className="text-2xl font-bold text-slate-900 mb-3">Confirm BVN Phone.</h1>
+                <p className="text-slate-600 font-medium">
+                  Partna requires you to provide the 11-digit phone number linked to your <span className="font-bold text-slate-800">BVN registry</span> to proceed.
+                </p>
+              </div>
+
+              <form onSubmit={handlePhoneConfirm} className="space-y-6">
+                <div className="relative group">
+                  <input
+                    type="text"
+                    value={confirmPhoneVal}
+                    onChange={(e) => setConfirmPhoneVal(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                    placeholder="Enter BVN phone number"
+                    className="w-full h-14 px-6 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-center tracking-[0.2em] text-lg"
+                    required
+                  />
+                </div>
+
+                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 mb-6">
+                  <p className="text-xs text-amber-700 font-bold leading-relaxed">
+                    IMPORTANT: This must be the exact phone number that was used when you registered your BVN.
+                  </p>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loading || confirmPhoneVal.length < 10}
+                  className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold shadow-lg shadow-emerald-500/20 transition-all disabled:bg-slate-200 disabled:shadow-none"
+                >
+                  {loading ? "Confirming..." : "Link Phone & Send Code"}
+                </Button>
+
+                <button
+                  type="button"
+                  onClick={() => setOtpStep("none")}
+                  className="text-slate-400 font-bold uppercase tracking-widest text-[10px] hover:text-slate-600 transition-colors"
+                >
+                  Choose another method
+                </button>
+              </form>
+            </motion.div>
+          ) : step === "form" && otpStep === "otp" ? (
+            <>
+              <div className="mb-10 text-center">
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
+                  Enter <span className="text-emerald-600">code.</span>
+                </h1>
+                <p className="text-slate-600 text-base font-bold leading-relaxed px-4">
+                  We've sent a verification code to your {selectedMethod}. Enter
+                  it below to complete your setup.
+                </p>
+              </div>
+
+              <form onSubmit={handleVerifyOtp} className="space-y-8">
+                <div className="space-y-3">
+                  <Label
+                    htmlFor="otp"
+                    className="text-sm font-bold text-slate-700 block text-center uppercase tracking-widest"
+                  >
+                    6-Digit Verification Code
+                  </Label>
+                  <Input
+                    id="otp"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="000 000"
+                    value={otp}
+                    onChange={(e) =>
+                      setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                    }
+                    required
+                    className="bg-slate-50! border-slate-200 h-20 rounded-3xl focus:border-emerald-500 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-4xl font-bold tracking-[0.4em] text-center"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loading || otp.length < 4}
+                  className="w-full h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-[0.98] group"
+                >
+                  {loading ? (
+                    <DotLoader size="sm" color="white" />
+                  ) : (
+                    "Verify & Complete Setup"
+                  )}
+                </Button>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setOtpStep("method")}
+                    className="text-xs text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest"
+                  >
+                    Didn't get a code? Resend
+                  </button>
+                </div>
+              </form>
             </>
           ) : step === "form" ? (
             <>
@@ -195,7 +501,7 @@ export default function IdentityOnboardingPage() {
                   One last <span className="text-emerald-600">step.</span>
                 </h1>
                 <p className="text-slate-600 text-base font-bold leading-relaxed px-4">
-                  {(currentCountry === "NG" || currentCountry === "Nigeria")
+                  {currentCountry === "NG" || currentCountry === "Nigeria"
                     ? "To receive and send payments, we need your Bank Verification Number (BVN). This is used to set up your payment account."
                     : "To receive and send payments in Kenya, we need your M-Pesa phone number."}
                 </p>
@@ -203,12 +509,18 @@ export default function IdentityOnboardingPage() {
 
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-3">
-                  <Label htmlFor="identity" className="text-sm font-bold text-slate-700 block ml-1 text-center font-primary uppercase tracking-wider">
-                    {(currentCountry === "NG" || currentCountry === "Nigeria") ? "Bank Verification Number (BVN)" : "M-Pesa Phone Number"}
+                  <Label
+                    htmlFor="identity"
+                    className="text-sm font-bold text-slate-700 block ml-1 text-center font-primary uppercase tracking-wider"
+                  >
+                    {currentCountry === "NG" || currentCountry === "Nigeria"
+                      ? "Bank Verification Number (BVN)"
+                      : "M-Pesa Phone Number"}
                   </Label>
 
                   <div className="relative group">
-                    {(currentCountry === "KE" || currentCountry === "Kenya") && (
+                    {(currentCountry === "KE" ||
+                      currentCountry === "Kenya") && (
                       <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-900 font-bold text-lg select-none">
                         +254
                       </div>
@@ -217,13 +529,17 @@ export default function IdentityOnboardingPage() {
                       id="identity"
                       type="text"
                       inputMode="numeric"
-                      placeholder={(currentCountry === "NG" || currentCountry === "Nigeria") ? "11 digits" : "9 digits"}
+                      placeholder={
+                        currentCountry === "NG" || currentCountry === "Nigeria"
+                          ? "11 digits"
+                          : "9 digits"
+                      }
                       value={val}
                       onChange={handleInputChange}
                       required
-                      className={`bg-slate-50! border-slate-200 h-16 rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${(currentCountry === "KE" || currentCountry === "Kenya") ? "pl-20" : "px-6"}`}
+                      className={`bg-slate-50! border-slate-200 h-16 rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${currentCountry === "KE" || currentCountry === "Kenya" ? "pl-20" : "px-6"}`}
                     />
-                    {(currentCountry === "NG" || currentCountry === "Nigeria") ? (
+                    {currentCountry === "NG" || currentCountry === "Nigeria" ? (
                       <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />
                     ) : (
                       <Phone className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />
@@ -233,7 +549,7 @@ export default function IdentityOnboardingPage() {
                   <div className="flex items-start gap-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
                     <Info className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
                     <p className="text-sm font-bold text-slate-600 leading-snug">
-                      {(currentCountry === "NG" || currentCountry === "Nigeria")
+                      {currentCountry === "NG" || currentCountry === "Nigeria"
                         ? "Dial *565*0# on any phone to retrieve your BVN. This is a one-time setup step."
                         : "Ensure this is the phone number registered with M-Pesa to avoid payment delays."}
                     </p>
@@ -243,12 +559,16 @@ export default function IdentityOnboardingPage() {
                 {error && (
                   <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
                     <div className="flex items-center gap-3 text-red-500 bg-red-50 p-4 rounded-2xl border border-red-200">
-                        <p className="text-sm font-bold leading-relaxed">{error}</p>
+                      <p className="text-sm font-bold leading-relaxed">
+                        {error}
+                      </p>
                     </div>
                     {attemptsRemaining !== null && (
-                        <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            {attemptsRemaining} {attemptsRemaining === 1 ? "attempt" : "attempts"} remaining
-                        </p>
+                      <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        {attemptsRemaining}{" "}
+                        {attemptsRemaining === 1 ? "attempt" : "attempts"}{" "}
+                        remaining
+                      </p>
                     )}
                   </div>
                 )}
@@ -262,7 +582,8 @@ export default function IdentityOnboardingPage() {
                     <DotLoader size="sm" color="white" />
                   ) : (
                     <span className="flex items-center gap-2">
-                      Complete Setup <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      Complete Setup{" "}
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </span>
                   )}
                 </Button>
@@ -293,39 +614,49 @@ export default function IdentityOnboardingPage() {
               <div className="mt-10 flex items-center justify-center gap-6">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Encrypted</span>
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">
+                    Encrypted
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Secure</span>
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">
+                    Secure
+                  </span>
                 </div>
               </div>
             </>
           ) : (
             <div className="py-8 text-center animate-in fade-in zoom-in-95 duration-500">
-                <div className="mb-8 flex justify-center">
-                  <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center relative border border-emerald-100 shadow-sm">
-                    <div className="absolute inset-0 border border-emerald-500/20 rounded-full animate-ping opacity-20"></div>
-                    <CheckCircle2 className="w-12 h-12 text-emerald-600" />
-                  </div>
+              <div className="mb-8 flex justify-center">
+                <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center relative border border-emerald-100 shadow-sm">
+                  <div className="absolute inset-0 border border-emerald-500/20 rounded-full animate-ping opacity-20"></div>
+                  <CheckCircle2 className="w-12 h-12 text-emerald-600" />
                 </div>
+              </div>
 
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
-                  Payment account <span className="text-emerald-600">ready.</span>
-                </h1>
-                
-                <p className="text-slate-600 text-base font-bold leading-relaxed px-4 mb-10">
-                  Your payment account has been set up. Complete identity verification in Settings to unlock withdrawals.
-                </p>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
+                Payment account <span className="text-emerald-600">ready.</span>
+              </h1>
 
-                <Button
-                  onClick={() => router.push(user?.role === "CLIENT" ? "/client" : "/freelancer")}
-                  className="w-full h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-[0.98] group"
-                >
-                  <span className="flex items-center gap-2 text-white">
-                    Continue to Dashboard <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </Button>
+              <p className="text-slate-600 text-base font-bold leading-relaxed px-4 mb-10">
+                Your payment account has been set up. Complete identity
+                verification in Settings to unlock withdrawals.
+              </p>
+
+              <Button
+                onClick={() =>
+                  router.push(
+                    user?.role === "CLIENT" ? "/client" : "/freelancer",
+                  )
+                }
+                className="w-full h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-[0.98] group"
+              >
+                <span className="flex items-center gap-2 text-white">
+                  Continue to Dashboard{" "}
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </Button>
             </div>
           )}
         </div>

@@ -151,9 +151,13 @@ export interface ApiClient {
     respond: (token: string, data: { decision: string; reasonCode?: string }) => Promise<any>;
   };
   onboarding: {
+    initialize: () => Promise<any>;
     setRole: (role: string) => Promise<any>;
     submitIdentity: (data: any) => Promise<any>;
     verifyIdentity: (data: any) => Promise<any>;
+    selectKycMethod: (method: string) => Promise<any>;
+    confirmKycPhone: (phone: string) => Promise<any>;
+    verifyOtp: (otp: string) => Promise<any>;
     submitKyc: (kycData: any) => Promise<any>;
     getStatus: () => Promise<any>;
     getDiditSession: () => Promise<{ sessionId: string; url: string }>;
@@ -469,6 +473,12 @@ export const api: ApiClient = {
 
 
   onboarding: {
+    initialize: async (): Promise<any> => {
+      return await request("/onboarding/initialize", {
+        method: "POST",
+      });
+    },
+
     setRole: async (role: string): Promise<any> => {
       return await request("/onboarding/role", {
         method: "PATCH",
@@ -487,6 +497,27 @@ export const api: ApiClient = {
       return await request("/onboarding/verify-identity", {
         method: "POST",
         body: data,
+      });
+    },
+
+    selectKycMethod: async (method: string): Promise<any> => {
+      return await request("/onboarding/kyc-method", {
+        method: "POST",
+        body: { method },
+      });
+    },
+
+    confirmKycPhone: async (phone: string): Promise<any> => {
+      return await request("/onboarding/kyc-confirm-phone", {
+        method: "POST",
+        body: { phone },
+      });
+    },
+
+    verifyOtp: async (otp: string): Promise<any> => {
+      return await request("/onboarding/kyc-otp", {
+        method: "POST",
+        body: { otp },
       });
     },
 

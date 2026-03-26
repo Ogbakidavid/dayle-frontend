@@ -75,33 +75,40 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
     // 1. Country Selection Intercept: If user is authenticated but country is missing
     // 2. Post-KYC Intercept: If KYC is VERIFIED but payment account is not ready
-    if (user) {
-      // New: Force country selection if missing
-      if (!user.country && !pathname.startsWith('/onboarding/identity')) {
-        console.log('[AuthGuard] Country missing, redirecting to onboarding/identity');
-        setRedirecting(true);
-        router.push('/onboarding/identity');
-        return;
-      }
+      if (user) {
+        // Redirection logic for onboarding
+        const isOnboardingIdentity = pathname.startsWith('/onboarding/identity');
+        const isOnboardingConfirmation = pathname.startsWith('/onboarding/identity-confirmation');
 
-      console.log("[AuthGuard] Checking user state:", {
-        kycStatus: user.kycStatus,
-        paymentAccountReady: user.paymentAccountReady,
-        pathname,
-      });
+        // 1. Force identity setup if country is missing OR payment account is not ready
+        if (!user.country || !user.paymentAccountReady) {
+          if (!isOnboardingIdentity && !isOnboardingConfirmation) {
+              console.log('[AuthGuard] Onboarding incomplete, redirecting to identity...');
+              setRedirecting(true);
+              router.push('/onboarding/identity');
+              return;
+          }
+        }
 
-      if (
-        user.kycStatus === KycStatus.VERIFIED &&
-        user.country && // Ensure country is set before proceeding to confirmation
-        !user.paymentAccountReady &&
-        !pathname.startsWith("/onboarding/identity-confirmation")
-      ) {
-        console.log("[AuthGuard] Redirecting to identity confirmation...");
-        setRedirecting(true);
-        router.push("/onboarding/identity-confirmation");
-        return;
+        console.log("[AuthGuard] Checking user state:", {
+          kycStatus: user.kycStatus,
+          paymentAccountReady: user.paymentAccountReady,
+          pathname,
+        });
+
+        // 2. Post-KYC Intercept: If KYC is VERIFIED but payment account is not ready
+        // (This handles cases where full KYC happened but Partna isn't linked yet)
+        if (
+          user.kycStatus === KycStatus.VERIFIED &&
+          !user.paymentAccountReady &&
+          !isOnboardingConfirmation
+        ) {
+          console.log("[AuthGuard] KYC verified but account not ready, redirecting to confirmation...");
+          setRedirecting(true);
+          router.push("/onboarding/identity-confirmation");
+          return;
+        }
       }
-    }
   }, [
     authenticated,
     privyReady,
