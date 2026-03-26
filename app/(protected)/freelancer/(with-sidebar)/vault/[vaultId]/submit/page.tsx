@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { SubmissionType } from "@/lib/domain/enums";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { SUBMISSION_TYPE_HINTS } from "@/lib/constants";
 
 
 interface DeliverableStatus {
@@ -366,6 +367,21 @@ export default function SubmissionPage() {
                                     onClick={(e) => e.stopPropagation()}
                                   />
                                 </div>
+                              </div>
+                            )}
+
+                            {/* Hints/Suggestions */}
+                            {vault?.type && SUBMISSION_TYPE_HINTS[vault.type.toLowerCase()] && (
+                              <div className="mt-3 flex flex-wrap gap-1.5 animate-in fade-in slide-in-from-top-1">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mr-1 self-center">Suggestions:</span>
+                                {SUBMISSION_TYPE_HINTS[vault.type.toLowerCase()][item.submissionType]?.map((hint, hIdx) => (
+                                  <span 
+                                    key={hIdx}
+                                    className="px-2 py-0.5 rounded-md bg-white border border-slate-100 text-slate-400 text-[10px] font-medium"
+                                  >
+                                    {hint}
+                                  </span>
+                                ))}
                               </div>
                             )}
 

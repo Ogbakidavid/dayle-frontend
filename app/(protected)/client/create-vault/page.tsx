@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence, Variants, Reorder } from "framer-motion";
-import { VAULT_PURPOSE_MAPPING } from "@/lib/constants";
+import { VAULT_PURPOSE_MAPPING, SUBMISSION_TYPE_HINTS } from "@/lib/constants";
 import { api } from "@/lib/api-client";
 import { useVault } from "@/lib/store/vault-context";
 import { SUPPORTED_TOKENS, CONTRACTS } from "@/lib/contracts";
@@ -498,6 +498,21 @@ export default function CreateVaultPage() {
                                           </button>
                                         ))}
                                       </div>
+
+                                      {/* Hints/Suggestions */}
+                                      {vaultPurpose && SUBMISSION_TYPE_HINTS[vaultPurpose] && (
+                                        <div className="flex flex-wrap gap-1.5 mt-3 animate-in fade-in slide-in-from-top-1">
+                                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mr-1 self-center">Suggestions:</span>
+                                          {SUBMISSION_TYPE_HINTS[vaultPurpose][deliverable.submissionType]?.map((hint, hIdx) => (
+                                            <span 
+                                              key={hIdx}
+                                              className="px-2 py-0.5 rounded-md bg-slate-100/50 text-slate-500 text-[10px] font-medium border border-slate-200/50"
+                                            >
+                                              {hint}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
