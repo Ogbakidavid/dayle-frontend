@@ -24,8 +24,6 @@ import { cn } from "@/lib/utils";
 import { SubmissionType } from "@/lib/domain/enums";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { SUBMISSION_TYPE_HINTS } from "@/lib/constants";
-
 
 interface DeliverableStatus {
   deliverableId: string;
@@ -332,7 +330,7 @@ export default function SubmissionPage() {
 
                         <div className="space-y-3">
                           <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            Deliverable files (optional)
+                            Deliverable assets (File or Link)
                           </Label>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {/* File Dropzone if needed */}
@@ -370,46 +368,28 @@ export default function SubmissionPage() {
                               </div>
                             )}
 
-                            {/* Hints/Suggestions */}
-                            {vault?.type && SUBMISSION_TYPE_HINTS[vault.type.toLowerCase()] && (
-                              <div className="mt-3 flex flex-wrap gap-1.5 animate-in fade-in slide-in-from-top-1">
-                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mr-1 self-center">Suggestions:</span>
-                                {SUBMISSION_TYPE_HINTS[vault.type.toLowerCase()][item.submissionType]?.map((hint, hIdx) => (
-                                  <span 
-                                    key={hIdx}
-                                    className="px-2 py-0.5 rounded-md bg-white border border-slate-100 text-slate-400 text-[10px] font-medium"
-                                  >
-                                    {hint}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
-
-
                             {item.files.map((file, fIdx) => (
-                                <div
-                                  key={fIdx}
-                                  className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 group shadow-sm"
+                              <div
+                                key={fIdx}
+                                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 group shadow-sm"
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <Paperclip className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                  <p className="text-sm font-bold text-slate-700 truncate">
+                                    {file.name}
+                                  </p>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeFile(idx, fIdx);
+                                  }}
+                                  className="text-slate-300 hover:text-red-500 p-1 transition-colors"
                                 >
-                                  <div className="flex items-center gap-3 min-w-0">
-                                    <Paperclip className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                                    <p className="text-sm font-bold text-slate-700 truncate">
-                                      {file.name}
-                                    </p>
-                                  </div>
-
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      removeFile(idx, fIdx);
-                                    }}
-                                    className="text-slate-300 hover:text-red-500 p-1 transition-colors"
-                                  >
-                                    <X className="w-3.5 h-3.5" />
-                                  </button>
-
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
                               </div>
                             ))}
                           </div>

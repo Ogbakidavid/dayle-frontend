@@ -122,25 +122,5 @@ export const VAULT_PURPOSE_MAPPING: Record<string, VaultPurpose> = {
   },
 };
 
-export const SUBMISSION_TYPE_HINTS: Record<string, Record<string, string[]>> = {
-  development: {
-    FILE: [".zip", ".tar.gz", "Source Code", "Build Artifact"],
-    LINK: ["GitHub Repo", "Vercel Preview", "Jira Ticket", "Documentation URL"],
-    BOTH: ["Repo + Source ZIP", "Preview Link + Build"],
-  },
-  design: {
-    FILE: [".fig", ".psd", ".ai", ".pdf", "Asset Package (ZIP)"],
-    LINK: ["Figma Prototype", "Behance Project", "Adobe Cloud", "Google Drive"],
-    BOTH: ["Figma Link + Exported PDF", "Cloud Link + Asset ZIP"],
-  },
-  content_ai: {
-    FILE: [".docx", ".pdf", ".ipynb", ".csv", ".mp4"],
-    LINK: ["Google Doc", "Notion Page", "HuggingFace Model", "Dropbox Folder"],
-    BOTH: ["Draft Link + Final PDF", "Dataset Link + Sample CSV"],
-  },
-  fixed_price: {
-    FILE: [".pdf", ".docx", ".zip", "Proof of Work"],
-    LINK: ["Shared Document", "Cloud Folder", "Result URL"],
-    BOTH: ["Document Link + Final File"],
-  },
-};
+// Re-export VaultPurposeMapping for UI components
+export const VAULT_PURPOSES = Object.keys(VAULT_PURPOSE_MAPPING);
