@@ -330,7 +330,11 @@ export default function SubmissionPage() {
 
                         <div className="space-y-3">
                           <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            Deliverable assets (File or Link)
+                            Deliverable assets ({
+                              item.submissionType === SubmissionType.FILE ? "File" : 
+                              item.submissionType === SubmissionType.LINK ? "Link" : 
+                              "File and Link"
+                            })
                           </Label>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {/* File Dropzone if needed */}
