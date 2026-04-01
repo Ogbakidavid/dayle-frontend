@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useFormPersistence } from "@/lib/hooks/use-form-persistence";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,11 +32,21 @@ export default function IdentityOnboardingPage() {
   const [loadingMessage, setLoadingMessage] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(user?.country || "");
   const [loading, setLoading] = useState(false);
-  const [val, setVal] = useState("");
   const [error, setError] = useState("");
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(
     null,
   );
+
+  // State with Persistence
+  const [persistedData, setPersistedData, clearPersistence] = useFormPersistence("onboarding_identity", {
+    val: "",
+    confirmPhoneVal: "",
+  });
+
+  const { val, confirmPhoneVal } = persistedData;
+
+  const setVal = (v: string) => setPersistedData(p => ({ ...p, val: v }));
+  const setConfirmPhoneVal = (v: string) => setPersistedData(p => ({ ...p, confirmPhoneVal: v }));
 
   // OTP Flow states
   const [otpMethods, setOtpMethods] = useState<any[]>([]);
@@ -44,7 +55,6 @@ export default function IdentityOnboardingPage() {
   const [otpStep, setOtpStep] = useState<
     "none" | "method" | "otp" | "phone_confirm"
   >("none");
-  const [confirmPhoneVal, setConfirmPhoneVal] = useState("");
 
   const isDev =
     process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
@@ -121,9 +131,9 @@ export default function IdentityOnboardingPage() {
         setOtpMethods(res.methods);
         // Force Step 3 (Phone Confirm) as a mandatory prerequisite for Nigeria (BVN)
         if (currentCountry === "Nigeria" || currentCountry === "NG") {
-           setOtpStep("phone_confirm");
+          setOtpStep("phone_confirm");
         } else {
-           setOtpStep("method");
+          setOtpStep("method");
         }
         setLoading(false);
         setLoadingMessage("");
@@ -131,6 +141,7 @@ export default function IdentityOnboardingPage() {
       }
 
       await refreshUser();
+      clearPersistence();
       setStep("success");
     } catch (err: any) {
       console.error(err);
@@ -199,6 +210,7 @@ export default function IdentityOnboardingPage() {
     try {
       await api.onboarding.verifyOtp(otp);
       await refreshUser();
+      clearPersistence();
       setStep("success");
     } catch (err: any) {
       toast.error(err.message || "Invalid code. Please try again.");
@@ -540,6 +552,7 @@ export default function IdentityOnboardingPage() {
                         try {
                           await api.onboarding.devBypassIdentity();
                           await refreshUser();
+                          clearPersistence();
                           setStep("success");
                         } catch (err: any) {
                           toast.error("Bypass failed: " + err.message);

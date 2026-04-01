@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useFormPersistence } from "@/lib/hooks/use-form-persistence";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -117,10 +118,25 @@ export function CreateDisputeForm({
   const { user } = useUser();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [selectedVaultId, setSelectedVaultId] = useState(initialVaultId || "");
-  const [selectedDeliverableTitle, setSelectedDeliverableTitle] = useState("");
-  const [selectedReasonCode, setSelectedReasonCode] = useState("");
-  const [description, setDescription] = useState("");
+  // State with Persistence
+  const [formData, setFormData, clearPersistence] = useFormPersistence("create_dispute_form", {
+    selectedVaultId: initialVaultId || "",
+    selectedDeliverableTitle: "",
+    selectedReasonCode: "",
+    description: "",
+  });
+
+  const {
+    selectedVaultId,
+    selectedDeliverableTitle,
+    selectedReasonCode,
+    description
+  } = formData;
+
+  const setSelectedVaultId = (val: string) => setFormData(prev => ({ ...prev, selectedVaultId: val }));
+  const setSelectedDeliverableTitle = (val: string) => setFormData(prev => ({ ...prev, selectedDeliverableTitle: val }));
+  const setSelectedReasonCode = (val: string) => setFormData(prev => ({ ...prev, selectedReasonCode: val }));
+  const setDescription = (val: string) => setFormData(prev => ({ ...prev, description: val }));
 
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
@@ -312,6 +328,7 @@ export function CreateDisputeForm({
 
       await api.disputes.create(payload);
 
+      clearPersistence();
       router.push(`/${role}/disputes`);
       router.refresh();
     } catch (err) {

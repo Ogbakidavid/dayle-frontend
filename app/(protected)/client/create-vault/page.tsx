@@ -34,6 +34,7 @@ import { DayleLogo } from "@/components/shared/DayleLogo";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 import { useUser } from "@/lib/store/user-context";
 import { useRates } from "@/lib/store/rates-context"
+import { useFormPersistence } from "@/lib/hooks/use-form-persistence";
 
 
 const variants: Variants = {
@@ -60,39 +61,61 @@ export default function CreateVaultPage() {
   const router = useRouter();
   const { createVault } = useVault();
   const [isDeploying, setIsDeploying] = useState(false);
-  const [[page, direction], setPage] = useState([1, 0]);
-  const step = page;
+  const [direction, setDirection] = useState(0);
+
+  // State with Persistence
+  const [formData, setFormData, clearPersistence] = useFormPersistence("create_vault_form", {
+    vaultPurpose: "",
+    vaultTitle: "",
+    vaultDescription: "",
+    budgetAmount: "",
+    freelancerEmail: "",
+    freelancerName: "",
+    deliverables: [{ title: "", description: "", id: crypto.randomUUID(), submissionType: SubmissionType.FILE }],
+    step: 1,
+  });
+
+  const {
+    vaultPurpose,
+    vaultTitle,
+    vaultDescription,
+    budgetAmount,
+    freelancerEmail,
+    freelancerName,
+    deliverables,
+    step
+  } = formData;
 
   const paginate = (newDirection: number) => {
-    setPage([page + newDirection, newDirection]);
+    setDirection(newDirection);
+    setFormData(prev => ({ ...prev, step: prev.step + newDirection }));
   };
 
-  // State
-  const [vaultPurpose, setVaultPurpose] = useState<string>("");
-  const [vaultTitle, setVaultTitle] = useState("");
-  const [vaultDescription, setVaultDescription] = useState("");
-  const [budgetAmount, setBudgetAmount] = useState("");
-  const [freelancerEmail, setFreelancerEmail] = useState("");
-  const [freelancerName, setFreelancerName] = useState("");
-  // Default to stable currency
-  const [deliverables, setDeliverables] = useState<
-    { title: string; description: string; id: string; submissionType: SubmissionType }[]
-  >([{ title: "", description: "", id: crypto.randomUUID(), submissionType: SubmissionType.FILE }]);
-
-
+  const setVaultPurpose = (val: string) => setFormData(prev => ({ ...prev, vaultPurpose: val }));
+  const setVaultTitle = (val: string) => setFormData(prev => ({ ...prev, vaultTitle: val }));
+  const setVaultDescription = (val: string) => setFormData(prev => ({ ...prev, vaultDescription: val }));
+  const setBudgetAmount = (val: string) => setFormData(prev => ({ ...prev, budgetAmount: val }));
+  const setFreelancerEmail = (val: string) => setFormData(prev => ({ ...prev, freelancerEmail: val }));
+  const setFreelancerName = (val: string) => setFormData(prev => ({ ...prev, freelancerName: val }));
+  
   const handleAddDeliverable = () => {
     if (deliverables.length < 10) {
-      setDeliverables([
-        ...deliverables,
-        { title: "", description: "", id: crypto.randomUUID(), submissionType: SubmissionType.FILE },
-      ]);
+      setFormData(prev => ({
+        ...prev,
+        deliverables: [
+          ...prev.deliverables,
+          { title: "", description: "", id: crypto.randomUUID(), submissionType: SubmissionType.FILE },
+        ]
+      }));
     }
-
   };
 
   const handleRemoveDeliverable = (id: string) => {
     if (deliverables.length > 1) {
-      setDeliverables(deliverables.filter((d) => d.id !== id));
+      setFormData(prev => ({
+        ...prev,
+        deliverables: prev.deliverables.filter((d) => d.id !== id)
+      }));
     }
   };
 
@@ -101,9 +124,10 @@ export default function CreateVaultPage() {
     field: "title" | "description" | "submissionType",
     value: string,
   ) => {
-    setDeliverables(
-      deliverables.map((d) => (d.id === id ? { ...d, [field]: value } : d)),
-    );
+    setFormData(prev => ({
+      ...prev,
+      deliverables: prev.deliverables.map((d) => (d.id === id ? { ...d, [field]: value } : d))
+    }));
   };
 
 
@@ -208,6 +232,7 @@ export default function CreateVaultPage() {
       }
 
       // 3. Redirect to checkout for the Fiat Onramp flow
+      clearPersistence();
       router.push(`/checkout/${newVault.id}?idem=${idempotencyKey}`);
     } catch (err) {
       console.error(err);
@@ -308,7 +333,7 @@ export default function CreateVaultPage() {
             <div className="relative min-h-[400px] sm:min-h-[500px] bg-background border border-white/5 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-xl overflow-hidden">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
-                  key={page}
+                  key={step}
                   custom={direction}
                   variants={variants}
                   initial="enter"
@@ -445,7 +470,7 @@ export default function CreateVaultPage() {
                           <Reorder.Group
                             axis="y"
                             values={deliverables}
-                            onReorder={setDeliverables}
+                            onReorder={(newOrder) => setFormData(prev => ({ ...prev, deliverables: newOrder }))}
                             className="space-y-4"
                           >
                             {deliverables.map((deliverable, index) => (

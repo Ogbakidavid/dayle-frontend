@@ -20,7 +20,7 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: https: blob:",
               // Allow connections to Privy, your backend, and blockchain RPCs
-              "connect-src 'self' https://auth.privy.io https://*.privy.io https://celo-mainnet.infura.io https://forno.celo.org https://forno.celo-sepolia.celo-testnet.org http://localhost:* ws://localhost:* wss://localhost:* wss://*.privy.io wss://*.ngrok-free.dev https://*.walletconnect.com wss://*.walletconnect.org https://api.pwnedpasswords.com https://public.pimlico.io https://api.pimlico.io https://*.didit.me https://*.ngrok-free.dev https://*.loca.lt data: blob:",
+              "connect-src 'self' https://auth.privy.io https://*.privy.io https://celo-mainnet.infura.io https://forno.celo.org https://forno.celo-sepolia.celo-testnet.org http://localhost:* ws://localhost:* wss://localhost:* wss://*.privy.io wss://*.ngrok-free.dev https://*.walletconnect.com wss://*.walletconnect.org https://api.pwnedpasswords.com https://public.pimlico.io https://api.pimlico.io https://*.didit.me https://*.ngrok-free.dev https://*.loca.lt https://dayle-app-storage.s3.us-east-1.amazonaws.com data: blob:",
               "frame-src 'self' https://auth.privy.io https://*.privy.io https://*.walletconnect.com https://*.walletconnect.org https://verify.didit.me https://*.didit.me https://*.ngrok-free.dev https://*.loca.lt data:",
               "worker-src 'self' blob:",
               "child-src 'self' blob:",

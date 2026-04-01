@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useFormPersistence } from "@/lib/hooks/use-form-persistence";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,8 +46,11 @@ export default function SubmissionPage() {
   const [deliverableStatuses, setDeliverableStatuses] = useState<
     DeliverableStatus[]
   >([]);
-  const [overallNotes, setOverallNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Persistence Hooks
+  const [overallNotes, setOverallNotes, clearNotes] = useFormPersistence(`submission_notes_${vaultId}`, "");
+  const [persistedDeliverables, setPersistedDeliverables, clearPersist] = useFormPersistence<Record<string, any>>(`submission_delivs_${vaultId}`, {});
 
   useEffect(() => {
     async function loadVault() {
@@ -59,10 +63,10 @@ export default function SubmissionPage() {
               deliverableId: d.id,
               deliverableTitle: d.title,
               submissionType: d.submissionType as SubmissionType,
-              included: false,
-              notes: "",
+              included: persistedDeliverables[d.id]?.included || false,
+              notes: persistedDeliverables[d.id]?.notes || "",
               files: [],
-              link: "",
+              link: persistedDeliverables[d.id]?.link || "",
             })),
           );
         }
@@ -76,15 +80,29 @@ export default function SubmissionPage() {
   }, [vaultId]);
 
   const toggleDeliverable = (index: number) => {
-    setDeliverableStatuses((prev) =>
-      prev.map((d, i) => (i === index ? { ...d, included: !d.included } : d)),
-    );
+    setDeliverableStatuses((prev) => {
+      const updated = prev.map((d, i) => (i === index ? { ...d, included: !d.included } : d));
+      // Sync to persistence
+      const d = updated[index];
+      setPersistedDeliverables(p => ({
+        ...p,
+        [d.deliverableId]: { ...p[d.deliverableId], included: d.included }
+      }));
+      return updated;
+    });
   };
 
   const updateDeliverableNotes = (index: number, notes: string) => {
-    setDeliverableStatuses((prev) =>
-      prev.map((d, i) => (i === index ? { ...d, notes } : d)),
-    );
+    setDeliverableStatuses((prev) => {
+      const updated = prev.map((d, i) => (i === index ? { ...d, notes } : d));
+      // Sync to persistence
+      const d = updated[index];
+      setPersistedDeliverables(p => ({
+        ...p,
+        [d.deliverableId]: { ...p[d.deliverableId], notes: d.notes }
+      }));
+      return updated;
+    });
   };
 
   const handleFileChange = (
@@ -102,9 +120,16 @@ export default function SubmissionPage() {
   };
 
   const updateDeliverableLink = (index: number, link: string) => {
-    setDeliverableStatuses((prev) =>
-      prev.map((d, i) => (i === index ? { ...d, link } : d)),
-    );
+    setDeliverableStatuses((prev) => {
+      const updated = prev.map((d, i) => (i === index ? { ...d, link } : d));
+      // Sync to persistence
+      const d = updated[index];
+      setPersistedDeliverables(p => ({
+        ...p,
+        [d.deliverableId]: { ...p[d.deliverableId], link: d.link }
+      }));
+      return updated;
+    });
   };
 
   const removeFile = (delIndex: number, fileIndex: number) => {
@@ -218,6 +243,8 @@ export default function SubmissionPage() {
       });
 
       toast.success("Work submitted successfully");
+      clearNotes();
+      clearPersist();
       router.replace(`/freelancer/vault/${vaultId}`);
     } catch (err) {
       console.error("Submission failed:", err);
