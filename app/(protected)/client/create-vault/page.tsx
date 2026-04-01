@@ -135,13 +135,13 @@ export default function CreateVaultPage() {
   const freelancerReceives = budgetUSD - settlementFeeUSD;
   const totalClientPays = budgetUSD + depositFeeUSD;
 
-  const getDeliverableLabel = (deliverableId: string) => {
-    const purposeData = (VAULT_PURPOSE_MAPPING as any)[vaultPurpose];
-    const list = purposeData?.deliverables || [];
-    return (
-      list.find((d: any) => d.id === deliverableId)?.label || deliverableId
-    );
-  };
+  // const getDeliverableLabel = (deliverableId: string) => {
+  //   const purposeData = (VAULT_PURPOSE_MAPPING as any)[vaultPurpose];
+  //   const list = purposeData?.deliverables || [];
+  //   return (
+  //     list.find((d: any) => d.id === deliverableId)?.label || deliverableId
+  //   );
+  // };
 
   // Validation
   const isStep1Complete =
@@ -155,6 +155,13 @@ export default function CreateVaultPage() {
 
   const canContinue =
     step === 1 ? isStep1Complete : step === 2 ? isStep2Complete : true;
+  const localTotal = budget * (1 + fees.processingPercent / 100);
+
+  const getDeliverableLabel = (deliverableId: string) => {
+    const purposeData = (VAULT_PURPOSE_MAPPING as any)[vaultPurpose];
+    const list = purposeData?.deliverables || [];
+    return list.find((d: any) => d.id === deliverableId)?.title || "Deliverable";
+  };
 
   const handleDeploy = async () => {
     // Create vault via API with idempotency to prevent duplicate creations
@@ -169,8 +176,8 @@ export default function CreateVaultPage() {
         title: vaultTitle,
         type: vaultPurpose.toUpperCase(),
         description: vaultDescription,
-        totalAmount: budgetUSD,
-        localAmount: budget,
+        totalAmount: budgetUSD,      // Store clean budget in USD for smart contract
+        localAmount: localTotal,      // Store fee-inclusive local total for client display
         localCurrency: currencyCode,
         // Defaulting to digital dollar for Fiat abstraction under the hood
         tokenAddress: CONTRACTS.usdcToken,
@@ -208,6 +215,40 @@ export default function CreateVaultPage() {
       setIsDeploying(false);
     }
   };
+
+  if (!user?.paymentAccountReady) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-8">
+        <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-2xl">
+          <ShieldCheck className="w-10 h-10" />
+        </div>
+        <div className="max-w-md space-y-4">
+          <h1 className="text-3xl font-bold tracking-tighter text-slate-900 ">
+            Verification Required
+          </h1>
+          <p className="text-slate-600 font-bold  leading-relaxed px-4">
+            To maintain a secure environment, we require all clients to complete 
+            basic verification (Tier 1) before creating project vaults.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
+          <Button
+            onClick={() => router.push("/onboarding")}
+            className="flex-1 h-14 bg-slate-900 hover:bg-black text-white font-black rounded-2xl shadow-xl transition-all active:scale-[0.98] uppercase tracking-widest"
+          >
+            Verify Now
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/client")}
+            className="flex-1 h-14 border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50"
+          >
+            Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen text-white selection:bg-emerald-500/30 selection:text-emerald-400 font-primary">

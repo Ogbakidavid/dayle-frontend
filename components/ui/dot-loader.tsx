@@ -25,19 +25,19 @@ export function DotLoader({
   };
 
   const dotClass = cn(
-    "rounded-full animate-pulse",
+    "rounded-full animate-bounce",
     sizeClasses[size],
     colorClasses[color],
   );
 
   return (
     <div
-      className={cn("flex items-center justify-center space-x-1.5", className)}
+      className={cn("flex items-center justify-center space-x-1.5 h-full", className)}
       {...props}
     >
-      <div className={dotClass} style={{ animationDelay: "0ms" }} />
-      <div className={dotClass} style={{ animationDelay: "150ms" }} />
-      <div className={dotClass} style={{ animationDelay: "300ms" }} />
+      <div className={dotClass} style={{ animationDelay: "-0.3s" }} />
+      <div className={dotClass} style={{ animationDelay: "-0.15s" }} />
+      <div className={dotClass} style={{ animationDelay: "0s" }} />
       <span className="sr-only">Loading...</span>
     </div>
   );

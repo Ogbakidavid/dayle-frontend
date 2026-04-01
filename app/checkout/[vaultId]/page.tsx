@@ -10,12 +10,13 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { DayleLogo } from "@/components/shared/DayleLogo";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 import { useVault, Vault } from "@/lib/store/vault-context";
 import { useUser } from "@/lib/store/user-context";
 import { KycStatus } from "@/lib/domain/enums";
 
-import { api } from "@/lib/api-client";
+import { api, VaultStatus } from "@/lib/api-client";
 import { toast } from "sonner";
 
 export default function CheckoutSelectionPage() {
@@ -27,8 +28,6 @@ export default function CheckoutSelectionPage() {
 
   const [localVault, setLocalVault] = React.useState<Vault | null>(null);
   const [fetching, setFetching] = React.useState(false);
-  const [currency, setCurrency] = React.useState<"USD" | "NGN" | "KES">("USD");
-  const EXCHANGE_RATES = { USD: 1, NGN: 1500, KES: 135 };
 
   const fetchVault = React.useCallback(async () => {
     setFetching(true);
@@ -55,144 +54,147 @@ export default function CheckoutSelectionPage() {
   const amount = vault?.formattedTotalAmount
     ? Number(vault.formattedTotalAmount)
     : 0;
-  const displayAmount = amount * EXCHANGE_RATES[currency as keyof typeof EXCHANGE_RATES];
-  const currencyPrefixes = { USD: "$", NGN: "₦", KES: "KSh" };
-  const currencyPrefix = currencyPrefixes[currency as keyof typeof currencyPrefixes];
+  const displayAmount = vault?.localAmount || 0;
+  const currencySymbol = vault?.localCurrency === "KES" ? "KSh" : (vault?.localCurrency === "NGN" ? "₦" : "$");
+  const currencyCode = vault?.localCurrency || "USD";
 
   return (
     <div className="min-h-screen bg-white text-slate-600 font-primary antialiased">
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT SIDEBAR (25%) */}
-        <section className="w-full lg:w-[400px] bg-slate-50 p-12 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
-          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
-
-          <div className="space-y-16 relative z-10">
-            <div className="flex items-center gap-0">
-              <div
-                className="w-10 h-10 flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
-                onClick={() => router.push("/client")}
-              >
-                <DayleLogo className="w-10 h-10 text-slate-900" />
+        <section className="w-full lg:w-[400px] bg-slate-50 p-10 lg:p-14 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500 opacity-20" />
+          
+          <div className="space-y-20 relative z-10">
+            <div className="flex items-center gap-0 group cursor-pointer" onClick={() => router.push("/client")}>
+              <div className="w-10 h-10 flex items-center justify-center cursor-pointer">
+                <DayleLogo className="w-10 h-10 text-emerald-600" />
               </div>
-              <span className="text-slate-900 font-bold tracking-tighter text-2xl ">
+              <span className="text-slate-900 font-black tracking-tighter text-2xl lg:text-3xl">
                 Dayle
               </span>
             </div>
 
-            <div className="space-y-10">
-              <div className="space-y-3">
-                <div className="flex flex-col gap-2 justify-between items-start">
-                    <p className=" font-bold text-slate-600 tracking-wide leading-none uppercase">
-                      Total settlement
-                    </p>
-                    <div className="flex bg-slate-200/50 p-1 rounded-lg flex-wrap gap-1">
-                      {["USD", "NGN", "KES"].map((curr) => (
-                        <button
-                          key={curr}
-                          onClick={() => setCurrency(curr as any)}
-                          className={`px-3 py-1 text-[10px] font-bold r rounded-md transition-all uppercase ${currency === curr ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-                        >
-                          {curr}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                <h1 className="text-6xl font-bold text-slate-900 tracking-tighter sm:text-4xl  flex items-baseline gap-2">
-                  <span className="text-emerald-600 font-bold text-2xl">
-                    {currencyPrefix}
-                  </span>
-                  {displayAmount.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                  <span className="text-emerald-600 font-bold text-xl ml-1">
-                    {currency}
-                  </span>
-                </h1>
+            <div className="space-y-12">
+              <div className="space-y-4">
+                <p className="text-[10px] font-black text-slate-400 tracking-wide capitalize">
+                  Total settlement
+                </p>
+                <div className="flex flex-col gap-1">
+                  <CurrencyEstimate 
+                    usdAmount={Number(vault?.formattedTotalAmount || 0) * 1.005} 
+                    className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tighter"
+                    showNote={false}
+                  />
+                  {/* <p className="text-emerald-600 font-black text-xs tracking-widest uppercase mt-1">
+                    {currencyCode}
+                  </p> */}
+                </div>
               </div>
 
-              <div className="pt-10 border-t border-slate-200 space-y-6">
-                <div className="flex justify-between items-center  font-bold tracking-[0.2em] text-slate-900 uppercase">
-                  <span className="text-slate-600 ">Project ID</span>
-                  <span className="text-emerald-600  tracking-normal text-[9px]">
+              <div className="pt-10 border-t border-slate-200/60 space-y-8">
+                <div className="flex justify-between items-center group">
+                  <span className="text-[10px] font-black text-slate-400 tracking-wide capitalize">Project ID</span>
+                  <span className="text-slate-900 font-bold text-[10px] bg-white px-3 py-1 rounded-lg border border-slate-200">
                     VAULT-{vault?.id.slice(0, 8).toUpperCase()}
                   </span>
                 </div>
-                <div className="flex justify-between items-center  font-bold tracking-[0.2em] text-slate-900 uppercase">
-                  <span className="text-slate-600 ">Network fee</span>
-                  <span className="text-emerald-600 ">Sponsored</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black text-slate-400 tracking-wide capitalize">Network fee</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-emerald-600 font-black text-[10px] tracking-wide capitalize">Sponsored</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* <div className="mt-auto pt-10">
+            <div className="p-6 bg-white border border-slate-200 rounded-3xl space-y-4 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
+              <ShieldCheck className="w-5 h-5 text-emerald-500 relative z-10" />
+              <div className="space-y-1 relative z-10">
+                <p className="text-[10px] font-black text-slate-900 tracking-wide capitalize">Secure Custody</p>
+                <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
+                  Funds are protected by smart contracts and bank-grade security.
+                </p>
+              </div>
+            </div>
+          </div> */}
         </section>
 
         {/* MAIN CONTENT AREA */}
-        <main className="flex-1 p-8 lg:p-24 flex items-center justify-center relative bg-slate-50/50">
-          <div className="max-w-xl w-full">
+        <main className="flex-1 p-8 lg:p-20 flex items-center justify-center relative bg-[#FDFDFD]">
+          {/* Subtle background element */}
+          <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[24px_24px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30" />
+          
+          <div className="max-w-xl w-full relative z-10">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="space-y-16"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-12"
             >
               <div className="text-center space-y-4">
-                <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter ">
-                  Vault deposit
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black tracking-wide capitalize mb-4 shadow-xl shadow-slate-900/10">
+                  Secure checkout
+                </div>
+                <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter">
+                  Deposit Funds
                 </h2>
-                <p className="text-sm font-bold text-slate-600 tracking-[0.3em] uppercase">
-                  Select your preferred method
+                <p className="text-sm font-bold text-slate-500 tracking-[0.05em]">
+                  Please choose a payment method to fund your vault.
                 </p>
               </div>
 
-              {user?.kycStatus !== KycStatus.VERIFIED ? (
-                <div className="bg-amber-50 border border-amber-200 rounded-[2.5rem] p-10 space-y-6 text-center shadow-sm">
-                  <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 mx-auto">
-                    <ShieldCheck className="w-8 h-8" />
+              {!(user?.kycStatus === KycStatus.VERIFIED || user?.paymentAccountReady) ? (
+                <div className="bg-white border border-slate-200 rounded-[3rem] p-12 space-y-8 text-center shadow-2xl shadow-slate-200/50">
+                  <div className="w-20 h-20 bg-amber-50 rounded-3xl flex items-center justify-center text-amber-500 mx-auto border border-amber-100 shadow-inner">
+                    <ShieldCheck className="w-10 h-10" />
                   </div>
-                  <div className="space-y-4">
-                    <h3 className="text-2xl font-bold text-slate-900  tracking-tighter">
-                      Identity Verification Required
+                  <div className="space-y-3">
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tighter">
+                      Verification Pending
                     </h3>
-                    <p className="text-sm text-slate-600 font-bold   leading-relaxed px-4">
-                      To comply with security and regulatory standards, you need
-                      to verify your identity before you can deposit funds into
-                      the project vault.
+                    <p className="text-sm text-slate-500 font-bold leading-relaxed px-4">
+                      To safeguard your transactions, identity verification is required before initiating deposits.
                     </p>
                   </div>
                   <button
                     onClick={() => router.push("/client/settings?tab=kyc")}
-                    className="w-full h-16 bg-slate-900 hover:bg-black text-white font-bold text-sm rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-[0.2em] "
+                    className="w-full h-16 bg-slate-900 hover:bg-black text-white font-black text-xs rounded-2xl shadow-xl shadow-slate-900/20 transition-all active:scale-[0.98] uppercase tracking-[0.2em]"
                   >
-                    Verify Identity Now
+                    Complete Verification
                   </button>
                 </div>
               ) : (
                 <div className="grid gap-6">
-
                   {/* Bank Transfer Selection */}
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() =>
                       router.push(
-                        `/checkout/${vaultId}/bank?currency=${currency}`,
+                        `/checkout/${vaultId}/bank?currency=${currencyCode}`,
                       )
                     }
-                    className="w-full p-8 bg-white border border-slate-200 rounded-[2.5rem] flex items-center gap-6 group hover:border-blue-200 hover:shadow-xl hover:shadow-blue-600/5 transition-all relative overflow-hidden"
+                    className="w-full p-10 bg-white border border-slate-200 rounded-[3rem] flex items-center gap-8 group hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-500/5 transition-all relative overflow-hidden"
                   >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-50 rounded-full -mr-20 -mt-20 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                    <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-all shrink-0">
-                      <Building2 className="w-6 h-6" />
+                    <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-500 transition-all shrink-0">
+                      <Building2 className="w-8 h-8" />
                     </div>
                     <div className="text-left relative z-10">
-                      <p className="text-slate-900 font-bold text-xl tracking-tight  group-hover:text-blue-950 transition-colors">
+                      <p className="text-slate-900 font-black text-2xl tracking-tight group-hover:text-slate-900 transition-colors">
                         Bank Transfer
                       </p>
-                      <p className=" font-bold text-slate-400 st group-hover:text-blue-600 transition-colors uppercase  mt-1">
-                        Direct transfer to virtual account
+                      <p className="text-[11px] font-bold text-slate-400 group-hover:text-emerald-600 transition-colors tracking-wide uppercase mt-1">
+                        Secure instant wire transfer
                       </p>
                     </div>
-                    <ChevronRight className="w-5 h-5 ml-auto text-slate-300 group-hover:text-blue-500 transition-all group-hover:translate-x-1" />
-                  </button>
+                    <ChevronRight className="w-6 h-6 ml-auto text-slate-300 group-hover:text-emerald-500 transition-all group-hover:translate-x-1" />
+                  </motion.button>
                 </div>
               )}
             </motion.div>

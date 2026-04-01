@@ -69,7 +69,14 @@ export default function ClientDashboard() {
     currentPage * itemsPerPage,
   );
 
-  const totalInvestment = vaults.reduce(
+  const investedVaults = vaults.filter(
+    (v: any) =>
+      v.status === VaultStatus.FUNDED ||
+      v.status === VaultStatus.RELEASED ||
+      v.status === VaultStatus.DISPUTED,
+  );
+
+  const totalInvestment = investedVaults.reduce(
     (acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0),
     0,
   );
@@ -113,7 +120,7 @@ export default function ClientDashboard() {
             />
             <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
               <Activity className="w-3.5 h-3.5" />
-              All-time project value
+              All-time invested value
             </div>
           </div>
         </motion.div>
@@ -285,6 +292,7 @@ export default function ClientDashboard() {
                             vault.formattedTotalAmount || vault.totalAmount,
                           )}
                           className="text-slate-900"
+                          align="right"
                         />
                       </div>
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">

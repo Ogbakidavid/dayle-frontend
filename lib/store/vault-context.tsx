@@ -31,11 +31,11 @@ export interface Vault {
   [key: string]: any;
 }
 
-interface VaultContextType {
+  interface VaultContextType {
   vaults: Vault[];
   loading: boolean;
   createVault: (data: any) => Promise<Vault>;
-  refreshVaults: () => Promise<void>;
+  refreshVaults: (options?: { isBackground?: boolean }) => Promise<void>;
 }
 
 const VaultContext = createContext<VaultContextType | undefined>(undefined);
@@ -46,34 +46,31 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("VaultProvider useEffect triggered:", {
-      user: !!user,
-      userLoading,
-    });
     if (user) {
       fetchVaults();
     } else if (!userLoading) {
-      // User finished loading but is null/unauthenticated, stop the vault spinner
-      console.log("VaultProvider: User is null, stopping spinner");
       setLoading(false);
     }
   }, [user, userLoading]);
 
-  async function fetchVaults() {
-    console.log("VaultProvider fetchVaults called, setting loading=true");
-    setLoading(true);
+  async function fetchVaults(options?: { isBackground?: boolean }) {
+    const isBackground = options?.isBackground ?? false;
+    
+    if (!isBackground) {
+      setLoading(true);
+    }
+    
     try {
       const data = await api.vaults.list();
-      console.log("VaultProvider fetched data:", data);
       setVaults(data);
     } catch (err: any) {
-      // Silently handle auth errors (user not logged in)
       if (err.statusCode !== 401) {
         console.error("Vault fetch error:", err);
       }
     } finally {
-      console.log("VaultProvider finally block, setting loading=false");
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   }
 

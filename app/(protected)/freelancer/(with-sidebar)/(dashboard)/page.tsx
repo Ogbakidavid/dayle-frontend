@@ -250,6 +250,7 @@ export default function FreelancerDashboard() {
                         invite.vault?.formattedTotalAmount || "0.00",
                       )}
                       className="text-slate-900 text-xl font-bold"
+                      align="right"
                     />
                   </div>
                   <Link
@@ -388,6 +389,7 @@ export default function FreelancerDashboard() {
                             vault.formattedTotalAmount || "0.00",
                           )}
                           className="text-slate-900 text-2xl font-bold"
+                          align="right"
                         />
                       </div>
                       <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">

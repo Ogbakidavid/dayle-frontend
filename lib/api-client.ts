@@ -132,6 +132,7 @@ export interface ApiClient {
     getStatus: (id: string) => Promise<any>;
     withdraw: (vaultId: string, data: { accountNumber: string, bankCode: string, accountName: string }) => Promise<any>;
     mockDeposit: (vaultId: string, data: { amount?: number, accountName?: string }) => Promise<any>;
+    confirmPayment: (vaultId: string) => Promise<any>;
   };
   disputes: {
     list: () => Promise<any[]>;
@@ -388,6 +389,11 @@ export const api: ApiClient = {
       return await request(`/vaults/${vaultId}/mock-deposit`, {
         method: "POST",
         body: data,
+      });
+    },
+    confirmPayment: async (vaultId: string): Promise<any> => {
+      return await request(`/vaults/${vaultId}/confirm-payment`, {
+        method: "POST",
       });
     },
   },

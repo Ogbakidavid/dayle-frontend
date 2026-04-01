@@ -32,7 +32,10 @@ import {
   ListChecks,
   Square,
   CheckSquare,
+  Building2,
+  Fingerprint,
 } from "lucide-react";
+import { DayleLogo } from "@/components/shared/DayleLogo";
 import { toast } from "sonner";
 import { api } from "@/lib/api-client";
 import {
@@ -50,7 +53,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Sheet,
   SheetContent,
@@ -85,6 +87,64 @@ import { useUser } from "@/lib/store/user-context";
 import { motion, AnimatePresence } from "framer-motion";
 import { calculateDayleFee } from "@/lib/utils/fee";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
+import { DotLoader } from "@/components/ui/dot-loader";
+
+
+function BankInfoElement({ label, value, icon, copyable, highlight }: any) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    toast.success(`${label} copied to clipboard`);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className={cn(
+      "p-6 rounded-2xl border transition-all duration-300",
+      highlight 
+        ? "bg-emerald-50 border-emerald-100 shadow-sm" 
+        : "bg-slate-50/50 border-slate-100 hover:border-slate-200"
+    )}>
+      <div className="flex items-center justify-between mb-3">
+        <div className={cn(
+          "w-8 h-8 rounded-lg flex items-center justify-center",
+          highlight ? "bg-emerald-100 text-emerald-600" : "bg-white text-slate-400 border border-slate-100"
+        )}>
+          {icon}
+        </div>
+        {copyable && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "h-8 w-8 rounded-lg transition-colors",
+              copied ? "bg-emerald-500 text-white" : "text-slate-300 hover:text-emerald-500 hover:bg-emerald-50"
+            )}
+            onClick={handleCopy}
+          >
+            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          </Button>
+        )}
+      </div>
+      <div className="space-y-1">
+        <p className={cn(
+          "text-[10px] font-black uppercase tracking-widest",
+          highlight ? "text-emerald-600/60" : "text-slate-400"
+        )}>
+          {label}
+        </p>
+        <p className={cn(
+          "text-sm font-black tracking-tight leading-tight break-all",
+          highlight ? "text-emerald-700" : "text-slate-900"
+        )}>
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function ClientVaultDetailPage() {
   const params = useParams();
@@ -158,7 +218,7 @@ export default function ClientVaultDetailPage() {
 
     if ((isSuccessReturn && vault?.status === VaultStatus.DRAFT) || isProcessing || isAwaiting) {
       const intervalId = setInterval(() => {
-        refreshVaults();
+        refreshVaults({ isBackground: true });
       }, 5000); // Poll every 5 seconds
       
       return () => clearInterval(intervalId);
@@ -270,6 +330,13 @@ export default function ClientVaultDetailPage() {
   };
 
   const submitRefundRequest = async () => {
+    if (user?.kycStatus !== KycStatus.VERIFIED) {
+      toast.error("Identity Verification Required", {
+        description:
+          "You must complete full identity verification (Tier 2) before you can request a refund.",
+      });
+      return;
+    }
     setRequestingRefund(true);
     try {
       await api.vaults.requestRefund(vault.id, {
@@ -375,9 +442,14 @@ export default function ClientVaultDetailPage() {
 
   if (vaultsLoading || !vault) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="animate-spin text-emerald-600">
-          <RefreshCcw className="w-8 h-8" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+        <div className="relative flex items-center justify-center h-24 w-24">
+          {/* Pulsating background ring */}
+          <div className="absolute inset-0 bg-emerald-100 rounded-full animate-ping opacity-20" />
+          {/* Main Logo with pulse effect */}
+          <div className="relative animate-pulse">
+            <DayleLogo className="w-12 h-12 text-emerald-600" />
+          </div>
         </div>
       </div>
     );
@@ -386,7 +458,7 @@ export default function ClientVaultDetailPage() {
   return (
     <>
       <div className="min-h-screen bg-white text-slate-600 font-sans selection:bg-emerald-500/30 pb-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 space-y-8">
           {/* SUCCESS ALERT */}
           {showSuccess && (
             <div className="fixed top-8 right-8 z-50 animate-in slide-in-from-right-10 fade-in duration-300">
@@ -438,79 +510,23 @@ export default function ClientVaultDetailPage() {
             </Alert>
           )}
 
-          {/* BANK INSTRUCTIONS ALERT (AWAITING PAYMENT) */}
+          {/* BANK INSTRUCTIONS INDICATOR (AWAITING PAYMENT) */}
           {vault.status === VaultStatus.AWAITING_PAYMENT && (
-            <Alert className="bg-emerald-600 border-none text-white shadow-2xl relative overflow-hidden">
-               <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
-                <CreditCard className="w-32 h-32" />
-              </div>
-              <div className="relative z-10">
-                <AlertTitle className="text-xl font-black flex items-center gap-2 mb-2">
+            <div className="pt-8 flex justify-end">
+              <div className="inline-flex items-center gap-4 p-4 pr-8 bg-white rounded-2xl border border-emerald-100 shadow-xl shadow-emerald-500/5 overflow-hidden border-l-4 border-l-emerald-500">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
                   <Clock className="w-5 h-5 animate-pulse" />
-                  Awaiting Bank Transfer
-                </AlertTitle>
-                <AlertDescription className="space-y-4">
-                  <p className="font-bold opacity-90 max-w-2xl">
-                    Please complete your transfer to secure the funds. Once received, the project will automatically move to "Funded".
+                </div>
+                <div className="space-y-0.5">
+                  <h3 className="text-sm font-black text-slate-900 tracking-tight leading-none">
+                    Transfer Pending
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-bold leading-tight">
+                    Securing funds via bank transfer...
                   </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
-                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
-                      <p className="text-[10px] font-bold uppercase opacity-60">Bank Name</p>
-                      <p className="text-lg font-black">{vault.partnaBankName || "Processing..."}</p>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20 relative group">
-                      <p className="text-[10px] font-bold uppercase opacity-60">Account Number</p>
-                      <p className="text-lg font-black">{vault.partnaAccountNumber || "..."}</p>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="absolute top-2 right-2 text-white/40 hover:text-white"
-                        onClick={() => {
-                          navigator.clipboard.writeText(vault.partnaAccountNumber);
-                          toast.success("Copied to clipboard");
-                        }}
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
-                      <p className="text-[10px] font-bold uppercase opacity-60">Beneficiary</p>
-                      <p className="text-sm font-bold">{vault.partnaAccountName || "..."}</p>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
-                      <p className="text-[10px] font-bold uppercase opacity-60">Amount to Transfer</p>
-                      <p className="text-lg font-black">
-                        {vault.partnaFromAmount?.toLocaleString()} {vault.partnaFromCurrency}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-4 pt-2">
-                    {user?.kycStatus === "VERIFIED" && process.env.NEXT_PUBLIC_NODE_ENV === "development" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleMockDeposit}
-                        disabled={mockingDeposit}
-                        className="bg-white/20 border-white/40 text-white hover:bg-white/30 font-bold shadow-lg"
-                      >
-                        {mockingDeposit ? <RefreshCcw className="w-4 h-4 animate-spin mr-2" /> : <Zap className="w-4 h-4 mr-2" />}
-                        Trigger Mock Deposit (Dev Only)
-                      </Button>
-                    )}
-                    <div className="flex items-center gap-2 text-xs font-bold bg-white/20 px-3 py-1.5 rounded-full">
-                      <ShieldCheck className="w-3 h-3" />
-                      Secured by Partna
-                    </div>
-                    <p className="text-xs font-bold opacity-60 flex items-center gap-1.5">
-                      <RefreshCcw className="w-3 h-3 animate-spin" />
-                      Polling for payment confirmation...
-                    </p>
-                  </div>
-                </AlertDescription>
+                </div>
               </div>
-            </Alert>
+            </div>
           )}
 
           {/* SECTION A: HEADER */}
@@ -623,6 +639,8 @@ export default function ClientVaultDetailPage() {
                       ? "Payment settled to freelancer"
                     : vault.status === VaultStatus.REFUNDED
                       ? "Funds returned to client"
+                    : vault.status === VaultStatus.AWAITING_PAYMENT
+                      ? "Awaiting bank transfer"
                     : vault.status === VaultStatus.PROCESSING_PAYMENT
                       ? "Verifying payment result..."
                     : isSuccessReturn && vault.status === VaultStatus.DRAFT
@@ -636,8 +654,8 @@ export default function ClientVaultDetailPage() {
 
           {/* SECTION: FEE BREAKDOWN (ONLY IF FUNDED OR RELEASED) */}
           {(vault.status === VaultStatus.FUNDED || vault.status === VaultStatus.RELEASED) && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="md:col-span-2 bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card className="lg:col-span-2 bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div className="flex items-center gap-3">
@@ -646,28 +664,31 @@ export default function ClientVaultDetailPage() {
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900">Fee Breakdown</h3>
-                        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Transparent platform costs</p>
+                        <p className="text-sm text-slate-500 font-bold tracking-wider">Transparent platform costs</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-6">
                         <div className="text-right">
-                          <p className="text-[10px] text-slate-500 font-bold uppercase">Settlement ({calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent}%)</p>
+                          <p className="text-[12px] text-slate-500 font-bold">Settlement ({calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent}%)</p>
                           <CurrencyEstimate 
                             usdAmount={vault.settlementFeeUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
+                            manualLocalAmount={vault.localSettlementFee}
                             className="text-slate-900 text-sm font-bold"
                           />
                         </div>
                         <div className="text-right">
-                          <p className="text-[10px] text-blue-500 font-bold uppercase">Deposit fee (0.5%)</p>
+                          <p className="text-[12px] text-blue-500 font-bold">Deposit fee (0.5%)</p>
                           <CurrencyEstimate 
                             usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).depositFeeUSD} 
+                            manualLocalAmount={vault.localProcessingFee}
                             className="text-blue-600 text-sm font-bold"
                           />
                         </div>
                         <div className="text-right border-l border-emerald-200 pl-6">
-                          <p className="text-[10px] text-emerald-600 font-bold uppercase">Total you paid</p>
+                          <p className="text-[12px] text-emerald-600 font-bold">Total you paid</p>
                           <CurrencyEstimate 
                             usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).totalClientPaysUSD} 
+                            manualLocalAmount={vault.localAmount}
                             className="text-emerald-700 text-lg font-black"
                           />
                         </div>
@@ -684,6 +705,7 @@ export default function ClientVaultDetailPage() {
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-1">Freelancer receives</p>
                   <CurrencyEstimate 
                     usdAmount={vault.freelancerReceivesUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).freelancerReceivesUSD} 
+                    manualLocalAmount={vault.localFreelancerReceives}
                     className="text-white text-3xl font-black"
                   />
                   <div className="mt-2 flex items-center gap-1.5">
@@ -695,9 +717,9 @@ export default function ClientVaultDetailPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             {/* LEFT COLUMN: SECTIONS B & C */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="xl:col-span-2 space-y-8">
               {/* SECTION B: DELIVERABLES CHECKLIST */}
               <Card className="bg-white border-slate-200 shadow-xl overflow-hidden">
                 <CardHeader className="border-b border-slate-100 pb-6">
@@ -1042,80 +1064,155 @@ export default function ClientVaultDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex flex-col gap-3">
-                    {vault.status === VaultStatus.DRAFT && !isSuccessReturn && (
-                      <Link href={`/checkout/${vaultId}`} className="w-full">
-                        <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm ">
-                          <CreditCard className="w-4 h-4 mr-2" />
-                          Fund project
-                        </Button>
-                      </Link>
-                    )}
-                    
-                    {vault.status === VaultStatus.DRAFT && isSuccessReturn && (
-                       <Button disabled className="w-full bg-emerald-600/50 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 transition-all text-sm ">
-                         <RefreshCcw className="w-4 h-4 mr-2 animate-spin" />
-                         Confirming Deposit...
-                       </Button>
-                    )}
-
-                    {/* Approve & Release — only show when FUNDED */}
-                    {vault.status === VaultStatus.FUNDED && (
-                      <Button
-                        onClick={() => setShowApproveDialog(true)}
-                        className="w-full bg-slate-900 text-white hover:bg-slate-800 font-bold h-12 rounded-xl shadow-xl active:scale-95 transition-all text-sm "
-                        disabled={
-                          !vault.submissions?.length ||
-                          vault.isFrozen
-                        }
-                      >
-                        <CheckCircle className="w-4 h-4 mr-2 text-emerald-400" />
-                        Approve & Release Funds
-                      </Button>
-                    )}
-
-                    {/* Request Changes — only show when FUNDED */}
-                    {vault.status === VaultStatus.FUNDED && (
-                      <Button
-                        variant="outline"
-                        className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl active:scale-95 transition-all text-sm  shadow-sm"
-                        onClick={() =>
-                          toast.info("Request Changes feature is coming soon!", {
-                            description:
-                              "Please use the chat or external communication to provide feedback for now.",
-                          })
-                        }
-                      >
-                        <RefreshCcw className="w-4 h-4 mr-2" />
-                        Request changes
-                      </Button>
-                    )}
-
-                    {/* Dispute — only available when FUNDED */}
-                    {vault.status === VaultStatus.FUNDED && (
-                      <Link
-                        href={`/client/disputes/create?vaultId=${vaultId}`}
-                        className="w-full"
-                      >
-                        <Button
-                          variant="outline"
-                          className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
+                    <AnimatePresence mode="wait">
+                      {!reassigning ? (
+                        <motion.div
+                          key="actions"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="flex flex-col gap-3"
                         >
-                          <Gavel className="w-4 h-4 mr-2 text-amber-600" />
-                          Initiate dispute
-                        </Button>
-                      </Link>
-                    )}
+                          {vault.status === VaultStatus.DRAFT && !isSuccessReturn && (
+                            <Link href={`/checkout/${vaultId}`} className="w-full">
+                              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm ">
+                                <CreditCard className="w-4 h-4 mr-2" />
+                                Fund project
+                              </Button>
+                            </Link>
+                          )}
 
-                    {!vault.freelancerId && (
-                      <Button
-                        variant="outline"
-                        onClick={() => setReassigning(true)}
-                        className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold  h-12 rounded-xl transition-all shadow-sm active:scale-95 "
-                      >
-                        <UserPlus className="w-4 h-4 mr-2 text-emerald-600" />
-                        Reassign freelancer
-                      </Button>
-                    )}
+                          {vault.status === VaultStatus.AWAITING_PAYMENT && (
+                            <div className="flex flex-col gap-3">
+                              <Link href={`/checkout/${vaultId}/bank`} className="w-full">
+                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black capitalize tracking-wide h-12 rounded-xl shadow-lg shadow-emerald-200 active:scale-95 transition-all">
+                                  Review transfer details
+                                  <ChevronRight className="w-5 h-5 ml-2" />
+                                </Button>
+                              </Link>
+                            </div>
+                          )}
+                          
+                          {vault.status === VaultStatus.DRAFT && isSuccessReturn && (
+                            <Button disabled className="w-full bg-emerald-600/50 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 transition-all text-sm ">
+                              <div className="flex items-center justify-center gap-1.5 h-full mr-2">
+                                <DotLoader color="white" size="sm" />
+                              </div>
+                              Confirming Deposit...
+                            </Button>
+                          )}
+
+                          {/* Approve & Release — only show when FUNDED */}
+                          {vault.status === VaultStatus.FUNDED && (
+                            <Button
+                              onClick={() => setShowApproveDialog(true)}
+                              className="w-full bg-slate-900 text-white hover:bg-slate-800 font-bold h-12 rounded-xl shadow-xl active:scale-95 transition-all text-sm "
+                              disabled={
+                                !vault.submissions?.length ||
+                                vault.isFrozen
+                              }
+                            >
+                              <CheckCircle className="w-4 h-4 mr-2 text-emerald-400" />
+                              Approve & Release Funds
+                            </Button>
+                          )}
+
+                          {/* Request Changes — only show when FUNDED */}
+                          {vault.status === VaultStatus.FUNDED && (
+                            <Button
+                              variant="outline"
+                              className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl active:scale-95 transition-all text-sm  shadow-sm"
+                              onClick={() =>
+                                toast.info("Request Changes feature is coming soon!", {
+                                  description:
+                                    "Please use the chat or external communication to provide feedback for now.",
+                                })
+                              }
+                            >
+                              <RefreshCcw className="w-4 h-4 mr-2" />
+                              Request changes
+                            </Button>
+                          )}
+
+                          {/* Dispute — only available when FUNDED */}
+                          {vault.status === VaultStatus.FUNDED && (
+                            <Link
+                              href={`/client/disputes/create?vaultId=${vaultId}`}
+                              className="w-full"
+                            >
+                              <Button
+                                variant="outline"
+                                className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
+                              >
+                                <Gavel className="w-4 h-4 mr-2 text-amber-600" />
+                                Initiate dispute
+                              </Button>
+                            </Link>
+                          )}
+
+                          {!vault.freelancerId && (
+                            <Button
+                              variant="outline"
+                              onClick={() => setReassigning(true)}
+                              className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold  h-12 rounded-xl transition-all shadow-sm active:scale-95 "
+                            >
+                              <UserPlus className="w-4 h-4 mr-2 text-emerald-600" />
+                              Reassign freelancer
+                            </Button>
+                          )}
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="reassign"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                        >
+                          <div className="space-y-4 pt-2">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-xs font-bold text-slate-900 uppercase">New assignment</h4>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setReassigning(false)}
+                                className="h-6 w-6 p-0"
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-[9px] font-bold text-slate-600 uppercase">Freelancer email</Label>
+                              <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                                <input
+                                  type="email"
+                                  value={inviteEmail}
+                                  onChange={(e) => setInviteEmail(e.target.value)}
+                                  placeholder="freelancer@example.com"
+                                  className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-900 placeholder:text-slate-300 focus:border-emerald-500/50 outline-none transition-all shadow-sm font-bold"
+                                />
+                              </div>
+                            </div>
+                            <Button
+                              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 rounded-lg shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-xs"
+                              onClick={() => handleUpdateFreelancer(inviteEmail)}
+                              disabled={!inviteEmail || reassigningLoading}
+                            >
+                              {reassigningLoading ? (
+                                <div className="flex items-center justify-center gap-1.5 h-full">
+                                  <DotLoader color="white" size="sm" />
+                                </div>
+                              ) : (
+                                <>
+                                  <UserPlus className="w-3 h-3 mr-2" />
+                                  Send Invitation
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
 
                   <div className="pt-4 border-t border-slate-100 mt-4">
@@ -1130,58 +1227,6 @@ export default function ClientVaultDetailPage() {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* REASSIGNMENT PANEL - Shown when reassigning is true */}
-              <AnimatePresence>
-                {reassigning && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <Card className="bg-white border-emerald-500/20 shadow-xl ring-1 ring-emerald-500/10">
-                      <CardHeader className="pb-4 flex flex-row items-center justify-between">
-                        <CardTitle className="text-slate-900 text-sm font-bold   uppercase">
-                          New assignment
-                        </CardTitle>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setReassigning(false)}
-                          className="h-6 w-6 p-0 hover:bg-slate-50 text-slate-600 hover:text-slate-900"
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <Label className="text-[9px] font-bold  text-slate-600 uppercase">
-                            Freelancer email
-                          </Label>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
-                            <input
-                              type="email"
-                              value={inviteEmail}
-                              onChange={(e) => setInviteEmail(e.target.value)}
-                              placeholder="freelancer@example.com"
-                              className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-900 placeholder:text-slate-300 focus:border-emerald-500/50 outline-none transition-all shadow-sm  font-bold"
-                            />
-                          </div>
-                        </div>
-                        <Button
-                          onClick={() => handleUpdateFreelancer(inviteEmail)}
-                          disabled={!inviteEmail || reassigningLoading}
-                          className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold   h-10 rounded-lg shadow-md shadow-emerald-600/10 "
-                        >
-                          Confirm reassignment
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -1406,8 +1451,14 @@ export default function ClientVaultDetailPage() {
                     <Clock className="w-3 h-3" />
                     Rate valid for: {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
                   </div>
-                  <button onClick={fetchRate} className="text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
-                    <RefreshCcw className={cn("w-3 h-3", loadingRate && "animate-spin")} />
+                  <button onClick={fetchRate} className="text-emerald-600 hover:text-emerald-700 flex items-center gap-1 min-w-[100px] justify-end">
+                    {loadingRate ? (
+                      <div className="flex items-center gap-1">
+                        <DotLoader size="sm" />
+                      </div>
+                    ) : (
+                      <RefreshCcw className="w-3 h-3" />
+                    )}
                     Refresh Rate
                   </button>
                 </div>
@@ -1425,7 +1476,9 @@ export default function ClientVaultDetailPage() {
                   disabled={initiatingRamp || loadingRate}
                 >
                   {initiatingRamp ? (
-                    <RefreshCcw className="w-5 h-5 animate-spin" />
+                    <div className="flex items-center justify-center gap-2 h-full">
+                      <DotLoader color="white" size="sm" />
+                    </div>
                   ) : (
                     "Proceed to Payment"
                   )}
@@ -1433,8 +1486,8 @@ export default function ClientVaultDetailPage() {
               </div>
             ) : (
               <div className="space-y-6">
-                 <div className="space-y-4">
-                   <div className="bg-slate-900 text-white p-6 rounded-2xl space-y-4 shadow-xl">
+                <div className="space-y-4">
+                  <div className="bg-slate-900 text-white p-6 rounded-2xl space-y-4 shadow-xl">
                       <div>
                         <p className="text-[10px] font-bold uppercase opacity-40 mb-1">Bank Name</p>
                         <p className="text-lg font-black">{vault.partnaBankName}</p>

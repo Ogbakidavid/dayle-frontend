@@ -8,25 +8,28 @@ import { useUser } from "@/lib/store/user-context";
 
 interface CurrencyEstimateProps {
   usdAmount: number;
+  manualLocalAmount?: number;
   currency?: "NGN" | "KES" | string;
   className?: string;
   showNote?: boolean;
   prefix?: string;
+  align?: "left" | "center" | "right";
 }
 
 /**
- * Displays amounts in LOCAL CURRENCY as primary, with USD as secondary note.
+ * Displays amounts in LOCAL CURRENCY as primary.
  * Fetches live display rates from Dayle backend with 60s auto-refresh.
  * 
- * Output: ₦300,100 (primary)
- *         ≈ $200.00 (secondary)
+ * Output: ₦300,100
  */
 export function CurrencyEstimate({
   usdAmount,
+  manualLocalAmount,
   currency: manualCurrency,
   className,
   showNote = true,
   prefix = "",
+  align = "left",
 }: CurrencyEstimateProps) {
   const { user } = useUser();
   const [rate, setRate] = useState<number | null>(null);
@@ -38,7 +41,7 @@ export function CurrencyEstimate({
   const currencySymbol = currency === "NGN" ? "₦" : currency === "KES" ? "KSh" : "";
 
   const fetchRate = useCallback(async () => {
-    if (!currency) return;
+    if (!currency || manualLocalAmount != null) return;
     // Use a small reference amount for rate fetch when usdAmount is 0
     const fetchAmount = Math.abs(usdAmount) || 100;
     
@@ -73,17 +76,15 @@ export function CurrencyEstimate({
     })}`;
   };
 
-  const formatUSD = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(Math.abs(amount));
-  };
 
   // If we have a zero amount, show local currency zero directly (no rate needed)
   if (usdAmount === 0) {
     return (
-      <span className={cn("inline-flex flex-col gap-0.5", className)}>
+      <span className={cn(
+        "inline-flex flex-col gap-0.5",
+        align === "right" ? "items-end text-right" : align === "center" ? "items-center text-center" : "items-start",
+        className
+      )}>
         <span className="font-semibold tracking-tight">
           {prefix}{currencySymbol}0
         </span>
@@ -92,40 +93,36 @@ export function CurrencyEstimate({
   }
 
   // Before rate loads, still show local currency symbol as fallback
-  if (error || !rate) {
+  if (manualLocalAmount == null && (error || !rate)) {
     return (
-      <span className={cn("inline-flex flex-col gap-0.5", className)}>
+      <span className={cn(
+        "inline-flex flex-col gap-0.5",
+        align === "right" ? "items-end text-right" : align === "center" ? "items-center text-center" : "items-start",
+        className
+      )}>
         <span className="font-semibold tracking-tight">{prefix}{currencySymbol}—</span>
-        <span className="flex items-center gap-1.5 text-slate-500 text-xs font-normal">
-          <span>≈ {prefix}{formatUSD(usdAmount)}</span>
-        </span>
       </span>
     );
   }
 
   // Convert: Local = USD / (USDC-per-local-unit rate)
-  const localAmount = usdAmount / rate;
+  const localValue = manualLocalAmount != null ? manualLocalAmount : usdAmount / (rate || 1);
 
   return (
-    <span className={cn("inline-flex flex-col gap-0.5", className)}>
+    <span className={cn(
+      "inline-flex flex-col gap-0.5",
+      align === "right" ? "items-end text-right" : align === "center" ? "items-center text-center" : "items-start",
+      className
+    )}>
       {/* PRIMARY: Local currency */}
       <span className="font-semibold tracking-tight">
-        {prefix}{formatLocal(localAmount)}
+        {prefix}{formatLocal(localValue)}
       </span>
-      {/* SECONDARY: USD equivalent */}
-      <span className="flex items-center gap-1.5 text-slate-500 text-xs font-normal">
-        <span className={cn(loading && "opacity-50 transition-opacity")}>
-          ≈ {prefix}{formatUSD(usdAmount)}
-        </span>
-        {isStale && (
+      {isStale && (
+        <span className="flex items-center gap-1.5 text-slate-600 text-xs font-normal">
           <span title="Rate may be outdated">
             <Clock className="size-3 text-amber-500" />
           </span>
-        )}
-      </span>
-      {showNote && (
-        <span className="text-[10px] text-slate-400/80 leading-none mt-0.5" title={isStale ? "Rate may be outdated" : "Estimated at current rate"}>
-          Estimated at current rate
         </span>
       )}
     </span>

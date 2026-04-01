@@ -138,7 +138,7 @@ export default function FreelancerVaultDetailPage() {
 
   return (
     <div className="min-h-screen text-slate-600 selection:bg-emerald-500/30 pb-20 font-primary">
-      <div className="max-w-6xl mx-auto px-6 space-y-8">
+      <div className="max-w-6xl mx-auto px-6 lg:px-10 space-y-8">
         {/* SECTION A: HEADER */}
         <header className="pt-4 md:pt-8 bg-transparent">
           <button
@@ -219,8 +219,8 @@ export default function FreelancerVaultDetailPage() {
 
         {/* SECTION: FEE BREAKDOWN (ONLY IF RELEASED) */}
         {vault.status === VaultStatus.RELEASED && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="md:col-span-2 bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-2 bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div className="flex items-center gap-3">
@@ -278,9 +278,9 @@ export default function FreelancerVaultDetailPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
           {/* LEFT COLUMN: SECTIONS B & C */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="xl:col-span-2 space-y-8">
             {/* SECTION B: DELIVERABLES CHECKLIST */}
             <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
               <CardHeader className="border-b border-slate-100 pb-6 bg-slate-50">

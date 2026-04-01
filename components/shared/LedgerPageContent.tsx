@@ -14,9 +14,11 @@ import { AmountDisplay } from "@/components/ui/amount-display";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { LedgerBalance } from "./LedgerBalance";
 import { Transaction, useLedger } from "@/lib/store/ledger-context";
-import { TransactionStatus } from "@/lib/domain/enums";
+import { TransactionStatus, KycStatus } from "@/lib/domain/enums";
 import { cn } from "@/lib/utils";
 import { CurrencyEstimate } from "./currency-estimate";
+import { useUser } from "@/lib/store/user-context";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -77,9 +79,17 @@ export default function LedgerPageContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
+  const { user } = useUser();
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!withdrawAmount || isWithdrawing) return;
+
+    if (user?.kycStatus !== KycStatus.VERIFIED) {
+      toast.error("Identity Verification Required", {
+        description: "You must complete full identity verification (Tier 2) to release funds to your bank account."
+      });
+      return;
+    }
 
     // Redirect to the new withdrawal flow with amount
     const url = `/withdraw?amount=${withdrawAmount}`;
@@ -167,7 +177,6 @@ export default function LedgerPageContent() {
                       </label>
                       <div className="relative group">
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-bold text-slate-900 group-focus-within:text-emerald-600 transition-colors">
-                          ≈
                         </span>
                         <input
                           type="number"

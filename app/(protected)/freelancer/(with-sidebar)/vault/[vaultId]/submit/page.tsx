@@ -174,7 +174,7 @@ export default function SubmissionPage() {
                 fileName: file.name,
                 fileType: file.type || 'application/octet-stream',
                 fileSize: file.size,
-                purpose: 'SUBMISSION',
+                purpose: 'deliverable',
               });
 
               // b. PUT file to S3
