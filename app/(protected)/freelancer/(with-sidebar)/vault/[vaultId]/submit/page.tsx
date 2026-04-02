@@ -202,17 +202,23 @@ export default function SubmissionPage() {
                 purpose: 'deliverable',
               });
 
-              // b. PUT file to S3
+               // b. PUT file to S3
+              console.log(`[SubmissionPage] Attempting to upload ${file.name} directly to S3...`);
               const uploadResponse = await fetch(url, {
                 method: 'PUT',
                 body: file,
                 headers: {
                   'Content-Type': file.type || 'application/octet-stream',
                 },
+              }).catch(err => {
+                console.error(`[UploadError] CORS or Network error for ${file.name}:`, err);
+                throw new Error(`Connection to storage failed for ${file.name}. This is usually a CORS configuration issue on your S3 bucket.`);
               });
 
               if (!uploadResponse.ok) {
-                throw new Error(`Failed to upload ${file.name}`);
+                const errorText = await uploadResponse.text().catch(() => 'No error body');
+                console.error(`[UploadError] S3 rejected upload for ${file.name}:`, uploadResponse.status, errorText);
+                throw new Error(`Failed to upload ${file.name}: S3 returned ${uploadResponse.status}`);
               }
 
               return {
