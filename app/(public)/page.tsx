@@ -992,7 +992,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-center md:items-start gap-1">
             <span>© 2026 Dayle.</span>
             <span className="text-[10px] uppercase tracking-widest text-slate-400">
-              Built by <span className="text-slate-600">Orynex Labs</span>
+              Built by <a href="https://orynexlabs.com/" target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-emerald-600 transition-colors underline decoration-slate-200 underline-offset-4 cursor-pointer">Orynex Labs</a>
             </span>
           </div>
 
