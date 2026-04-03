@@ -31,6 +31,11 @@ export enum VaultStatus {
   REFUNDED = "REFUNDED",
   DISPUTED = "DISPUTED",
   CANCELLED = "CANCELLED",
+  RELEASING = "RELEASING",
+  RELEASE_FAILED = "RELEASE_FAILED",
+  REFUNDING = "REFUNDING",
+  REFUND_FAILED = "REFUND_FAILED",
+  WITHDRAWAL_FAILED = "WITHDRAWAL_FAILED",
 }
 
 // ============================================================================
@@ -216,6 +221,16 @@ export const getVaultDerivedLabel = (status: string | undefined): string => {
       return "IN DISPUTE";
     case VaultStatus.CANCELLED:
       return "CANCELLED";
+    case VaultStatus.RELEASING:
+      return "RELEASING FUNDS...";
+    case VaultStatus.REFUNDING:
+      return "REFUNDING FUNDS...";
+    case VaultStatus.RELEASE_FAILED:
+      return "RELEASE FAILED";
+    case VaultStatus.REFUND_FAILED:
+      return "REFUND FAILED";
+    case VaultStatus.WITHDRAWAL_FAILED:
+      return "WITHDRAWAL FAILED — CONTACT SUPPORT";
     case VaultStatus.PROCESSING_PAYMENT:
       return "PROCESSING PAYMENT";
     default:
@@ -241,6 +256,13 @@ export const getVaultStatusDisplay = (vault: any): { label: string; color: strin
       return { label: "REFUNDED", color: "text-gray-400" };
     case VaultStatus.CANCELLED:
       return { label: "CANCELLED", color: "text-gray-500" };
+    case VaultStatus.RELEASING:
+    case VaultStatus.REFUNDING:
+      return { label: status, color: "text-amber-500" };
+    case VaultStatus.RELEASE_FAILED:
+    case VaultStatus.REFUND_FAILED:
+    case VaultStatus.WITHDRAWAL_FAILED:
+      return { label: status, color: "text-red-400" };
     case VaultStatus.PROCESSING_PAYMENT:
       return { label: "PROCESSING", color: "text-amber-500" };
     case VaultStatus.DRAFT:
