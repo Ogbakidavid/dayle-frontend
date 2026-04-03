@@ -307,6 +307,38 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Powered By Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className="py-12 border-y border-slate-100 bg-white/50 relative overflow-hidden"
+      >
+        <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 opacity-50 hover:opacity-80 transition-opacity duration-500 grayscale hover:grayscale-0">
+            <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-slate-400 mb-2 md:mb-0">
+              Strategic Partners
+            </span>
+            <div className="flex items-center gap-12 md:gap-20">
+              <img 
+                src="/paycrest-logo.svg" 
+                alt="Paycrest" 
+                className="h-6 md:h-8 w-auto object-contain"
+              />
+              <div className="flex items-center gap-2 md:gap-3">
+                <img 
+                  src="/partna-logo.png" 
+                  alt="Partna" 
+                  className="h-6 md:h-8 w-auto object-contain"
+                />
+                <span className="font-extrabold text-3xl text-slate-900 tracking-tighter">Partna</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
       {/* Protocol Logic Flow */}
       <section
         id="protocol"
@@ -957,7 +989,12 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-7xl mx-auto mt-16 md:mt-24 lg:mt-32 pt-8 md:pt-12 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-sm md:text-sm font-semibold text-slate-600">
-          <span>© 2026 Dayle.</span>
+          <div className="flex flex-col items-center md:items-start gap-1">
+            <span>© 2026 Dayle.</span>
+            <span className="text-[10px] uppercase tracking-widest text-slate-400">
+              Built by <span className="text-slate-600">Orynex Labs</span>
+            </span>
+          </div>
 
           <div className="flex items-center gap-6">
             <Link
