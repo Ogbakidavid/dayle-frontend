@@ -99,7 +99,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
         </motion.div>
         <motion.h1
           variants={itemVariants}
-          className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tighter "
+          className="text-2xl sm:text-3xl md:text-5xl font-bold text-slate-900 tracking-tighter "
         >
           {role === "client" ? "Ledger management" : "Earning history"}
         </motion.h1>
@@ -154,13 +154,13 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                   stat.bg,
                 )}
               />
-              <CardContent className="py-8 relative z-10">
+              <CardContent className="p-4 sm:py-8 relative z-10">
                 <p className="text-sm font-bold  text-slate-600 mb-2 group-hover:text-slate-600 transition-colors ">
                   {stat.label}
                 </p>
                 <div
                   className={cn(
-                    "text-3xl font-bold text-slate-900 tracking-tighter ",
+                    "text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ",
                     stat.color,
                   )}
                 >
@@ -184,7 +184,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search ledger entries..."
-            className="w-full pl-12 pr-4 py-4 bg-white font-bold  border border-slate-200 rounded-2xl text-sm md:text-base text-slate-900 placeholder-slate-900 focus:outline-none focus:border-emerald-500/30 shadow-sm transition-all"
+            className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-white font-bold  border border-slate-200 rounded-xl sm:rounded-2xl text-xs sm:text-sm md:text-base text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500/30 shadow-sm transition-all"
           />
         </div>
         <div className="flex items-center gap-3">
@@ -251,11 +251,11 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                           key={entry.id}
                           className="group hover:bg-slate-50 transition-colors cursor-pointer border-l-2 border-transparent hover:border-emerald-600 flex flex-col sm:table-row sm:border-none last:border-none"
                         >
-                          <td className="px-4 sm:px-6 py-5 sm:py-6 sm:table-cell">
+                          <td className="px-4 sm:px-6 py-4 sm:py-6 sm:table-cell">
                             <div className="flex items-center gap-3 sm:gap-4">
                               <div
                                 className={cn(
-                                  "hidden xs:flex w-9 h-9 sm:w-10 sm:h-10 rounded-xl items-center justify-center border transition-all shadow-lg shrink-0",
+                                  "hidden xs:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl items-center justify-center border transition-all shadow-lg shrink-0",
                                   entry.type === "RELEASE" ||
                                     entry.type === "DEPOSIT"
                                     ? "bg-emerald-50 border-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600"
@@ -274,7 +274,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p 
-                                  className="text-sm text-slate-900 font-bold tracking-tight line-clamp-1 max-w-[400px] group-hover:text-emerald-700 transition-colors"
+                                  className="text-[13px] sm:text-sm text-slate-900 font-bold tracking-tight line-clamp-1 max-w-[400px] group-hover:text-emerald-700 transition-colors"
                                   title={entry.description || entry.id}
                                 >
                                   {entry.description || entry.id}
@@ -296,13 +296,13 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                                 <CurrencyEstimate 
                                   usdAmount={Math.abs(formatAmount(entry.amount))} 
                                   showNote={false}
-                                  className="text-sm font-bold text-slate-900"
+                                  className="text-[13px] sm:text-sm font-bold text-slate-900"
                                 />
                                 <p className={cn(
                                   "text-[10px] font-bold mt-0.5",
                                   entry.amount < 0 ? "text-amber-600" : "text-emerald-600"
                                 )}>
-                                  {entry.amount < 0 ? "Debit" : "Credit"}
+                                  {entry.amount < 0 ? "Out" : "In"}
                                 </p>
                               </div>
                             </div>
@@ -311,7 +311,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             <p className="text-sm text-slate-600 font-bold tracking-tight  truncate max-w-[200px]">
                               {vault?.title || "Independent transaction"}
                             </p>
-                            <p className="text-sm text-slate-600 font-bold  mt-1.5 flex items-center gap-1.5">
+                            <p className="text-[13px] sm:text-sm text-slate-600 font-bold  mt-1.5 flex items-center gap-1.5">
                               <Clock className="w-3 h-3" />
                               {new Date(entry.createdAt).toLocaleDateString(
                                 "en-US",
@@ -327,7 +327,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
                             <div className="flex sm:justify-start">
                               <span
                                 className={cn(
-                                  "px-2.5 py-1 text-[10px] sm:text-xs font-bold rounded-full border shadow-sm transition-all uppercase sm:capitalize",
+                                  "px-2 py-1 text-[9px] sm:text-xs font-bold rounded-full border shadow-sm transition-all uppercase sm:capitalize",
                                   statusStyles[entry.status] ||
                                     "bg-slate-50 border-slate-200 text-slate-600",
                                 )}

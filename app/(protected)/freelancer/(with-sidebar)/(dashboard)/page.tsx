@@ -68,11 +68,16 @@ export default function FreelancerDashboard() {
     [VaultStatus.FUNDED, VaultStatus.DISPUTED].includes(v.status),
   );
   const completedVaults = vaults.filter(
-    (v: any) =>
-      v.status === VaultStatus.RELEASED || v.status === VaultStatus.REFUNDED,
+    (v: any) => v.status === VaultStatus.RELEASED,
+  );
+  const totalEarnings = completedVaults.reduce(
+    (acc: number, v: any) =>
+      acc + (Number(v.formattedTotalAmount) || Number(v.totalAmount) || 0),
+    0,
   );
   const totalPending = activeVaults.reduce(
-    (acc: number, v: any) => acc + (v.totalAmount || v.amount),
+    (acc: number, v: any) =>
+      acc + (Number(v.formattedTotalAmount) || 0),
     0,
   );
 
@@ -90,18 +95,18 @@ export default function FreelancerDashboard() {
       className="space-y-8 max-w-6xl mx-auto font-primary"
     >
       {/* Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <motion.div variants={itemVariants} className="space-y-2">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-slate-900 ">
+          <h1 className="text-xl sm:text-2xl md:text-4xl font-bold tracking-tighter text-slate-900 leading-tight">
             Overview
           </h1>
-          <p className="text-[10px] md:text-xs text-slate-600 font-bold tracking-wide">
+          <p className="text-xs md:text-sm text-slate-600 font-bold tracking-wide">
             Track your deliverables and secure earnings
           </p>
         </motion.div>
-        <motion.div variants={itemVariants} className="flex gap-3">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Link href="/freelancer/balance" className="w-full sm:w-auto">
-            <Button className="w-full sm:w-auto bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 font-bold text-xs h-11 px-6 transition-all shadow-sm">
+            <Button className="w-full sm:w-auto bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 font-bold text-xs h-10 sm:h-11 px-4 sm:px-6 transition-all shadow-sm">
               Withdraw funds
             </Button>
           </Link>
@@ -109,25 +114,22 @@ export default function FreelancerDashboard() {
       </header>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-6 rounded-2xl hover:border-emerald-500/20 transition-all shadow-sm group"
+          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform">
-              <Landmark className="w-5 h-5 text-emerald-600" />
-            </div>
-            <span className="text-[10px] font-bold tracking-wide text-slate-600 group-hover:text-slate-600 transition-colors">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-sm font-bold  text-slate-900">
               Available to withdraw
             </span>
           </div>
           <div className="space-y-2">
             <CurrencyEstimate
               usdAmount={Number(balance?.formattedAvailable) || 0}
-              className="text-slate-900 text-4xl font-bold"
+              className="text-slate-900"
             />
-            <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-bold tracking-wide">
+            <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
               <Zap className="w-3.5 h-3.5" />
               Funds liquid
             </div>
@@ -136,26 +138,19 @@ export default function FreelancerDashboard() {
 
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-6 rounded-2xl hover:border-blue-500/20 transition-all shadow-sm group"
+          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform">
-              <Shield className="w-5 h-5 text-blue-600" />
-            </div>
-            <span className="text-[10px] font-bold tracking-wide text-slate-600 group-hover:text-slate-600 transition-colors">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-sm font-bold  text-slate-900">
               Pending in projects
             </span>
           </div>
           <div className="space-y-2">
             <CurrencyEstimate
-              usdAmount={activeVaults.reduce(
-                (acc: number, v: any) =>
-                  acc + (Number(v.formattedTotalAmount) || 0),
-                0,
-              )}
-              className="text-slate-900 text-4xl font-bold"
+              usdAmount={totalPending}
+              className="text-slate-900"
             />
-            <p className="text-blue-400 text-[10px] font-bold tracking-wide">
+            <p className="text-blue-400 text-xs font-bold tracking-wide">
               {activeVaults.length} active assignments
             </p>
           </div>
@@ -163,23 +158,24 @@ export default function FreelancerDashboard() {
 
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-6 rounded-2xl hover:border-amber-500/20 transition-all shadow-sm group"
+          className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 transition-transform">
-              <CheckCircle className="w-5 h-5 text-amber-600" />
-            </div>
-            <span className="text-[10px] font-bold tracking-wide text-slate-600 group-hover:text-slate-600 transition-colors">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-sm font-bold  text-slate-900">
               Completed projects
             </span>
           </div>
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tighter ">
+            <h2 className="font-bold text-slate-900 tracking-tighter">
               {completedVaults.length}
             </h2>
-            <p className="text-amber-400 text-[10px] font-bold tracking-wide">
-              Project access level 1
-            </p>
+            <div className="flex flex-wrap items-center gap-1.5 text-slate-900 text-[10px] font-bold uppercase tracking-wider">
+              <span>Total earned:</span>
+              <CurrencyEstimate
+                usdAmount={totalEarnings}
+                className="text-slate-900"
+              />
+            </div>
           </div>
         </motion.div>
       </div>
@@ -189,10 +185,10 @@ export default function FreelancerDashboard() {
         <div className="pt-4 space-y-6">
           <div className="flex flex-col items-start sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                <Shield className="w-5 h-5 text-emerald-600" />
+              <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0">
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
               </div>
-              <h2 className="text-xl font-bold tracking-wide text-slate-900 ">
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
                 Pending project invitations
               </h2>
             </div>
@@ -205,24 +201,24 @@ export default function FreelancerDashboard() {
             {invitations.map((invite: any) => (
               <div
                 key={invite.id}
-                className="group flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-white border border-blue-500/20 rounded-2xl hover:border-emerald-500/30 transition-all gap-6 shadow-sm relative overflow-hidden"
+                className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 bg-white border border-blue-500/20 rounded-2xl hover:border-emerald-500/30 transition-all gap-4 sm:gap-6 shadow-sm relative overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50" />
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <h4 className="text-lg font-bold tracking-tight text-slate-900">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <h4 className="text-base sm:text-lg font-bold tracking-tight text-slate-900">
                       {invite.vault?.title}
                     </h4>
-                    <span className="bg-blue-500/10 text-blue-500 text-[9px] font-bold tracking-wide rounded-lg border border-blue-500/20 py-1 px-3">
+                    <span className="bg-blue-500/10 text-blue-500 text-[8px] sm:text-[9px] font-bold tracking-wide rounded-lg border border-blue-500/20 py-0.5 sm:py-1 px-2 sm:px-3">
                       Action required
                     </span>
                     {invite.vault?.isFunded ? (
-                      <span className="bg-emerald-50 text-emerald-700 text-[9px] font-bold tracking-wide rounded-lg border border-emerald-200 py-1 px-3">
+                      <span className="bg-emerald-50 text-emerald-700 text-[8px] sm:text-[9px] font-bold tracking-wide rounded-lg border border-emerald-200 py-0.5 sm:py-1 px-2 sm:px-3">
                         Funded
                       </span>
                     ) : (
-                      <span className="bg-amber-50 text-amber-700 text-[9px] font-bold tracking-wide rounded-lg border border-amber-200 py-1 px-3">
+                      <span className="bg-amber-50 text-amber-700 text-[8px] sm:text-[9px] font-bold tracking-wide rounded-lg border border-amber-200 py-0.5 sm:py-1 px-2 sm:px-3">
                         Payment Pending
                       </span>
                     )}
@@ -240,25 +236,25 @@ export default function FreelancerDashboard() {
                   </div>
                 </div>
 
-                <div className="flex flex-col xs:flex-row items-center gap-4 sm:gap-6 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                  <div className="text-center sm:text-right">
-                    <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1 uppercase">
+                <div className="flex flex-row sm:flex-row items-center justify-between sm:justify-end gap-4 sm:gap-6 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                  <div className="text-left sm:text-right">
+                    <p className="text-[8px] sm:text-[9px] text-slate-600 font-bold tracking-wide mb-1 uppercase">
                       Project value
                     </p>
                     <CurrencyEstimate
                       usdAmount={Number(
                         invite.vault?.formattedTotalAmount || "0.00",
                       )}
-                      className="text-slate-900 text-xl font-bold"
+                      className="text-slate-900 text-lg sm:text-xl font-bold"
                       align="right"
                     />
                   </div>
                   <Link
                     href={`/invite/${invite.token}`}
-                    className="w-full xs:w-auto"
+                    className="w-auto"
                   >
-                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] h-10 px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/10">
-                      View invitation
+                    <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] h-9 sm:h-10 px-4 sm:px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/10">
+                      View
                     </Button>
                   </Link>
                 </div>
@@ -272,11 +268,11 @@ export default function FreelancerDashboard() {
       <div className="pt-8 space-y-6">
         <motion.div
           variants={itemVariants}
-          className="flex items-center justify-between"
+          className="flex flex-col items-start gap-2 sm:flex-row sm:items-center justify-between"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <Briefcase className="w-5 h-5 text-emerald-600" />
+            <div className="p-2 rounded-lg bg-[#F8F9FA] border border-slate-200">
+              <Briefcase className="w-5 h-5 text-slate-900" />
             </div>
             <h2 className="text-xl font-bold tracking-wide text-slate-900 ">
               Active assignments
@@ -327,22 +323,21 @@ export default function FreelancerDashboard() {
                 <Link key={vault.id} href={`/freelancer/vault/${vault.id}`}>
                   <motion.div
                     variants={itemVariants}
-                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500/30 transition-all gap-6 shadow-sm relative overflow-hidden"
+                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500/30 transition-all gap-4 sm:gap-6 shadow-sm relative overflow-hidden"
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500/50 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-3 mb-3">
-                        <h4 className="text-lg font-bold tracking-tight text-slate-900 truncate max-w-md">
-                          {vault.title}
-                        </h4>
-                        <Badge
-                          // variant="outline"
-                          className="bg-emerald-50 text-emerald-700 text-[9px] font-bold tracking-wide rounded-lg border border-emerald-200 py-1 px-3 whitespace-nowrap"
-                        >
-                          {getVaultDerivedLabel(vault.status)}
-                        </Badge>
-                      </div>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                          <h4 className="text-sm sm:text-lg font-bold tracking-tight text-slate-900 truncate max-w-[150px] sm:max-w-md">
+                            {vault.title}
+                          </h4>
+                          <Badge
+                            className="bg-emerald-50 text-emerald-700 text-[8px] sm:text-[9px] font-bold tracking-wide rounded-lg border border-emerald-200 py-0.5 sm:py-1 px-2 sm:px-3 whitespace-nowrap"
+                          >
+                            {getVaultDerivedLabel(vault.status)}
+                          </Badge>
+                        </div>
                       {vault.description && (
                         <p className="text-[11px] text-slate-600 mb-3 line-clamp-1 max-w-xl font-bold tracking-wide leading-relaxed">
                           {vault.description}
@@ -350,9 +345,6 @@ export default function FreelancerDashboard() {
                       )}
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
-                            <Briefcase className="w-2.5 h-2.5 text-slate-600" />
-                          </div>
                           <p className="text-[10px] text-slate-600 font-bold tracking-wide">
                             Client:{" "}
                             <span className="text-slate-700">
@@ -372,28 +364,30 @@ export default function FreelancerDashboard() {
                             {vault.status === VaultStatus.RELEASED
                               ? "Released"
                               : vault.submissions?.length > 0
-                                ? `${vault.submissions[0].deliverableStatus?.filter((d: any) => d.included).length || 0} of ${vault.deliverables?.length || 0} deliverables claimed`
+                                ? vault.deliverables?.length > 1
+                                  ? "Deliverables submitted"
+                                  : "Deliverable submitted"
                                 : "Not started"}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-8 border-t sm:border-t-0 border-slate-100 pt-6 sm:pt-0">
-                      <div className="sm:text-right">
-                        <p className="text-[9px] text-slate-600 font-bold tracking-wide mb-1">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-8 border-t sm:border-t-0 border-slate-100 pt-4 sm:pt-0">
+                      <div className="text-left sm:text-right">
+                        <p className="text-[8px] sm:text-[9px] text-slate-600 font-bold tracking-wide mb-1">
                           Project value
                         </p>
                         <CurrencyEstimate
                           usdAmount={Number(
                             vault.formattedTotalAmount || "0.00",
                           )}
-                          className="text-slate-900 text-2xl font-bold"
+                          className="text-slate-900 text-xl sm:text-2xl font-bold"
                           align="right"
                         />
                       </div>
-                      <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">
-                        <ArrowUpRight className="w-5 h-5 text-slate-600 group-hover:text-white transition-colors" />
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">
+                        <ArrowUpRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-slate-600 group-hover:text-white transition-colors" />
                       </div>
                     </div>
                   </motion.div>
@@ -403,12 +397,12 @@ export default function FreelancerDashboard() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-between bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                <p className="text-[10px] font-bold text-slate-600 tracking-wide">
+              <div className="mt-8 flex flex-col xs:flex-row items-center justify-between bg-slate-50 border border-slate-200 rounded-2xl p-4 gap-4">
+                <p className="text-xs sm:text-sm font-bold text-slate-600 ">
                   Page <span className="text-slate-600">{currentPage}</span> /{" "}
                   {totalPages}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full xs:w-auto">
                   <Button
                     variant="outline"
                     size="sm"
@@ -416,7 +410,7 @@ export default function FreelancerDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(1, prev - 1))
                     }
-                    className="h-10 px-4 text-[10px] border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-wide transition-all disabled:opacity-50"
+                    className="flex-1 xs:flex-none h-8 sm:h-9 px-3 sm:px-4 text-[10px] sm:text-xs md:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition-all disabled:opacity-50"
                   >
                     Previous
                   </Button>
@@ -427,7 +421,7 @@ export default function FreelancerDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                     }
-                    className="h-10 px-4 text-[10px] border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold tracking-wide transition-all disabled:opacity-50"
+                    className="flex-1 xs:flex-none h-8 sm:h-9 px-3 sm:px-4 text-[10px] sm:text-xs md:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition-all disabled:opacity-50"
                   >
                     Next
                   </Button>

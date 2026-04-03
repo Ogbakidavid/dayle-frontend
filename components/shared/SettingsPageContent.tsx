@@ -531,8 +531,8 @@ export default function SettingsPageContent({ role = "client" }) {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
-        <div className="flex flex-col md:flex-row gap-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-16">
           {/* Sidebar: Clean & Floating */}
           <aside className="md:w-64 shrink-0">
             <div className="mb-8">
@@ -552,7 +552,7 @@ export default function SettingsPageContent({ role = "client" }) {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-bold  relative group",
+                    "w-full flex items-center gap-2.5 sm:gap-3 px-3 py-2 sm:py-2.5 rounded-lg transition-all text-xs sm:text-sm font-bold  relative group",
                     activeTab === tab.id
                       ? "text-emerald-700 bg-emerald-50"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100",
@@ -594,14 +594,14 @@ export default function SettingsPageContent({ role = "client" }) {
           <section className="flex-1 max-w-2xl">
             {/* Profile Section */}
             {activeTab === "profile" && (
-              <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <div className="flex items-end gap-6">
+              <div className="space-y-8 sm:space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 text-center sm:text-left">
                   <div className="relative group">
                     <UserAvatar
                       identifier={user?.id || user?.email || "guest"}
                       src={user?.profileImage}
-                      size={80}
-                      className="h-20 w-20 rounded-2xl bg-white border border-slate-200 shadow-sm"
+                      size={64}
+                      className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-white border border-slate-200 shadow-sm"
                     />
                     {user?.kycStatus === "VERIFIED" && (
                       <div className="absolute -top-2 -right-2 bg-emerald-50 border border-emerald-100 backdrop-blur-md px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
@@ -629,10 +629,10 @@ export default function SettingsPageContent({ role = "client" }) {
                     />
                   </div>
                   <div className="pb-1">
-                    <h3 className="text-lg font-bold text-slate-900 tracking-tight ">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight ">
                       {isClient ? "Profile picture" : "Freelancer profile"}
                     </h3>
-                    <p className="text-sm font-bold text-slate-600  mt-1">
+                    <p className="text-[10px] sm:text-sm font-bold text-slate-600  mt-0.5 sm:mt-1">
                       PNG, JPG or GIF up to 10MB
                     </p>
                   </div>
@@ -708,7 +708,7 @@ export default function SettingsPageContent({ role = "client" }) {
                   <Button
                     onClick={handleSaveProfile}
                     disabled={savingProfile}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 rounded-lg transition-all shadow-md shadow-emerald-600/10 disabled:opacity-50 disabled:cursor-not-allowed "
+                    className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 rounded-lg transition-all shadow-md shadow-emerald-600/10 disabled:opacity-50 disabled:cursor-not-allowed h-10 sm:h-11 text-xs sm:text-sm"
                   >
                     {savingProfile ? "Saving..." : "Save changes"}
                   </Button>
@@ -729,7 +729,7 @@ export default function SettingsPageContent({ role = "client" }) {
                           <h4 className="text-sm font-bold text-slate-600 tracking-widest uppercase">
                             Available items to withdraw
                           </h4>
-                          <h2 className="text-4xl font-bold text-slate-900 tracking-tighter">
+                          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter">
                             <CurrencyEstimate 
                               usdAmount={Number(balance?.formattedAvailable) || 0} 
                               showNote={false}
@@ -737,7 +737,7 @@ export default function SettingsPageContent({ role = "client" }) {
                           </h2>
                         </div>
                         <Button
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all"
+                          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-10 sm:h-11 px-6 sm:px-8 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-xs sm:text-sm"
                           disabled={!balance?.formattedAvailable || Number(balance.formattedAvailable) <= 0}
                           onClick={() => {
                             setWithdrawAmount("");
@@ -750,14 +750,14 @@ export default function SettingsPageContent({ role = "client" }) {
                       </div>
                     </div>
 
-                    <div className="bg-slate-50 border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm border-dashed flex flex-col justify-center">
-                      <h4 className="text-sm font-bold text-slate-600 mb-2">
+                    <div className="bg-slate-50 border border-slate-200 p-5 sm:p-8 rounded-2xl shadow-sm border-dashed flex flex-col justify-center">
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-600 mb-1 sm:mb-2 text-center sm:text-left">
                         Billing cycle
                       </h4>
-                      <p className="text-sm font-bold text-slate-900">
+                      <p className="text-sm sm:text-base font-bold text-slate-900 text-center sm:text-left">
                         Monthly billing
                       </p>
-                      <p className="text-[11px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
+                      <p className="text-[9px] sm:text-[11px] font-bold text-slate-500 mt-1 uppercase tracking-wider text-center sm:text-left">
                         Next invoice: April 1, 2026
                       </p>
                     </div>
@@ -826,7 +826,7 @@ export default function SettingsPageContent({ role = "client" }) {
                             <Button 
                               disabled={!selectedBillingMethod}
                               onClick={() => setBillingStep("BANK")}
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 h-11 rounded-xl shadow-lg shadow-emerald-600/10"
+                              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 h-10 sm:h-11 rounded-xl shadow-lg shadow-emerald-600/10 text-xs sm:text-sm"
                             >
                               Continue
                             </Button>
@@ -926,7 +926,7 @@ export default function SettingsPageContent({ role = "client" }) {
                               <Button 
                                 onClick={handleSaveBank}
                                 disabled={isSavingBilling || !bankData.accountName}
-                                className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/10 mt-6"
+                                className="w-full h-10 sm:h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/10 mt-6 text-xs sm:text-sm"
                               >
                                 {isSavingBilling ? "Saving..." : "Save Bank Account"}
                               </Button>
@@ -990,7 +990,7 @@ export default function SettingsPageContent({ role = "client" }) {
 
                       <Button 
                         onClick={() => setIsAddingBillingMethod(true)}
-                        className="w-full py-7 bg-white border border-dashed border-slate-200 hover:border-emerald-500/50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all rounded-xl font-bold  text-sm shadow-sm group mt-4"
+                        className="w-full py-5 sm:py-7 bg-white border border-dashed border-slate-200 hover:border-emerald-500/50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all rounded-xl font-bold  text-xs sm:text-sm shadow-sm group mt-4"
                       >
                         <Plus className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />{" "}
                         {isClient ? "Add a billing method" : "Add settlement method"}

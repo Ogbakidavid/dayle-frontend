@@ -378,7 +378,7 @@ export function CreateDisputeForm({
 
       {/* Header */}
       <header className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
           Open a dispute
         </h1>
         <p className="text-sm leading-relaxed text-slate-600 font-bold">
@@ -424,7 +424,7 @@ export function CreateDisputeForm({
                     resetDownstream();
                   }}
                 >
-                  <SelectTrigger className="h-11 w-full border-slate-200 bg-white text-slate-900 hover:border-slate-300 focus:ring-2 focus:ring-emerald-500/20 font-bold">
+                  <SelectTrigger className="h-10 sm:h-11 w-full border-slate-200 bg-white text-slate-900 hover:border-slate-300 focus:ring-2 focus:ring-emerald-500/20 font-bold text-xs sm:text-sm">
                     <SelectValue placeholder="Select a vault...">
                       {selectedVault ? (
                         <span className="block w-full truncate">
@@ -644,7 +644,7 @@ export function CreateDisputeForm({
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-3">
                               <div className="flex items-center gap-2">
-                                <div className="text-[15px] font-bold text-slate-900">
+                                <div className="text-sm sm:text-[15px] font-bold text-slate-900">
                                   {code.label}
                                 </div>
                                 {code.requiresDeliverableRef && (
@@ -696,7 +696,7 @@ export function CreateDisputeForm({
                       placeholder="State facts. Timeline. What you delivered vs what was agreed. Avoid emotions."
                       className="min-h-[140px] resize-none border-slate-200 bg-white text-slate-900 hover:border-slate-300 focus:ring-2 focus:ring-emerald-500/10 font-bold"
                     />
-                    <p className="text-xs text-slate-500 font-bold">
+                    <p className="text-[10px] sm:text-xs text-slate-500 font-bold">
                       Good disputes read like a report: facts, dates, evidence.
                       No drama.
                     </p>
@@ -743,7 +743,7 @@ export function CreateDisputeForm({
                       onDrop={onDrop}
                       onClick={() => inputRef.current?.click()}
                       className={cn(
-                        "cursor-pointer rounded-xl border-2 border-dashed p-6 transition-all",
+                        "cursor-pointer rounded-xl border-2 border-dashed p-4 sm:p-6 transition-all",
                         isDragging
                           ? "border-emerald-500/50 bg-emerald-50"
                           : "border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300",

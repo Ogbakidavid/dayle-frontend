@@ -102,7 +102,7 @@ function BankInfoElement({ label, value, icon, copyable, highlight }: any) {
 
   return (
     <div className={cn(
-      "p-6 rounded-2xl border transition-all duration-300",
+      "p-4 sm:p-6 rounded-2xl border transition-all duration-300",
       highlight 
         ? "bg-emerald-50 border-emerald-100 shadow-sm" 
         : "bg-slate-50/50 border-slate-100 hover:border-slate-200"
@@ -540,8 +540,8 @@ export default function ClientVaultDetailPage() {
             </button>
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-slate-900 tracking-tighter break-words">
                     {vault.title}
                   </h1>
                   <Badge
@@ -559,30 +559,30 @@ export default function ClientVaultDetailPage() {
                   </Badge>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-6">
+                <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center shadow-sm">
-                      <Users className="w-4 h-4 text-slate-600" />
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center shadow-sm">
+                      <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-600" />
                     </div>
                     <div>
-                      <p className="text-[9px] text-slate-600 font-bold st uppercase">
+                      <p className="text-[8px] sm:text-[9px] text-slate-600 font-bold uppercase tracking-wider">
                         Freelancer
                       </p>
-                      <p className="text-sm text-slate-900 font-bold ">
+                      <p className="text-xs sm:text-sm text-slate-900 font-bold ">
                         {vault.freelancerName || "Unassigned"}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm">
-                      <Clock className="w-4 h-4 text-emerald-600/50" />
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm">
+                      <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600/50" />
                     </div>
                     <div>
-                      <p className="text-[9px] text-slate-600 font-bold st uppercase">
+                      <p className="text-[8px] sm:text-[9px] text-slate-600 font-bold uppercase tracking-wider">
                         Created
                       </p>
-                      <p className="text-sm text-slate-900 font-bold ">
+                      <p className="text-xs sm:text-sm text-slate-900 font-bold ">
                         {new Date(vault.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -591,12 +591,12 @@ export default function ClientVaultDetailPage() {
               </div>
 
               <div className="text-left md:text-right p-4 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 shadow-xl min-w-0 sm:min-w-[240px]">
-                <p className="text-sm text-slate-600 font-bold  mb-1 uppercase">
+                <p className="text-xs sm:text-sm text-slate-600 font-bold mb-1 uppercase tracking-wider">
                   Total secured value
                 </p>
                 <CurrencyEstimate 
                   usdAmount={Number(vault.formattedTotalAmount || "0.00")} 
-                  className="text-slate-900 text-4xl font-bold"
+                  className="text-slate-900 text-2xl sm:text-4xl font-bold"
                 />
                 <div className="mt-2 flex items-center justify-start md:justify-end gap-2">
                   <div
@@ -617,7 +617,7 @@ export default function ClientVaultDetailPage() {
                   />
                   <p
                     className={cn(
-                      " font-bold  ",
+                      "text-[10px] sm:text-xs font-bold",
                       vault.status === VaultStatus.FUNDED
                         ? "text-emerald-600"
                       : vault.status === VaultStatus.DISPUTED
@@ -656,40 +656,40 @@ export default function ClientVaultDetailPage() {
           {(vault.status === VaultStatus.FUNDED || vault.status === VaultStatus.RELEASED) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card className="lg:col-span-2 bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div className="flex items-center gap-3">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                    <div className="flex items-center gap-3 text-left">
                       <div className="p-2 rounded-lg bg-emerald-100/50 border border-emerald-200">
                         <CreditCard className="w-5 h-5 text-emerald-600" />
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900">Fee Breakdown</h3>
-                        <p className="text-sm text-slate-500 font-bold tracking-wider">Transparent platform costs</p>
+                        <p className="text-[10px] text-slate-500 font-bold tracking-wider">Transparent costs</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
-                        <div className="text-right">
-                          <p className="text-[12px] text-slate-500 font-bold">Settlement ({calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent}%)</p>
+                    <div className="flex flex-wrap items-center gap-4 sm:gap-6 w-full sm:w-auto">
+                        <div className="text-left sm:text-right">
+                          <p className="text-[8px] sm:text-[10px] text-slate-500 font-bold">Settlement ({calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent}%)</p>
                           <CurrencyEstimate 
                             usdAmount={vault.settlementFeeUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
                             manualLocalAmount={vault.localSettlementFee}
-                            className="text-slate-900 text-sm font-bold"
+                            className="text-slate-900 text-xs sm:text-sm font-bold"
                           />
                         </div>
-                        <div className="text-right">
-                          <p className="text-[12px] text-blue-500 font-bold">Deposit fee (0.5%)</p>
+                        <div className="text-left sm:text-right">
+                          <p className="text-[8px] sm:text-[10px] text-blue-500 font-bold">Deposit (0.5%)</p>
                           <CurrencyEstimate 
                             usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).depositFeeUSD} 
                             manualLocalAmount={vault.localProcessingFee}
-                            className="text-blue-600 text-sm font-bold"
+                            className="text-blue-600 text-xs sm:text-sm font-bold"
                           />
                         </div>
-                        <div className="text-right border-l border-emerald-200 pl-6">
-                          <p className="text-[12px] text-emerald-600 font-bold">Total you paid</p>
+                        <div className="text-left sm:text-right border-l border-emerald-200 pl-4 sm:pl-6 ml-auto sm:ml-0">
+                          <p className="text-[8px] sm:text-[10px] text-emerald-600 font-bold">Total paid</p>
                           <CurrencyEstimate 
                             usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).totalClientPaysUSD} 
                             manualLocalAmount={vault.localAmount}
-                            className="text-emerald-700 text-lg font-black"
+                            className="text-emerald-700 text-base sm:text-lg font-black"
                           />
                         </div>
                     </div>
@@ -701,16 +701,16 @@ export default function ClientVaultDetailPage() {
                 <div className="absolute top-0 right-0 p-4 opacity-10">
                   <ShieldCheck className="w-16 h-16" />
                 </div>
-                <CardContent className="p-6">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-1">Freelancer receives</p>
+                <CardContent className="p-4 sm:p-6">
+                  <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-1">Freelancer receives</p>
                   <CurrencyEstimate 
                     usdAmount={vault.freelancerReceivesUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).freelancerReceivesUSD} 
                     manualLocalAmount={vault.localFreelancerReceives}
-                    className="text-white text-3xl font-black"
+                    className="text-white text-2xl sm:text-3xl font-black"
                   />
                   <div className="mt-2 flex items-center gap-1.5">
                     <CheckCircle className="w-3 h-3 text-emerald-400" />
-                    <p className="text-[10px] font-bold text-emerald-400/80">Net after settlement & withdrawal fees</p>
+                    <p className="text-[9px] sm:text-[10px] font-bold text-emerald-400/80">Net after settlement & withdrawal fees</p>
                   </div>
                 </CardContent>
               </Card>
@@ -766,7 +766,7 @@ export default function ClientVaultDetailPage() {
                           <div
                             key={item.id || idx}
                             className={cn(
-                              "p-6 transition-colors group",
+                              "p-4 sm:p-6 transition-colors group",
                               isIncluded
                                 ? "bg-emerald-50/50"
                                 : "hover:bg-slate-50",
@@ -1075,7 +1075,7 @@ export default function ClientVaultDetailPage() {
                         >
                           {vault.status === VaultStatus.DRAFT && !isSuccessReturn && (
                             <Link href={`/checkout/${vaultId}`} className="w-full">
-                              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm ">
+                              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-10 sm:h-12 rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-xs sm:text-sm ">
                                 <CreditCard className="w-4 h-4 mr-2" />
                                 Fund project
                               </Button>
@@ -1085,16 +1085,16 @@ export default function ClientVaultDetailPage() {
                           {vault.status === VaultStatus.AWAITING_PAYMENT && (
                             <div className="flex flex-col gap-3">
                               <Link href={`/checkout/${vaultId}/bank`} className="w-full">
-                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black capitalize tracking-wide h-12 rounded-xl shadow-lg shadow-emerald-200 active:scale-95 transition-all">
+                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black capitalize tracking-wide h-10 sm:h-12 rounded-xl shadow-lg shadow-emerald-200 active:scale-95 transition-all text-xs sm:text-sm">
                                   Review transfer details
-                                  <ChevronRight className="w-5 h-5 ml-2" />
+                                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1 sm:ml-2" />
                                 </Button>
                               </Link>
                             </div>
                           )}
                           
                           {vault.status === VaultStatus.DRAFT && isSuccessReturn && (
-                            <Button disabled className="w-full bg-emerald-600/50 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/10 transition-all text-sm ">
+                            <Button disabled className="w-full bg-emerald-600/50 text-white font-bold h-10 sm:h-12 rounded-xl shadow-lg shadow-emerald-600/10 transition-all text-xs sm:text-sm ">
                               <div className="flex items-center justify-center gap-1.5 h-full mr-2">
                                 <DotLoader color="white" size="sm" />
                               </div>
@@ -1106,7 +1106,7 @@ export default function ClientVaultDetailPage() {
                           {vault.status === VaultStatus.FUNDED && (
                             <Button
                               onClick={() => setShowApproveDialog(true)}
-                              className="w-full bg-slate-900 text-white hover:bg-slate-800 font-bold h-12 rounded-xl shadow-xl active:scale-95 transition-all text-sm "
+                              className="w-full bg-slate-900 text-white hover:bg-slate-800 font-bold h-10 sm:h-12 rounded-xl shadow-xl active:scale-95 transition-all text-xs sm:text-sm "
                               disabled={
                                 !vault.submissions?.length ||
                                 vault.isFrozen
@@ -1121,7 +1121,7 @@ export default function ClientVaultDetailPage() {
                           {vault.status === VaultStatus.FUNDED && (
                             <Button
                               variant="outline"
-                              className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl active:scale-95 transition-all text-sm  shadow-sm"
+                              className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-10 sm:h-12 rounded-xl active:scale-95 transition-all text-xs sm:text-sm shadow-sm"
                               onClick={() =>
                                 toast.info("Request Changes feature is coming soon!", {
                                   description:
@@ -1142,7 +1142,7 @@ export default function ClientVaultDetailPage() {
                             >
                               <Button
                                 variant="outline"
-                                className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
+                                className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-10 sm:h-12 rounded-xl transition-all shadow-sm active:scale-95"
                               >
                                 <Gavel className="w-4 h-4 mr-2 text-amber-600" />
                                 Initiate dispute
@@ -1235,17 +1235,17 @@ export default function ClientVaultDetailPage() {
       {/* APPROVE/RELEASE DIALOG */}
       <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
         <DialogContent className="sm:max-w-[480px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
-          <DialogHeader className="p-8 bg-slate-900 text-white relative">
-            <div className="absolute top-0 right-0 p-8 opacity-10">
-              <Zap className="w-24 h-24" />
+          <DialogHeader className="p-5 sm:p-8 bg-slate-900 text-white relative">
+            <div className="absolute top-0 right-0 p-5 sm:p-8 opacity-10">
+              <Zap className="w-16 sm:w-24 h-16 sm:h-24" />
             </div>
-            <DialogTitle className="text-2xl font-black tracking-tighter">Release Funds?</DialogTitle>
-            <DialogDescription className="text-slate-400 font-bold mt-2">
+            <DialogTitle className="text-xl sm:text-2xl font-black tracking-tighter">Release Funds?</DialogTitle>
+            <DialogDescription className="text-slate-400 font-bold mt-1 sm:mt-2 text-xs sm:text-sm">
               This will settle the payment to the freelancer and deduct platform fees.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="p-8 space-y-6 bg-white">
+          <div className="p-5 sm:p-8 space-y-4 sm:space-y-6 bg-white">
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-dashed border-slate-100">
                 <span className="text-sm font-bold text-slate-500">Vault Total</span>
@@ -1271,7 +1271,7 @@ export default function ClientVaultDetailPage() {
                     <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1">Freelancer receives</p>
                     <CurrencyEstimate 
                       usdAmount={parseFloat(vault.formattedTotalAmount) - calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
-                      className="text-emerald-900 text-2xl font-black"
+                      className="text-emerald-900 text-xl sm:text-2xl font-black"
                     />
                   </div>
                   <div className="w-10 h-10 rounded-full bg-white border border-emerald-200 flex items-center justify-center shadow-sm">

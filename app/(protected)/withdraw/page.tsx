@@ -6,16 +6,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
-  Lock,
   Building2,
-  Globe,
   Fingerprint,
   CheckCircle2,
+  Check,
   XCircle,
   AlertCircle,
-  Shield,
   Zap,
-  Check,
   CreditCard,
   Landmark,
   ArrowRight,
@@ -23,7 +20,7 @@ import {
   Info,
   ChevronDown,
   ChevronRight,
-  Clock,
+  Globe,
 } from "lucide-react";
 import { DayleLogo } from "@/components/shared/DayleLogo";
 import Image from "next/image";
@@ -33,6 +30,7 @@ import { useUser } from "@/lib/store/user-context";
 import { KycStatus } from "@/lib/domain/enums";
 import { api } from "@/lib/api-client";
 import { toast } from "sonner";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 type Step =
   | "method_selection"
@@ -77,7 +75,7 @@ export default function WithdrawPage() {
 
   // Get parameters from URL
   const amount = Number(searchParams.get("amount") || 0);
-  const [currency, setCurrency] = React.useState<string>("NGN");
+  const [currency, setCurrency] = useState<string>("NGN");
 
   useEffect(() => {
     if (user?.country === "Kenya") {
@@ -87,7 +85,7 @@ export default function WithdrawPage() {
     }
   }, [user?.country]);
   const [liveRate, setLiveRate] = useState<number>(1);
-  const [loadingRate, setLoadingRate] = useState(false);
+
   
   const APP_FEE_PERCENT = 0.005; // 0.5%
   const appFee = amount * APP_FEE_PERCENT;
@@ -99,7 +97,7 @@ export default function WithdrawPage() {
         setLiveRate(1);
         return;
       }
-      setLoadingRate(true);
+
       try {
         const response = await api.rates.getDisplayRate(currency, amount);
         if (response && response.rate) {
@@ -108,7 +106,7 @@ export default function WithdrawPage() {
       } catch (err) {
         console.error("Failed to fetch rate:", err);
       } finally {
-        setLoadingRate(false);
+
       }
     };
     fetchRate();
@@ -436,18 +434,18 @@ export default function WithdrawPage() {
 
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT SIDEBAR - Summary */}
-        <aside className="w-full lg:w-[340px] bg-slate-50 p-8 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
+        <aside className="w-full lg:w-[340px] bg-slate-50 p-4 sm:p-8 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
           <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
 
           <div className="space-y-10 relative z-10">
             <div className="flex items-center gap-0">
               <div
-                className="w-10 h-10 flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
+                className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
                 onClick={() => router.push("/freelancer")}
               >
-                <DayleLogo className="w-10 h-10 text-slate-900" />
+                <DayleLogo className="w-8 h-8 sm:w-10 sm:h-10 text-slate-900" />
               </div>
-              <span className="text-slate-900 font-bold tracking-tighter text-2xl ">
+              <span className="text-slate-900 font-bold tracking-tighter text-xl sm:text-2xl ">
                 Dayle
               </span>
             </div>
@@ -458,40 +456,39 @@ export default function WithdrawPage() {
                   <p className=" font-bold text-slate-600 tracking-wide leading-none ">
                     Net Settlement
                   </p>
-                  <div className="flex bg-slate-200/50 p-1 rounded-lg gap-1">
+                  <div className="flex bg-slate-200/50 p-1 rounded-lg gap-0.5 sm:gap-1">
                     {["USD", "NGN", "KES"].map((curr) => (
                       <button
                         key={curr}
                         onClick={() => setCurrency(curr as any)}
-                        className={`px-3 py-1 text-[10px] sm:text-sm font-bold rounded-md transition-all uppercase ${currency === curr ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                        className={`px-2 sm:px-3 py-1 text-[10px] sm:text-sm font-bold rounded-md transition-all uppercase ${currency === curr ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                       >
                         {curr}
                       </button>
                     ))}
                   </div>
                 </div>
-                <h1 className="text-4xl font-bold text-slate-900 tracking-tighter sm:text-3xl flex items-baseline gap-2">
-                  <span className="text-emerald-600 font-bold text-2xl">
-                    {currencyPrefix}
-                  </span>
-                  {(currency === "USD" ? amount : amount * liveRate).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                  <span className="text-emerald-600 font-bold text-xl ml-1">
-                    {currency}
-                  </span>
-                </h1>
+                <div className="flex flex-col gap-1">
+                  <CurrencyEstimate
+                    usdAmount={currency === "USD" ? amount : amount}
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter"
+                    showNote={false}
+                    currency={currency}
+                  />
+                  <p className="text-[9px] sm:text-[10px] font-bold text-emerald-600 uppercase tracking-[0.15em] sm:tracking-[0.2em]">Net settlement value</p>
+                </div>
               </div>
 
               <div className="space-y-4 pt-8 border-t border-slate-100">
-                <SummaryItem
-                  label="Service Fees"
-                  value={`${currencyPrefix}${displayAppFee.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`}
-                />
+                <div className="flex justify-between items-center bg-slate-100/50 p-3 rounded-xl border border-slate-100">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Service Fees</span>
+                  <CurrencyEstimate
+                    usdAmount={appFee}
+                    currency={currency}
+                    className="text-xs font-bold text-slate-900"
+                    showNote={false}
+                  />
+                </div>
                 <SummaryItem
                   label="Transaction ID"
                   value={transactionId}
@@ -500,22 +497,10 @@ export default function WithdrawPage() {
               </div>
             </div>
           </div>
-
-          {/* <div className="hidden lg:block p-8 bg-emerald-50 border border-emerald-100 rounded-3xl relative group overflow-hidden shadow-sm">
-            <div className="absolute inset-0 bg-emerald-500/2 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 text-emerald-600  font-bold tracking-[0.3em] mb-3  uppercase">
-                <ShieldCheck className="w-4 h-4" /> Secure withdrawal
-              </div>
-              <p className=" text-slate-500 leading-relaxed font-bold st mt-2 text-[10px] uppercase">
-                Select your preferred method to settle funds to your regional account.
-              </p>
-            </div>
-          </div> */}
         </aside>
 
         {/* MAIN CONTENT AREA */}
-        <main className="flex-1 p-6 md:p-12 lg:p-16 relative overflow-y-auto bg-slate-50/30">
+        <main className="flex-1 p-4 md:p-12 lg:p-16 relative overflow-y-auto bg-slate-50/30">
           <div className="max-w-4xl mx-auto w-full">
             {/* Navigation */}
             <AnimatePresence mode="wait">
@@ -539,12 +524,12 @@ export default function WithdrawPage() {
                         : "method_selection",
                     );
                   }}
-                  className="flex items-center gap-3 text-slate-600 hover:text-slate-900 transition-all  font-bold tracking-wide mb-12 group bg-white border border-slate-200 py-3 px-6 rounded-2xl shadow-sm hover:border-slate-300"
+                  className="flex items-center gap-2 sm:gap-3 text-slate-600 hover:text-slate-900 transition-all font-bold tracking-wide mb-8 sm:mb-12 group bg-white border border-slate-200 py-2 sm:py-3 px-4 sm:px-6 rounded-xl sm:rounded-2xl shadow-sm hover:border-slate-300 text-xs sm:text-sm"
                 >
-                  <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                  <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-translate-x-1 transition-transform" />
                   {step === "card" && cardStep === "ADDRESS"
-                    ? "Back to Card Details"
-                    : "Method Selection"}
+                    ? "Back"
+                    : "Selection"}
                 </motion.button>
               )}
             </AnimatePresence>
@@ -560,7 +545,7 @@ export default function WithdrawPage() {
                   className="max-w-xl mx-auto w-full space-y-12 py-8"
                 >
                   <div className="text-center space-y-4">
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
                       Withdrawal method
                     </h2>
                     <p className="text-xs font-bold text-slate-600 tracking-[0.2em] uppercase">
@@ -569,7 +554,7 @@ export default function WithdrawPage() {
                   </div>
 
                   {user?.kycStatus !== KycStatus.VERIFIED ? (
-                    <div className="bg-amber-50 border border-amber-200 rounded-[2.5rem] p-10 space-y-6 text-center shadow-sm">
+                    <div className="bg-amber-50 border border-amber-200 rounded-3xl sm:rounded-[2.5rem] p-6 sm:p-10 space-y-6 text-center shadow-sm">
                       <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 mx-auto">
                         <ShieldCheck className="w-8 h-8" />
                       </div>
@@ -585,7 +570,7 @@ export default function WithdrawPage() {
                       </div>
                       <button
                         onClick={() => router.push("/onboarding")}
-                        className="w-full h-16 bg-slate-900 hover:bg-black text-white font-bold text-sm rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-[0.2em] "
+                        className="w-full h-14 sm:h-16 bg-slate-900 hover:bg-black text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-[0.1em] sm:tracking-[0.2em] "
                       >
                         Verify Identity Now
                       </button>
@@ -626,7 +611,7 @@ export default function WithdrawPage() {
                   className="space-y-8"
                 >
                   <div className="text-center space-y-2">
-                    <h2 className="text-3xl font-bold text-slate-900 tracking-tighter">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter">
                       Card Authorization
                     </h2>
                     <p className="text-slate-400 font-bold tracking-[0.2em] uppercase text-xs">
@@ -644,7 +629,7 @@ export default function WithdrawPage() {
                     </div>
                   </div>
 
-                  <div className="bg-white border border-slate-200 rounded-3xl p-8 lg:p-10 shadow-xl space-y-6 relative overflow-hidden max-w-2xl mx-auto w-full">
+                  <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-8 lg:p-10 shadow-xl space-y-6 relative overflow-hidden max-w-2xl mx-auto w-full">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -mr-32 -mt-32" />
 
                     {cardStep === "DETAILS" ? (
@@ -845,7 +830,7 @@ export default function WithdrawPage() {
 
                         <Button
                           onClick={handleAddressSubmit}
-                          className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-3xl shadow-xl shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.2em]"
+                          className="w-full h-14 sm:h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-3xl shadow-xl shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.1em] sm:tracking-[0.2em]"
                         >
                           <div className="flex items-center justify-center gap-2">
                             <ShieldCheck className="w-4 h-4" />
@@ -877,7 +862,7 @@ export default function WithdrawPage() {
                       <Globe className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ">
                         Regional settings
                       </h2>
                       <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">
@@ -886,7 +871,7 @@ export default function WithdrawPage() {
                     </div>
                   </div>
 
-                   <div className="w-full max-w-lg space-y-8 bg-white border border-slate-200 p-8 lg:p-10 rounded-3xl shadow-xl relative">
+                   <div className="w-full max-w-lg space-y-6 sm:space-y-8 bg-white border border-slate-200 p-4 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-xl relative">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
 
                     <div className="space-y-8 relative z-10">
@@ -980,7 +965,7 @@ export default function WithdrawPage() {
                       <Landmark className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ">
                         Recipient details
                       </h2>
                       <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase text-center">
@@ -990,7 +975,7 @@ export default function WithdrawPage() {
                   </div>
 
                   <div className="grid lg:grid-cols-2 gap-8 w-full max-w-5xl">
-                    <div className="space-y-8 bg-white border border-slate-200 p-8 rounded-3xl shadow-xl relative">
+                    <div className="space-y-6 sm:space-y-8 bg-white border border-slate-200 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl relative">
                       <div className="space-y-8 relative z-10">
                         <div className="space-y-3">
                           <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
@@ -1005,7 +990,7 @@ export default function WithdrawPage() {
                                   bankName: e.target.value,
                                 })
                               }
-                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all appearance-none cursor-pointer text-sm shadow-sm mt-2 "
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-4 sm:py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all appearance-none cursor-pointer text-xs sm:text-sm shadow-sm mt-1 sm:mt-2 "
                             >
                                 <option
                                   value=""
@@ -1047,7 +1032,7 @@ export default function WithdrawPage() {
                                 accountNumber: e.target.value,
                               })
                             }
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all text-sm shadow-sm mt-2 placeholder:text-slate-300 "
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-4 sm:py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all text-xs sm:text-sm shadow-sm mt-1 sm:mt-2 placeholder:text-slate-300 "
                           />
                         </div>
                       </div>
@@ -1081,10 +1066,10 @@ export default function WithdrawPage() {
                           <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            className="space-y-6 bg-white border border-slate-200 p-8 rounded-3xl shadow-xl h-full flex flex-col justify-center"
+                            className="space-y-6 bg-white border border-slate-200 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl h-full flex flex-col justify-center"
                           >
                             <div className="space-y-3">
-                              <h3 className="text-2xl font-bold text-slate-900 tracking-tight ">
+                              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight ">
                                 Account verification
                               </h3>
                               <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 shadow-sm">
@@ -1097,7 +1082,7 @@ export default function WithdrawPage() {
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-6 gap-3">
+                            <div className="grid grid-cols-6 gap-2 sm:gap-3">
                               {otp.map((digit, index) => (
                                 <input
                                   key={index}
@@ -1108,7 +1093,7 @@ export default function WithdrawPage() {
                                   onChange={(e) =>
                                     handleOtpChange(index, e.target.value)
                                   }
-                                  className="aspect-square bg-slate-50 border border-slate-200 rounded-xl text-center text-xl font-bold text-slate-900 focus:border-emerald-500/30 focus:bg-emerald-50 outline-none transition-all shadow-sm"
+                                  className="aspect-square bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-center text-sm sm:text-xl font-bold text-slate-900 focus:border-emerald-500/30 focus:bg-emerald-50 outline-none transition-all shadow-sm w-full"
                                 />
                               ))}
                             </div>
@@ -1161,7 +1146,7 @@ export default function WithdrawPage() {
                       <Info className="w-10 h-10 text-emerald-600" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ">
                         Final manifest
                       </h2>
                       <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] px-10 leading-relaxed uppercase text-center">
@@ -1171,7 +1156,7 @@ export default function WithdrawPage() {
                     </div>
                   </div>
 
-                  <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl relative">
+                  <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl relative">
                     <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-600 to-emerald-500/0 opacity-20" />
                     <div className="divide-y divide-slate-100">
                       {selectedMethod === "bank" ? (
@@ -1228,11 +1213,13 @@ export default function WithdrawPage() {
                             Net Settlement
                           </span>
                           <div className="text-right">
-                            <span className="text-4xl font-bold text-slate-900 st ">
-                              {loadingRate ? "..." : `${currencyPrefix}${displayAmount.toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}`}
+                            <span className="text-2xl sm:text-4xl font-bold text-slate-900 st ">
+                              <CurrencyEstimate
+                                usdAmount={netSettlement}
+                                currency={currency}
+                                className="text-2xl font-bold text-slate-900"
+                                showNote={false}
+                              />
                             </span>
                             <p className=" text-slate-400 font-black st mt-1 tracking-widest text-[10px] uppercase">
                               {selectedCurrency}
@@ -1263,13 +1250,13 @@ export default function WithdrawPage() {
                     <Button
                       variant="ghost"
                       onClick={() => setStep("verification")}
-                      className="h-14 font-black  tracking-widest text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-2xl transition-all  uppercase"
+                      className="h-12 sm:h-14 font-black tracking-widest text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl sm:rounded-2xl transition-all uppercase text-xs sm:text-sm"
                     >
                       Go back
                     </Button>
                     <Button
                       onClick={handleConfirmWithdrawal}
-                      className="h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95  uppercase"
+                      className="h-12 sm:h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm tracking-widest rounded-xl sm:rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 uppercase"
                     >
                       Confirm & execute
                     </Button>

@@ -94,7 +94,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
         )}
       >
         {/* Logo & Brand */}
-        <div className="p-6 pb-4">
+        <div className="p-4 sm:p-6 pb-4">
           <Link href="/freelancer" className="flex items-center gap-0 group">
             <DayleLogo className="w-10 h-10 text-slate-900 transition-transform group-hover:scale-110" />
             <div>
@@ -210,17 +210,17 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header */}
-        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 p-4 flex items-center justify-between">
+        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 p-2 sm:p-4 flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setSidebarOpen(true)}
-            className="text-slate-900 hover:bg-slate-100"
+            className="text-slate-900 hover:bg-slate-100 h-9 w-9 p-0"
           >
             <Menu className="w-5 h-5" />
           </Button>
-          <h1 className="text-lg font-bold font-primary">Dayle</h1>
-          <div className="w-9" /> {/* Spacer for centering */}
+          <h1 className="text-lg font-bold font-primary tracking-tight">Dayle</h1>
+          <div className="w-9" /> {/* Spacer for centering with menu button */}
         </div>
 
         {/* Content Area */}
@@ -228,7 +228,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
           {/* Subtle Noise Texture for Premium Feel */}
           <div className="absolute inset-0 z-0 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02]"></div>
 
-          <div className="relative z-10 p-4 lg:p-8">
+          <div className="relative z-10 p-2 sm:p-4 lg:p-8">
             <div className="max-w-7xl mx-auto">{children}</div>
           </div>
         </main>

@@ -19,7 +19,7 @@ interface CurrencyEstimateProps {
 /**
  * Displays amounts in LOCAL CURRENCY as primary.
  * Fetches live display rates from Dayle backend with 60s auto-refresh.
- * 
+ *
  * Output: ₦300,100
  */
 export function CurrencyEstimate({
@@ -27,7 +27,7 @@ export function CurrencyEstimate({
   manualLocalAmount,
   currency: manualCurrency,
   className,
-  showNote = true,
+  showNote = false,
   prefix = "",
   align = "left",
 }: CurrencyEstimateProps) {
@@ -37,14 +37,16 @@ export function CurrencyEstimate({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const currency = manualCurrency || (user?.country === "Kenya" ? "KES" : "NGN");
-  const currencySymbol = currency === "NGN" ? "₦" : currency === "KES" ? "KSh" : "";
+  const currency =
+    manualCurrency || (user?.country === "Kenya" ? "KES" : "NGN");
+  const currencySymbol =
+    currency === "NGN" ? "₦" : currency === "KES" ? "KSh" : "";
 
   const fetchRate = useCallback(async () => {
     if (!currency || manualLocalAmount != null) return;
     // Use a small reference amount for rate fetch when usdAmount is 0
     const fetchAmount = Math.abs(usdAmount) || 100;
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -65,7 +67,9 @@ export function CurrencyEstimate({
   }, [currency]);
 
   useEffect(() => {
-    const handler = setTimeout(() => { fetchRate(); }, 300);
+    const handler = setTimeout(() => {
+      fetchRate();
+    }, 300);
     return () => clearTimeout(handler);
   }, [usdAmount, fetchRate]);
 
@@ -76,17 +80,23 @@ export function CurrencyEstimate({
     })}`;
   };
 
-
   // If we have a zero amount, show local currency zero directly (no rate needed)
   if (usdAmount === 0) {
     return (
-      <span className={cn(
-        "inline-flex flex-col gap-0.5",
-        align === "right" ? "items-end text-right" : align === "center" ? "items-center text-center" : "items-start",
-        className
-      )}>
+      <span
+        className={cn(
+          "inline-flex flex-col gap-0.5",
+          align === "right"
+            ? "items-end text-right"
+            : align === "center"
+              ? "items-center text-center"
+              : "items-start",
+          className,
+        )}
+      >
         <span className="font-semibold tracking-tight">
-          {prefix}{currencySymbol}0
+          {prefix}
+          {currencySymbol}0
         </span>
       </span>
     );
@@ -95,28 +105,45 @@ export function CurrencyEstimate({
   // Before rate loads, still show local currency symbol as fallback
   if (manualLocalAmount == null && (error || !rate)) {
     return (
-      <span className={cn(
-        "inline-flex flex-col gap-0.5",
-        align === "right" ? "items-end text-right" : align === "center" ? "items-center text-center" : "items-start",
-        className
-      )}>
-        <span className="font-semibold tracking-tight">{prefix}{currencySymbol}—</span>
+      <span
+        className={cn(
+          "inline-flex flex-col gap-0.5",
+          align === "right"
+            ? "items-end text-right"
+            : align === "center"
+              ? "items-center text-center"
+              : "items-start",
+          className,
+        )}
+      >
+        <span className="font-semibold tracking-tight">
+          {prefix}
+          {currencySymbol}—
+        </span>
       </span>
     );
   }
 
   // Convert: Local = USD / (USDC-per-local-unit rate)
-  const localValue = manualLocalAmount != null ? manualLocalAmount : usdAmount / (rate || 1);
+  const localValue =
+    manualLocalAmount != null ? manualLocalAmount : usdAmount / (rate || 1);
 
   return (
-    <span className={cn(
-      "inline-flex flex-col gap-0.5",
-      align === "right" ? "items-end text-right" : align === "center" ? "items-center text-center" : "items-start",
-      className
-    )}>
+    <span
+      className={cn(
+        "inline-flex flex-col gap-0.5",
+        align === "right"
+          ? "items-end text-right"
+          : align === "center"
+            ? "items-center text-center"
+            : "items-start",
+        className,
+      )}
+    >
       {/* PRIMARY: Local currency */}
       <span className="font-semibold tracking-tight">
-        {prefix}{formatLocal(localValue)}
+        {prefix}
+        {formatLocal(localValue)}
       </span>
       {isStale && (
         <span className="flex items-center gap-1.5 text-slate-600 text-xs font-normal">

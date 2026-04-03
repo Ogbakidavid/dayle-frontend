@@ -192,11 +192,11 @@ function StatCard({
       <Card
         className={cn("transition-colors", toneMap[tone] || toneMap.neutral)}
       >
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between gap-4">
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex items-start justify-between gap-3 sm:gap-4">
             <div>
-              <p className="text-sm font-bold  text-slate-600 mb-2 ">{title}</p>
-              <p className="text-3xl font-bold text-slate-900 tracking-tighter ">
+              <p className="text-xs sm:text-sm font-bold text-slate-600 mb-1 sm:mb-2 ">{title}</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tighter ">
                 {value}
               </p>
               {hint ? (
@@ -329,11 +329,11 @@ export function DisputeListView({ role }: DisputeListViewProps) {
             <div className="hidden xs:flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-100 bg-amber-50 shrink-0">
               <Gavel className="h-5 w-5 text-amber-600" />
             </div>
-            <div className="space-y-3">
-              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
+            <div className="space-y-1 sm:space-y-3">
+              <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
                 Disputes
               </h1>
-              <p className="text-sm md:text-sm font-bold text-slate-600  max-w-2xl leading-relaxed">
+              <p className="text-xs sm:text-sm font-bold text-slate-600 max-w-2xl leading-relaxed">
                 {role === "client"
                   ? "Review and manage disputes tied to your vaults."
                   : "Open and track disputes for fair vault resolution."}
@@ -344,8 +344,8 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
         <motion.div variants={itemVariants}>
           <Link href={`/${role}/disputes/create`} className="w-full sm:w-auto">
-            <Button className="h-11 w-full sm:w-auto bg-amber-500 px-6 font-bold text-white hover:bg-amber-600  shadow-md shadow-amber-500/20 rounded-xl transition-all">
-              <Plus className="mr-2 h-4 w-4" strokeWidth={3} />
+            <Button className="h-10 sm:h-11 w-full sm:w-auto bg-amber-500 px-4 sm:px-6 font-bold text-white hover:bg-amber-600 shadow-md shadow-amber-500/20 rounded-xl transition-all text-xs sm:text-sm">
+              <Plus className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={3} />
               Open dispute
             </Button>
           </Link>
@@ -395,10 +395,10 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search disputes..."
+                  placeholder="Search..."
                   className="
-                  h-12 w-full rounded-2xl border border-slate-200 bg-white
-                  pl-12 pr-12 text-sm text-slate-900 placeholder:text-slate-900
+                  h-10 sm:h-12 w-full rounded-xl sm:rounded-2xl border border-slate-200 bg-white
+                  pl-10 sm:pl-12 pr-10 sm:pr-12 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400
                   outline-none transition-all font-bold 
                   focus:border-emerald-500/30 focus:ring-4 focus:ring-emerald-500/5 shadow-sm
                 "
@@ -418,13 +418,13 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-11 w-full sm:w-auto border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold  transition-all shadow-sm rounded-xl"
+                  className="h-10 sm:h-11 w-full sm:w-auto border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold transition-all shadow-sm rounded-xl text-xs sm:text-sm"
                   onClick={() =>
                     setSortKey((s) => (s === "newest" ? "oldest" : "newest"))
                   }
                 >
-                  <ArrowDownUp className="mr-2 h-4 w-4" />
-                  {sortKey === "newest" ? "Newest first" : "Oldest first"}
+                  <ArrowDownUp className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  {sortKey === "newest" ? "Newest" : "Oldest"}
                 </Button>
               </div>
             </div>
@@ -439,7 +439,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                     type="button"
                     onClick={() => setStatusFilter(t.key)}
                     className={cn(
-                      "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-bold transition-all",
+                      "inline-flex items-center gap-1.5 sm:gap-2 rounded-full border px-2.5 sm:px-3 py-1 sm:py-1.5 font-bold transition-all text-[10px] sm:text-xs",
                       active
                         ? "border-amber-200 bg-amber-50 text-amber-700 shadow-sm"
                         : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900",
@@ -521,7 +521,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                   return (
                     <div
                       key={dispute.id}
-                      className="group px-6 py-6 transition-all hover:bg-slate-50 md:px-8 border-l-2 border-l-transparent hover:border-l-amber-500/40"
+                      className="group px-4 py-6 transition-all hover:bg-slate-50 md:px-8 border-l-2 border-l-transparent hover:border-l-amber-500/40"
                     >
                       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                         {/* Left */}
@@ -530,7 +530,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
                           <div className="min-w-0 space-y-2">
                             {/* Primary line: Vault title */}
-                            <p className="truncate text-lg font-bold tracking-tighter leading-none text-slate-900 group-hover:text-slate-700 transition-colors ">
+                            <p className="truncate text-sm sm:text-lg font-bold tracking-tighter leading-none text-slate-900 group-hover:text-slate-700 transition-colors ">
                               {dispute.vaultTitle}
                             </p>
 
@@ -562,7 +562,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
                             {/* Summary */}
                             {dispute.description ? (
-                              <p className="line-clamp-2 max-w-2xl text-[13px] leading-relaxed text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-sm mt-4">
+                              <p className="line-clamp-3 max-w-2xl text-[12px] sm:text-[13px] leading-relaxed text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-sm mt-3 sm:mt-4">
                                 {dispute.description}
                               </p>
                             ) : (
@@ -584,10 +584,10 @@ export function DisputeListView({ role }: DisputeListViewProps) {
                             <Button
                               variant="outline"
                               className="
-                                h-11 w-full lg:w-auto border-slate-200 bg-white
-                                text-slate-600 font-bold  transition-all
+                                h-10 sm:h-11 w-full lg:w-auto border-slate-200 bg-white
+                                text-slate-600 font-bold transition-all
                                 hover:bg-slate-50 hover:text-slate-900
-                                px-6 text-[11px] shadow-sm rounded-xl uppercase 
+                                px-4 sm:px-6 text-[10px] sm:text-[11px] shadow-sm rounded-xl uppercase 
                               "
                             >
                               View docket

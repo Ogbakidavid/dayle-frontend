@@ -283,24 +283,24 @@ export default function CreateVaultPage() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-20">
+      <div className="relative w-full max-w-7xl mx-auto px-2 sm:px-6 py-8 lg:py-20">
         {/* Header Section */}
         <header className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-0 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500  font-bold tracking-[0.2em] mb-4">
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-0 px-2 sm:px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] sm:text-xs font-bold tracking-wide mb-3 sm:mb-4">
               Secure project settlement
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter ">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tighter text-slate-900 leading-tight">
               New <span className="text-emerald-500">project</span>
             </h1>
           </div>
 
           <div className="flex flex-col items-center md:items-end gap-4">
-            <Link href="/client">
+            <Link href="/client" className="w-full sm:w-auto order-2 sm:order-1">
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-slate-900 hover:text-emerald-500 text-sm font-bold transition-all"
+                className="w-full sm:w-auto text-slate-600 hover:text-emerald-500 text-xs sm:text-sm font-bold transition-all h-9"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to dashboard
@@ -330,7 +330,7 @@ export default function CreateVaultPage() {
         {/* Main Interface */}
         <div className="max-w-3xl mx-auto">
           <main className="w-full">
-            <div className="relative min-h-[400px] sm:min-h-[500px] bg-background border border-white/5 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-xl overflow-hidden">
+            <div className="relative min-h-[400px] sm:min-h-[500px] bg-background border border-white/5 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl backdrop-blur-xl overflow-hidden">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={step}
@@ -345,7 +345,7 @@ export default function CreateVaultPage() {
                   {step === 1 && (
                     <div className="space-y-8">
                       <div className="space-y-4">
-                        <Label className="text-sm md:text-sm r text-slate-900 font-bold">
+                        <Label className="text-xs sm:text-sm r text-slate-900 font-bold">
                           1. Select project type
                         </Label>
                         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -358,7 +358,7 @@ export default function CreateVaultPage() {
                                   key={key}
                                   onClick={() => setVaultPurpose(key)}
                                   className={cn(
-                                    "group relative flex flex-col items-center gap-3 p-4 rounded-2xl border transition-all duration-300",
+                                    "group relative flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300",
                                     isActive
                                       ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
                                       : "bg-white/2 border-slate-900/5 hover:border-slate-900/20",
@@ -366,7 +366,7 @@ export default function CreateVaultPage() {
                                 >
                                   <Icon
                                     className={cn(
-                                      "w-6 h-6 transition-transform group-hover:scale-110",
+                                      "w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:scale-110",
                                       isActive
                                         ? "text-emerald-500"
                                         : "text-slate-900",
@@ -398,7 +398,7 @@ export default function CreateVaultPage() {
                             value={vaultTitle}
                             onChange={(e) => setVaultTitle(e.target.value)}
                             placeholder="Project title"
-                            className="bg-muted! border-white/10! h-14 text-lg text-slate-900 font-medium placeholder:text-slate-600 focus:border-emerald-500/50 focus:ring-emerald-500/20 rounded-xl"
+                            className="bg-muted! border-white/10! h-12 sm:h-14 text-base sm:text-lg text-slate-900 font-medium placeholder:text-slate-600 focus:border-emerald-500/50 focus:ring-emerald-500/20 rounded-xl"
                           />
                         </div>
 
@@ -415,7 +415,7 @@ export default function CreateVaultPage() {
                               value={budgetAmount}
                               onChange={(e) => setBudgetAmount(e.target.value)}
                               placeholder="0.00"
-                              className="bg-muted! border-white/10! h-14 pl-14 text-xl  text-slate-900 font-medium focus:border-emerald-500/50 rounded-xl"
+                              className="bg-muted! border-white/10! h-12 sm:h-14 pl-12 sm:pl-14 text-lg sm:text-xl text-slate-900 font-medium focus:border-emerald-500/50 rounded-xl"
                             />
                           </div>
                           {budget > 0 && (
@@ -480,7 +480,7 @@ export default function CreateVaultPage() {
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 10 }}
-                                className="group relative bg-white/3 border border-white/5 hover:border-white/10 p-5 rounded-2xl transition-all cursor-grab active:cursor-grabbing"
+                                className="group relative bg-white/3 border border-slate-200 hover:border-emerald-500/30 p-4 sm:p-5 rounded-2xl transition-all cursor-grab active:cursor-grabbing"
                               >
                                 {deliverables.length > 1 && (
                                   <button
@@ -554,13 +554,13 @@ export default function CreateVaultPage() {
                                             type="button"
                                             onClick={() => updateDeliverable(deliverable.id, "submissionType", opt.id)}
                                             className={cn(
-                                              "px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase transition-all border",
+                                              "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[8px] sm:text-[10px] font-bold tracking-wider uppercase transition-all border",
                                               deliverable.submissionType === opt.id
                                                 ? "bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/20"
                                                 : "bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-300 hover:bg-slate-100"
                                             )}
                                           >
-                                            {opt.label}
+                                            <span className="truncate">{opt.label}</span>
                                           </button>
                                         ))}
                                       </div>
@@ -583,7 +583,7 @@ export default function CreateVaultPage() {
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl rotate-12 flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
                           <Users className="w-10 h-10 text-emerald-500 -rotate-12" />
                         </div>
-                        <h2 className="text-2xl font-bold  tracking-tighter">
+                        <h2 className="text-xl sm:text-2xl font-bold tracking-tighter text-slate-900">
                           Assign freelancer
                         </h2>
                         <p className="text-slate-900 text-sm font-bold st">
@@ -596,13 +596,13 @@ export default function CreateVaultPage() {
                           value={freelancerEmail}
                           onChange={(e) => setFreelancerEmail(e.target.value)}
                           placeholder="Freelancer email"
-                          className="bg-muted! border-white/10! text-slate-900 h-14 rounded-xl text-center font-bold st placeholder:text-slate-600"
+                          className="bg-muted! border-white/10! text-slate-900 h-12 sm:h-14 rounded-xl text-center font-bold st placeholder:text-slate-600 text-sm sm:text-base"
                         />
                         <Input
                           value={freelancerName}
                           onChange={(e) => setFreelancerName(e.target.value)}
                           placeholder="Full name (optional)"
-                          className="bg-muted! border-white/10! text-slate-900 h-14 rounded-xl text-center font-bold st placeholder:text-slate-600"
+                          className="bg-muted! border-white/10! text-slate-900 h-12 sm:h-14 rounded-xl text-center font-bold st placeholder:text-slate-600 text-sm sm:text-base"
                         />
                         <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 flex gap-3 items-center">
                           <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0" />
@@ -621,7 +621,7 @@ export default function CreateVaultPage() {
                       {/* Invoice Header */}
                       <div className="flex items-start justify-between">
                         <div>
-                          <h2 className="text-2xl font-bold tracking-tighter text-slate-900">
+                          <h2 className="text-xl sm:text-2xl font-bold tracking-tighter text-slate-900">
                             Project Summary
                           </h2>
                           <p className="text-sm text-slate-500 font-medium mt-1">
@@ -637,7 +637,7 @@ export default function CreateVaultPage() {
                       </div>
 
                       {/* Project Identity Card */}
-                      <div className="bg-slate-900 rounded-2xl p-6 flex items-center justify-between">
+                      <div className="bg-slate-900 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
                             <ListChecks className="w-6 h-6 text-emerald-400" />
@@ -659,7 +659,7 @@ export default function CreateVaultPage() {
                         <div className="text-right">
                           <CurrencyEstimate 
                             usdAmount={budgetUSD} 
-                            className="text-white text-2xl font-bold"
+                            className="text-white text-xl sm:text-2xl font-bold"
                             showNote={false}
                           />
                         </div>
@@ -668,10 +668,10 @@ export default function CreateVaultPage() {
                       {/* Fee Breakdown — Invoice Table */}
                       <div className="border border-slate-200 rounded-2xl overflow-hidden">
                         {/* Table Header */}
-                        <div className="bg-slate-50 px-6 py-3 border-b border-slate-200">
+                        <div className="bg-slate-50 px-4 sm:px-6 py-3 border-b border-slate-200">
                           <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Description</span>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Amount</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Description</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount</span>
                           </div>
                         </div>
 
@@ -708,7 +708,7 @@ export default function CreateVaultPage() {
                             <p className="text-sm font-bold text-slate-900 uppercase tracking-wider">You pay today</p>
                             <CurrencyEstimate usdAmount={totalClientPays} className="text-emerald-600 text-xl font-bold" />
                           </div>
-                          <div className="px-6 pb-4 flex justify-between items-center">
+                          <div className="px-4 sm:px-6 pb-4 flex justify-between items-center">
                             <p className="text-xs text-slate-500 font-medium">Freelancer receives at release</p>
                             <CurrencyEstimate usdAmount={freelancerReceives} className="text-emerald-600 text-sm font-bold" showNote={false} />
                           </div>
@@ -716,17 +716,17 @@ export default function CreateVaultPage() {
                       </div>
 
                       {/* Beneficiary Card */}
-                      <div className="flex items-center gap-4 p-5 bg-white border border-slate-200 rounded-2xl">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                          <Users className="w-5 h-5 text-slate-500" />
+                      <div className="flex flex-col xs:flex-row xs:items-center gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-slate-200 rounded-2xl">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                          <Users className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.15em]">Beneficiary</p>
                           <p className="text-sm font-bold text-slate-900 truncate">{freelancerEmail}</p>
                         </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 rounded-lg border border-emerald-100">
-                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                          <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Verified on accept</span>
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 rounded-lg border border-emerald-100 w-fit">
+                          <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-500" />
+                          <span className="text-[8px] sm:text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Verified on accept</span>
                         </div>
                       </div>
 
@@ -815,7 +815,7 @@ export default function CreateVaultPage() {
         {/* Footer */}
         <div className="mt-12 flex items-center justify-center gap-3 text-slate-900">
           <DayleLogo className="w-4 h-4" />
-          <span className="text-sm tracking-[0.3em] font-bold">
+          <span className="text-sm tracking-wide font-bold">
             Secured by Dayle settlement protocol
           </span>
         </div>

@@ -206,11 +206,11 @@ export default function VaultsPage() {
       animate="visible"
       className="min-h-screen  text-slate-900 selection:bg-emerald-500/30 font-primary"
     >
-      <div className="max-w-7xl mx-auto px-6 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8 sm:space-y-10">
         {/* 1. TOP NAVIGATION / HEADER */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
           <motion.div variants={itemVariants} className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-slate-900 ">
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold tracking-tighter text-slate-900 leading-tight">
               Secured projects
             </h1>
             <p className="text-sm md:text-sm text-slate-600 font-bold">
@@ -222,8 +222,8 @@ export default function VaultsPage() {
             className="flex items-start gap-3 sm:flex-row flex-col sm:items-center"
           >
             <Link href="/client/create-vault" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 h-11 px-6 rounded-xl font-bold  shadow-md shadow-emerald-500/20 transition-all">
-                <Plus className="w-4 h-4 mr-2" strokeWidth={3} />
+              <Button className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 h-10 sm:h-11 px-4 sm:px-6 rounded-xl font-bold shadow-md shadow-emerald-500/20 transition-all text-xs sm:text-base">
+                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" strokeWidth={3} />
                 New project
               </Button>
             </Link>
@@ -244,7 +244,7 @@ export default function VaultsPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={cn(
-                "px-6 py-4 text-sm font-bold transition-all relative",
+                "px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold transition-all relative",
                 activeTab === tab.id
                   ? "text-emerald-600"
                   : "text-slate-500 hover:text-slate-700",
@@ -267,7 +267,7 @@ export default function VaultsPage() {
             <motion.div
               variants={itemVariants}
               key={i}
-              className="relative group bg-white border border-slate-200 p-6 rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-sm"
+              className="relative group bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-sm"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-100 transition-all" />
               <div className="flex justify-end items-start mb-4">
@@ -285,7 +285,7 @@ export default function VaultsPage() {
               <p className="text-sm font-bold  text-slate-600 mb-2">
                 {stat.label}
               </p>
-              <h2 className="text-3xl font-bold text-slate-900 tracking-tighter ">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tighter">
                 {typeof stat.value === "number" ? (
                   <CurrencyEstimate usdAmount={stat.value} showNote={false} />
                 ) : (
@@ -360,17 +360,17 @@ export default function VaultsPage() {
                         (window.location.href = `/client/vault/${vault.id}`)
                       }
                     >
-                      <td className="px-4 md:px-6 py-5 sm:table-cell">
-                        <div className="flex items-center gap-3 md:gap-4">
-                          <div className="hidden xs:flex w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 items-center justify-center text-slate-600 group-hover:text-emerald-700 group-hover:border-emerald-200 transition-all shrink-0">
-                            <FileText className="w-5 h-5" />
+                      <td className="px-3 md:px-6 py-4 sm:py-5 sm:table-cell">
+                        <div className="flex items-center gap-2 sm:gap-4">
+                          <div className="hidden xs:flex w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-100 items-center justify-center text-slate-600 group-hover:text-emerald-700 group-hover:border-emerald-200 transition-all shrink-0">
+                            <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate">
+                            <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate max-w-[120px] sm:max-w-none">
                               {vault.title}
                             </p>
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
-                              <p className="text-xs md:text-sm text-slate-600 font-bold">
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 sm:mt-1">
+                              <p className="text-[10px] sm:text-xs text-slate-600 font-bold">
                                 {vault.createdAt
                                   ? new Date(
                                       vault.createdAt,
@@ -379,7 +379,7 @@ export default function VaultsPage() {
                               </p>
                               <div
                                 className={cn(
-                                  "sm:hidden flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[10px] font-bold",
+                                  "sm:hidden flex items-center gap-1.5 px-1.5 py-0.5 rounded-md border text-[8px] font-bold",
                                   statusConfig[
                                     vault.status as keyof typeof statusConfig
                                   ]?.classes ||
@@ -391,7 +391,7 @@ export default function VaultsPage() {
                                 ]?.label || vault.status}
                               </div>
                             </div>
-                            <p className="lg:hidden text-sm text-slate-600 font-bold mt-1 truncate">
+                            <p className="lg:hidden text-[10px] sm:text-sm text-slate-600 font-bold mt-0.5 sm:mt-1 truncate">
                               {vault.freelancerName ||
                                 vault.freelancerEmail ||
                                 vault.freelancer?.email ||
@@ -404,7 +404,7 @@ export default function VaultsPage() {
                                 vault.formattedTotalAmount || vault.totalAmount,
                               )}
                               showNote={false}
-                              className="text-sm font-bold text-slate-900"
+                              className="text-xs sm:text-sm font-bold text-slate-900"
                             />
                           </div>
                         </div>

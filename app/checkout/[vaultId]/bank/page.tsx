@@ -378,7 +378,7 @@ export default function BankTransferPage() {
                         </div>
                       )}
 
-                      {(process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NODE_ENV === "development") && !isWaitingForConfirmation && (
+                      {(process.env.NEXT_PUBLIC_NODE_ENV !== "production" || process.env.NEXT_PUBLIC_TESTNET_MODE === "true") && !isWaitingForConfirmation && (
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center mt-2">
                           Simulation mode active ⚙️
                         </p>

@@ -15,21 +15,21 @@ export function LedgerBalance({
   role = "client",
 }: LedgerBalanceProps) {
   return (
-    <div className="grid md:grid-cols-2 gap-6 p-4">
+    <div className="grid md:grid-cols-2 gap-4 sm:gap-6 p-4">
       {/* Available Funds - The High Value Side */}
       <Card className="bg-muted border-white/5 shadow-2xl overflow-hidden relative group rounded-sm">
-        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-700 ease-in-out">
-          <Landmark size={120} className="text-black rotate-12" />
+        <div className="absolute top-0 right-0 p-4 sm:p-5 lg:p-8 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-700 ease-in-out">
+          <Landmark className="w-20 h-20 sm:w-24 sm:h-24 lg:w-[120px] lg:h-[120px] text-black rotate-12" />
         </div>
         <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500 to-transparent" />
-        <CardContent className="p-8 relative z-10">
+        <CardContent className="p-4 sm:p-5 lg:p-8 relative z-10">
           <div className="flex items-center gap-2 text-slate-900 font-bold  text-sm mb-5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
             {role === "client" ? "Total investment" : "Available balance"}
           </div>
           <CurrencyEstimate 
             usdAmount={Number(balance?.formattedAvailable || "0")} 
-            className="text-slate-900 text-5xl font-bold"
+            className="text-slate-900 text-3xl sm:text-4xl lg:text-5xl font-bold"
           />
           <div className="mt-8 flex items-center gap-3">
             <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-sm font-bold text-emerald-500  border border-emerald-500/20 flex items-center gap-2">
@@ -41,17 +41,17 @@ export function LedgerBalance({
 
       {/* Pending Funds - Future Certainty */}
       <Card className="bg-muted border-white/5 shadow-2xl overflow-hidden relative group rounded-sm">
-        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-700 ease-in-out">
-          <Clock size={120} className="text-black rotate-12" />
+        <div className="absolute top-0 right-0 p-4 sm:p-5 lg:p-8 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-700 ease-in-out">
+          <Clock className="w-20 h-20 sm:w-24 sm:h-24 lg:w-[120px] lg:h-[120px] text-black rotate-12" />
         </div>
-        <CardContent className="p-8 relative z-10">
+        <CardContent className="p-4 sm:p-5 lg:p-8 relative z-10">
           <div className="flex items-center gap-2 text-slate-900 font-bold  text-sm mb-5">
             <ShieldCheck size={14} className="text-emerald-500/50" />
             Pending settlement
           </div>
           <CurrencyEstimate 
             usdAmount={Number(balance?.formattedPending || "0")} 
-            className="text-slate-900 text-5xl font-bold"
+            className="text-slate-900 text-3xl sm:text-4xl lg:text-5xl font-bold"
           />
           <div className="mt-8 flex items-center gap-2">
             <span className="text-sm font-bold text-slate-900  flex items-center gap-2">

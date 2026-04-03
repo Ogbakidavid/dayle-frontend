@@ -8,12 +8,9 @@ import { Button } from "@/components/ui/button";
 import { useVault } from "@/lib/store/vault-context";
 import { useLedger } from "@/lib/store/ledger-context";
 import {
-  Landmark,
-  Shield,
   Activity,
   ArrowUpRight,
   LayoutGrid,
-  Zap,
   Plus,
 } from "lucide-react";
 import { VaultStatus, getVaultDerivedLabel } from "@/lib/domain/enums";
@@ -91,7 +88,7 @@ export default function ClientDashboard() {
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <motion.div variants={itemVariants} className="space-y-1">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tighter text-slate-900">
+          <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold tracking-tighter text-slate-900 leading-tight">
             Overview
           </h1>
           <p className="text-xs md:text-sm text-slate-600 font-bold">
@@ -103,12 +100,9 @@ export default function ClientDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            {/* <div className="w-9 h-9 rounded-sm bg-[#F8F9FA] flex items-center justify-center">
-              <Landmark className="w-4 h-4 text-slate-900" />
-            </div> */}
             <span className="text-sm font-bold  text-slate-900">
               Total investment
             </span>
@@ -127,12 +121,9 @@ export default function ClientDashboard() {
 
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            {/* <div className="w-9 h-9 rounded-sm bg-emerald-50 flex items-center justify-center">
-              <Zap className="w-4 h-4 text-emerald-600" />
-            </div> */}
             <span className="text-sm font-bold  text-slate-900">
               Available balance
             </span>
@@ -154,12 +145,9 @@ export default function ClientDashboard() {
 
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            {/* <div className="w-9 h-9 rounded-sm bg-[#F8F9FA] flex items-center justify-center">
-              <Shield className="w-4 h-4 text-slate-900" />
-            </div> */}
             <span className="text-sm font-bold  text-slate-900">
               Secured in projects
             </span>
@@ -190,7 +178,7 @@ export default function ClientDashboard() {
               Active projects
             </h2>
           </div>
-          <div className=" font-bold  text-slate-600 bg-slate-50 px-3 py-1 rounded-full border border-slate-200">
+          <div className="text-[10px] sm:text-sm font-bold text-slate-600 bg-slate-50 px-2 sm:px-3 py-1 rounded-full border border-slate-200">
             {activeVaults.length} active
           </div>
         </motion.div>
@@ -241,19 +229,19 @@ export default function ClientDashboard() {
                 <Link key={vault.id} href={`/client/vault/${vault.id}`}>
                   <motion.div
                     variants={itemVariants}
-                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500/30 transition-all gap-6 shadow-sm relative overflow-hidden"
+                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500/30 transition-all gap-4 sm:gap-6 shadow-sm relative overflow-hidden"
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500/50 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-3 mb-3">
-                        <h4 className="text-lg font-bold tracking-tight text-slate-900 truncate max-w-md">
-                          {vault.title}
-                        </h4>
-                        <span className="bg-emerald-50 text-emerald-700 text-[9px] font-bold  rounded-lg border border-emerald-200 py-1 px-3 whitespace-nowrap">
-                          {getVaultDerivedLabel(vault.status)}
-                        </span>
-                      </div>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                          <h4 className="text-sm sm:text-lg font-bold tracking-tight text-slate-900 truncate max-w-[150px] sm:max-w-md">
+                            {vault.title}
+                          </h4>
+                          <span className="bg-emerald-50 text-emerald-700 text-[7px] sm:text-[9px] font-bold rounded-lg border border-emerald-200 py-0.5 sm:py-1 px-1.5 sm:px-3 whitespace-nowrap">
+                            {getVaultDerivedLabel(vault.status)}
+                          </span>
+                        </div>
                       <div className="flex flex-col gap-2">
                         <p className="text-sm font-bold  text-slate-600 truncate">
                           {vault.freelancerName ||
@@ -262,13 +250,13 @@ export default function ClientDashboard() {
                             "Unassigned freelancer"}
                         </p>
                         <div className="flex flex-wrap items-center gap-3">
-                          <span className=" font-bold  text-slate-600">
+                          <span className="text-[10px] sm:text-xs font-bold text-slate-600">
                             {vault.deliverables?.length || 0} deliverables
                           </span>
                           <span className="w-1 h-1 rounded-full bg-slate-200" />
                           <span
                             className={cn(
-                              " font-bold  px-2 py-0.5 rounded-md",
+                              "text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md",
                               vault.submissions?.length > 0
                                 ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
                                 : "bg-slate-100 text-slate-600 border border-slate-200",
@@ -282,7 +270,7 @@ export default function ClientDashboard() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-8 border-t sm:border-t-0 border-slate-100 pt-5 sm:pt-0">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-8 border-t sm:border-t-0 border-slate-100 pt-4 sm:pt-0">
                       <div className="sm:text-right">
                         <p className="text-[10px] text-slate-600 font-bold mb-1">
                           Project value
@@ -295,8 +283,8 @@ export default function ClientDashboard() {
                           align="right"
                         />
                       </div>
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">
-                        <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 group-hover:text-white transition-colors" />
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all group-hover:scale-110 shadow-sm group-hover:shadow-emerald-500/20">
+                        <ArrowUpRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-slate-600 group-hover:text-white transition-colors" />
                       </div>
                     </div>
                   </motion.div>
@@ -319,7 +307,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(1, prev - 1))
                     }
-                    className="flex-1 xs:flex-none h-9 px-4 text-xs sm:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition-all disabled:opacity-50"
+                    className="flex-1 xs:flex-none h-8 sm:h-9 px-3 sm:px-4 text-[10px] sm:text-xs md:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition-all disabled:opacity-50"
                   >
                     Previous
                   </Button>
@@ -330,7 +318,7 @@ export default function ClientDashboard() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                     }
-                    className="flex-1 xs:flex-none h-9 px-4 text-xs sm:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition-all disabled:opacity-50"
+                    className="flex-1 xs:flex-none h-8 sm:h-9 px-3 sm:px-4 text-[10px] sm:text-xs md:text-sm border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition-all disabled:opacity-50"
                   >
                     Next
                   </Button>

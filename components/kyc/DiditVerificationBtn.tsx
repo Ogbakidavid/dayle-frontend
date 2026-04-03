@@ -66,7 +66,7 @@ export default function DiditVerificationBtn({
       DiditSdk.shared.startVerification({
         url,
         configuration: {
-          loggingEnabled: process.env.NODE_ENV === "development",
+          loggingEnabled: process.env.NEXT_PUBLIC_NODE_ENV !== "production" || process.env.NEXT_PUBLIC_TESTNET_MODE === "true",
         },
       });
     } catch (error) {

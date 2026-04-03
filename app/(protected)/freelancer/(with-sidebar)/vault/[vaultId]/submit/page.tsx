@@ -268,19 +268,18 @@ export default function SubmissionPage() {
     );
   }
 
-
   return (
     <div className="min-h-screen text-slate-600 selection:bg-emerald-500/30 pb-20 font-primary">
-      <div className="max-w-4xl mx-auto px-6 space-y-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-8">
         <header className="pt-8">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-all mb-8 font-bold tracking-tight bg-white border border-slate-200 py-2.5 px-5 rounded-xl cursor-pointer group shadow-sm"
+            className="inline-flex items-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-all mb-6 sm:mb-8 font-bold tracking-tight bg-white border border-slate-200 py-2 sm:py-2.5 px-3 sm:px-5 rounded-xl cursor-pointer group shadow-sm"
           >
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to project
+            <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            Back
           </button>
-          <h1 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tighter leading-none mb-3">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-slate-900 tracking-tighter leading-tight mb-3">
             Submit work
           </h1>
           <p className="md:text-lg text-slate-600 font-medium">
@@ -311,7 +310,7 @@ export default function SubmissionPage() {
                     <div
                       onClick={() => toggleDeliverable(idx)}
                       className={cn(
-                        "p-6 flex items-center gap-4 cursor-pointer transition-colors",
+                        "p-4 sm:p-6 flex items-center gap-3 sm:gap-4 cursor-pointer transition-colors",
                         item.included ? "bg-emerald-50/50" : "hover:bg-slate-50",
                       )}
                     >
@@ -322,7 +321,7 @@ export default function SubmissionPage() {
                       )}
                       <span
                         className={cn(
-                          "text-base font-bold tracking-tight transition-colors",
+                          "text-xs sm:text-base font-bold tracking-tight transition-colors truncate",
                           item.included ? "text-slate-900" : "text-slate-600",
                         )}
                       >
@@ -344,7 +343,7 @@ export default function SubmissionPage() {
 
 
                     {item.included && (
-                      <div className="p-6 border-t border-slate-100 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="p-4 sm:p-6 border-t border-slate-100 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="space-y-3">
                           <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                             Notes about this deliverable (required)
@@ -372,7 +371,7 @@ export default function SubmissionPage() {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {/* File Dropzone if needed */}
                             {(item.submissionType === SubmissionType.FILE || item.submissionType === SubmissionType.BOTH) && (
-                              <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-6 hover:bg-emerald-50/50 hover:border-emerald-500/20 transition-all text-center cursor-pointer group">
+                              <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-4 sm:p-6 hover:bg-emerald-50/50 hover:border-emerald-500/20 transition-all text-center cursor-pointer group">
                                 <input
                                   type="file"
                                   multiple
@@ -440,13 +439,13 @@ export default function SubmissionPage() {
           </div>
 
           <Card className="bg-white border-slate-200 shadow-sm relative overflow-hidden">
-            <CardContent className="p-8 space-y-4">
+            <CardContent className="p-4 sm:p-8 space-y-4">
               <Label className="text-xs font-bold text-emerald-600 uppercase tracking-wider block">
                 General notes about this submission (required)
               </Label>
               <Textarea
                 placeholder="Overall summary of the work provided in this update..."
-                className="bg-slate-50 border-slate-200 text-slate-900 min-h-[140px] rounded-2xl p-6 focus:ring-emerald-500/20 focus:border-emerald-500/30 placeholder:text-slate-600 font-medium text-sm leading-relaxed transition-all"
+                className="bg-slate-50 border-slate-200 text-slate-900 min-h-[120px] sm:min-h-[140px] rounded-xl sm:rounded-2xl p-4 sm:p-6 focus:ring-emerald-500/20 focus:border-emerald-500/30 placeholder:text-slate-600 font-medium text-sm leading-relaxed transition-all"
                 value={overallNotes}
                 onChange={(e) => setOverallNotes(e.target.value)}
               />
@@ -467,7 +466,7 @@ export default function SubmissionPage() {
                 variant="ghost"
                 type="button"
                 onClick={() => router.back()}
-                className="flex-1 sm:flex-none h-14 px-8 font-bold text-slate-600 hover:text-slate-600 hover:bg-slate-100 rounded-2xl transition-all"
+                className="flex-1 sm:flex-none h-12 sm:h-14 px-6 sm:px-8 font-bold text-slate-600 hover:text-slate-600 hover:bg-slate-100 rounded-xl sm:rounded-2xl transition-all text-sm"
               >
                 Cancel
               </Button>
@@ -475,7 +474,7 @@ export default function SubmissionPage() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 sm:flex-none h-14 px-12 bg-emerald-600 text-white hover:bg-emerald-500 font-bold tracking-tight text-sm rounded-2xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all"
+                className="flex-1 sm:flex-none h-12 sm:h-14 px-8 sm:px-12 bg-emerald-600 text-white hover:bg-emerald-500 font-bold tracking-tight text-sm rounded-xl sm:rounded-2xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

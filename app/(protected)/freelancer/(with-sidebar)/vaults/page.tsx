@@ -113,11 +113,11 @@ export default function FreelancerVaultsPage() {
       animate="visible"
       className="min-h-screen text-slate-600 font-sans selection:bg-emerald-500/30"
     >
-      <div className="max-w-7xl mx-auto px-6 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8 sm:space-y-10">
         {/* 1. TOP NAVIGATION / HEADER */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <motion.div variants={itemVariants} className="space-y-2">
-            <h1 className="text-4xl font-bold tracking-tighter text-slate-900 ">
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold tracking-tighter text-slate-900 leading-tight">
               Your projects
             </h1>
             <p className=" text-slate-400 font-medium">
@@ -145,7 +145,7 @@ export default function FreelancerVaultsPage() {
             <motion.div
               variants={itemVariants}
               key={i}
-              className="relative group bg-white border border-slate-200 p-6 rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-sm"
+              className="relative group bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-sm"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-0 group-hover:opacity-100 transition-all" />
 
@@ -165,7 +165,7 @@ export default function FreelancerVaultsPage() {
               <p className="text-sm font-bold text-slate-400 mb-2 group-hover:text-slate-500 transition-colors uppercase tracking-wider">
                 {stat.label}
               </p>
-              <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
                 {(stat as any).isAmount ? (
                   <CurrencyEstimate
                     usdAmount={stat.value as number}
@@ -187,7 +187,7 @@ export default function FreelancerVaultsPage() {
             placeholder="Search projects or clients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-5 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500/30 text-slate-900 placeholder:text-slate-300 transition-all shadow-sm font-medium  text-sm"
+            className="w-full pl-12 pr-4 py-4 sm:py-5 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500/30 text-slate-900 placeholder:text-slate-300 transition-all shadow-sm font-medium text-xs sm:text-base"
           />
         </motion.div>
 
@@ -197,7 +197,7 @@ export default function FreelancerVaultsPage() {
           className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm"
         >
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[640px]">
+            <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/50">
                   <th className="px-6 py-5  font-bold text-slate-400 text-xs uppercase tracking-wider">
@@ -219,18 +219,18 @@ export default function FreelancerVaultsPage() {
                 {paginatedVaults.map((vault: any) => (
                   <tr
                     key={vault.id}
-                    className="group hover:bg-slate-50 transition-all cursor-pointer relative"
+                    className="group hover:bg-slate-50 transition-all cursor-pointer relative flex flex-col sm:table-row border-b border-slate-100 sm:border-none last:border-none"
                     onClick={() =>
                       (window.location.href = `/freelancer/vault/${vault.id}`)
                     }
                   >
-                    <td className="px-6 py-6">
+                    <td className="px-4 sm:px-6 py-4 sm:py-6 sm:table-cell">
                       <div className="flex items-center gap-4">
-                        <div className="hidden xs:flex w-11 h-11 rounded-xl bg-slate-50 border border-slate-200 items-center justify-center text-slate-400 group-hover:text-emerald-600 group-hover:border-emerald-500/30 transition-all shrink-0 shadow-sm">
-                          <FileText className="w-5 h-5" />
+                        <div className="hidden xs:flex w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 items-center justify-center text-slate-400 group-hover:text-emerald-600 group-hover:border-emerald-500/30 transition-all shrink-0 shadow-sm">
+                          <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-all tracking-tight truncate max-w-xs md:max-w-md">
+                          <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-600 transition-all tracking-tight truncate max-w-[140px] sm:max-w-md">
                             {vault.title}
                           </p>
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2">
@@ -276,7 +276,7 @@ export default function FreelancerVaultsPage() {
                                       : vault.status}
                             </span>
                           </div>
-                          <p className="lg:hidden text-[10px] text-slate-400 font-medium mt-2 truncate">
+                          <p className="lg:hidden text-[10px] text-slate-400 font-medium mt-1 sm:mt-2 truncate">
                             Client:{" "}
                             {vault.clientEmail ||
                               vault.client?.email ||
@@ -343,17 +343,17 @@ export default function FreelancerVaultsPage() {
                                 : vault.status}
                       </div>
                     </td>
-                    <td className="px-6 py-6 text-right">
-                      <CurrencyEstimate
+                    <td className="px-4 sm:px-6 py-4 sm:py-6 text-right sm:table-cell flex items-center justify-between sm:justify-end border-t sm:border-t-0 border-slate-100">
+                        <span className="sm:hidden text-[10px] font-bold text-slate-400 uppercase tracking-wider">Value</span>
+                        <CurrencyEstimate
                         usdAmount={Number(
-                          vault.formattedTotalAmount || vault.totalAmount,
-                        )}
+                            vault.formattedTotalAmount || vault.totalAmount,
+                          )}
                         showNote={false}
-                        className="text-base font-bold text-slate-900"
-                      />
+                          className="text-sm sm:text-base font-bold text-slate-900"
+                        />
                     </td>
-                    Broadway:
-                    <td className="px-6 py-6 text-right">
+                    <td className="px-6 py-6 text-right hidden sm:table-cell">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
                         <Link
                           href={`/freelancer/vault/${vault.id}`}
@@ -392,7 +392,7 @@ export default function FreelancerVaultsPage() {
                 setCurrentPage((prev) => Math.max(1, prev - 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-11 px-6 border-slate-200 bg-white hover:bg-slate-50 text-slate-900 transition-all font-bold disabled:opacity-20 shadow-sm"
+              className="h-9 sm:h-11 px-4 sm:px-6 border-slate-200 bg-white hover:bg-slate-50 text-slate-900 transition-all font-bold disabled:opacity-20 shadow-sm text-xs sm:text-sm"
             >
               Previous
             </Button>
@@ -424,7 +424,7 @@ export default function FreelancerVaultsPage() {
                 setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="h-11 px-6 border-slate-200 bg-white hover:bg-slate-50 text-slate-900 transition-all font-bold disabled:opacity-20 shadow-sm"
+              className="h-9 sm:h-11 px-4 sm:px-6 border-slate-200 bg-white hover:bg-slate-50 text-slate-900 transition-all font-bold disabled:opacity-20 shadow-sm text-xs sm:text-sm"
             >
               Next
             </Button>

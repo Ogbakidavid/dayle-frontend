@@ -58,7 +58,9 @@ export default function IdentityOnboardingPage() {
 
   const isDev =
     process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
-    process.env.NODE_ENV === "development";
+    process.env.NODE_ENV === "development" ||
+    process.env.NEXT_PUBLIC_TESTNET_MODE === "true";
+  const showBypass = process.env.NEXT_PUBLIC_ENABLE_DEV_BYPASS === "true";
   const currentCountry = selectedCountry || user?.country;
 
   useEffect(() => {
@@ -243,8 +245,8 @@ export default function IdentityOnboardingPage() {
       <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
 
       <div className="relative z-10 w-full max-w-xl">
-        <div className="flex justify-center mb-12">
-          <DayleLogo className="w-16 h-16 text-emerald-500" />
+        <div className="flex justify-center mb-8 sm:mb-12">
+          <DayleLogo className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-500" />
         </div>
 
         <div className="bg-white border border-slate-200 p-8 sm:p-12 rounded-[40px] shadow-sm relative overflow-hidden">
@@ -285,8 +287,8 @@ export default function IdentityOnboardingPage() {
 
           {step === "country" ? (
             <>
-              <div className="mb-10 text-center text-slate-900">
-                <h1 className="text-3xl font-bold tracking-tight leading-none mb-4">
+              <div className="mb-8 sm:mb-10 text-center text-slate-900">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight mb-3 sm:mb-4">
                   Select your <span className="text-emerald-600">country.</span>
                 </h1>
                 <p className="text-slate-600 text-base font-bold leading-relaxed">
@@ -386,7 +388,7 @@ export default function IdentityOnboardingPage() {
           ) : step === "form" && otpStep === "otp" ? (
             <>
               <div className="mb-10 text-center">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4">
                   Enter <span className="text-emerald-600">code.</span>
                 </h1>
                 <p className="text-slate-600 text-base font-bold leading-relaxed px-4">
@@ -413,7 +415,7 @@ export default function IdentityOnboardingPage() {
                       setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
                     }
                     required
-                    className="bg-slate-50! border-slate-200 h-20 rounded-3xl focus:border-emerald-500 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-4xl font-bold tracking-[0.4em] text-center"
+                    className="bg-slate-50! border-slate-200 h-16 sm:h-20 rounded-2xl sm:rounded-3xl focus:border-emerald-500 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-2xl sm:text-4xl font-bold tracking-[0.4em] text-center"
                   />
                   {isDev && (
                     <p className="mt-2 text-center text-[10px] text-slate-400 font-bold">
@@ -448,7 +450,7 @@ export default function IdentityOnboardingPage() {
           ) : step === "form" ? (
             <>
               <div className="mb-10 text-center">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4">
                   One last <span className="text-emerald-600">step.</span>
                 </h1>
                 <p className="text-slate-600 text-base font-bold leading-relaxed px-4">
@@ -488,7 +490,7 @@ export default function IdentityOnboardingPage() {
                       value={val}
                       onChange={handleInputChange}
                       required
-                      className={`bg-slate-50! border-slate-200 h-16 rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${currentCountry === "KE" || currentCountry === "Kenya" ? "pl-20" : "px-6"}`}
+                      className={`bg-slate-50! border-slate-200 h-14 sm:h-16 rounded-xl sm:rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-base sm:text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${currentCountry === "KE" || currentCountry === "Kenya" ? "pl-16 sm:pl-20" : "px-4 sm:px-6"}`}
                     />
                     {isDev && currentCountry === "NG" && (
                       <p className="mt-2 text-[10px] text-slate-400 font-bold text-left ml-2">
@@ -544,7 +546,7 @@ export default function IdentityOnboardingPage() {
                   )}
                 </Button>
 
-                {process.env.NEXT_PUBLIC_NODE_ENV === "development" && (
+                {showBypass && (
                   <div className="mt-4 text-center">
                     <button
                       type="button"
@@ -592,7 +594,7 @@ export default function IdentityOnboardingPage() {
                 </div>
               </div>
 
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none mb-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4">
                 Payment account <span className="text-emerald-600">ready.</span>
               </h1>
 
@@ -607,7 +609,7 @@ export default function IdentityOnboardingPage() {
                     user?.role === "CLIENT" ? "/client" : "/freelancer",
                   )
                 }
-                className="w-full h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-[0.98] group"
+                className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group"
               >
                 <span className="flex items-center gap-2 text-white">
                   Continue to Dashboard{" "}
