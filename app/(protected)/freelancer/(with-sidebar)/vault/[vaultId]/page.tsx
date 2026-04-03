@@ -174,7 +174,7 @@ export default function FreelancerVaultDetailPage() {
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
             <div className="min-w-0 space-y-4">
               <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-slate-900 tracking-tighter leading-tight break-words">
+                <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-slate-900 tracking-tighter leading-tight wrap-break-word">
                   {vault.title}
                 </h1>
                 <Badge

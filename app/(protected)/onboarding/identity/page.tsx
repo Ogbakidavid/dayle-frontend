@@ -355,9 +355,14 @@ export default function IdentityOnboardingPage() {
                     className="w-full h-14 px-6 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-center tracking-[0.2em] text-lg"
                     required
                   />
-                  {isDev && (
+                  {isDev && (currentCountry === "NG" || currentCountry === "Nigeria") && (
                     <p className="mt-2 text-[10px] text-slate-400 font-bold float-left ml-2">
                        Staging: use 08032043843
+                    </p>
+                  )}
+                  {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
+                    <p className="mt-2 text-[10px] text-slate-400 font-bold float-left ml-2">
+                       Staging: no phone confirm needed for Kenya
                     </p>
                   )}
                 </div>
@@ -494,7 +499,12 @@ export default function IdentityOnboardingPage() {
                     />
                     {isDev && currentCountry === "NG" && (
                       <p className="mt-2 text-[10px] text-slate-400 font-bold text-left ml-2">
-                         Staging: use any 11-digit number e.g. 12345678901
+                        Staging: use any 11-digit number e.g. 12345678901
+                      </p>
+                    )}
+                    {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
+                      <p className="mt-2 text-[10px] text-slate-400 font-bold text-left ml-2">
+                        Staging: use 0714325678
                       </p>
                     )}
                     {currentCountry === "NG" || currentCountry === "Nigeria" ? (

@@ -570,7 +570,7 @@ export default function WithdrawPage() {
                       </div>
                       <button
                         onClick={() => router.push("/onboarding")}
-                        className="w-full h-14 sm:h-16 bg-slate-900 hover:bg-black text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-[0.1em] sm:tracking-[0.2em] "
+                        className="w-full h-14 sm:h-16 bg-slate-900 hover:bg-black text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-wide"
                       >
                         Verify Identity Now
                       </button>
@@ -830,7 +830,7 @@ export default function WithdrawPage() {
 
                         <Button
                           onClick={handleAddressSubmit}
-                          className="w-full h-14 sm:h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-3xl shadow-xl shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-[0.1em] sm:tracking-[0.2em]"
+                          className="w-full h-14 sm:h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-3xl shadow-xl shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-wide"
                         >
                           <div className="flex items-center justify-center gap-2">
                             <ShieldCheck className="w-4 h-4" />

@@ -541,7 +541,7 @@ export default function ClientVaultDetailPage() {
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-slate-900 tracking-tighter break-words">
+                  <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-slate-900 tracking-tighter wrap-break-word">
                     {vault.title}
                   </h1>
                   <Badge
