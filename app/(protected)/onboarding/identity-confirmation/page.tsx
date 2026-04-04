@@ -186,7 +186,7 @@ export default function IdentityConfirmationPage() {
                                 value={val}
                                 onChange={handleInputChange}
                                 required
-                                className={`bg-slate-50! border-slate-200 h-14 sm:h-16 rounded-xl sm:rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-base sm:text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${(country === "KE" || country === "Kenya") ? "pl-16 sm:pl-20" : "px-4 sm:px-6"}`}
+                                className={`bg-white border-2 border-slate-200 h-14 sm:h-16 rounded-xl sm:rounded-2xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all text-slate-900 text-base sm:text-lg placeholder:text-slate-400 font-mono tracking-widest text-center shadow-sm ${(country === "KE" || country === "Kenya") ? "pl-16 sm:pl-20" : "px-4 sm:px-6"}`}
                             />
                             {(country === "NG" || country === "Nigeria") ? (
                                 <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />

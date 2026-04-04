@@ -79,7 +79,7 @@ const OTPInput = ({
           onChange={(e) => handleChange(e, i)}
           onKeyDown={(e) => handleKeyDown(e, i)}
           onPaste={handlePaste}
-          className="w-9 xs:w-10 sm:w-12 h-14 text-center text-xl sm:text-2xl font-bold bg-slate-50! border-slate-200 rounded-xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 placeholder:text-slate-600"
+          className="w-9 xs:w-10 sm:w-12 h-14 text-center text-xl sm:text-2xl font-bold bg-white border-2 border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all text-slate-900 placeholder:text-slate-400 shadow-sm"
         />
       ))}
     </div>
@@ -370,9 +370,9 @@ export default function SignupPage() {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       required
-                      className="bg-slate-50! border-slate-200 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-600"
+                      className="bg-white border-2 border-slate-200 h-14 rounded-2xl px-6 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all text-slate-900 text-lg placeholder:text-slate-400 shadow-sm"
                     />
-                    <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                    <User className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none group-focus-within:text-emerald-500 transition-colors" />
                   </div>
                 </div>
 
@@ -394,9 +394,9 @@ export default function SignupPage() {
                         setFormData({ ...formData, email: e.target.value })
                       }
                       required
-                      className="bg-slate-50! border-slate-200 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg placeholder:text-slate-600"
+                      className="bg-white border-2 border-slate-200 h-14 rounded-2xl px-6 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all text-slate-900 text-lg placeholder:text-slate-400 shadow-sm"
                     />
-                    <Mail className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                    <Mail className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none group-focus-within:text-emerald-500 transition-colors" />
                   </div>
                 </div>
 
@@ -422,12 +422,12 @@ export default function SignupPage() {
                         }
                       }}
                       required
-                      className="w-full bg-slate-50! border-slate-200 h-14 rounded-2xl px-6 focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-lg appearance-none outline-none"
+                      className="w-full bg-white border-2 border-slate-200 h-14 rounded-2xl px-6 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all text-slate-900 text-lg appearance-none outline-none shadow-sm"
                     >
                       <option value="NG">Nigeria</option>
                       <option value="KE">Kenya</option>
                     </select>
-                    <Globe className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
+                    <Globe className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none group-focus-within:text-emerald-500 transition-colors" />
                   </div>
                 </div>
 
