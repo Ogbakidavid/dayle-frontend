@@ -539,7 +539,7 @@ export default function InvitePage() {
                   >
                     {processing ? (
                       <div className="flex items-center gap-2">
-                        <DotLoader size="sm" />
+                        <DotLoader size="sm" color="white" />
                       </div>
                     ) : (
                       "Accept invitation"

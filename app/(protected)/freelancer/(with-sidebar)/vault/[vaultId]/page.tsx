@@ -44,8 +44,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import { calculateDayleFee } from "@/lib/utils/fee";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
+import { useUser } from "@/lib/store/user-context";
 
 export default function FreelancerVaultDetailPage() {
+  const { user } = useUser();
   const params = useParams();
   const router = useRouter();
   const vaultId = params.vaultId as string;
@@ -778,9 +780,9 @@ export default function FreelancerVaultDetailPage() {
                         onClick={handleRequestRelease}
                         disabled={requestingRelease}
                       >
-                        {vault.localCurrency === "NGN" || vault.currency === "NGN" ? (
+                        {user?.country === "Nigeria" || user?.country === "NG" ? (
                           <span className="w-4 h-4 mr-2 flex items-center justify-center font-black text-sm antialiased text-slate-400 group-hover:text-emerald-500/50 transition-colors">₦</span>
-                        ) : vault.localCurrency === "KES" || vault.currency === "KES" ? (
+                        ) : user?.country === "Kenya" || user?.country === "KE" ? (
                           <span className="w-4 h-4 mr-2 flex items-center justify-center font-black text-[10px] antialiased text-slate-400 group-hover:text-emerald-500/50 transition-colors">KSh</span>
                         ) : (
                           <CircleDollarSign className="w-4 h-4 mr-2 text-slate-400 group-hover:text-emerald-500/50 transition-colors" />
