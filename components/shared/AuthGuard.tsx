@@ -82,7 +82,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
         // 1. Force identity setup if country is missing OR payment account is not ready
         if (!user.country || !user.paymentAccountReady) {
-          if (!isOnboardingIdentity && !isOnboardingConfirmation) {
+          if (!pathname.startsWith('/onboarding')) {
               console.log('[AuthGuard] Onboarding incomplete, redirecting to identity...');
               setRedirecting(true);
               router.push('/onboarding/identity');

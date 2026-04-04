@@ -67,8 +67,9 @@ export default function IdentityOnboardingPage() {
     if (!authLoading && !user) {
       router.push("/login");
     }
-    // If identity is already set, skip this page
-    if ((user?.bvn || user?.phoneNumber) && step !== "success" && !otpStep) {
+    // Only redirect away if payment account is actually ready
+    // Don't redirect if we're mid-onboarding or OTP flow
+    if (user?.paymentAccountReady && step !== "success") {
       router.push(user.role === "CLIENT" ? "/client" : "/freelancer");
     }
   }, [user, authLoading, router, step, otpStep]);
@@ -139,7 +140,7 @@ export default function IdentityOnboardingPage() {
         }
         setLoading(false);
         setLoadingMessage("");
-        return;
+        return; // Don't call refreshUser here — it triggers guard redirects
       }
 
       await refreshUser();
@@ -435,7 +436,10 @@ export default function IdentityOnboardingPage() {
                   className="w-full h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-[0.98] group"
                 >
                   {loading ? (
-                    <DotLoader size="sm" color="white" />
+                    <div className="flex items-center gap-3">
+                      <DotLoader size="sm" color="white" />
+                      <span>Verifying...</span>
+                    </div>
                   ) : (
                     "Verify & Complete Setup"
                   )}
@@ -547,7 +551,10 @@ export default function IdentityOnboardingPage() {
                   className="w-full h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-[0.98] group"
                 >
                   {loading ? (
-                    <DotLoader size="sm" color="white" />
+                    <div className="flex items-center gap-3">
+                      <DotLoader size="sm" color="white" />
+                      <span>Processing...</span>
+                    </div>
                   ) : (
                     <span className="flex items-center gap-2">
                       Complete Setup{" "}
