@@ -30,6 +30,7 @@ import { api } from "@/lib/api-client";
 import { useVault } from "@/lib/store/vault-context";
 import { SUPPORTED_TOKENS, CONTRACTS } from "@/lib/contracts";
 import { SubmissionType } from "@/lib/domain/enums";
+import { LogoLoader } from "@/components/ui/logo-loader";
 import { DayleLogo } from "@/components/shared/DayleLogo";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 import { useUser } from "@/lib/store/user-context";
@@ -276,7 +277,8 @@ export default function CreateVaultPage() {
   }
 
   return (
-    <div className="min-h-screen text-white selection:bg-emerald-500/30 selection:text-emerald-400 font-primary">
+    <div className="min-h-screen bg-white relative overflow-hidden font-sans">
+      {isDeploying && <LogoLoader fullPage={true} size="lg" message="Securing your project assets..." />}
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 rounded-full blur-[120px]" />
