@@ -426,9 +426,6 @@ export default function SignupPage() {
                     >
                       <option value="NG">Nigeria</option>
                       <option value="KE">Kenya</option>
-                      <option value="GH">Ghana</option>
-                      <option value="ZA">South Africa</option>
-                      <option value="OTHER">Other</option>
                     </select>
                     <Globe className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 pointer-events-none group-focus-within:text-emerald-500/50 transition-colors" />
                   </div>
