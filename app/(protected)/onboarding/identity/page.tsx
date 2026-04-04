@@ -416,18 +416,18 @@ export default function IdentityOnboardingPage() {
                     variant="outline"
                     onClick={() => handleSelectMethod(m.method)}
                     disabled={loading}
-                    className="h-20 rounded-2xl border-slate-200 flex items-center justify-between px-8 hover:border-emerald-500/50 hover:bg-slate-50 group"
+                    className="min-h-[100px] h-auto py-6 rounded-[24px] border-slate-200 flex items-center justify-between px-8 hover:border-emerald-500/50 hover:bg-slate-50 group transition-all"
                   >
-                    <div className="flex flex-col items-start text-left">
-                      <span className="text-lg font-bold text-slate-900 uppercase">
+                    <div className="flex flex-col items-start text-left flex-1 pr-6">
+                      <span className="text-base sm:text-lg font-bold text-slate-900 uppercase tracking-tight">
                         {m.method === 'sendotp' ? 'Receive SMS Code' : 'Send SMS Recognition'}
                       </span>
-                      <span className="text-xs text-slate-500 font-medium">
+                      <span className="text-xs sm:text-[13px] text-slate-500 font-medium leading-relaxed mt-1 break-words max-w-[280px] sm:max-w-xs">
                         {m.hint || 'Standard carrier rates apply'}
                       </span>
                     </div>
-                    <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
-                      <ArrowRight className="w-5 h-5" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors shrink-0 shadow-sm border border-slate-200/50">
+                      <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                   </Button>
                 ))}
