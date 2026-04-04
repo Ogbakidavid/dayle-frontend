@@ -418,6 +418,16 @@ export default function CreateVaultPage() {
                               className="bg-muted! border-white/10! h-12 sm:h-14 pl-12 sm:pl-14 text-lg sm:text-xl text-slate-900 font-medium focus:border-emerald-500/50 rounded-xl"
                             />
                           </div>
+                          
+                          {/* Testnet Limit Notice */}
+                          <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl mt-2 text-amber-700 text-[10px] font-bold leading-relaxed animate-in fade-in slide-in-from-top-1">
+                            <Info className="w-3.5 h-3.5 shrink-0" />
+                            <span>
+                              Testnet Limit: Max {currencyCode === "NGN" ? "50,000 NGN" : "5,000 KES"} per vault. 
+                              Larger amounts may fail during testnet funding.
+                            </span>
+                          </div>
+
                           {budget > 0 && (
                             <div className="mt-2 px-1 flex items-center gap-2">
                               <span className="text-slate-500 text-xs font-bold">Estimated:</span>

@@ -61,8 +61,9 @@ export default function IdentityConfirmationPage() {
         return "Bank Verification Number must be exactly 11 digits.";
       }
     } else if (country === "KE" || country === "Kenya") {
-      if (!/^\d{9}$/.test(value)) {
-        return "Phone number must be 9 digits after +254.";
+      const cleaned = value.replace(/^0/, "");
+      if (!/^\d{9}$/.test(cleaned)) {
+        return "Please enter a valid 9 or 10-digit Kenyan phone number.";
       }
     }
     return "";
@@ -84,7 +85,9 @@ export default function IdentityConfirmationPage() {
       if (country === "NG" || country === "Nigeria") {
         payload.bvn = val;
       } else {
-        payload.phoneNumber = `+254${val}`;
+        // Clean leading 0 if present before sending: 07123 -> 7123
+        const cleanedPhone = val.replace(/^0/, "");
+        payload.phoneNumber = `+254${cleanedPhone}`;
       }
 
       await api.onboarding.verifyIdentity(payload);
@@ -107,7 +110,8 @@ export default function IdentityConfirmationPage() {
     if (country === "NG" || country === "Nigeria") {
       if (value.length <= 11) setVal(value);
     } else {
-      if (value.length <= 9) setVal(value);
+      // Allow up to 10 digits to accommodate leading 0 (e.g. 0712345678)
+      if (value.length <= 10) setVal(value);
     }
   };
 
