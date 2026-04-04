@@ -391,6 +391,56 @@ export default function IdentityOnboardingPage() {
                 </button>
               </form>
             </motion.div>
+          ) : step === "form" && otpStep === "method" ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center"
+            >
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <ShieldCheck className="w-8 h-8" />
+                </div>
+                <h1 className="text-2xl font-bold text-slate-900 mb-3">Verification Method.</h1>
+                <p className="text-slate-600 font-medium">
+                  {currentCountry === "Kenya" || currentCountry === "KE" 
+                    ? "Choose how you'd like to verify your M-Pesa number." 
+                    : "Choose how you'd like to receive your verification code."}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 mb-8">
+                {otpMethods.map((m: any) => (
+                  <Button
+                    key={m.method}
+                    variant="outline"
+                    onClick={() => handleSelectMethod(m.method)}
+                    disabled={loading}
+                    className="h-20 rounded-2xl border-slate-200 flex items-center justify-between px-8 hover:border-emerald-500/50 hover:bg-slate-50 group"
+                  >
+                    <div className="flex flex-col items-start text-left">
+                      <span className="text-lg font-bold text-slate-900 uppercase">
+                        {m.method === 'sendotp' ? 'Receive SMS Code' : 'Send SMS Recognition'}
+                      </span>
+                      <span className="text-xs text-slate-500 font-medium">
+                        {m.hint || 'Standard carrier rates apply'}
+                      </span>
+                    </div>
+                    <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
+                      <ArrowRight className="w-5 h-5" />
+                    </div>
+                  </Button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setOtpStep("none")}
+                className="text-slate-400 font-bold uppercase tracking-widest text-[10px] hover:text-slate-600 transition-colors"
+              >
+                Go back to phone input
+              </button>
+            </motion.div>
           ) : step === "form" && otpStep === "otp" ? (
             <>
               <div className="mb-10 text-center">
