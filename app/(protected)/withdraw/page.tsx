@@ -352,7 +352,8 @@ export default function WithdrawPage() {
 
   // --- Review Logic ---
   const handleConfirmWithdrawal = () => {
-    if (user?.kycStatus !== KycStatus.VERIFIED) {
+    const isTestnet = process.env.NEXT_PUBLIC_TESTNET_MODE === "true";
+    if (user?.kycStatus !== KycStatus.VERIFIED && !isTestnet) {
       toast.error("Identity Verification Required", {
         description:
           "You must complete full identity verification (Tier 2) before you can withdraw funds.",
@@ -553,7 +554,7 @@ export default function WithdrawPage() {
                     </p>
                   </div>
 
-                  {user?.kycStatus !== KycStatus.VERIFIED ? (
+                  {user?.kycStatus !== KycStatus.VERIFIED && process.env.NEXT_PUBLIC_TESTNET_MODE !== "true" ? (
                     <div className="bg-amber-50 border border-amber-200 rounded-3xl sm:rounded-[2.5rem] p-6 sm:p-10 space-y-6 text-center shadow-sm">
                       <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 mx-auto">
                         <ShieldCheck className="w-8 h-8" />

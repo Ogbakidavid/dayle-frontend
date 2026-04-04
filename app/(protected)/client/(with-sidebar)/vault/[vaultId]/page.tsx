@@ -197,6 +197,11 @@ export default function ClientVaultDetailPage() {
     routingNumber: "",
   });
 
+  // Request Changes State
+  const [showReasonModal, setShowReasonModal] = useState(false);
+  const [reason, setReason] = useState("");
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
   // Fetch latest invitation status for this vault
   useEffect(() => {
     async function fetchInviteStatus() {
@@ -258,7 +263,8 @@ export default function ClientVaultDetailPage() {
   };
 
   const handleApprove = async () => {
-    if (user?.kycStatus !== KycStatus.VERIFIED) {
+    const isTestnet = process.env.NEXT_PUBLIC_TESTNET_MODE === "true";
+    if (user?.kycStatus !== KycStatus.VERIFIED && !isTestnet) {
       toast.error("Identity Verification Required", {
         description: "You must complete full identity verification (Tier 2) to release funds."
       });
@@ -330,7 +336,8 @@ export default function ClientVaultDetailPage() {
   };
 
   const submitRefundRequest = async () => {
-    if (user?.kycStatus !== KycStatus.VERIFIED) {
+    const isTestnet = process.env.NEXT_PUBLIC_TESTNET_MODE === "true";
+    if (user?.kycStatus !== KycStatus.VERIFIED && !isTestnet) {
       toast.error("Identity Verification Required", {
         description:
           "You must complete full identity verification (Tier 2) before you can request a refund.",
@@ -394,8 +401,34 @@ export default function ClientVaultDetailPage() {
     } finally {
       setMockingDeposit(false);
     }
-  };
+  };  const handleRequestChanges = async () => {
+    if (!reason.trim()) {
+      toast.error("Reason Required", {
+        description: "Please provide a reason for the requested changes.",
+      });
+      return;
+    }
 
+    try {
+      setIsUpdatingStatus(true);
+      await api.vaults.updateStatus(vaultId, {
+        status: VaultStatus.CHANGES_REQUESTED,
+        reason: reason,
+      });
+      toast.success("Changes Requested", {
+        description: "The freelancer has been notified of your requested changes.",
+      });
+      setReason("");
+      setShowReasonModal(false);
+      refreshVaults();
+    } catch (err: any) {
+      toast.error("Action Failed", {
+        description: err.message || "Failed to request changes. Please try again.",
+      });
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
   const [expandedSubmissions, setExpandedSubmissions] = useState<string[]>([]);
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<
     string | null
@@ -1122,12 +1155,7 @@ export default function ClientVaultDetailPage() {
                             <Button
                               variant="outline"
                               className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-10 sm:h-12 rounded-xl active:scale-95 transition-all text-xs sm:text-sm shadow-sm"
-                              onClick={() =>
-                                toast.info("Request Changes feature is coming soon!", {
-                                  description:
-                                    "Please use the chat or external communication to provide feedback for now.",
-                                })
-                              }
+                              onClick={() => setShowReasonModal(true)}
                             >
                               <RefreshCcw className="w-4 h-4 mr-2" />
                               Request changes
@@ -1540,6 +1568,50 @@ export default function ClientVaultDetailPage() {
                  </Button>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showReasonModal} onOpenChange={setShowReasonModal}>
+        <DialogContent className="sm:max-w-md bg-white rounded-3xl border-none shadow-2xl overflow-hidden p-0">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-amber-500" />
+          <div className="p-8 space-y-6">
+            <div className="space-y-2">
+              <DialogTitle className="text-2xl font-black text-slate-900 tracking-tighter">
+                Request Changes
+              </DialogTitle>
+              <DialogDescription className="text-sm font-bold text-slate-500 leading-relaxed">
+                Provide specific feedback or list the revisions needed for the freelancer to complete the project.
+              </DialogDescription>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                Feedback & Instructions
+              </Label>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="List specific changes required..."
+                className="w-full h-40 bg-slate-50 border border-slate-100 rounded-2xl p-5 text-slate-900 text-sm font-bold focus:border-amber-500/30 outline-none transition-all resize-none shadow-inner"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowReasonModal(false)}
+                className="flex-1 h-14 rounded-2xl border-slate-200 text-slate-600 font-bold hover:bg-slate-50 active:scale-95 transition-all text-xs uppercase"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleRequestChanges}
+                disabled={isUpdatingStatus || !reason.trim()}
+                className="flex-1 h-14 rounded-2xl bg-slate-900 border-none text-white font-bold hover:bg-black active:scale-95 transition-all text-xs uppercase shadow-xl disabled:bg-slate-300 disabled:opacity-50"
+              >
+                {isUpdatingStatus ? "Sending..." : "Submit Request"}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
