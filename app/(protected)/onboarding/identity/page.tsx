@@ -473,11 +473,11 @@ export default function IdentityOnboardingPage() {
                     required
                     className="bg-slate-50! border-slate-200 h-16 sm:h-20 rounded-2xl sm:rounded-3xl focus:border-emerald-500 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-2xl sm:text-4xl font-bold tracking-[0.4em] text-center"
                   />
-                  {isDev && (
-                    <p className="mt-2 text-center text-[10px] text-slate-400 font-bold">
-                       Staging: OTP is always 123456
+                  <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                    <p className="text-center text-[11px] text-amber-700 font-bold uppercase tracking-wider">
+                      Staging Mode: Use <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100 font-mono text-xs">123456</span> to verify
                     </p>
-                  )}
+                  </div>
                 </div>
 
                 <Button
@@ -557,9 +557,11 @@ export default function IdentityOnboardingPage() {
                       </p>
                     )}
                     {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
-                      <p className="mt-2 text-[10px] text-slate-400 font-bold text-left ml-2">
-                        Staging: use 0714325678
-                      </p>
+                      <div className="mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                        <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider text-center">
+                          Staging: Use phone <span className="bg-white px-2 py-0.5 rounded-lg border border-emerald-200 font-mono text-xs">0714325678</span> for testing
+                        </p>
+                      </div>
                     )}
                     {currentCountry === "NG" || currentCountry === "Nigeria" ? (
                       <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />
