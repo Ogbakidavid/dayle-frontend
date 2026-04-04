@@ -22,6 +22,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LogoLoader } from "@/components/ui/logo-loader";
 import { DayleLogo } from "@/components/shared/DayleLogo";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
+import { useUser } from "@/lib/store/user-context";
+import { useVault } from "@/lib/store/vault-context";
 
 interface InviteData {
   invite: {
@@ -53,6 +55,8 @@ interface CurrentUser {
 }
 
 export default function InvitePage() {
+  const { refreshUser } = useUser();
+  const { refreshVaults } = useVault();
   const params = useParams();
   const router = useRouter();
   const inviteToken = params?.inviteToken as string;
@@ -139,8 +143,15 @@ export default function InvitePage() {
       setProcessing(true);
       const res = (await api.invites.respond(inviteToken, {
         decision: "ACCEPT",
-      })) as { success: boolean; vaultId: string };
+      })) as { success: boolean; vaultId: string; roleUpdated?: boolean };
+      
       if (res.success && res.vaultId) {
+        // If role was updated, refresh session to rotate JWT roles
+        if (res.roleUpdated) {
+          await refreshUser();
+          await refreshVaults();
+        }
+        
         // Redirect to acceptance success page instead of vault directly
         router.push(`/invitation-accepted?vaultId=${res.vaultId}`);
         return;
