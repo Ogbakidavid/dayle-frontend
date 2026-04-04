@@ -140,7 +140,7 @@ export default function CreateVaultPage() {
 
   const { user } = useUser();
   const { rates } = useRates();
-  const currencySymbol = user?.country === "Kenya" ? "KSh" : "₦";
+  const currencySymbol = (user?.country === "Kenya" || user?.country === "KE") ? "KSh" : "₦";
   const currencyCode = user?.country === "Kenya" ? "KES" : "NGN";
 
   const budget = Number(budgetAmount) || 0;

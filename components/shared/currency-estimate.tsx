@@ -37,8 +37,9 @@ export function CurrencyEstimate({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const isKenya = user?.country === "Kenya" || user?.country === "KE";
   const currency =
-    manualCurrency || (user?.country === "Kenya" ? "KES" : "NGN");
+    manualCurrency || (isKenya ? "KES" : "NGN");
   const currencySymbol =
     currency === "NGN" ? "₦" : currency === "KES" ? "KSh" : "";
 

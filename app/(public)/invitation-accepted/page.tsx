@@ -1,5 +1,6 @@
 "use client";
 import { LogoLoader } from "@/components/ui/logo-loader";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 import * as React from "react";
 import { useEffect, useState } from "react";
@@ -114,10 +115,20 @@ export default function InvitationAcceptedPage() {
 
         <div className="pt-8 px-4">
           <Button
-            onClick={() => router.replace(`/freelancer/vault/${vault.id}`)}
+            onClick={() => {
+              setLoading(true);
+              router.replace(`/freelancer/vault/${vault.id}`);
+            }}
+            disabled={loading}
             className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 font-bold px-8 py-6 h-auto shadow-lg shadow-emerald-600/20"
           >
-            View project
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <DotLoader size="sm" color="white" />
+              </div>
+            ) : (
+              "View project"
+            )}
           </Button>
         </div>
       </div>

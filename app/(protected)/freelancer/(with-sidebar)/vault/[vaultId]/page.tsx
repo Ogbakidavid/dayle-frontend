@@ -778,12 +778,12 @@ export default function FreelancerVaultDetailPage() {
                         onClick={handleRequestRelease}
                         disabled={requestingRelease}
                       >
-                        {vault.localCurrency === "NGN" ? (
-                          <span className="w-4 h-4 mr-2 flex items-center justify-center font-black text-sm antialiased">₦</span>
-                        ) : vault.localCurrency === "KES" ? (
-                          <span className="w-4 h-4 mr-2 flex items-center justify-center font-black text-[10px] antialiased">KSh</span>
+                        {vault.localCurrency === "NGN" || vault.currency === "NGN" ? (
+                          <span className="w-4 h-4 mr-2 flex items-center justify-center font-black text-sm antialiased text-slate-400 group-hover:text-emerald-500/50 transition-colors">₦</span>
+                        ) : vault.localCurrency === "KES" || vault.currency === "KES" ? (
+                          <span className="w-4 h-4 mr-2 flex items-center justify-center font-black text-[10px] antialiased text-slate-400 group-hover:text-emerald-500/50 transition-colors">KSh</span>
                         ) : (
-                          <CircleDollarSign className="w-4 h-4 mr-2" />
+                          <CircleDollarSign className="w-4 h-4 mr-2 text-slate-400 group-hover:text-emerald-500/50 transition-colors" />
                         )}
                         {requestingRelease ? "Requesting..." : "Request release"}
                       </Button>

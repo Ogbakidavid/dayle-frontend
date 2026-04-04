@@ -422,17 +422,33 @@ export default function InvitePage() {
                 </div>
                 <div className="grid gap-3">
                   <Button
-                    onClick={handleLoginRedirect}
-                    className="w-full h-12 bg-emerald-600 text-white hover:bg-emerald-700 font-bold  rounded-xl transition-all shadow-lg active:scale-95"
+                    onClick={() => {
+                      setProcessing(true);
+                      handleLoginRedirect();
+                    }}
+                    disabled={processing}
+                    className="w-full h-12 bg-emerald-600 text-white hover:bg-emerald-700 font-bold  rounded-xl transition-all shadow-lg active:scale-95 group"
                   >
-                    Log in
+                    {processing ? (
+                      <DotLoader size="sm" color="white" />
+                    ) : (
+                      "Log in"
+                    )}
                   </Button>
                   <Button
-                    onClick={handleSignupRedirect}
+                    onClick={() => {
+                      setProcessing(true);
+                      handleSignupRedirect();
+                    }}
+                    disabled={processing}
                     variant="outline"
                     className="w-full h-12 border-slate-200 text-slate-900 hover:bg-slate-50 font-bold  rounded-xl transition-all active:scale-95"
                   >
-                    Create account
+                    {processing ? (
+                      <DotLoader size="sm" />
+                    ) : (
+                      "Create account"
+                    )}
                   </Button>
                 </div>
               </div>
