@@ -91,9 +91,8 @@ export default function IdentityConfirmationPage() {
       }
 
       await api.onboarding.verifyIdentity(payload);
-      await refreshUser();
-      
       setStep("success");
+      await refreshUser();
     } catch (err: any) {
       console.error(err);
       if (err.data?.attemptsRemaining !== undefined) {
@@ -221,10 +220,13 @@ export default function IdentityConfirmationPage() {
                     <Button
                       type="submit"
                       disabled={loading || !val}
-                      className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group"
+                      className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group relative overflow-hidden"
                     >
                       {loading ? (
-                        <DotLoader size="sm" color="white" />
+                        <div className="flex items-center gap-3">
+                          <DotLoader size="sm" color="white" />
+                          <span>Processing...</span>
+                        </div>
                       ) : (
                         <span className="flex items-center gap-2">
                           Complete Setup <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -239,8 +241,8 @@ export default function IdentityConfirmationPage() {
                           onClick={async () => {
                             try {
                               await api.onboarding.devBypassIdentity();
-                              await refreshUser();
                               setStep("success");
+                              await refreshUser();
                             } catch (err: any) {
                               toast.error("Bypass failed: " + err.message);
                             }
@@ -283,12 +285,21 @@ export default function IdentityConfirmationPage() {
                   </p>
 
                   <Button
-                    onClick={() => router.push(user?.role === "CLIENT" ? "/client" : "/freelancer")}
-                    className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group"
+                    onClick={async () => {
+                      setLoading(true);
+                      await refreshUser();
+                      router.push(user?.role === "CLIENT" ? "/client" : "/freelancer");
+                    }}
+                    disabled={loading}
+                    className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group relative overflow-hidden"
                   >
-                    <span className="flex items-center gap-2 text-white">
-                      Continue to Dashboard <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </span>
+                    {loading ? (
+                      <DotLoader size="sm" color="white" />
+                    ) : (
+                      <span className="flex items-center gap-2 text-white">
+                        Continue to Dashboard <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    )}
                   </Button>
               </div>
             )}
