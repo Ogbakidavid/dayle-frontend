@@ -158,7 +158,7 @@ export default function BankTransferPage() {
       const res = await api.vaults.getStatus(vaultId);
       if (res.status === "FUNDED") {
         setStep("success");
-        toast.success("Payment confirmed on-chain!", {
+        toast.success("Payment confirmed!", {
           description: "Your funds are now secured in the vault.",
         });
         setTimeout(() => {
@@ -402,7 +402,7 @@ export default function BankTransferPage() {
                       Payment Accepted
                     </h2>
                     <p className=" text-emerald-600 font-bold tracking-[0.5em] uppercase ">
-                      Funds are being secured on-chain
+                      Funds are being secured
                     </p>
                   </div>
                   <p className=" font-bold text-slate-400 tracking-[0.2em] uppercase ">
