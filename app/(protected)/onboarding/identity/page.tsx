@@ -530,10 +530,10 @@ export default function IdentityOnboardingPage() {
                       : "M-Pesa Phone Number"}
                   </Label>
 
-                  <div className="relative group">
+                  <div className="relative group/input">
                     {(currentCountry === "KE" ||
                       currentCountry === "Kenya") && (
-                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-900 font-bold text-lg select-none">
+                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-900 font-bold text-lg select-none z-10">
                         +254
                       </div>
                     )}
@@ -551,24 +551,28 @@ export default function IdentityOnboardingPage() {
                       required
                       className={`bg-slate-50! border-slate-200 h-14 sm:h-16 rounded-xl sm:rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-base sm:text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${currentCountry === "KE" || currentCountry === "Kenya" ? "pl-16 sm:pl-20" : "px-4 sm:px-6"}`}
                     />
-                    {isDev && currentCountry === "NG" && (
-                      <p className="mt-2 text-[10px] text-slate-400 font-bold text-left ml-2">
-                        Staging: use any 11-digit number e.g. 12345678901
-                      </p>
-                    )}
-                    {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
-                      <div className="mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
-                        <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider text-center">
-                          Staging: Use phone <span className="bg-white px-2 py-0.5 rounded-lg border border-emerald-200 font-mono text-xs">0714325678</span> for testing
-                        </p>
-                      </div>
-                    )}
+                    
                     {currentCountry === "NG" || currentCountry === "Nigeria" ? (
-                      <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />
+                      <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within/input:text-emerald-500/50 transition-colors" />
                     ) : (
-                      <Phone className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />
+                      <Phone className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within/input:text-emerald-500/50 transition-colors" />
                     )}
                   </div>
+
+                  {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
+                    <div className="mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                      <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider text-center">
+                        Staging: Use phone <span className="bg-white px-2 py-0.5 rounded-lg border border-emerald-200 font-mono text-xs">0714325678</span> for testing
+                      </p>
+                    </div>
+                  )}
+                  {isDev && (currentCountry === "NG" || currentCountry === "Nigeria") && (
+                    <div className="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
+                      <p className="text-[10px] text-blue-700 font-bold uppercase tracking-wider text-center">
+                        Staging: Use any 11-digit number e.g. 12345678901
+                      </p>
+                    </div>
+                  )}
 
                   <div className="flex items-start gap-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
                     <Info className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
