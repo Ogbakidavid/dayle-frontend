@@ -9,6 +9,7 @@ import {
 } from "react";
 import { api } from "@/lib/api-client";
 import { useUser } from "./user-context";
+import { useSocket } from "../contexts/socket-context";
 
 export interface Vault {
   id: string;
@@ -42,6 +43,7 @@ const VaultContext = createContext<VaultContextType | undefined>(undefined);
 
 export function VaultProvider({ children }: { children: ReactNode }) {
   const { user, loading: userLoading } = useUser();
+  const { socket } = useSocket();
   const [vaults, setVaults] = useState<Vault[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,6 +54,30 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     }
   }, [user, userLoading]);
+
+  // Real-time updates via WebSockets
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleVaultUpdate = (data: any) => {
+      console.log("Real-time vault update received:", data);
+      fetchVaults({ isBackground: true });
+    };
+
+    const handleNotification = (data: any) => {
+      if (data.type === 'vault' || data.type === 'payment') {
+        fetchVaults({ isBackground: true });
+      }
+    };
+
+    socket.on("vault_updated", handleVaultUpdate);
+    socket.on("notification", handleNotification);
+
+    return () => {
+      socket.off("vault_updated", handleVaultUpdate);
+      socket.off("notification", handleNotification);
+    };
+  }, [socket]);
 
   async function fetchVaults(options?: { isBackground?: boolean }) {
     const isBackground = options?.isBackground ?? false;

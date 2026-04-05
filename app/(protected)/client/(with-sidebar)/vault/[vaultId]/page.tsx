@@ -224,7 +224,7 @@ export default function ClientVaultDetailPage() {
     if ((isSuccessReturn && vault?.status === VaultStatus.DRAFT) || isProcessing || isAwaiting) {
       const intervalId = setInterval(() => {
         refreshVaults({ isBackground: true });
-      }, 15000); // Poll every 15 seconds to reduce Redis load
+      }, 60000); // Poll every 60 seconds (sockets handle real-time)
       
       return () => clearInterval(intervalId);
     } else if (isSuccessReturn && vault?.status === VaultStatus.FUNDED) {
