@@ -125,7 +125,7 @@ export interface ApiClient {
     submit: (vaultId: string, opts?: any) => Promise<any>;
     refund: (vaultId: string, opts?: any) => Promise<any>;
     getById: (id: string) => Promise<any>;
-    updateStatus: (id: string, status: string) => Promise<any>;
+    updateStatus: (id: string, data: { status: string; reason?: string }) => Promise<any>;
     requestRefund: (vaultId: string, data: any) => Promise<any>;
     updateFreelancer: (vaultId: string, data: any) => Promise<any>;
     getStatus: (id: string) => Promise<any>;
@@ -356,10 +356,10 @@ export const api: ApiClient = {
       return await request(`/vaults/${id}`);
     },
 
-    updateStatus: async (id: string, status: string): Promise<any> => {
+    updateStatus: async (id: string, data: { status: string; reason?: string }): Promise<any> => {
       return await request(`/vaults/${id}/status`, {
         method: "PATCH",
-        body: { status },
+        body: data,
       });
     },
 

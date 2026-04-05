@@ -420,7 +420,7 @@ export default function ClientVaultDetailPage() {
       });
       setReason("");
       setShowReasonModal(false);
-      refreshVaults();
+      await refreshVaults();
     } catch (err: any) {
       toast.error("Action Failed", {
         description: err.message || "Failed to request changes. Please try again.",
