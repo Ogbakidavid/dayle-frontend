@@ -50,6 +50,9 @@ export default function PublicGuard({ children }: PublicGuardProps) {
       } else {
         router.replace(dashboardPath);
       }
+    } else if (user && !isPublicOnly) {
+      // User is authenticated but on a page allowed for everyone (like an invite page)
+      setShouldRender(true);
     } else if (!loading && !user) {
       // Ensure we render if we're sure there's no user
       setShouldRender(true);
