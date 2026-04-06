@@ -10,7 +10,7 @@ import { api } from "@/lib/api-client";
 import { useUser } from "@/lib/store/user-context";
 import { DayleLogo } from "@/components/shared/DayleLogo";
 import { DotLoader } from "@/components/ui/dot-loader";
-import { ShieldCheck, Phone, Info, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Phone, Info, ArrowRight, CheckCircle2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -252,22 +252,34 @@ export default function IdentityConfirmationPage() {
                       </div>
                     )}
 
-                    <Button
-                      type="submit"
-                      disabled={loading || !val}
-                      className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group relative overflow-hidden"
-                    >
-                      {loading ? (
-                        <div className="flex items-center gap-3">
-                          <DotLoader size="sm" color="white" />
-                          <span>Processing...</span>
-                        </div>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          Complete Setup <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </span>
-                      )}
-                    </Button>
+                    <div className="flex flex-col items-center gap-6">
+                      <Button
+                        type="submit"
+                        disabled={loading || !val}
+                        className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group relative overflow-hidden"
+                      >
+                        {loading ? (
+                          <div className="flex items-center gap-3">
+                            <DotLoader size="sm" color="white" />
+                            <span>Processing...</span>
+                          </div>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            Complete Setup{" "}
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                          </span>
+                        )}
+                      </Button>
+
+                      <button
+                        type="button"
+                        onClick={() => router.push(user?.role === "CLIENT" ? "/client" : "/freelancer")}
+                        className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-[0.2em] inline-flex items-center gap-2 group mb-2"
+                      >
+                        <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
+                        Return to Dashboard
+                      </button>
+                    </div>
 
                     {showBypass && (
                       <div className="mt-4 text-center">
