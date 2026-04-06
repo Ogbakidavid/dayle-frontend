@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import {
   User,
   CreditCard,
@@ -15,7 +14,6 @@ import {
   Bell,
   LogOut,
   Shield,
-  Mail,
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
@@ -24,8 +22,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   X,
-  MessageSquare,
-  Phone,
   Landmark,
   Building,
 } from "lucide-react";
@@ -34,7 +30,6 @@ import { useLedger } from "@/lib/store/ledger-context";
 import { cn } from "@/lib/utils";
 import UserAvatar from "@/components/shared/UserAvatar";
 import { api } from "@/lib/api-client";
-import { useMfaEnrollment } from "@privy-io/react-auth";
 import {
   Dialog,
   DialogContent,
@@ -57,7 +52,6 @@ export default function SettingsPageContent({ role = "client" }) {
   const router = useRouter();
   const { user, logout, refreshUser } = useUser();
   const { balance } = useLedger();
-  const { showMfaEnrollmentModal } = useMfaEnrollment();
   const [activeTab, setActiveTab] = useState("profile");
   const [isAddingBillingMethod, setIsAddingBillingMethod] = useState(false);
   const [selectedBillingMethod, setSelectedBillingMethod] = useState<string | null>(null);
@@ -104,25 +98,6 @@ export default function SettingsPageContent({ role = "client" }) {
     fetchNotifications();
     fetchPaymentMethods();
   }, []);
-
-  // Notification Preferences State
-  const [notificationPrefs, setNotificationPrefs] = useState<any>(null);
-  const [loadingPrefs, setLoadingPrefs] = useState(false);
-  const [savingPrefs, setSavingPrefs] = useState(false);
-  const [prefsError, setPrefsError] = useState("");
-  const [prefsSuccess, setPrefsSuccess] = useState("");
-
-  // Telegram state
-  const [loadingTelegram, setLoadingTelegram] = useState(false);
-
-  // WhatsApp state
-  const [showWhatsAppFlow, setShowWhatsAppFlow] = useState(false);
-  const [whatsappPhone, setWhatsappPhone] = useState("");
-  const [whatsappCode, setWhatsappCode] = useState("");
-  const [whatsappConsent, setWhatsappConsent] = useState(false);
-  const [whatsappStep, setWhatsappStep] = useState(1); // 1: phone, 2: verify
-  const [loadingWhatsApp, setLoadingWhatsApp] = useState(false);
-  const [whatsappError, setWhatsappError] = useState("");
 
   const [bankData, setBankData] = useState({ bankCode: "", accountNumber: "", accountName: "", currency: "NGN", country: "Nigeria" });
   const [billingError, setBillingError] = useState("");
@@ -273,24 +248,7 @@ export default function SettingsPageContent({ role = "client" }) {
 
   const isClient = role === "client";
 
-  // Load notification preferences
-  useEffect(() => {
-    const loadPreferences = async () => {
-      setLoadingPrefs(true);
-      try {
-        const prefs = await api.notifications.getPreferences();
-        setNotificationPrefs(prefs);
-      } catch (error: any) {
-        console.error("Failed to load notification preferences:", error);
-        setPrefsError(error.message || "Failed to load preferences");
-      } finally {
-        setLoadingPrefs(false);
-      }
-    };
-    if (activeTab === "channels") {
-      loadPreferences();
-    }
-  }, [activeTab]);
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
@@ -353,124 +311,7 @@ export default function SettingsPageContent({ role = "client" }) {
     await refreshUser();
   };
 
-  // Notification Preferences Handlers
-  const handleEmailToggle = async (enabled: boolean) => {
-    setSavingPrefs(true);
-    setPrefsError("");
-    try {
-      const updated = await api.notifications.updatePreferences({
-        emailEnabled: enabled,
-      });
-      setNotificationPrefs(updated);
-      setPrefsSuccess(
-        "Email notifications " + (enabled ? "enabled" : "disabled"),
-      );
-      setTimeout(() => setPrefsSuccess(""), 3000);
-    } catch (error: any) {
-      setPrefsError(error.message || "Failed to update email preference");
-    } finally {
-      setSavingPrefs(false);
-    }
-  };
 
-  const handleTelegramConnect = async () => {
-    setLoadingTelegram(true);
-    setPrefsError("");
-    try {
-      const { linkToken } = await api.telegram.getLinkToken();
-      window.open(`https://t.me/DayleAIBot?start=${linkToken}`, "_blank");
-
-      setTimeout(async () => {
-        try {
-          const result = await api.telegram.simulateConnect(
-            `@user_${Math.random().toString(36).substr(2, 6)}`,
-          );
-          setNotificationPrefs(result.preferences);
-          setPrefsSuccess("Telegram connected successfully!");
-          setTimeout(() => setPrefsSuccess(""), 3000);
-        } catch (error: any) {
-          setPrefsError(error.message || "Failed to connect Telegram");
-        }
-        setLoadingTelegram(false);
-      }, 3000);
-    } catch (error: any) {
-      setPrefsError(error.message || "Failed to generate Telegram link");
-      setLoadingTelegram(false);
-    }
-  };
-
-  const handleTelegramDisconnect = async () => {
-    setLoadingTelegram(true);
-    setPrefsError("");
-    try {
-      const result = await api.telegram.disconnect();
-      setNotificationPrefs(result.preferences);
-      setPrefsSuccess("Telegram disconnected");
-      setTimeout(() => setPrefsSuccess(""), 3000);
-    } catch (error: any) {
-      setPrefsError(error.message || "Failed to disconnect Telegram");
-    } finally {
-      setLoadingTelegram(false);
-    }
-  };
-
-  const handleWhatsAppStartVerification = async () => {
-    setLoadingWhatsApp(true);
-    setWhatsappError("");
-    try {
-      await api.whatsapp.startVerification(whatsappPhone);
-      setWhatsappStep(2);
-      setPrefsSuccess("Verification code sent! (Use 123456 for demo)");
-      setTimeout(() => setPrefsSuccess(""), 5000);
-    } catch (error: any) {
-      setWhatsappError(error.message || "Failed to send verification code");
-    } finally {
-      setLoadingWhatsApp(false);
-    }
-  };
-
-  const handleWhatsAppConfirmVerification = async () => {
-    setLoadingWhatsApp(true);
-    setWhatsappError("");
-    try {
-      const result = await api.whatsapp.confirmVerification(
-        whatsappCode,
-        whatsappConsent,
-      );
-      setNotificationPrefs(result.preferences);
-      closeWhatsAppFlow();
-      setPrefsSuccess("WhatsApp verified and enabled!");
-      setTimeout(() => setPrefsSuccess(""), 3000);
-    } catch (error: any) {
-      setWhatsappError(error.message || "Failed to verify WhatsApp");
-    } finally {
-      setLoadingWhatsApp(false);
-    }
-  };
-
-  const handleWhatsAppDisable = async () => {
-    setLoadingWhatsApp(true);
-    setPrefsError("");
-    try {
-      const result = await api.whatsapp.disable();
-      setNotificationPrefs(result.preferences);
-      setPrefsSuccess("WhatsApp disabled");
-      setTimeout(() => setPrefsSuccess(""), 3000);
-    } catch (error: any) {
-      setPrefsError(error.message || "Failed to disable WhatsApp");
-    } finally {
-      setLoadingWhatsApp(false);
-    }
-  };
-
-  const closeWhatsAppFlow = () => {
-    setShowWhatsAppFlow(false);
-    setWhatsappStep(1);
-    setWhatsappPhone("");
-    setWhatsappCode("");
-    setWhatsappConsent(false);
-    setWhatsappError("");
-  };
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
@@ -479,7 +320,6 @@ export default function SettingsPageContent({ role = "client" }) {
       label: isClient ? "Billing & Payments" : "Payouts",
       icon: CreditCard,
     },
-    { id: "channels", label: "Channels", icon: MessageSquare },
     { id: "notifications", label: "Notifications", icon: Bell },
   ];
 
@@ -1001,230 +841,7 @@ export default function SettingsPageContent({ role = "client" }) {
               </div>
             )}
 
-            {/* Channels Section */}
-            {activeTab === "channels" && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                {/* Header */}
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900  mb-1 ">
-                    Notification channels
-                  </h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    Choose how you want to receive alerts
-                  </p>
-                </div>
 
-                {/* Success/Error Messages */}
-                {prefsSuccess && (
-                  <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
-                    <p className="text-sm text-emerald-700 font-bold ">
-                      {prefsSuccess}
-                    </p>
-                  </div>
-                )}
-                {prefsError && (
-                  <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
-                    <p className="text-sm text-red-700 font-bold ">
-                      {prefsError}
-                    </p>
-                  </div>
-                )}
-
-                {loadingPrefs ? (
-                  <div className="p-8 text-center text-slate-300">
-                    <p className="text-sm">Loading preferences...</p>
-                  </div>
-                ) : (
-                  notificationPrefs && (
-                    <div className="space-y-4">
-                      {/* In-App (Always On) */}
-                      <div className="flex items-start justify-between p-5 bg-white border border-slate-200 rounded-xl shadow-sm">
-                        <div className="flex gap-4">
-                          <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg">
-                            <Bell className="w-5 h-5 text-emerald-600" />
-                          </div>
-                          <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
-                              In-app notifications
-                            </h4>
-                            <p className="text-sm text-slate-600 leading-relaxed max-w-md">
-                              Receive notifications within the platform
-                            </p>
-                            <span className="inline-block text-sm px-2 py-1 rounded-full font-bold  bg-emerald-50 text-emerald-700 border border-emerald-100">
-                              Always enabled
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Email */}
-                      <div className="flex items-start justify-between p-5 bg-white border border-slate-200 rounded-xl hover:border-emerald-500/20 transition-all shadow-sm">
-                        <div className="flex gap-4">
-                          <div className="p-2.5 bg-blue-50 border border-blue-100 rounded-lg">
-                            <Mail className="w-5 h-5 text-blue-600" />
-                          </div>
-                          <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
-                              Email notifications
-                            </h4>
-                            <p className="text-sm text-slate-600 leading-relaxed max-w-md">
-                              Get important updates via email
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Switch
-                            id="email-notifications"
-                            checked={!!notificationPrefs.emailEnabled}
-                            onCheckedChange={handleEmailToggle}
-                            disabled={savingPrefs}
-                            className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-slate-200"
-                          />
-                        </div>
-                      </div>
-
-                      {/* MFA Section */}
-                      <div className="flex items-start justify-between p-5 bg-white border border-slate-200 rounded-xl hover:border-purple-500/20 transition-all shadow-sm">
-                        <div className="flex gap-4">
-                          <div className="p-2.5 bg-purple-50 border border-purple-100 rounded-lg">
-                            <Shield className="w-5 h-5 text-purple-600" />
-                          </div>
-                          <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
-                              Transaction security (MFA)
-                            </h4>
-                            <p className="text-sm text-slate-600 leading-relaxed max-w-md">
-                              Require verification for high-value transactions
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          onClick={() => showMfaEnrollmentModal()}
-                          className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 text-sm rounded-lg shadow-md shadow-purple-600/10 "
-                        >
-                          Manage MFA
-                        </Button>
-                      </div>
-
-                      {/* Telegram */}
-                      <div className="flex items-start justify-between p-5 bg-white border border-slate-200 rounded-xl hover:border-sky-500/20 transition-all shadow-sm">
-                        <div className="flex gap-4 flex-1">
-                          <div className="p-2.5 bg-sky-50 border border-sky-100 rounded-lg">
-                            <MessageSquare className="w-5 h-5 text-sky-600" />
-                          </div>
-                          <div className="space-y-2 flex-1">
-                            <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
-                              Telegram
-                            </h4>
-                            <p className="text-sm text-slate-600 leading-relaxed max-w-md">
-                              Instant alerts via Telegram bot
-                            </p>
-                            {notificationPrefs.telegram.connected && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm px-2 py-1 rounded-full font-bold  bg-emerald-50 text-emerald-700 border border-emerald-100 ">
-                                  Connected
-                                </span>
-                                <span className="text-sm text-slate-600 font-bold ">
-                                  {notificationPrefs.telegram.username}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div>
-                          {!notificationPrefs.telegram.connected ? (
-                            <Button
-                              onClick={handleTelegramConnect}
-                              disabled={loadingTelegram}
-                              className="bg-sky-600 hover:bg-sky-700 text-white font-bold px-4 text-sm rounded-lg shadow-md shadow-sky-600/10 "
-                            >
-                              {loadingTelegram ? "Connecting..." : "Connect"}
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={handleTelegramDisconnect}
-                              disabled={loadingTelegram}
-                              variant="outline"
-                              className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-bold px-4 text-sm "
-                            >
-                              {loadingTelegram
-                                ? "Disconnecting..."
-                                : "Disconnect"}
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* WhatsApp */}
-                      <div className="p-5 bg-white border border-slate-200 rounded-xl hover:border-green-500/20 transition-all shadow-sm">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex gap-4 flex-1">
-                            <div className="p-2.5 bg-green-50 border border-green-100 rounded-lg">
-                              <Phone className="w-5 h-5 text-green-600" />
-                            </div>
-                            <div className="space-y-2 flex-1">
-                              <h4 className="text-sm font-bold text-slate-900 tracking-tight ">
-                                WhatsApp
-                              </h4>
-                              <p className="text-sm text-slate-600 leading-relaxed max-w-md">
-                                Receive alerts via WhatsApp messages
-                              </p>
-                              {notificationPrefs.whatsapp.phoneVerified && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm px-2 py-1 rounded-full font-bold  bg-emerald-50 text-emerald-700 border border-emerald-100 ">
-                                    Verified
-                                  </span>
-                                  <span className="text-sm text-slate-600 font-bold ">
-                                    {notificationPrefs.whatsapp.phoneE164}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div>
-                            {!notificationPrefs.whatsapp.phoneVerified ? (
-                              <Button
-                                onClick={() => setShowWhatsAppFlow(true)}
-                                className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 text-sm rounded-lg shadow-md shadow-green-600/10 "
-                              >
-                                {loadingWhatsApp ? "Verifying..." : "Verify"}
-                              </Button>
-                            ) : (
-                              <Button
-                                onClick={handleWhatsAppDisable}
-                                disabled={loadingWhatsApp}
-                                variant="outline"
-                                className="border-slate-200 text-slate-600 hover:text-red-600 hover:bg-red-50 font-bold px-4 text-sm "
-                              >
-                                {loadingWhatsApp ? "Disabling..." : "Disable"}
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Quiet Hours Info */}
-                      <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div className="flex items-start gap-3">
-                          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                          <div>
-                            <h5 className="text-sm font-bold text-slate-900 mb-1 ">
-                              Quiet Hours
-                            </h5>
-                            <p className="text-sm text-slate-600 leading-relaxed font-bold">
-                              Customize notification schedules and quiet hours.{" "}
-                              <span className="text-amber-600 font-bold ">
-                                Coming in v2
-                              </span>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
-            )}
 
             {/* Notifications Section */}
             {activeTab === "notifications" && (
@@ -1430,146 +1047,6 @@ export default function SettingsPageContent({ role = "client" }) {
           </section>
         </div>
       </main>
-
-      {/* WhatsApp Setup Modal */}
-      {showWhatsAppFlow && !notificationPrefs?.whatsapp?.phoneVerified && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl">
-            <button
-              onClick={closeWhatsAppFlow}
-              className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-lg transition-colors"
-            >
-              <X className="w-4 h-4 text-slate-600 hover:text-slate-900" />
-            </button>
-
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-6 ">
-              Add WhatsApp number
-            </h2>
-
-            <div className="space-y-6">
-              {whatsappStep === 1 ? (
-                <>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-bold text-slate-900  ml-1">
-                      Phone number (E.164 format)
-                    </Label>
-                    <Input
-                      type="tel"
-                      placeholder="+1234567890"
-                      value={whatsappPhone}
-                      onChange={(e) => setWhatsappPhone(e.target.value)}
-                      className="bg-white border-slate-200 text-slate-900 focus:ring-1 focus:ring-green-500/30 h-11 shadow-sm"
-                    />
-                    <p className="text-sm text-slate-600  font-bold ">
-                      Include country code (e.g., +1 for US)
-                    </p>
-                  </div>
-
-                  {whatsappError && (
-                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                      <p className="text-sm text-red-400">{whatsappError}</p>
-                    </div>
-                  )}
-
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={closeWhatsAppFlow}
-                      variant="outline"
-                      className="flex-1 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold  "
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleWhatsAppStartVerification}
-                      disabled={loadingWhatsApp || !whatsappPhone}
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold  shadow-md shadow-green-600/10 "
-                    >
-                      {loadingWhatsApp ? "Sending..." : "Send code"}
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-bold text-slate-900  ml-1">
-                        Verification code
-                      </Label>
-                      <Input
-                        type="text"
-                        placeholder="123456"
-                        value={whatsappCode}
-                        onChange={(e) =>
-                          setWhatsappCode(
-                            e.target.value.replace(/\D/g, "").slice(0, 6),
-                          )
-                        }
-                        className="bg-white border-slate-200 text-slate-900 text-center text-2xl  tracking-[0.5em] h-14 shadow-sm"
-                        maxLength={6}
-                      />
-                      <p className="text-sm text-slate-600 text-center  font-bold ">
-                        Enter the 6-digit code sent to your phone
-                      </p>
-                    </div>
-
-                    {/* Consent Checkbox */}
-                    <div className="flex items-start gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                      <div className="pt-0.5">
-                        <input
-                          type="checkbox"
-                          id="whatsapp-consent-modal"
-                          checked={whatsappConsent}
-                          onChange={(e) => setWhatsappConsent(e.target.checked)}
-                          className="w-4 h-4 rounded border-slate-300 bg-white text-green-600 focus:ring-green-500 focus:ring-offset-0 transition-colors"
-                        />
-                      </div>
-                      <label
-                        htmlFor="whatsapp-consent-modal"
-                        className="text-sm text-slate-600 leading-relaxed font-bold tracking-tight "
-                      >
-                        I agree to receive WhatsApp alerts for vault activity.
-                        Reply STOP to opt out.
-                      </label>
-                    </div>
-                  </div>
-
-                  {whatsappError && (
-                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                      <p className="text-sm text-red-400">{whatsappError}</p>
-                    </div>
-                  )}
-
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={() => {
-                        setWhatsappStep(1);
-                        setWhatsappCode("");
-                        setWhatsappConsent(false);
-                        setWhatsappError("");
-                      }}
-                      variant="outline"
-                      className="flex-1 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold  "
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      onClick={handleWhatsAppConfirmVerification}
-                      disabled={
-                        loadingWhatsApp ||
-                        whatsappCode.length !== 6 ||
-                        !whatsappConsent
-                      }
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold  shadow-md shadow-green-600/10 "
-                    >
-                      {loadingWhatsApp ? "Verifying..." : "Verify & enable"}
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Withdrawal Amount Selection Dialog */}
       <Dialog open={showWithdrawAmountDialog} onOpenChange={setShowWithdrawAmountDialog}>
