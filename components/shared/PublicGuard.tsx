@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "@/lib/store/user-context";
+import { usePrivy } from "@privy-io/react-auth";
 import { UserRole } from "@/lib/api-client";
 import { LogoLoader } from "@/components/ui/logo-loader";
 
@@ -16,11 +17,18 @@ interface PublicGuardProps {
  */
 export default function PublicGuard({ children }: PublicGuardProps) {
   const { user, loading } = useUser();
+  const { authenticated, ready } = usePrivy();
   const router = useRouter();
   const pathname = usePathname();
   const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
+    // If neither Privy nor Backend say we're logged in, we're definitely public
+    if ((ready && !authenticated) || (!loading && !user)) {
+      setShouldRender(true);
+      return;
+    }
+
     if (loading) return;
 
     // Define pages that are ONLY for non-authenticated users
@@ -42,13 +50,18 @@ export default function PublicGuard({ children }: PublicGuardProps) {
       } else {
         router.replace(dashboardPath);
       }
-    } else {
-      // User is not authenticated, or on a shared public page (like support)
+    } else if (!loading && !user) {
+      // Ensure we render if we're sure there's no user
       setShouldRender(true);
     }
-  }, [user, loading, router, pathname]);
+  }, [user, loading, authenticated, ready, router, pathname]);
 
-  if (loading || !shouldRender) {
+  // If we're on a public-only page and we KNOW they're authenticated, keep showing loader while redirecting
+  const publicOnlyPages = ["/", "/login", "/signup"];
+  const isPublicOnly = publicOnlyPages.includes(pathname);
+  const isStuckLoader = (loading || !shouldRender) && !(ready && !authenticated);
+
+  if (isStuckLoader || (user && isPublicOnly)) {
     return (
       <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
         <LogoLoader size="lg" />

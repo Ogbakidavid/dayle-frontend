@@ -123,10 +123,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   async function logout() {
-    await privyLogout();
-    await api.auth.logout();
-    setUser(null);
-    router.push("/login");
+    try {
+      await privyLogout();
+      // Try to notify backend, but don't block if it fails (e.g. token already gone)
+      await api.auth.logout().catch(() => {});
+    } finally {
+      localStorage.removeItem("dayle_access_token");
+      setUser(null);
+      router.push("/login");
+    }
   }
 
   return (
