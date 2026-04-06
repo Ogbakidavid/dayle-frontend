@@ -17,13 +17,12 @@ import {
   Info,
   ArrowRight,
   CheckCircle2,
-  Mail,
   Smartphone,
   AlertCircle,
   ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function IdentityOnboardingPage() {
@@ -67,15 +66,12 @@ export default function IdentityOnboardingPage() {
     process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
     process.env.NODE_ENV === "development" ||
     process.env.NEXT_PUBLIC_TESTNET_MODE === "true";
-  const showBypass = process.env.NEXT_PUBLIC_ENABLE_DEV_BYPASS === "true";
   const currentCountry = selectedCountry || user?.country;
 
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/login");
     }
-    // Only redirect away if payment account is actually ready
-    // Don't redirect if we're mid-onboarding or OTP flow
     if (user?.paymentAccountReady && step !== "success") {
       if (returnTo) {
         router.push(returnTo);
@@ -94,11 +90,10 @@ export default function IdentityOnboardingPage() {
       await refreshUser();
       setSelectedCountry(c);
       setStep("form");
-      setLoading(false);
-      setLoadingMessage("");
     } catch (err: any) {
       console.error(err);
       toast.error("Failed to initialize account. Please try again.");
+    } finally {
       setLoading(false);
       setLoadingMessage("");
     }
@@ -129,7 +124,7 @@ export default function IdentityOnboardingPage() {
     }
 
     setLoading(true);
-    setLoadingMessage("Verifying your identity and linking account...");
+    setLoadingMessage("Verifying your identity...");
     try {
       const c = selectedCountry || user?.country;
       const payload: any = { 
@@ -146,15 +141,12 @@ export default function IdentityOnboardingPage() {
 
       if (res.requiresOtp) {
         setOtpMethods(res.methods);
-        // Force Step 3 (Phone Confirm) as a mandatory prerequisite for Nigeria (BVN)
         if (currentCountry === "Nigeria" || currentCountry === "NG") {
           setOtpStep("phone_confirm");
         } else {
           setOtpStep("method");
         }
-        setLoading(false);
-        setLoadingMessage("");
-        return; // Don't call refreshUser here — it triggers guard redirects
+        return;
       }
 
       await refreshUser();
@@ -182,19 +174,12 @@ export default function IdentityOnboardingPage() {
     setLoadingMessage("Confirming phone number...");
     try {
       await api.onboarding.confirmKycPhone(confirmPhoneVal);
-      // Rahman's Step 3: Auto-trigger OTP with 'sendotp'
       setLoadingMessage("Triggering verification code...");
       await api.onboarding.selectKycMethod("sendotp");
-      
       setOtpStep("otp");
-      if (isDev) {
-        setOtp("123456"); // Pre-fill staging OTP
-      }
+      if (isDev) setOtp("123456");
     } catch (err: any) {
-      toast.error(
-        err.message ||
-          "Confirmation failed. Please check the number and try again.",
-      );
+      toast.error(err.message || "Confirmation failed. Please try again.");
     } finally {
       setLoading(false);
       setLoadingMessage("");
@@ -209,9 +194,7 @@ export default function IdentityOnboardingPage() {
       await api.onboarding.selectKycMethod(method);
       setOtpStep("otp");
     } catch (err: any) {
-      toast.error(
-        err.message || "Failed to trigger verification. Please try again.",
-      );
+      toast.error(err.message || "Failed to trigger verification.");
     } finally {
       setLoading(false);
       setLoadingMessage("");
@@ -223,7 +206,7 @@ export default function IdentityOnboardingPage() {
     if (!otp) return;
 
     setLoading(true);
-    setLoadingMessage("Verifying code and completing setup...");
+    setLoadingMessage("Verifying code...");
     try {
       await api.onboarding.verifyOtp(otp);
       await refreshUser();
@@ -238,7 +221,7 @@ export default function IdentityOnboardingPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, ""); // Only numeric
+    const value = e.target.value.replace(/\D/g, "");
     if (currentCountry === "Nigeria" || currentCountry === "NG") {
       if (value.length <= 11) setVal(value);
     } else {
@@ -246,540 +229,334 @@ export default function IdentityOnboardingPage() {
     }
   };
 
-  if (authLoading)
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <DotLoader />
-      </div>
-    );
+  if (authLoading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <DotLoader />
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 font-primary">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 xs:p-6 selection:bg-emerald-500/30 font-primary">
       {/* Background Decor */}
       <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
 
-      <div className="relative z-10 w-full max-w-xl">
-        <div className="flex justify-center mb-8 sm:mb-12">
-          <DayleLogo className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-500" />
+      <div className="relative z-10 w-full max-w-[340px] xs:max-w-xl lg:max-w-5xl">
+        <div className="flex lg:hidden justify-center mb-8 xs:mb-10">
+          <DayleLogo className="w-12 h-12 text-emerald-500" />
         </div>
 
-        <div className="bg-white border border-slate-200 p-8 sm:p-12 rounded-[40px] shadow-sm relative overflow-hidden">
-          {/* Suble glow inside card */}
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/5 blur-[60px] rounded-full pointer-events-none"></div>
+        <div className="bg-white border border-slate-200 lg:border-none p-5 xs:p-8 sm:p-12 lg:p-0 rounded-[32px] sm:rounded-[40px] lg:rounded-none shadow-sm lg:shadow-none relative overflow-hidden lg:overflow-visible lg:grid lg:grid-cols-12 lg:gap-16 lg:items-center">
+          {/* Suble glow inside card (mobile only) */}
+          <div className="lg:hidden absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/5 blur-[60px] rounded-full pointer-events-none"></div>
 
-          {isDev && step !== "success" && (
-            <Alert className="mb-8 p-6 bg-blue-50/50 border-blue-200/50 rounded-[32px] border-2">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center shrink-0">
-                  <ShieldCheck className="h-6 w-6 text-blue-600" />
+          {/* Desktop Left Side - Info */}
+          <div className="hidden lg:flex lg:col-span-5 flex-col items-start text-left space-y-8">
+            <DayleLogo className="w-16 h-16 text-emerald-500 mb-4" />
+            <div className="space-y-4">
+              <h2 className="text-4xl xl:text-5xl font-black text-slate-900 tracking-tighter leading-[1.1]">
+                Identity &<br />
+                <span className="text-emerald-600">Settlement.</span>
+              </h2>
+              <p className="text-slate-600 font-bold text-lg leading-relaxed max-w-sm">
+                Complete your identity set up to unlock secure project vaults and instant withdrawals.
+              </p>
+            </div>
+            
+            <div className="space-y-4 pt-8 border-t border-slate-100 w-full">
+              {[
+                { icon: ShieldCheck, text: "Bank-grade encryption" },
+                { icon: CheckCircle2, text: "Instant account linking" },
+                { icon: Info, text: "Compliance ensured" }
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 text-slate-500">
+                  <item.icon className="w-5 h-5 text-emerald-500" />
+                  <span className="text-[13px] font-bold uppercase tracking-wider">{item.text}</span>
                 </div>
-                <div>
-                  <AlertTitle className="text-sm font-bold uppercase tracking-widest text-blue-900 mb-2">Staging Environment</AlertTitle>
-                  <AlertDescription className="text-[13px] text-blue-800/80 font-medium leading-relaxed">
-                    You are testing on the Dayle Testnet. Please use the staging details provided in the hints below to complete verification. 
-                    <span className="block mt-2 font-bold text-blue-900">KYC is bypassed for testnet auditors.</span>
-                  </AlertDescription>
-                </div>
-              </div>
-            </Alert>
-          )}
+              ))}
+            </div>
+          </div>
 
-          {loading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center"
-            >
-              <motion.div
-                animate={{
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <DayleLogo className="w-16 h-16 text-emerald-500" />
-              </motion.div>
-              {loadingMessage && (
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 text-slate-600 font-bold text-sm tracking-wide"
+          {/* Right Side - Form Container */}
+          <div className="lg:col-span-7 bg-white lg:border lg:border-slate-200 lg:p-12 lg:rounded-[48px] lg:shadow-2xl lg:shadow-emerald-500/5 relative">
+            <AnimatePresence mode="wait">
+              {loading && (
+                <motion.div
+                  key="loader"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-[32px] sm:rounded-[48px]"
                 >
-                  {loadingMessage}
-                </motion.p>
+                  <div className="animate-bounce">
+                    <DayleLogo className="w-16 h-16 text-emerald-500" />
+                  </div>
+                  {loadingMessage && (
+                    <p className="mt-6 text-slate-600 font-bold text-sm tracking-wide">
+                      {loadingMessage}
+                    </p>
+                  )}
+                </motion.div>
               )}
-            </motion.div>
-          )}
 
-          {step === "country" ? (
-            <>
-              <div className="mb-8 sm:mb-10 text-center text-slate-900">
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight mb-3 sm:mb-4">
-                  Select your <span className="text-emerald-600">country.</span>
-                </h1>
-                <p className="text-slate-600 text-base font-bold leading-relaxed">
-                  We need this to ensure we use the correct payment rails for
-                  your region.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <Button
-                  variant="outline"
-                  onClick={() => handleCountrySelect("NG")}
-                  disabled={loading}
-                  className="h-20 rounded-2xl border-slate-200 flex items-center justify-between px-8 hover:border-emerald-500/50 hover:bg-slate-50 group"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">🇳🇬</span>
-                    <span className="text-lg font-bold text-slate-900">
-                      Nigeria
-                    </span>
-                  </div>
-                  <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={() => handleCountrySelect("KE")}
-                  disabled={loading}
-                  className="h-20 rounded-2xl border-slate-200 flex items-center justify-between px-8 hover:border-emerald-500/50 hover:bg-slate-50 group"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">🇰🇪</span>
-                    <span className="text-lg font-bold text-slate-900">
-                      Kenya
-                    </span>
-                  </div>
-                  <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
-                </Button>
-              </div>
-            </>
-          ) : step === "form" && otpStep === "phone_confirm" ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center"
-            >
-              <div className="mb-8">
-                <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Smartphone className="w-8 h-8" />
-                </div>
-                <h1 className="text-2xl font-bold text-slate-900 mb-3">Confirm BVN Phone.</h1>
-                <p className="text-slate-600 font-medium">
-                  Partna requires you to provide the 11-digit phone number linked to your <span className="font-bold text-slate-800">BVN registry</span> to proceed.
-                </p>
-              </div>
-
-              <form onSubmit={handlePhoneConfirm} className="space-y-6">
-                <div className="relative group">
-                  <input
-                    type="text"
-                    value={confirmPhoneVal}
-                    onChange={(e) => setConfirmPhoneVal(e.target.value.replace(/\D/g, "").slice(0, 11))}
-                    placeholder="Enter BVN phone number"
-                    className="w-full h-14 px-6 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-center tracking-[0.2em] text-lg"
-                    required
-                  />
-                  {isDev && (currentCountry === "NG" || currentCountry === "Nigeria") && (
-                    <div className="mt-2 text-[11px] text-slate-500 font-bold flex items-center gap-1.5 ml-2">
-                       <Info className="w-3 h-3 text-blue-500" />
-                       STAGING: Use 08032043843
-                    </div>
-                  )}
-                  {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
-                    <div className="mt-2 text-[11px] text-slate-500 font-bold flex items-center gap-1.5 ml-2">
-                       <Info className="w-3 h-3 text-emerald-500" />
-                       STAGING: no phone confirm needed for Kenya
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 mb-6">
-                  <p className="text-xs text-amber-700 font-bold leading-relaxed">
-                    IMPORTANT: This must be the exact phone number that was used when you registered your BVN.
-                  </p>
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={loading || confirmPhoneVal.length < 10}
-                  className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold shadow-lg shadow-emerald-500/20 transition-all disabled:bg-slate-200 disabled:shadow-none"
-                >
-                  {loading ? "Confirming..." : "Link Phone & Send Code"}
-                </Button>
-
-                <button
-                  type="button"
-                  onClick={() => setOtpStep("none")}
-                  className="text-slate-400 font-bold uppercase tracking-widest text-[10px] hover:text-slate-600 transition-colors"
-                >
-                  Choose another method
-                </button>
-              </form>
-            </motion.div>
-          ) : step === "form" && otpStep === "method" ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center"
-            >
-              <div className="mb-8">
-                <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <ShieldCheck className="w-8 h-8" />
-                </div>
-                <h1 className="text-2xl font-bold text-slate-900 mb-3">Verification Method.</h1>
-                <p className="text-slate-600 font-medium">
-                  {currentCountry === "Kenya" || currentCountry === "KE" 
-                    ? "Choose how you'd like to verify your number." 
-                    : "Choose how you'd like to receive your verification code."}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 mb-8">
-                {otpMethods.map((m: any) => (
-                  <Button
-                    key={m.method}
-                    variant="outline"
-                    onClick={() => handleSelectMethod(m.method)}
-                    disabled={loading}
-                    className="min-h-[100px] h-auto py-6 rounded-[24px] border-slate-200 flex items-center justify-between px-8 hover:border-emerald-500/50 hover:bg-slate-50 group transition-all whitespace-normal"
-                  >
-                    <div className="flex flex-col items-start text-left flex-1 pr-4 min-w-0">
-                      <span className="text-base sm:text-lg font-bold text-slate-900 uppercase tracking-tight whitespace-normal">
-                        {m.method === 'sendotp' ? 'Receive SMS Code' : 'Send SMS Recognition'}
-                      </span>
-                      <span className="text-xs sm:text-[13px] text-slate-500 font-medium leading-relaxed mt-1 wrap-break-word whitespace-normal">
-                        {m.hint || 'Standard carrier rates apply'}
-                      </span>
-                    </div>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors shrink-0 shadow-sm border border-slate-200/50 ml-2">
-                      <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </div>
-                  </Button>
-                ))}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setOtpStep("none")}
-                className="text-slate-400 font-bold uppercase tracking-widest text-[10px] hover:text-slate-600 transition-colors"
-              >
-                Go back to phone input
-              </button>
-            </motion.div>
-          ) : step === "form" && otpStep === "otp" ? (
-            <>
-              <div className="mb-10 text-center">
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4">
-                  Enter <span className="text-emerald-600">code.</span>
-                </h1>
-                <p className="text-slate-600 text-base font-bold leading-relaxed px-4">
-                  We've sent a verification code to your {selectedMethod}. Enter
-                  it below to complete your setup.
-                </p>
-              </div>
-
-              <form onSubmit={handleVerifyOtp} className="space-y-8">
-                <div className="space-y-3">
-                  <Label
-                    htmlFor="otp"
-                    className="text-sm font-bold text-slate-700 block text-center uppercase tracking-widest"
-                  >
-                    6-Digit Verification Code
-                  </Label>
-                  <Input
-                    id="otp"
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="000 000"
-                    value={otp}
-                    onChange={(e) =>
-                      setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                    }
-                    required
-                    className="bg-slate-50! border-slate-200 h-16 sm:h-20 rounded-2xl sm:rounded-3xl focus:border-emerald-500 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-2xl sm:text-4xl font-bold tracking-[0.4em] text-center"
-                  />
-                  <Alert className="mt-4 p-5 bg-amber-50/50 border-amber-200/50 rounded-2xl border-2">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                        <AlertCircle className="h-5 w-5 text-amber-600" />
-                      </div>
-                      <div>
-                        <AlertTitle className="text-xs font-bold text-amber-900 uppercase tracking-widest mb-0.5">Staging Mode</AlertTitle>
-                        <AlertDescription className="text-xs text-amber-800 font-medium">
-                          Use <span className="text-emerald-600 bg-white px-2 py-0.5 rounded-lg border border-emerald-100 font-mono font-bold text-sm shadow-sm">123456</span> to verify
-                        </AlertDescription>
-                      </div>
-                    </div>
-                  </Alert>
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={loading || otp.length < 4}
-                  className="w-full h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-[0.98] group"
-                >
-                  {loading ? (
-                    <div className="flex items-center gap-3">
-                      <DotLoader size="sm" color="white" />
-                      <span>Verifying...</span>
-                    </div>
-                  ) : (
-                    "Verify & Complete Setup"
-                  )}
-                </Button>
-
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={() => setOtpStep("method")}
-                    className="text-xs text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest"
-                  >
-                    Didn't get a code? Resend
-                  </button>
-                </div>
-              </form>
-            </>
-          ) : step === "form" ? (
-            <>
-              <div className="mb-10 text-center">
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4">
-                  One last <span className="text-emerald-600">step.</span>
-                </h1>
-                <p className="text-slate-600 text-base font-bold leading-relaxed px-4">
-                  {currentCountry === "NG" || currentCountry === "Nigeria"
-                    ? "To receive and send payments, we need your Bank Verification Number (BVN). This is used to set up your payment account."
-                    : "To receive and send payments in Kenya, we need your M-Pesa phone number."}
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="space-y-6">
-                  {/* Full Name Field */}
-                  <div className="space-y-3">
-                    <Label
-                      htmlFor="fullName"
-                      className="text-sm font-bold text-slate-700 block ml-1 text-center font-primary uppercase tracking-wider"
-                    >
-                      Legal Full Name
-                    </Label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="e.g. John Doe"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                      className="bg-slate-50! border-slate-200 h-14 sm:h-16 rounded-xl sm:rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-base sm:text-lg placeholder:text-slate-400 font-bold px-6"
-                    />
-                    <p className="text-[10px] text-slate-400 font-bold text-center uppercase tracking-widest">
-                      Should match your government ID or bank records
+              {step === "country" ? (
+                <motion.div key="country" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                  <div className="mb-8 xs:mb-10 text-center text-slate-900">
+                    <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold tracking-tight leading-tight mb-3 sm:mb-4">
+                      Select your <span className="text-emerald-600">country.</span>
+                    </h1>
+                    <p className="text-slate-600 text-sm xs:text-base font-bold leading-relaxed px-2">
+                      We need this to ensure we use the correct payment rails for your region.
                     </p>
                   </div>
 
-                  {/* ID / Phone Field */}
-                  <div className="space-y-3">
-                    <Label
-                      htmlFor="identity"
-                      className="text-sm font-bold text-slate-700 block ml-1 text-center font-primary uppercase tracking-wider"
+                  <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleCountrySelect("NG")}
+                      disabled={loading}
+                      className="h-16 xs:h-20 rounded-2xl border-slate-200 flex items-center justify-between px-6 xs:px-8 hover:border-emerald-500/50 hover:bg-slate-50 group transition-all"
                     >
-                      {currentCountry === "NG" || currentCountry === "Nigeria"
-                        ? "Bank Verification Number (BVN)"
-                        : "M-Pesa Phone Number"}
-                    </Label>
+                      <div className="flex items-center gap-3 xs:gap-4">
+                        <span className="text-2xl xs:text-3xl">🇳🇬</span>
+                        <span className="text-base xs:text-lg font-bold text-slate-900">Nigeria</span>
+                      </div>
+                      <ArrowRight className="w-4 h-4 xs:w-5 xs:h-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                    </Button>
 
-                    <div className="relative group/input">
-                      {(currentCountry === "KE" ||
-                        currentCountry === "Kenya") && (
-                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-900 font-bold text-lg select-none z-10">
-                          +254
+                    <Button
+                      variant="outline"
+                      onClick={() => handleCountrySelect("KE")}
+                      disabled={loading}
+                      className="h-16 xs:h-20 rounded-2xl border-slate-200 flex items-center justify-between px-6 xs:px-8 hover:border-emerald-500/50 hover:bg-slate-50 group transition-all"
+                    >
+                      <div className="flex items-center gap-3 xs:gap-4">
+                        <span className="text-2xl xs:text-3xl">🇰🇪</span>
+                        <span className="text-base xs:text-lg font-bold text-slate-900">Kenya</span>
+                      </div>
+                      <ArrowRight className="w-4 h-4 xs:w-5 xs:h-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                    </Button>
+                  </div>
+                </motion.div>
+              ) : step === "form" && otpStep === "phone_confirm" ? (
+                <motion.div key="phone_confirm" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+                  <div className="mb-8">
+                    <div className="w-14 h-14 xs:w-16 xs:h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Smartphone className="w-7 h-7 xs:w-8 xs:h-8" />
+                    </div>
+                    <h1 className="text-xl xs:text-2xl font-bold text-slate-900 mb-3">Confirm BVN Phone.</h1>
+                    <p className="text-slate-600 text-sm xs:text-base font-medium">
+                      Provide the 11-digit phone number linked to your <span className="font-bold text-slate-800">BVN registry</span>.
+                    </p>
+                  </div>
+
+                  <form onSubmit={handlePhoneConfirm} className="space-y-6">
+                    <div className="relative group">
+                      <input
+                        type="text"
+                        value={confirmPhoneVal}
+                        onChange={(e) => setConfirmPhoneVal(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                        placeholder="Enter BVN phone number"
+                        className="w-full h-12 xs:h-14 px-6 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-center tracking-[0.2em] text-lg"
+                        required
+                      />
+                      {isDev && (currentCountry === "NG" || currentCountry === "Nigeria") && (
+                        <div className="mt-2 text-[10px] xs:text-[11px] text-slate-500 font-bold flex items-center gap-1.5 ml-2">
+                           <Info className="w-3 h-3 text-blue-500" /> STAGING: Use 08032043843
                         </div>
                       )}
+                    </div>
+
+                    <div className="p-3 xs:p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                      <p className="text-[10px] xs:text-xs text-amber-700 font-bold leading-relaxed">
+                        IMPORTANT: This must be the phone number used during your BVN registration.
+                      </p>
+                    </div>
+
+                    <Button type="submit" disabled={loading || confirmPhoneVal.length < 10} className="w-full h-12 xs:h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold shadow-lg shadow-emerald-500/20 transition-all disabled:bg-slate-200">
+                      {loading ? "Confirming..." : "Link Phone & Send Code"}
+                    </Button>
+
+                    <button type="button" onClick={() => setOtpStep("none")} className="text-slate-400 font-bold uppercase tracking-widest text-[9px] xs:text-[10px] hover:text-slate-600 transition-colors">
+                      Choose another method
+                    </button>
+                  </form>
+                </motion.div>
+              ) : step === "form" && otpStep === "method" ? (
+                <motion.div key="method" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+                  <div className="mb-8">
+                    <div className="w-14 h-14 xs:w-16 xs:h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <ShieldCheck className="w-7 h-7 xs:w-8 xs:h-8" />
+                    </div>
+                    <h1 className="text-xl xs:text-2xl font-bold text-slate-900 mb-3">Verification Method.</h1>
+                    <p className="text-slate-600 text-sm xs:text-base font-medium">
+                      Choose how you'd like to receive your verification code.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-1 gap-3 xs:gap-4 mb-8">
+                    {otpMethods.map((m: any) => (
+                      <Button
+                        key={m.method}
+                        variant="outline"
+                        onClick={() => handleSelectMethod(m.method)}
+                        disabled={loading}
+                        className="min-h-[80px] xs:min-h-[100px] h-auto py-4 xs:py-6 rounded-[24px] border-slate-200 flex items-center justify-between px-6 xs:px-8 hover:border-emerald-500/50 hover:bg-slate-50 group transition-all whitespace-normal"
+                      >
+                        <div className="flex flex-col items-start text-left flex-1 pr-3 xs:pr-4 min-w-0">
+                          <span className="text-sm xs:text-base font-bold text-slate-900 uppercase tracking-tight leading-tight">
+                            {m.method === 'sendotp' ? 'SMS Code' : 'Recognition'}
+                          </span>
+                          <span className="text-[10px] xs:text-xs text-slate-500 font-medium leading-tight mt-1">
+                            {m.hint || 'Standard rates apply'}
+                          </span>
+                        </div>
+                        <div className="w-8 h-8 xs:w-10 xs:h-10 bg-slate-100 rounded-xl xs:rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors shrink-0">
+                          <ArrowRight className="w-4 h-4 xs:w-5 xs:h-5" />
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+
+                  <button type="button" onClick={() => setOtpStep("none")} className="text-slate-400 font-bold uppercase tracking-widest text-[9px] xs:text-[10px] hover:text-slate-600 transition-colors">
+                    Go back to initial input
+                  </button>
+                </motion.div>
+              ) : step === "form" && otpStep === "otp" ? (
+                <motion.div key="otp" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+                  <div className="mb-8">
+                    <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4">
+                      Enter <span className="text-emerald-600">code.</span>
+                    </h1>
+                    <p className="text-slate-600 text-sm xs:text-base font-bold leading-relaxed px-4">
+                      We've sent a verification code via {selectedMethod}.
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleVerifyOtp} className="space-y-8">
+                    <div className="space-y-3">
+                      <Label className="text-xs font-bold text-slate-700 block text-center uppercase tracking-widest">6-Digit Code</Label>
                       <Input
-                        id="identity"
                         type="text"
                         inputMode="numeric"
-                        placeholder={
-                          currentCountry === "NG" || currentCountry === "Nigeria"
-                            ? "11 digits"
-                            : "9 digits"
-                        }
-                        value={val}
-                        onChange={handleInputChange}
+                        placeholder="000 000"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                         required
-                        className={`bg-slate-50! border-slate-200 h-14 sm:h-16 rounded-xl sm:rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-base sm:text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${currentCountry === "KE" || currentCountry === "Kenya" ? "pl-16 sm:pl-20" : "px-4 sm:px-6"}`}
+                        className="bg-slate-50! border-slate-200 h-14 xs:h-16 sm:h-20 rounded-2xl sm:rounded-3xl focus:border-emerald-500 text-slate-900 text-2xl xs:text-3xl sm:text-4xl font-bold tracking-[0.4em] text-center"
                       />
-                      
-                      {currentCountry === "NG" || currentCountry === "Nigeria" ? (
-                        <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within/input:text-emerald-500/50 transition-colors" />
-                      ) : (
-                        <Phone className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within/input:text-emerald-500/50 transition-colors" />
+                      <Alert className="mt-4 p-4 xs:p-5 bg-amber-50/50 border-amber-200/50 rounded-2xl border-2">
+                        <div className="flex items-center gap-3 xs:gap-4 text-left">
+                          <div className="w-8 h-8 xs:w-10 xs:h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                            <AlertCircle className="h-4 w-4 xs:h-5 xs:w-5 text-amber-600" />
+                          </div>
+                          <div>
+                            <AlertTitle className="text-[10px] xs:text-xs font-bold text-amber-900 uppercase tracking-widest mb-0.5">Staging Mode</AlertTitle>
+                            <AlertDescription className="text-[10px] xs:text-xs text-amber-800 font-medium">Use <span className="text-emerald-600 font-bold">123456</span> to verify</AlertDescription>
+                          </div>
+                        </div>
+                      </Alert>
+                    </div>
+
+                    <Button type="submit" disabled={loading || otp.length < 4} className="w-full h-12 xs:h-14 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-base transition-all">
+                      {loading ? "Verifying..." : "Verify & Complete Setup"}
+                    </Button>
+
+                    <button type="button" onClick={() => setOtpStep("method")} className="text-[10px] xs:text-xs text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest">
+                      Didn't get a code? Resend
+                    </button>
+                  </form>
+                </motion.div>
+              ) : step === "form" ? (
+                <motion.div key="form" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                  <div className="mb-8 xs:mb-10 text-center">
+                    <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4">
+                      One last <span className="text-emerald-600">step.</span>
+                    </h1>
+                    <p className="text-slate-600 text-sm xs:text-base font-bold leading-relaxed px-2">
+                      {currentCountry === "NG" || currentCountry === "Nigeria" ? "To set up your payment account, we need your BVN." : "To receive payments, we need your M-Pesa phone number."}
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-6 xs:space-y-8">
+                    <div className="space-y-4 xs:space-y-6">
+                      <div className="space-y-2 xs:space-y-3">
+                        <Label className="text-xs xs:text-sm font-bold text-slate-700 block text-center uppercase tracking-wider">Legal Full Name</Label>
+                        <Input
+                          type="text"
+                          placeholder="e.g. John Doe"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          required
+                          className="bg-slate-50! border-slate-200 h-12 xs:h-14 sm:h-16 rounded-xl sm:rounded-2xl text-slate-900 text-sm xs:text-base font-bold px-4 xs:px-6"
+                        />
+                      </div>
+
+                      <div className="space-y-2 xs:space-y-3">
+                        <Label className="text-xs xs:text-sm font-bold text-slate-700 block text-center uppercase tracking-wider">
+                          {currentCountry === "NG" || currentCountry === "Nigeria" ? "BVN Number" : "M-Pesa Phone"}
+                        </Label>
+                        <div className="relative group">
+                          {(currentCountry === "KE" || currentCountry === "Kenya") && (
+                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-900 font-bold text-base xs:text-lg z-10">+254</div>
+                          )}
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder={currentCountry === "NG" || currentCountry === "Nigeria" ? "11 digits" : "9 digits"}
+                            value={val}
+                            onChange={handleInputChange}
+                            required
+                            className={`bg-slate-50! border-slate-200 h-12 xs:h-14 sm:h-16 rounded-xl sm:rounded-2xl text-slate-900 text-sm xs:text-base font-mono tracking-widest text-center ${currentCountry === "KE" || currentCountry === "Kenya" ? "pl-16 xs:pl-20" : "px-4"}`}
+                          />
+                        </div>
+                      </div>
+
+                      {isDev && (
+                        <Alert className="bg-emerald-50/50 border-emerald-200/50 rounded-2xl p-4 xs:p-5 border-2 text-left">
+                          <div className="flex items-center gap-3">
+                            <Info className="h-4 w-4 xs:h-5 xs:w-5 text-emerald-600" />
+                            <div>
+                              <span className="text-[10px] xs:text-xs font-bold uppercase text-emerald-900 block">Staging Hint</span>
+                              <span className="text-[10px] xs:text-[12px] font-medium text-emerald-800/80">Use {currentCountry === "KE" || currentCountry === "Kenya" ? "0714325678" : "any 11 digits"}</span>
+                            </div>
+                          </div>
+                        </Alert>
                       )}
                     </div>
-                  </div>
 
-                  {/* Staging Hints */}
-                  {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
-                    <Alert className="bg-emerald-50/50 border-emerald-200/50 text-emerald-800 rounded-3xl mb-0 py-5 px-6 border-2">
-                       <div className="flex items-center gap-4">
-                         <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
-                           <Info className="h-5 w-5 text-emerald-600" />
-                         </div>
-                         <div>
-                            <AlertTitle className="text-sm font-bold uppercase tracking-wide text-emerald-900 mb-1">Staging Hint</AlertTitle>
-                            <AlertDescription className="text-[13px] font-medium leading-relaxed text-emerald-800/80">
-                               Use phone <span className="bg-white px-2.5 py-1 rounded-xl border border-emerald-200 font-mono font-bold text-emerald-600 shadow-sm">0714325678</span> to bypass verification.
-                            </AlertDescription>
-                         </div>
-                       </div>
-                    </Alert>
-                  )}
-                  {isDev && (currentCountry === "NG" || currentCountry === "Nigeria") && (
-                    <Alert className="bg-blue-50/50 border-blue-200/50 text-blue-800 rounded-3xl mb-0 py-5 px-6 border-2">
-                       <div className="flex items-center gap-4">
-                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
-                           <ShieldCheck className="h-5 w-5 text-blue-600" />
-                         </div>
-                         <div>
-                            <AlertTitle className="text-sm font-bold uppercase tracking-wide text-blue-900 mb-1">Staging Hint</AlertTitle>
-                            <AlertDescription className="text-[13px] font-medium leading-relaxed text-blue-800/80">
-                               Use any <span className="bg-white px-2.5 py-1 rounded-xl border border-blue-200 font-mono font-bold text-blue-600 shadow-sm">11-digit number</span> e.g. 12345678901 for testing.
-                            </AlertDescription>
-                         </div>
-                       </div>
-                    </Alert>
-                  )}
-                </div>
+                    {error && <div className="text-center p-3 sm:p-4 bg-red-50 text-red-500 rounded-2xl border border-red-100 text-xs font-bold">{error}</div>}
 
-                {error && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                    <div className="flex items-center gap-3 text-red-500 bg-red-50 p-4 rounded-2xl border border-red-200">
-                      <p className="text-sm font-bold leading-relaxed">
-                        {error}
-                      </p>
+                    <div className="flex flex-col gap-4 xs:gap-6">
+                      <Button type="submit" disabled={loading || !val} className="w-full h-12 xs:h-14 sm:h-16 bg-slate-900 text-white rounded-xl xs:rounded-2xl font-bold text-base transition-all shadow-xl">
+                        {loading ? "Processing..." : "Complete Setup"}
+                      </Button>
+                      <button type="button" onClick={() => router.push(user?.role === "CLIENT" ? "/client" : "/freelancer")} className="text-[10px] xs:text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest flex items-center justify-center gap-2">
+                        <ArrowLeft className="w-3 h-3" /> Skip for now
+                      </button>
                     </div>
-                    {attemptsRemaining !== null && (
-                      <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        {attemptsRemaining}{" "}
-                        {attemptsRemaining === 1 ? "attempt" : "attempts"} remaining
-                      </p>
-                    )}
+                  </form>
+                </motion.div>
+              ) : (
+                <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="py-8 text-center">
+                  <div className="mb-8 flex justify-center">
+                    <div className="w-20 h-20 xs:w-24 xs:h-24 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 shadow-sm relative">
+                      <div className="absolute inset-0 border border-emerald-500/20 rounded-full animate-ping opacity-20"></div>
+                      <CheckCircle2 className="w-10 h-10 xs:w-12 xs:h-12 text-emerald-600" />
+                    </div>
                   </div>
-                )}
-
-                <div className="flex flex-col items-center gap-6">
-                  <Button
-                    type="submit"
-                    disabled={loading || !val}
-                    className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group relative overflow-hidden"
-                  >
-                    {loading ? (
-                      <div className="flex items-center gap-3">
-                        <DotLoader size="sm" color="white" />
-                        <span>Processing...</span>
-                      </div>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        Complete Setup{" "}
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    )}
+                  <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-slate-900 leading-tight mb-4">Account <span className="text-emerald-600">ready.</span></h1>
+                  <p className="text-slate-600 text-sm xs:text-base font-bold leading-relaxed mb-8">Your payment account is set up. You can now use the platform.</p>
+                  <Button onClick={() => router.push(returnTo || (user?.role === "CLIENT" ? "/client" : "/freelancer"))} className="w-full h-12 xs:h-14 sm:h-16 bg-slate-900 text-white rounded-xl xs:rounded-2xl font-bold transition-all shadow-xl">
+                    Continue to Dashboard
                   </Button>
-
-                  <button
-                    type="button"
-                    onClick={() => router.push(user?.role === "CLIENT" ? "/client" : "/freelancer")}
-                    className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-[0.2em] inline-flex items-center gap-2 group mb-2"
-                  >
-                    <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
-                    Skip for now & Browse Dashboard
-                  </button>
-                </div>
-                {showBypass && (
-                  <div className="mt-4 text-center">
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          await api.onboarding.devBypassIdentity();
-                          await refreshUser();
-                          clearPersistence();
-                          setStep("success");
-                        } catch (err: any) {
-                          toast.error("Bypass failed: " + err.message);
-                        }
-                      }}
-                      className="text-xs text-slate-400 hover:text-slate-600 underline transition-colors"
-                      title="Development only — not available in production"
-                    >
-                      {/* DEV ONLY - Remove before production deployment */}
-                      Skip for development
-                    </button>
-                  </div>
-                )}
-              </form>
-
-              <div className="mt-10 flex items-center justify-center gap-6">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">
-                    Encrypted
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">
-                    Secure
-                  </span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="py-8 text-center animate-in fade-in zoom-in-95 duration-500">
-              <div className="mb-8 flex justify-center">
-                <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center relative border border-emerald-100 shadow-sm">
-                  <div className="absolute inset-0 border border-emerald-500/20 rounded-full animate-ping opacity-20"></div>
-                  <CheckCircle2 className="w-12 h-12 text-emerald-600" />
-                </div>
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4">
-                Payment account <span className="text-emerald-600">ready.</span>
-              </h1>
-
-              <p className="text-slate-600 text-base font-bold leading-relaxed px-4 mb-10">
-                {process.env.NEXT_PUBLIC_TESTNET_MODE === "true"
-                  ? "Your payment account has been set up. You can now fully use the platform for testing."
-                  : "Your payment account has been set up. Complete identity verification (Tier 2) in Settings to unlock withdrawals."}
-              </p>
-
-              <Button
-                onClick={() => {
-                  if (returnTo) {
-                    router.push(returnTo);
-                    return;
-                  }
-                  router.push(user?.role === "CLIENT" ? "/client" : "/freelancer");
-                }}
-                className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group"
-              >
-                <span className="flex items-center gap-2 text-white">
-                  {returnTo ? "Continue to Action" : "Continue to Dashboard"}{" "}
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Button>
-            </div>
-          )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        <p className="mt-8 text-center text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">
+        <p className="mt-8 text-center text-[9px] xs:text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] px-4">
           Identity verification is mandatory for financial compliance
         </p>
       </div>
