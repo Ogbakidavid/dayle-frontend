@@ -263,6 +263,23 @@ export default function IdentityOnboardingPage() {
           {/* Suble glow inside card */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/5 blur-[60px] rounded-full pointer-events-none"></div>
 
+          {isDev && step !== "success" && (
+            <Alert className="mb-8 p-6 bg-blue-50/50 border-blue-200/50 rounded-[32px] border-2">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center shrink-0">
+                  <ShieldCheck className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <AlertTitle className="text-sm font-bold uppercase tracking-widest text-blue-900 mb-2">Staging Environment</AlertTitle>
+                  <AlertDescription className="text-[13px] text-blue-800/80 font-medium leading-relaxed">
+                    You are testing on the Dayle Testnet. Please use the staging details provided in the hints below to complete verification. 
+                    <span className="block mt-2 font-bold text-blue-900">KYC is bypassed for testnet auditors.</span>
+                  </AlertDescription>
+                </div>
+              </div>
+            </Alert>
+          )}
+
           {loading && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -657,10 +674,10 @@ export default function IdentityOnboardingPage() {
                   <button
                     type="button"
                     onClick={() => router.push(user?.role === "CLIENT" ? "/client" : "/freelancer")}
-                    className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-[0.2em] inline-flex items-center gap-2 group mb-2"
+                    className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-[0.2em] inline-flex items-center gap-2 group mb-2"
                   >
                     <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
-                    Return to Dashboard
+                    Skip for now & Browse Dashboard
                   </button>
                 </div>
                 {showBypass && (

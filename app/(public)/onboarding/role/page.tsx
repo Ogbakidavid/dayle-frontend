@@ -27,8 +27,15 @@ export default function RoleSelectionPage() {
         if (token) {
           await api.onboarding.setRole(role);
           await refreshUser(token);
-          // Redirect to identity verification step before dashboard
-          router.push("/onboarding/identity");
+          
+          const searchParams = new URLSearchParams(window.location.search);
+          const returnTo = searchParams.get("returnTo");
+          
+          if (returnTo) {
+            router.push(returnTo);
+          } else {
+            router.push(role === UserRole.CLIENT ? "/client" : "/freelancer");
+          }
           return;
         }
       }

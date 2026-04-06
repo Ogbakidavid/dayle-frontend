@@ -175,10 +175,13 @@ export default function SignupPage() {
         const freshRole = freshUser?.role;
 
         if (freshRole && freshRole !== UserRole.NONE) {
-          // Check if identity is set (we can assume if they just signed up, it's not)
-          router.push("/onboarding/identity");
+          if (returnTo) {
+            router.push(returnTo);
+          } else {
+            router.push(freshRole === UserRole.CLIENT ? "/client" : "/freelancer");
+          }
         } else {
-          router.push("/onboarding/role");
+          router.push("/onboarding/role" + (returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ""));
         }
       } catch (err: any) {
         console.error(err);
