@@ -13,6 +13,7 @@ import { DotLoader } from "@/components/ui/dot-loader";
 import { ShieldCheck, Phone, Info, ArrowRight, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function IdentityConfirmationPage() {
   const router = useRouter();
@@ -193,15 +194,47 @@ export default function IdentityConfirmationPage() {
                                 <Phone className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-emerald-500/50 transition-colors" />
                             )}
                         </div>
+                        
+                        {isDev && (country === "KE" || country === "Kenya") && (
+                          <Alert className="bg-emerald-50/50 border-emerald-200/50 text-emerald-800 rounded-[24px] py-4 px-5 border-2">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+                                <Info className="h-5 w-5 text-emerald-600" />
+                              </div>
+                              <div>
+                                  <AlertTitle className="text-[11px] font-bold uppercase tracking-wide text-emerald-900 mb-0.5">Staging Hint</AlertTitle>
+                                  <AlertDescription className="text-[13px] font-medium leading-relaxed text-emerald-800/80">
+                                    Use phone <span className="bg-white px-2 py-0.5 rounded-lg border border-emerald-100 font-mono font-bold text-emerald-600 shadow-sm">0714325678</span>
+                                  </AlertDescription>
+                              </div>
+                            </div>
+                          </Alert>
+                        )}
 
-                        <div className="flex items-start gap-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                        {isDev && (country === "NG" || country === "Nigeria") && (
+                          <Alert className="bg-blue-50/50 border-blue-200/50 text-blue-800 rounded-[24px] py-4 px-5 border-2">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                                <ShieldCheck className="h-5 w-5 text-blue-600" />
+                              </div>
+                              <div>
+                                  <AlertTitle className="text-[11px] font-bold uppercase tracking-wide text-blue-900 mb-0.5">Staging Hint</AlertTitle>
+                                  <AlertDescription className="text-[13px] font-medium leading-relaxed text-blue-800/80">
+                                    Use any <span className="bg-white px-2 py-0.5 rounded-lg border border-blue-100 font-mono font-bold text-blue-600 shadow-sm">11-digit number</span>
+                                  </AlertDescription>
+                              </div>
+                            </div>
+                          </Alert>
+                        )}
+
+                        {/* <div className="flex items-start gap-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
                             <Info className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
                             <p className="text-sm font-bold text-slate-600 leading-snug">
                                 {(country === "NG" || country === "Nigeria")
                                     ? "Dial *565*0# on any phone to retrieve your BVN. This is a one-time setup step." 
                                     : "Ensure this is the phone number registered with M-Pesa to avoid payment delays."}
                             </p>
-                        </div>
+                        </div> */}
                     </div>
 
                     {error && (

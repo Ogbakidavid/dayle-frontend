@@ -19,9 +19,11 @@ import {
   CheckCircle2,
   Mail,
   Smartphone,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function IdentityOnboardingPage() {
   const router = useRouter();
@@ -357,14 +359,16 @@ export default function IdentityOnboardingPage() {
                     required
                   />
                   {isDev && (currentCountry === "NG" || currentCountry === "Nigeria") && (
-                    <p className="mt-2 text-[10px] text-slate-400 font-bold float-left ml-2">
-                       Staging: use 08032043843
-                    </p>
+                    <div className="mt-2 text-[11px] text-slate-500 font-bold flex items-center gap-1.5 ml-2">
+                       <Info className="w-3 h-3 text-blue-500" />
+                       STAGING: Use 08032043843
+                    </div>
                   )}
                   {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
-                    <p className="mt-2 text-[10px] text-slate-400 font-bold float-left ml-2">
-                       Staging: no phone confirm needed for Kenya
-                    </p>
+                    <div className="mt-2 text-[11px] text-slate-500 font-bold flex items-center gap-1.5 ml-2">
+                       <Info className="w-3 h-3 text-emerald-500" />
+                       STAGING: no phone confirm needed for Kenya
+                    </div>
                   )}
                 </div>
 
@@ -473,11 +477,19 @@ export default function IdentityOnboardingPage() {
                     required
                     className="bg-slate-50! border-slate-200 h-16 sm:h-20 rounded-2xl sm:rounded-3xl focus:border-emerald-500 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-2xl sm:text-4xl font-bold tracking-[0.4em] text-center"
                   />
-                  <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl">
-                    <p className="text-center text-[11px] text-amber-700 font-bold uppercase tracking-wider">
-                      Staging Mode: Use <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100 font-mono text-xs">123456</span> to verify
-                    </p>
-                  </div>
+                  <Alert className="mt-4 p-5 bg-amber-50/50 border-amber-200/50 rounded-2xl border-2">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                        <AlertCircle className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <AlertTitle className="text-xs font-bold text-amber-900 uppercase tracking-widest mb-0.5">Staging Mode</AlertTitle>
+                        <AlertDescription className="text-xs text-amber-800 font-medium">
+                          Use <span className="text-emerald-600 bg-white px-2 py-0.5 rounded-lg border border-emerald-100 font-mono font-bold text-sm shadow-sm">123456</span> to verify
+                        </AlertDescription>
+                      </div>
+                    </div>
+                  </Alert>
                 </div>
 
                 <Button
@@ -560,28 +572,44 @@ export default function IdentityOnboardingPage() {
                   </div>
 
                   {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
-                    <div className="mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
-                      <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider text-center">
-                        Staging: Use phone <span className="bg-white px-2 py-0.5 rounded-lg border border-emerald-200 font-mono text-xs">0714325678</span> for testing
-                      </p>
-                    </div>
+                    <Alert className="bg-emerald-50/50 border-emerald-200/50 text-emerald-800 rounded-3xl mb-6 py-5 px-6 border-2">
+                       <div className="flex items-center gap-4">
+                         <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+                           <Info className="h-5 w-5 text-emerald-600" />
+                         </div>
+                         <div>
+                            <AlertTitle className="text-sm font-bold uppercase tracking-wide text-emerald-900 mb-1">Staging Hint</AlertTitle>
+                            <AlertDescription className="text-[13px] font-medium leading-relaxed text-emerald-800/80">
+                               Use phone <span className="bg-white px-2.5 py-1 rounded-xl border border-emerald-200 font-mono font-bold text-emerald-600 shadow-sm">0714325678</span> to bypass verification in this environment.
+                            </AlertDescription>
+                         </div>
+                       </div>
+                    </Alert>
                   )}
                   {isDev && (currentCountry === "NG" || currentCountry === "Nigeria") && (
-                    <div className="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
-                      <p className="text-[10px] text-blue-700 font-bold uppercase tracking-wider text-center">
-                        Staging: Use any 11-digit number e.g. 12345678901
-                      </p>
-                    </div>
+                    <Alert className="bg-blue-50/50 border-blue-200/50 text-blue-800 rounded-3xl mb-6 py-5 px-6 border-2">
+                       <div className="flex items-center gap-4">
+                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                           <ShieldCheck className="h-5 w-5 text-blue-600" />
+                         </div>
+                         <div>
+                            <AlertTitle className="text-sm font-bold uppercase tracking-wide text-blue-900 mb-1">Staging Hint</AlertTitle>
+                            <AlertDescription className="text-[13px] font-medium leading-relaxed text-blue-800/80">
+                               Use any <span className="bg-white px-2.5 py-1 rounded-xl border border-blue-200 font-mono font-bold text-blue-600 shadow-sm">11-digit number</span> e.g. 12345678901 for testing.
+                            </AlertDescription>
+                         </div>
+                       </div>
+                    </Alert>
                   )}
 
-                  <div className="flex items-start gap-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                  {/* <div className="flex items-start gap-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
                     <Info className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
                     <p className="text-sm font-bold text-slate-600 leading-snug">
                       {currentCountry === "NG" || currentCountry === "Nigeria"
                         ? "Dial *565*0# on any phone to retrieve your BVN. This is a one-time setup step."
                         : "Ensure this is the phone number registered with M-Pesa to avoid payment delays."}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
 
                 {error && (
