@@ -155,19 +155,12 @@ export default function SignupPage() {
         const roleToPass =
           roleParam && roleParam !== UserRole.NONE ? roleParam : undefined;
 
-        await api.auth.socialLogin({ accessToken, role: roleToPass });
-
-        // Update profile with name if available (from form or social)
-        const socialName =
-          privyUser?.google?.name ||
-          privyUser?.github?.username ||
-          formData.name ||
-          "";
-
-        if (socialName) {
-          // Only update if we have a name to update
-          await api.auth.updateProfile({ name: socialName });
-        }
+        await api.auth.socialLogin({ 
+          accessToken, 
+          role: roleToPass,
+          name: formData.name || privyUser?.google?.name || privyUser?.github?.username || undefined,
+          country: formData.country 
+        });
 
         await refreshUser();
 
