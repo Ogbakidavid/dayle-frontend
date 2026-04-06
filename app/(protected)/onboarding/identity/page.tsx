@@ -46,12 +46,14 @@ export default function IdentityOnboardingPage() {
   const [persistedData, setPersistedData, clearPersistence] = useFormPersistence("onboarding_identity", {
     val: "",
     confirmPhoneVal: "",
+    fullName: user?.name || "",
   });
 
-  const { val, confirmPhoneVal } = persistedData;
+  const { val, confirmPhoneVal, fullName } = persistedData;
 
   const setVal = (v: string) => setPersistedData(p => ({ ...p, val: v }));
   const setConfirmPhoneVal = (v: string) => setPersistedData(p => ({ ...p, confirmPhoneVal: v }));
+  const setFullName = (v: string) => setPersistedData(p => ({ ...p, fullName: v }));
 
   // OTP Flow states
   const [otpMethods, setOtpMethods] = useState<any[]>([]);
@@ -130,7 +132,10 @@ export default function IdentityOnboardingPage() {
     setLoadingMessage("Verifying your identity and linking account...");
     try {
       const c = selectedCountry || user?.country;
-      const payload: any = { country: c };
+      const payload: any = { 
+        country: c,
+        fullName: fullName 
+      };
       if (c === "Nigeria" || c === "NG") {
         payload.bvn = val;
       } else {
@@ -556,47 +561,73 @@ export default function IdentityOnboardingPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="space-y-3">
-                  <Label
-                    htmlFor="identity"
-                    className="text-sm font-bold text-slate-700 block ml-1 text-center font-primary uppercase tracking-wider"
-                  >
-                    {currentCountry === "NG" || currentCountry === "Nigeria"
-                      ? "Bank Verification Number (BVN)"
-                      : "M-Pesa Phone Number"}
-                  </Label>
-
-                  <div className="relative group/input">
-                    {(currentCountry === "KE" ||
-                      currentCountry === "Kenya") && (
-                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-900 font-bold text-lg select-none z-10">
-                        +254
-                      </div>
-                    )}
+                <div className="space-y-6">
+                  {/* Full Name Field */}
+                  <div className="space-y-3">
+                    <Label
+                      htmlFor="fullName"
+                      className="text-sm font-bold text-slate-700 block ml-1 text-center font-primary uppercase tracking-wider"
+                    >
+                      Legal Full Name
+                    </Label>
                     <Input
-                      id="identity"
+                      id="fullName"
                       type="text"
-                      inputMode="numeric"
-                      placeholder={
-                        currentCountry === "NG" || currentCountry === "Nigeria"
-                          ? "11 digits"
-                          : "9 digits"
-                      }
-                      value={val}
-                      onChange={handleInputChange}
+                      placeholder="e.g. John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                       required
-                      className={`bg-slate-50! border-slate-200 h-14 sm:h-16 rounded-xl sm:rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-base sm:text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${currentCountry === "KE" || currentCountry === "Kenya" ? "pl-16 sm:pl-20" : "px-4 sm:px-6"}`}
+                      className="bg-slate-50! border-slate-200 h-14 sm:h-16 rounded-xl sm:rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-base sm:text-lg placeholder:text-slate-400 font-bold px-6"
                     />
-                    
-                    {currentCountry === "NG" || currentCountry === "Nigeria" ? (
-                      <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within/input:text-emerald-500/50 transition-colors" />
-                    ) : (
-                      <Phone className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within/input:text-emerald-500/50 transition-colors" />
-                    )}
+                    <p className="text-[10px] text-slate-400 font-bold text-center uppercase tracking-widest">
+                      Should match your government ID or bank records
+                    </p>
                   </div>
 
+                  {/* ID / Phone Field */}
+                  <div className="space-y-3">
+                    <Label
+                      htmlFor="identity"
+                      className="text-sm font-bold text-slate-700 block ml-1 text-center font-primary uppercase tracking-wider"
+                    >
+                      {currentCountry === "NG" || currentCountry === "Nigeria"
+                        ? "Bank Verification Number (BVN)"
+                        : "M-Pesa Phone Number"}
+                    </Label>
+
+                    <div className="relative group/input">
+                      {(currentCountry === "KE" ||
+                        currentCountry === "Kenya") && (
+                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-900 font-bold text-lg select-none z-10">
+                          +254
+                        </div>
+                      )}
+                      <Input
+                        id="identity"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder={
+                          currentCountry === "NG" || currentCountry === "Nigeria"
+                            ? "11 digits"
+                            : "9 digits"
+                        }
+                        value={val}
+                        onChange={handleInputChange}
+                        required
+                        className={`bg-slate-50! border-slate-200 h-14 sm:h-16 rounded-xl sm:rounded-2xl focus:border-emerald-500/50 focus:bg-white! focus:ring-0 transition-all text-slate-900 text-base sm:text-lg placeholder:text-slate-400 font-mono tracking-widest text-center ${currentCountry === "KE" || currentCountry === "Kenya" ? "pl-16 sm:pl-20" : "px-4 sm:px-6"}`}
+                      />
+                      
+                      {currentCountry === "NG" || currentCountry === "Nigeria" ? (
+                        <ShieldCheck className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within/input:text-emerald-500/50 transition-colors" />
+                      ) : (
+                        <Phone className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within/input:text-emerald-500/50 transition-colors" />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Staging Hints */}
                   {isDev && (currentCountry === "KE" || currentCountry === "Kenya") && (
-                    <Alert className="bg-emerald-50/50 border-emerald-200/50 text-emerald-800 rounded-3xl mb-6 py-5 px-6 border-2">
+                    <Alert className="bg-emerald-50/50 border-emerald-200/50 text-emerald-800 rounded-3xl mb-0 py-5 px-6 border-2">
                        <div className="flex items-center gap-4">
                          <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
                            <Info className="h-5 w-5 text-emerald-600" />
@@ -604,14 +635,14 @@ export default function IdentityOnboardingPage() {
                          <div>
                             <AlertTitle className="text-sm font-bold uppercase tracking-wide text-emerald-900 mb-1">Staging Hint</AlertTitle>
                             <AlertDescription className="text-[13px] font-medium leading-relaxed text-emerald-800/80">
-                               Use phone <span className="bg-white px-2.5 py-1 rounded-xl border border-emerald-200 font-mono font-bold text-emerald-600 shadow-sm">0714325678</span> to bypass verification in this environment.
+                               Use phone <span className="bg-white px-2.5 py-1 rounded-xl border border-emerald-200 font-mono font-bold text-emerald-600 shadow-sm">0714325678</span> to bypass verification.
                             </AlertDescription>
                          </div>
                        </div>
                     </Alert>
                   )}
                   {isDev && (currentCountry === "NG" || currentCountry === "Nigeria") && (
-                    <Alert className="bg-blue-50/50 border-blue-200/50 text-blue-800 rounded-3xl mb-6 py-5 px-6 border-2">
+                    <Alert className="bg-blue-50/50 border-blue-200/50 text-blue-800 rounded-3xl mb-0 py-5 px-6 border-2">
                        <div className="flex items-center gap-4">
                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
                            <ShieldCheck className="h-5 w-5 text-blue-600" />
@@ -625,15 +656,6 @@ export default function IdentityOnboardingPage() {
                        </div>
                     </Alert>
                   )}
-
-                  {/* <div className="flex items-start gap-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-                    <Info className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
-                    <p className="text-sm font-bold text-slate-600 leading-snug">
-                      {currentCountry === "NG" || currentCountry === "Nigeria"
-                        ? "Dial *565*0# on any phone to retrieve your BVN. This is a one-time setup step."
-                        : "Ensure this is the phone number registered with M-Pesa to avoid payment delays."}
-                    </p>
-                  </div> */}
                 </div>
 
                 {error && (
