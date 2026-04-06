@@ -259,7 +259,7 @@ export default function CreateVaultPage() {
         </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
           <Button
-            onClick={() => router.push("/onboarding")}
+            onClick={() => router.push("/onboarding/identity?returnTo=" + encodeURIComponent(window.location.pathname))}
             className="flex-1 h-14 bg-slate-900 hover:bg-black text-white font-black rounded-2xl shadow-xl transition-all active:scale-[0.98] uppercase tracking-widest"
           >
             Verify Now
@@ -278,7 +278,7 @@ export default function CreateVaultPage() {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden font-sans">
-      {isDeploying && <LogoLoader fullPage={true} size="lg" message="Securing your project assets..." />}
+      {isDeploying && <LogoLoader fullPage={true} size="lg" />}
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 rounded-full blur-[120px]" />

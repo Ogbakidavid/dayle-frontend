@@ -76,38 +76,17 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     // 1. Country Selection Intercept: If user is authenticated but country is missing
     // 2. Post-KYC Intercept: If KYC is VERIFIED but payment account is not ready
       if (user) {
-        // Redirection logic for onboarding
-        const isOnboardingIdentity = pathname.startsWith('/onboarding/identity');
-        const isOnboardingConfirmation = pathname.startsWith('/onboarding/identity-confirmation');
+        // Tier 0 Access: Allow users to see the dashboard immediately.
+        // We no longer force a redirect to onboarding even for country selection,
+        // fulfilling the "landing in their dashboard" requirement.
+        // Country-specific UI defaults to NGN/Nigeria if not set.
 
-        // 1. Force identity setup if country is missing OR payment account is not ready
-        if (!user.country || !user.paymentAccountReady) {
-          if (!pathname.startsWith('/onboarding')) {
-              console.log('[AuthGuard] Onboarding incomplete, redirecting to identity...');
-              setRedirecting(true);
-              router.push('/onboarding/identity');
-              return;
-          }
-        }
-
-        console.log("[AuthGuard] Checking user state:", {
+        console.log("[AuthGuard] User state:", {
           kycStatus: user.kycStatus,
           paymentAccountReady: user.paymentAccountReady,
+          country: user.country,
           pathname,
         });
-
-        // 2. Post-KYC Intercept: If KYC is VERIFIED but payment account is not ready
-        // (This handles cases where full KYC happened but Partna isn't linked yet)
-        if (
-          user.kycStatus === KycStatus.VERIFIED &&
-          !user.paymentAccountReady &&
-          !isOnboardingConfirmation
-        ) {
-          console.log("[AuthGuard] KYC verified but account not ready, redirecting to confirmation...");
-          setRedirecting(true);
-          router.push("/onboarding/identity-confirmation");
-          return;
-        }
       }
   }, [
     authenticated,
@@ -127,7 +106,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     redirecting
   ) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
         <LogoLoader size="lg" />
       </div>
     );

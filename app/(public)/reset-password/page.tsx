@@ -172,7 +172,7 @@ export default function ResetPasswordPage() {
                 >
                   {loading ? (
                     <div className="flex items-center gap-3">
-                      <DotLoader size="sm" />
+                      <DotLoader size="sm" color="white" />
                       <span>Updating...</span>
                     </div>
                   ) : (

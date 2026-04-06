@@ -570,7 +570,7 @@ export default function WithdrawPage() {
                         </p>
                       </div>
                       <button
-                        onClick={() => router.push("/onboarding")}
+                        onClick={() => router.push("/onboarding/kyc?returnTo=" + encodeURIComponent(window.location.pathname + window.location.search))}
                         className="w-full h-14 sm:h-16 bg-slate-900 hover:bg-black text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-wide"
                       >
                         Verify Identity Now

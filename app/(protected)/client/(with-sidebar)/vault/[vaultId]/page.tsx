@@ -266,7 +266,11 @@ export default function ClientVaultDetailPage() {
     const isTestnet = process.env.NEXT_PUBLIC_TESTNET_MODE === "true";
     if (user?.kycStatus !== KycStatus.VERIFIED && !isTestnet) {
       toast.error("Identity Verification Required", {
-        description: "You must complete full identity verification (Tier 2) to release funds."
+        description: "You must complete full identity verification (Tier 2) to release funds.",
+        action: {
+          label: "Verify Now",
+          onClick: () => router.push("/onboarding/kyc?returnTo=" + encodeURIComponent(window.location.pathname)),
+        }
       });
       return;
     }
@@ -290,6 +294,10 @@ export default function ClientVaultDetailPage() {
       toast.error("Onboarding Required", {
         description:
           "Please complete your BVN verification (Tier 1) before you can fund projects.",
+        action: {
+          label: "Verify Now",
+          onClick: () => router.push("/onboarding/identity?returnTo=" + encodeURIComponent(window.location.pathname)),
+        }
       });
       return;
     }
@@ -1482,7 +1490,7 @@ export default function ClientVaultDetailPage() {
                   <button onClick={fetchRate} className="text-emerald-600 hover:text-emerald-700 flex items-center gap-1 min-w-[100px] justify-end">
                     {loadingRate ? (
                       <div className="flex items-center gap-1">
-                        <DotLoader size="sm" />
+                        <DotLoader size="sm" color="white" />
                       </div>
                     ) : (
                       <RefreshCcw className="w-3 h-3" />

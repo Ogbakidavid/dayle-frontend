@@ -59,7 +59,7 @@ export default function RoleGuard({
   if (loading || (user && !allowedRoles.includes(user.role))) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-4">
-        <DotLoader size="lg" />
+        <DotLoader size="lg" color="primary" />
         <p className=" font-bold text-emerald-600 tracking-[0.4em]">
           Verifying permissions
         </p>

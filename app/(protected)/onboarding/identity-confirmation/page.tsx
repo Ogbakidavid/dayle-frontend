@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,8 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function IdentityConfirmationPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const { user, refreshUser, loading: authLoading } = useUser();
   const [loading, setLoading] = useState(false);
   const [val, setVal] = useState("");
@@ -314,13 +316,19 @@ export default function IdentityConfirmationPage() {
                   </h1>
                   
                   <p className="text-slate-600 text-base font-bold leading-relaxed px-4 mb-10">
-                    Your payment account has been set up. Complete identity verification in Settings to unlock withdrawals.
+                    {process.env.NEXT_PUBLIC_TESTNET_MODE === "true"
+                      ? "Your payment account has been set up. You can now fully use the platform for testing."
+                      : "Your payment account has been set up. Complete identity verification (Tier 2) in Settings to unlock fund releases and withdrawals."}
                   </p>
 
                   <Button
                     onClick={async () => {
                       setLoading(true);
                       await refreshUser();
+                      if (returnTo) {
+                        router.push(returnTo);
+                        return;
+                      }
                       router.push(user?.role === "CLIENT" ? "/client" : "/freelancer");
                     }}
                     disabled={loading}
@@ -330,7 +338,8 @@ export default function IdentityConfirmationPage() {
                       <DotLoader size="sm" color="white" />
                     ) : (
                       <span className="flex items-center gap-2 text-white">
-                        Continue to Dashboard <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        {returnTo ? "Continue to Action" : "Continue to Dashboard"}{" "}
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                       </span>
                     )}
                   </Button>

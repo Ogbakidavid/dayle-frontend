@@ -20,6 +20,10 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Dayle - Work with Certainty",
   description: "Bank-grade infrastructure for secure project settlement.",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export interface RootLayoutProps {

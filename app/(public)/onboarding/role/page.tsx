@@ -96,7 +96,7 @@ export default function RoleSelectionPage() {
                 className="p-0 text-emerald-500 font-bold  text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
               >
                 {loading === UserRole.CLIENT ? (
-                  <DotLoader size="sm" />
+                  <DotLoader size="sm" color="primary" />
                 ) : (
                   <span className="flex items-center gap-2">
                     Setup client account <ArrowRight className="w-5 h-5" />
@@ -139,7 +139,7 @@ export default function RoleSelectionPage() {
                 className="p-0 text-emerald-500 font-bold  text-sm hover:bg-transparent group-hover:translate-x-2 transition-transform"
               >
                 {loading === UserRole.FREELANCER ? (
-                  <DotLoader size="sm" />
+                  <DotLoader size="sm" color="primary" />
                 ) : (
                   <span className="flex items-center gap-2">
                     Setup contractor account <ArrowRight className="w-5 h-5" />

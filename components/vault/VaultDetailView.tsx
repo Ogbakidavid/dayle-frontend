@@ -58,7 +58,7 @@ export function VaultDetailView({ vaultId, role }: VaultDetailViewProps) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-white/50 gap-4">
-        <DotLoader size="lg" />
+        <DotLoader size="lg" color="primary" />
         <p className="font-bold st text-sm">Securing data link...</p>
       </div>
     );

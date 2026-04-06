@@ -263,7 +263,7 @@ export default function SubmissionPage() {
   if (!vault) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <DotLoader size="lg" />
+        <DotLoader size="lg" color="primary" />
       </div>
     );
   }

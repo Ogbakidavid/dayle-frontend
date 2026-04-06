@@ -77,8 +77,8 @@ export default function FreelancerVaultDetailPage() {
 
   if (vaultsLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen space-y-8 font-primary">
-        <LogoLoader />
+      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
+        <LogoLoader size="lg" />
       </div>
     );
   }

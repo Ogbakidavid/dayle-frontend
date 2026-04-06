@@ -150,7 +150,7 @@ export default function ForgotPasswordPage() {
               >
                 {loading ? (
                   <div className="flex items-center gap-3">
-                    <DotLoader size="sm" />
+                    <DotLoader size="sm" color="white" />
                     <span>Sending Link...</span>
                   </div>
                 ) : (

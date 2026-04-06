@@ -184,8 +184,8 @@ export default function BankTransferPage() {
 
   if (vaultsLoading || !bankDetails)
     return (
-      <div className="flex items-center justify-center h-screen">
-        <LogoLoader />
+      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
+        <LogoLoader size="lg" />
       </div>
     );
 

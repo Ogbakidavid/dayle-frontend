@@ -11,12 +11,19 @@ import DiditVerificationBtn from "@/components/kyc/DiditVerificationBtn";
 function KYCPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const roleParam = searchParams.get("role");
   const { user, refreshUser } = useUser();
 
   const handleSuccess = async () => {
     // Refresh user state so the frontend knows that KYC is complete
     const freshUser = await refreshUser();
+    
+    if (returnTo) {
+      router.push(returnTo);
+      return;
+    }
+
     const currentUserRole = roleParam || freshUser?.role || user?.role;
 
     if (
@@ -112,7 +119,7 @@ export default function KYCPage() {
     <React.Suspense
       fallback={
         <div className="min-h-screen bg-white flex items-center justify-center">
-          <DotLoader size="lg" />
+          <DotLoader size="lg" color="primary" />
         </div>
       }
     >

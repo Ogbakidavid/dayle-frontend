@@ -24,6 +24,7 @@ import { DayleLogo } from "@/components/shared/DayleLogo";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 import { useUser } from "@/lib/store/user-context";
 import { useVault } from "@/lib/store/vault-context";
+import { toast } from "sonner";
 
 interface InviteData {
   invite: {
@@ -55,7 +56,7 @@ interface CurrentUser {
 }
 
 export default function InvitePage() {
-  const { refreshUser } = useUser();
+  const { user, refreshUser } = useUser();
   const { refreshVaults } = useVault();
   const params = useParams();
   const router = useRouter();
@@ -139,6 +140,16 @@ export default function InvitePage() {
   };
 
   const handleAccept = async () => {
+    // KYC Tier 1 Check: Required to accept a job (freelancer)
+    if (currentUser && !user?.paymentAccountReady) {
+      toast.error("Identity Verification Required", {
+        description: "Please complete your BVN/Phone verification (Tier 1) before you can accept invitations.",
+      });
+      const returnTo = encodeURIComponent(`/invite/${inviteToken}`);
+      router.push(`/onboarding/identity?returnTo=${returnTo}`);
+      return;
+    }
+
     try {
       setProcessing(true);
       const res = (await api.invites.respond(inviteToken, {
@@ -157,16 +168,16 @@ export default function InvitePage() {
         return;
       }
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message || "Failed to accept invitation");
       setProcessing(false);
     }
   };
 
   if (loading) {
     return (
-      <LogoLoader 
-        fullPage 
-      />
+      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
+        <LogoLoader size="lg" />
+      </div>
     );
   }
 
@@ -237,7 +248,7 @@ export default function InvitePage() {
               >
                 {isRedirecting ? (
                   <div className="flex items-center gap-2">
-                    <DotLoader size="sm" />
+                    <DotLoader size="sm" color="white" />
                   </div>
                 ) : (
                   "View project"
@@ -456,7 +467,7 @@ export default function InvitePage() {
                     className="w-full h-12 border-slate-200 text-slate-900 hover:bg-slate-50 font-bold  rounded-xl transition-all active:scale-95"
                   >
                     {processing ? (
-                      <DotLoader size="sm" />
+                      <DotLoader size="sm" color="primary" />
                     ) : (
                       "Create account"
                     )}

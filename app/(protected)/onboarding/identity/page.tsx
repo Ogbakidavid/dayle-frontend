@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useFormPersistence } from "@/lib/hooks/use-form-persistence";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,8 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function IdentityOnboardingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const { user, refreshUser, loading: authLoading } = useUser();
   const [step, setStep] = useState<"country" | "form" | "success">(
     user?.country ? "form" : "country",
@@ -72,9 +74,13 @@ export default function IdentityOnboardingPage() {
     // Only redirect away if payment account is actually ready
     // Don't redirect if we're mid-onboarding or OTP flow
     if (user?.paymentAccountReady && step !== "success") {
+      if (returnTo) {
+        router.push(returnTo);
+        return;
+      }
       router.push(user.role === "CLIENT" ? "/client" : "/freelancer");
     }
-  }, [user, authLoading, router, step, otpStep]);
+  }, [user, authLoading, router, step, otpStep, returnTo]);
 
   const handleCountrySelect = async (c: string) => {
     setLoading(true);
@@ -700,20 +706,23 @@ export default function IdentityOnboardingPage() {
               </h1>
 
               <p className="text-slate-600 text-base font-bold leading-relaxed px-4 mb-10">
-                Your payment account has been set up. Complete identity
-                verification in Settings to unlock withdrawals.
+                {process.env.NEXT_PUBLIC_TESTNET_MODE === "true"
+                  ? "Your payment account has been set up. You can now fully use the platform for testing."
+                  : "Your payment account has been set up. Complete identity verification (Tier 2) in Settings to unlock withdrawals."}
               </p>
 
               <Button
-                onClick={() =>
-                  router.push(
-                    user?.role === "CLIENT" ? "/client" : "/freelancer",
-                  )
-                }
+                onClick={() => {
+                  if (returnTo) {
+                    router.push(returnTo);
+                    return;
+                  }
+                  router.push(user?.role === "CLIENT" ? "/client" : "/freelancer");
+                }}
                 className="w-full h-14 sm:h-16 bg-slate-900 text-white hover:bg-emerald-600 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-xl active:scale-[0.98] group"
               >
                 <span className="flex items-center gap-2 text-white">
-                  Continue to Dashboard{" "}
+                  {returnTo ? "Continue to Action" : "Continue to Dashboard"}{" "}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Button>

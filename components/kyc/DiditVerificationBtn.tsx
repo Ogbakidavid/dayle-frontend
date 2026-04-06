@@ -86,7 +86,7 @@ export default function DiditVerificationBtn({
     >
       {loading ? (
         <span className="flex items-center gap-3">
-          <DotLoader size="sm" />
+          <DotLoader size="sm" color="white" />
           Initializing...
         </span>
       ) : (
