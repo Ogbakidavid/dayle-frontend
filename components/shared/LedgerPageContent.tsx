@@ -133,7 +133,7 @@ export default function LedgerPageContent() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen pb-20 text-slate-900"
+      className="min-h-screen pb-20 text-slate-900 w-full overflow-x-hidden"
     >
       {/* Header */}
       <header className="mb-6 md:mb-10 px-4 md:px-0">
@@ -169,16 +169,16 @@ export default function LedgerPageContent() {
         {/* Balance Visualization */}
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 rounded-sm p-1 shadow-sm"
+          className="bg-white border border-slate-200 rounded-sm p-1 shadow-sm overflow-x-auto"
         >
           <LedgerBalance balance={enhancedBalance} role="freelancer" />
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-10">
           {/* Withdrawal Interface */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 min-w-0">
             <motion.div variants={itemVariants}>
-              <Card className="bg-white border-slate-200 overflow-hidden sticky top-32 rounded-sm shadow-xl">
+              <Card className="bg-white border-slate-200 overflow-hidden sticky top-32 rounded-sm shadow-xl w-full max-w-full">
                 <div className="bg-emerald-50 border-b border-emerald-100 py-4 px-6">
                   <h3 className="text-emerald-700 font-bold  text-sm">
                     Instant withdrawal
@@ -275,7 +275,8 @@ export default function LedgerPageContent() {
             </div>
 
             <div className="bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm">
-              <table className="w-full border-collapse">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse min-w-[500px] sm:min-w-0">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
                     <th className="px-2 sm:px-4 md:px-6 py-5 text-left text-[11px] font-bold text-slate-600">
@@ -381,6 +382,7 @@ export default function LedgerPageContent() {
                   )}
                 </tbody>
               </table>
+            </div>
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
