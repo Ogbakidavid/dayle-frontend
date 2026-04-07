@@ -360,16 +360,14 @@ export default function IdentityOnboardingPage() {
                         className="w-full h-12 xs:h-14 px-6 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-center tracking-[0.2em] text-lg"
                         required
                       />
-                      {isDev && (currentCountry === "NG" || currentCountry === "Nigeria") && (
-                        <div className="mt-2 text-[10px] xs:text-[11px] text-slate-500 font-bold flex items-center gap-1.5 ml-2">
-                           <Info className="w-3 h-3 text-blue-500" /> STAGING: Use 08032043843
-                        </div>
-                      )}
+
                     </div>
 
                     <div className="p-3 xs:p-4 bg-amber-50 rounded-2xl border border-amber-100">
                       <p className="text-[10px] xs:text-xs text-amber-700 font-bold leading-relaxed">
-                        IMPORTANT: This must be the phone number used during your BVN registration.
+                        {isDev 
+                          ? "STAGING: Use 08032043843 to proceed with testing." 
+                          : "IMPORTANT: This must be the phone number used during your BVN registration."}
                       </p>
                     </div>
 
@@ -377,9 +375,7 @@ export default function IdentityOnboardingPage() {
                       {loading ? "Confirming..." : "Link Phone & Send Code"}
                     </Button>
 
-                    <button type="button" onClick={() => setOtpStep("none")} className="text-slate-400 font-bold uppercase tracking-widest text-[9px] xs:text-[10px] hover:text-slate-600 transition-colors">
-                      Choose another method
-                    </button>
+
                   </form>
                 </motion.div>
               ) : step === "form" && otpStep === "method" ? (
