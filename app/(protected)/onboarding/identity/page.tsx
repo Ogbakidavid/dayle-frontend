@@ -441,26 +441,28 @@ export default function IdentityOnboardingPage() {
                         required
                         className="bg-slate-50! border-slate-200 h-14 xs:h-16 sm:h-20 rounded-2xl sm:rounded-3xl focus:border-emerald-500 text-slate-900 text-2xl xs:text-3xl sm:text-4xl font-bold tracking-[0.4em] text-center"
                       />
-                      <Alert className="mt-4 p-4 xs:p-5 bg-amber-50/50 border-amber-200/50 rounded-2xl border-2">
-                        <div className="flex items-center gap-3 xs:gap-4 text-left">
-                          <div className="w-8 h-8 xs:w-10 xs:h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                            <AlertCircle className="h-4 w-4 xs:h-5 xs:w-5 text-amber-600" />
+                      <div className="w-full flex justify-center mt-4">
+                        <div className="w-full p-4 bg-amber-50/50 border border-amber-200/50 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all">
+                          <div className="flex items-center gap-2 px-2.5 py-0.5 bg-amber-100/50 rounded-full border border-amber-200/40">
+                            <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-700">Staging Mode</span>
                           </div>
-                          <div>
-                            <AlertTitle className="text-[10px] xs:text-xs font-bold text-amber-900 uppercase tracking-widest mb-0.5">Staging Mode</AlertTitle>
-                            <AlertDescription className="text-[10px] xs:text-xs text-amber-800 font-medium">Use <span className="text-emerald-600 font-bold">123456</span> to verify</AlertDescription>
-                          </div>
+                          <p className="text-[11px] xs:text-[12px] font-bold text-amber-800 text-center leading-relaxed">
+                            Use <span className="text-emerald-600 font-extrabold tracking-widest">123456</span> to verify
+                          </p>
                         </div>
-                      </Alert>
+                      </div>
                     </div>
 
                     <Button type="submit" disabled={loading || otp.length < 4} className="w-full h-12 xs:h-14 bg-slate-900 text-white hover:bg-emerald-600 rounded-2xl font-bold text-base transition-all">
                       {loading ? "Verifying..." : "Verify & Complete Setup"}
                     </Button>
 
-                    <button type="button" onClick={() => setOtpStep("method")} className="text-[10px] xs:text-xs text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest">
-                      Didn't get a code? Resend
-                    </button>
+                    {!isDev && (
+                      <button type="button" onClick={() => setOtpStep("method")} className="text-[10px] xs:text-xs text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest">
+                        Didn't get a code? Resend
+                      </button>
+                    )}
                   </form>
                 </motion.div>
               ) : step === "form" ? (
