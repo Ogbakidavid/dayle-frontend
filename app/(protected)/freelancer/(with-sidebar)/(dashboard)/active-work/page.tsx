@@ -172,7 +172,7 @@ export default function AssignmentsPage() {
                       <CardContent className="p-8">
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                           <div className="space-y-4 flex-1 min-w-0">
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-col items-start md:flex-row md:items-center gap-3">
                               <h3 className="text-xl md:text-2xl font-bold text-slate-900  tracking-tight group-hover:text-emerald-700 transition-colors">
                                 {vault.title}
                               </h3>

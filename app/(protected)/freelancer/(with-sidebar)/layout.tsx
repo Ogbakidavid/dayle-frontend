@@ -110,7 +110,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <Link key={item.name} href={item.href}>
+              <Link key={item.name} href={item.href} onClick={() => setSidebarOpen(false)}>
                 <motion.div
                   variants={itemVariants}
                   className={cn(
@@ -176,7 +176,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 gap-2 mt-4">
-            <Link href="/freelancer/settings" className="relative group">
+            <Link href="/freelancer/settings" className="relative group" onClick={() => setSidebarOpen(false)}>
               <Button
                 variant="outline"
                 size="sm"
@@ -187,7 +187,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
               </Button>
               {(hasUnread ||
                 ((user?.kycStatus === "NONE" || user?.kycStatus === "REJECTED") &&
-                 process.env.NEXT_PUBLIC_TESTNET_MODE !== "true")) && (
+                process.env.NEXT_PUBLIC_TESTNET_MODE !== "true")) && (
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-muted"></span>

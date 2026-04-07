@@ -119,7 +119,7 @@ export default function ClientLayout({
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <Link key={item.name} href={item.href}>
+              <Link key={item.name} href={item.href} onClick={() => setSidebarOpen(false)}>
                 <motion.div
                   variants={itemVariants}
                   className={cn(
@@ -185,7 +185,7 @@ export default function ClientLayout({
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 gap-2 mt-4">
-            <Link href="/client/settings" className="relative group">
+            <Link href="/client/settings" className="relative group" onClick={() => setSidebarOpen(false)}>
               <Button
                 variant="outline"
                 size="sm"
