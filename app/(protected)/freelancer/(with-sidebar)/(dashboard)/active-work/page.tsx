@@ -155,7 +155,7 @@ export default function AssignmentsPage() {
                 <p className="text-xl font-bold text-slate-900 tracking-tighter ">
                   {statusFilter === "COMPLETED" ? "No history yet" : "Clean slate"}
                 </p>
-                <p className="text-xs font-bold text-slate-600 tracking-widest leading-relaxed max-w-xs mx-auto">
+                <p className="text-xs font-bold text-slate-600 tracking-widest leading-relaxed max-w-xs mx-auto px-3">
                   {statusFilter === "COMPLETED" 
                     ? "You haven't completed any assignments in this workspace yet."
                     : "No assignments match your current filter criteria."}
