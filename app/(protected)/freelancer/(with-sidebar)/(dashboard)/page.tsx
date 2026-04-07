@@ -373,7 +373,7 @@ export default function FreelancerDashboard() {
                                 ? vault.deliverables?.length > 1
                                   ? "Deliverables submitted"
                                   : "Deliverable submitted"
-                                : "Not started"}
+                                : "Awaiting submission"}
                           </span>
                         </div>
                       </div>

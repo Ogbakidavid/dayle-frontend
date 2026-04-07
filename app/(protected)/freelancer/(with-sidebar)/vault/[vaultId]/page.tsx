@@ -547,7 +547,7 @@ export default function FreelancerVaultDetailPage() {
                                 >
                                   {submissionWithThis
                                     ? `Included in submission (${new Date(submissionWithThis.submittedAt).toLocaleDateString()})`
-                                    : "Not started"}
+                                    : "Awaiting submission"}
                                 </Badge>
                               </div>
                             </div>
