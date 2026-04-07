@@ -140,6 +140,7 @@ export default function InvitePage() {
   };
 
   const handleAccept = async () => {
+    setProcessing(true);
     // KYC Tier 1 Check: Required to accept a job (freelancer)
     if (currentUser && !user?.paymentAccountReady) {
       toast.error("Identity Verification Required", {
@@ -151,7 +152,7 @@ export default function InvitePage() {
     }
 
     try {
-      setProcessing(true);
+      // reseting processing is handled by catch or redirect
       const res = (await api.invites.respond(inviteToken, {
         decision: "ACCEPT",
       })) as { success: boolean; vaultId: string; roleUpdated?: boolean };

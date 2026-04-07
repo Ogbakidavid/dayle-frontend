@@ -241,7 +241,7 @@ export default function IdentityOnboardingPage() {
       <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[60px_60px] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
 
-      <div className="relative z-10 w-full max-w-[340px] xs:max-w-xl lg:max-w-5xl">
+      <div className="relative z-10 w-full max-w-[min(100%,360px)] xs:max-w-xl md:max-w-2xl lg:max-w-5xl mx-auto">
         <div className="flex lg:hidden justify-center mb-8 xs:mb-10">
           <DayleLogo className="w-12 h-12 text-emerald-500" />
         </div>
@@ -302,10 +302,10 @@ export default function IdentityOnboardingPage() {
               {step === "country" ? (
                 <motion.div key="country" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <div className="mb-8 xs:mb-10 text-center text-slate-900">
-                    <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold tracking-tight leading-tight mb-3 sm:mb-4">
+                    <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold tracking-tight leading-tight mb-3 sm:mb-4 text-balance">
                       Select your <span className="text-emerald-600">country.</span>
                     </h1>
-                    <p className="text-slate-600 text-sm xs:text-base font-bold leading-relaxed px-2">
+                    <p className="text-slate-600 text-sm xs:text-base font-bold leading-relaxed px-2 text-balance">
                       We need this to ensure we use the correct payment rails for your region.
                     </p>
                   </div>
@@ -470,10 +470,10 @@ export default function IdentityOnboardingPage() {
               ) : step === "form" ? (
                 <motion.div key="form" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <div className="mb-8 xs:mb-10 text-center">
-                    <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4">
+                    <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-3 sm:mb-4 text-balance">
                       One last <span className="text-emerald-600">step.</span>
                     </h1>
-                    <p className="text-slate-600 text-sm xs:text-base font-bold leading-relaxed px-2">
+                    <p className="text-slate-600 text-sm xs:text-base font-bold leading-relaxed px-2 text-balance">
                       {currentCountry === "NG" || currentCountry === "Nigeria" ? "To set up your payment account, we need your BVN." : "To receive payments, we need your M-Pesa phone number."}
                     </p>
                   </div>
@@ -513,13 +513,13 @@ export default function IdentityOnboardingPage() {
                       </div>
 
                       {isDev && (
-                        <Alert className="bg-emerald-50/50 border-emerald-200/50 rounded-2xl p-4 xs:p-5 border-2 text-left">
-                          <div className="flex items-center gap-3">
-                            <Info className="h-4 w-4 xs:h-5 xs:w-5 text-emerald-600" />
-                            <div>
-                              <span className="text-[10px] xs:text-xs font-bold uppercase text-emerald-900 block">Staging Hint</span>
-                              <span className="text-[10px] xs:text-[12px] font-medium text-emerald-800/80">Use {currentCountry === "KE" || currentCountry === "Kenya" ? "0714325678" : "any 11 digits"}</span>
+                        <Alert className="bg-emerald-50/50 border-emerald-200/50 rounded-2xl p-4 xs:p-5 border-2 text-center w-full">
+                          <div className="flex flex-col items-center justify-center gap-1.5">
+                            <div className="flex items-center gap-2">
+                              <Info className="h-4 w-4 xs:h-5 xs:w-5 text-emerald-600" />
+                              <span className="text-[10px] xs:text-[11px] font-bold uppercase text-emerald-900">Staging Hint</span>
                             </div>
+                            <span className="text-[10px] xs:text-[12px] font-medium text-emerald-800/80">Use {currentCountry === "KE" || currentCountry === "Kenya" ? "0714325678" : "any 11 digits"}</span>
                           </div>
                         </Alert>
                       )}
