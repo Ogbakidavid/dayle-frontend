@@ -65,7 +65,13 @@ export default function FreelancerDashboard() {
 
   // Work categories
   const activeVaults = vaults.filter((v: any) =>
-    [VaultStatus.FUNDED, VaultStatus.DISPUTED].includes(v.status),
+    [
+      VaultStatus.FUNDED,
+      VaultStatus.DISPUTED,
+      VaultStatus.AWAITING_PAYMENT,
+      VaultStatus.PROCESSING_PAYMENT,
+      VaultStatus.CHANGES_REQUESTED,
+    ].includes(v.status),
   );
   const completedVaults = vaults.filter(
     (v: any) => v.status === VaultStatus.RELEASED,

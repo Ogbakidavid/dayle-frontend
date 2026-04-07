@@ -161,8 +161,8 @@ export default function InvitePage() {
         // If role was updated, refresh session to rotate JWT roles
         if (res.roleUpdated) {
           await refreshUser();
-          await refreshVaults();
         }
+        await refreshVaults();
         
         // Redirect to acceptance success page instead of vault directly
         router.push(`/invitation-accepted?vaultId=${res.vaultId}`);
