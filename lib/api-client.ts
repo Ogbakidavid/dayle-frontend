@@ -28,15 +28,21 @@ interface RequestOptions extends RequestInit {
 
 // HTTP request helper
 async function request(endpoint: string, options: RequestOptions = {}) {
-  const { method = "GET", body, headers = {} } = options;
+  const { method = "GET", body, headers: customHeaders = {} } = options;
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(customHeaders as any),
+  };
+
+  // Only add ngrok bypass header if we're actually using ngrok
+  if (API_BASE_URL.includes("ngrok")) {
+    headers["ngrok-skip-browser-warning"] = "true";
+  }
 
   const config: RequestInit = {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      "ngrok-skip-browser-warning": "true",
-      ...headers,
-    },
+    headers,
     credentials: "include", // Important: sends cookies with requests
   };
 
