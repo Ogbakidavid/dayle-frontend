@@ -133,7 +133,7 @@ export default function LedgerPageContent() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen pb-20 text-slate-900 w-full overflow-x-hidden"
+      className="min-h-screen pb-20 text-slate-900"
     >
       {/* Header */}
       <header className="mb-6 md:mb-10 px-4 md:px-0">
@@ -169,14 +169,14 @@ export default function LedgerPageContent() {
         {/* Balance Visualization */}
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 rounded-sm p-1 shadow-sm overflow-x-auto"
+          className="bg-white border border-slate-200 rounded-sm p-1 shadow-sm"
         >
           <LedgerBalance balance={enhancedBalance} role="freelancer" />
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-10">
+        <div className="grid xl:grid-cols-3 gap-10">
           {/* Withdrawal Interface */}
-          <div className="lg:col-span-1 min-w-0">
+          <div className="xl:col-span-1 min-w-0">
             <motion.div variants={itemVariants}>
               <Card className="bg-white border-slate-200 overflow-hidden sticky top-32 rounded-sm shadow-xl w-full max-w-full">
                 <div className="bg-emerald-50 border-b border-emerald-100 py-4 px-6">
@@ -257,14 +257,14 @@ export default function LedgerPageContent() {
           {/* Transaction History Ledger */}
           <motion.div
             variants={itemVariants}
-            className="lg:col-span-2 space-y-6"
+            className="xl:col-span-2 space-y-6"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h2 className="text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2 tracking-tight">
                 <History className="w-5 h-5 text-emerald-600" />
                 Settlement Ledger
               </h2>
-              <div className="relative w-full sm:w-auto">
+              <div className="relative w-auto">
                 <Search className="w-4 h-4 text-slate-900 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
@@ -275,8 +275,7 @@ export default function LedgerPageContent() {
             </div>
 
             <div className="bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse min-w-[500px] sm:min-w-0">
+                <table className="w-full border-collapse">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
                     <th className="px-2 sm:px-4 md:px-6 py-5 text-left text-[11px] font-bold text-slate-600">
@@ -382,7 +381,6 @@ export default function LedgerPageContent() {
                   )}
                 </tbody>
               </table>
-            </div>
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
