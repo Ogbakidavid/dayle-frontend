@@ -29,7 +29,7 @@ export function LedgerBalance({
           </div>
           <CurrencyEstimate 
             usdAmount={Number(balance?.formattedAvailable || "0")} 
-            className="text-slate-900 text-3xl sm:text-4xl lg:text-5xl font-bold"
+            className="text-slate-900 text-2xl sm:text-4xl lg:text-5xl font-bold"
           />
           <div className="mt-8 flex items-center gap-3">
             <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-sm font-bold text-emerald-500  border border-emerald-500/20 flex items-center gap-2">
@@ -51,7 +51,7 @@ export function LedgerBalance({
           </div>
           <CurrencyEstimate 
             usdAmount={Number(balance?.formattedPending || "0")} 
-            className="text-slate-900 text-3xl sm:text-4xl lg:text-5xl font-bold"
+            className="text-slate-900 text-2xl sm:text-4xl lg:text-5xl font-bold"
           />
           <div className="mt-8 flex items-center gap-2">
             <span className="text-sm font-bold text-slate-900  flex items-center gap-2">

@@ -198,7 +198,7 @@ export default function LedgerPageContent() {
                           value={withdrawAmount}
                           onChange={(e) => setWithdrawAmount(e.target.value)}
                           placeholder="0.00"
-                          className="w-full text-2xl sm:text-3xl lg:text-4xl font-bold tabular-nums bg-transparent border-b border-slate-200 focus:border-emerald-600 outline-none py-4 pl-0 sm:pl-8 transition-all text-slate-900 placeholder:text-slate-900 "
+                          className="w-full text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tabular-nums bg-transparent border-b border-slate-200 focus:border-emerald-600 outline-none py-2 md:py-4 pl-0 transition-all text-slate-900 placeholder:text-slate-900"
                           min="1"
                           step="0.01"
                         />
@@ -259,20 +259,18 @@ export default function LedgerPageContent() {
             variants={itemVariants}
             className="lg:col-span-2 space-y-6"
           >
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3 tracking-tight">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2 tracking-tight">
                 <History className="w-5 h-5 text-emerald-600" />
                 Settlement Ledger
               </h2>
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Search className="w-4 h-4 text-slate-900 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="Search ledger..."
-                    className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-sm text-sm font-medium outline-none focus:border-emerald-500 transition-all text-slate-900 w-full sm:w-64 placeholder:text-slate-900 shadow-sm"
-                  />
-                </div>
+              <div className="relative w-full sm:w-auto">
+                <Search className="w-4 h-4 text-slate-900 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search ledger..."
+                  className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-sm text-sm font-medium outline-none focus:border-emerald-500 transition-all text-slate-900 w-full sm:w-64 placeholder:text-slate-900 shadow-sm"
+                />
               </div>
             </div>
 
@@ -333,7 +331,9 @@ export default function LedgerPageContent() {
                                 {tx.description}
                               </div>
                               <div className=" md:text-sm text-slate-600 font-bold  mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                {new Date(tx.date).toLocaleDateString()}
+                                {tx.date && !isNaN(new Date(tx.date).getTime()) 
+                                  ? new Date(tx.date).toLocaleDateString()
+                                  : "Recently"}
                                 <span className="hidden md:block w-1 h-1 rounded-full bg-slate-200" />
                                 <span className="truncate">
                                   Ref: {formatRef(tx.id)}
