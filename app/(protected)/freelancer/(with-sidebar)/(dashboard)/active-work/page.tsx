@@ -169,7 +169,7 @@ export default function AssignmentsPage() {
                   <Link href={`/freelancer/vault/${vault.id}`}>
                     <Card className="bg-white border border-slate-200 shadow-sm hover:border-emerald-500/20 group transition-all duration-500 cursor-pointer overflow-hidden relative">
                       <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500/40 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <CardContent className="p-8">
+                      <CardContent className="p-4 md:p-8">
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                           <div className="space-y-4 flex-1 min-w-0">
                             <div className="flex flex-col items-start md:flex-row md:items-center gap-3">
