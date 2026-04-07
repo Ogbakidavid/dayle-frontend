@@ -371,7 +371,7 @@ export default function IdentityOnboardingPage() {
                       </p>
                     </div>
 
-                    <Button type="submit" disabled={loading || confirmPhoneVal.length < 10} className="w-full h-12 xs:h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold shadow-lg shadow-emerald-500/20 transition-all disabled:bg-slate-200">
+                    <Button type="submit" disabled={loading || confirmPhoneVal.length < 10} className="w-full h-12 xs:h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold shadow-lg shadow-emerald-500/20 transition-all disabled:bg-slate-900">
                       {loading ? "Confirming..." : "Link Phone & Send Code"}
                     </Button>
 
