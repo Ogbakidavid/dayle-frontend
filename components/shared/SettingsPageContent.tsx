@@ -336,15 +336,15 @@ export default function SettingsPageContent({ role = "client" }) {
             className="flex items-center gap-2 group transition-colors"
           >
             <ChevronLeft className="w-4 h-4 text-slate-900 group-hover:text-emerald-600 transition-transform group-hover:-translate-x-1" />
-            <span className="text-sm font-bold  text-slate-900 group-hover:text-emerald-600">
+            <span className="text-sm font-bold  text-slate-900 group-hover:text-emerald-600 max-[425px]:hidden">
               {isClient ? "Dashboard" : "Freelancer dashboard"}
             </span>
           </Link>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-bold text-slate-900 ">
+            <span className="text-sm font-bold text-slate-900 max-[425px]:hidden">
               Account center
             </span>
-            <div className="h-4 w-px bg-slate-200" />
+            <div className="h-4 w-px bg-slate-200 max-[425px]:hidden" />
             <div className="flex items-center gap-2">
               <div className="relative group">
                 <UserAvatar
