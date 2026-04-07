@@ -488,7 +488,7 @@ export default function IdentityOnboardingPage() {
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           required
-                          className="bg-slate-50! border-slate-200 h-12 xs:h-14 sm:h-16 rounded-xl sm:rounded-2xl text-slate-900 text-sm xs:text-base font-bold px-4 xs:px-6"
+                          className="bg-slate-50! border-slate-200 h-12 xs:h-14 sm:h-16 rounded-xl sm:rounded-2xl text-slate-900 text-sm xs:text-base font-bold px-4 xs:px-6 text-center"
                         />
                       </div>
 
