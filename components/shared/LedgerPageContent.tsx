@@ -133,12 +133,12 @@ export default function LedgerPageContent() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen pb-20 text-slate-900"
+      className="min-h-screen pb-20 text-slate-900 max-w-full"
     >
       {/* Header */}
-      <header className="mb-6 md:mb-10 px-4 md:px-0">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <motion.div variants={itemVariants} className="space-y-1">
+      <header className="mb-6 md:mb-10 px-3 md:px-0">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 max-w-full">
+          <motion.div variants={itemVariants} className="space-y-1 min-w-0">
             <div className="flex items-center gap-2 text-sm md:text-sm font-bold text-emerald-500 tracking-wide mb-2 ">
               <Lock className="w-3.5 h-3.5 shrink-0" />
               Secured Settlement Account
@@ -184,7 +184,7 @@ export default function LedgerPageContent() {
                     Instant withdrawal
                   </h3>
                 </div>
-                <CardContent className="p-4 sm:p-6 lg:p-8 space-y-8">
+                <CardContent className="p-3 sm:p-6 lg:p-8 space-y-8">
                   <form onSubmit={handleWithdraw} className="space-y-8">
                     <div>
                       <label className="text-sm font-bold text-slate-900  mb-4 block">
@@ -274,17 +274,17 @@ export default function LedgerPageContent() {
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm">
-                <table className="w-full border-collapse">
+            <div className="bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm max-w-full">
+                <table className="w-full border-collapse table-fixed">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="px-2 sm:px-4 md:px-6 py-5 text-left text-[11px] font-bold text-slate-600">
+                    <th className="w-[60%] sm:w-[50%] px-2 sm:px-4 md:px-6 py-5 text-left text-[11px] font-bold text-slate-600">
                       Transaction
                     </th>
                     <th className="hidden sm:table-cell px-6 py-5 text-left text-[11px] font-bold text-slate-600">
                       Status
                     </th>
-                    <th className="px-2 sm:px-4 md:px-6 py-5 text-right text-[11px] font-bold text-slate-600">
+                    <th className="w-[40%] sm:w-[25%] px-2 sm:px-4 md:px-6 py-5 text-right text-[11px] font-bold text-slate-600">
                       Amount
                     </th>
                   </tr>
