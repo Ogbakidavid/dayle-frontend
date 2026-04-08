@@ -34,6 +34,7 @@ interface DeliverableStatus {
   notes: string;
   files: File[];
   link: string;
+  existingFiles?: any[]; // For pre-filling
 }
 
 
@@ -57,18 +58,46 @@ export default function SubmissionPage() {
       try {
         const data = await api.vaults.getById(vaultId);
         setVault(data);
+        
+        // Find latest submission if we are in CHANGES_REQUESTED
+        const latestSubmission = data.status === "CHANGES_REQUESTED" && data.submissions?.length > 0 
+          ? data.submissions[0] // Assuming backend returns sorted or we just pick first
+          : null;
+
         if (data.deliverables) {
+          const hasLocalData = Object.keys(persistedDeliverables).length > 0 || overallNotes.length > 0;
+
           setDeliverableStatuses(
-            data.deliverables.map((d: any) => ({
-              deliverableId: d.id,
-              deliverableTitle: d.title,
-              submissionType: d.submissionType as SubmissionType,
-              included: persistedDeliverables[d.id]?.included || false,
-              notes: persistedDeliverables[d.id]?.notes || "",
-              files: [],
-              link: persistedDeliverables[d.id]?.link || "",
-            })),
+            data.deliverables.map((d: any) => {
+              // Pre-fill from latest submission if no local draft exists
+              const prevStatus = latestSubmission?.deliverableStatus?.find(
+                (ps: any) => ps.deliverableId === d.id || ps.deliverableTitle === d.title
+              );
+
+              return {
+                deliverableId: d.id,
+                deliverableTitle: d.title,
+                submissionType: d.submissionType as SubmissionType,
+                included: hasLocalData 
+                  ? (persistedDeliverables[d.id]?.included || false)
+                  : (prevStatus?.included || false),
+                notes: hasLocalData
+                  ? (persistedDeliverables[d.id]?.notes || "")
+                  : (prevStatus?.notes || ""),
+                files: [],
+                existingFiles: hasLocalData
+                  ? []
+                  : (prevStatus?.files || []),
+                link: hasLocalData
+                  ? (persistedDeliverables[d.id]?.link || "")
+                  : (prevStatus?.link || ""),
+              };
+            }),
           );
+
+          if (!hasLocalData && latestSubmission?.notes) {
+            setOverallNotes(latestSubmission.notes);
+          }
         }
 
       } catch (err) {
@@ -143,6 +172,19 @@ export default function SubmissionPage() {
     );
   };
 
+  const removeExistingFile = (delIndex: number, fileIndex: number) => {
+    setDeliverableStatuses((prev) =>
+      prev.map((d, i) =>
+        i === delIndex
+          ? { 
+              ...d, 
+              existingFiles: d.existingFiles?.filter((_, fIdx) => fIdx !== fileIndex) 
+            }
+          : d,
+      ),
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const includedDeliverables = deliverableStatuses.filter((d) => d.included);
@@ -161,7 +203,9 @@ export default function SubmissionPage() {
       const needsFile = d.submissionType === SubmissionType.FILE || d.submissionType === SubmissionType.BOTH;
       const needsLink = d.submissionType === SubmissionType.LINK || d.submissionType === SubmissionType.BOTH;
 
-      if (needsFile && d.files.length === 0) {
+      const totalFiles = (d.files?.length || 0) + (d.existingFiles?.length || 0);
+
+      if (needsFile && totalFiles === 0) {
         toast.error(`File attachment is mandatory for: ${d.deliverableTitle}`);
         return;
       }
@@ -235,7 +279,7 @@ export default function SubmissionPage() {
             deliverableId: d.deliverableId,
             included: d.included,
             notes: d.notes,
-            files: uploadedFiles,
+            files: [...(d.existingFiles || []), ...uploadedFiles],
             link: d.link,
           };
         })
@@ -403,6 +447,32 @@ export default function SubmissionPage() {
                                 </div>
                               </div>
                             )}
+
+                            {/* Existing Files from previous submission */}
+                            {item.existingFiles?.map((file, fIdx) => (
+                              <div
+                                key={`ex-${fIdx}`}
+                                className="flex items-center justify-between p-3 rounded-xl bg-emerald-50/50 border border-emerald-100 group shadow-sm"
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                  <p className="text-sm font-bold text-slate-700 truncate">
+                                    {file.filename || file.name}
+                                  </p>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeExistingFile(idx, fIdx);
+                                  }}
+                                  className="text-slate-300 hover:text-red-500 p-1 transition-colors"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ))}
 
                             {item.files.map((file, fIdx) => (
                               <div
