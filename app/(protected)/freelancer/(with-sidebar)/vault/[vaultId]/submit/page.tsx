@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/api-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { SubmissionType } from "@/lib/domain/enums";
+import { SubmissionType, VaultStatus } from "@/lib/domain/enums";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
@@ -60,42 +60,44 @@ export default function SubmissionPage() {
         setVault(data);
         
         // Find latest submission if we are in CHANGES_REQUESTED
-        const latestSubmission = data.status === "CHANGES_REQUESTED" && data.submissions?.length > 0 
-          ? data.submissions[0] // Assuming backend returns sorted or we just pick first
+        // Sort explicitly to be 100% sure we get the newest
+        const submissions = (data.submissions || []).sort((a: any, b: any) => 
+          new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+        );
+
+        const latestSubmission = (data.status === VaultStatus.CHANGES_REQUESTED || data.status === "CHANGES_REQUESTED") && submissions.length > 0 
+          ? submissions[0] 
           : null;
 
         if (data.deliverables) {
-          const hasLocalData = Object.keys(persistedDeliverables).length > 0 || overallNotes.length > 0;
-
           setDeliverableStatuses(
             data.deliverables.map((d: any) => {
-              // Pre-fill from latest submission if no local draft exists
+              // Try to find status from latest submission
               const prevStatus = latestSubmission?.deliverableStatus?.find(
                 (ps: any) => ps.deliverableId === d.id || ps.deliverableTitle === d.title
               );
+
+              // Check local persistence
+              const local = persistedDeliverables[d.id] || {};
+              const hasLocal = Object.keys(local).length > 0;
 
               return {
                 deliverableId: d.id,
                 deliverableTitle: d.title,
                 submissionType: d.submissionType as SubmissionType,
-                included: hasLocalData 
-                  ? (persistedDeliverables[d.id]?.included || false)
-                  : (prevStatus?.included || false),
-                notes: hasLocalData
-                  ? (persistedDeliverables[d.id]?.notes || "")
-                  : (prevStatus?.notes || ""),
+                // If we have a previous submission that was requested for changes, 
+                // we DEFAULT to that data unless the user has actively typed something NEW locally.
+                included: hasLocal ? local.included : (prevStatus?.included ?? false),
+                notes: (hasLocal && local.notes) ? local.notes : (prevStatus?.notes || ""),
                 files: [],
-                existingFiles: hasLocalData
-                  ? []
-                  : (prevStatus?.files || []),
-                link: hasLocalData
-                  ? (persistedDeliverables[d.id]?.link || "")
-                  : (prevStatus?.link || ""),
+                existingFiles: hasLocal ? [] : (prevStatus?.files || []),
+                link: (hasLocal && local.link) ? local.link : (prevStatus?.link || ""),
               };
             }),
           );
 
-          if (!hasLocalData && latestSubmission?.notes) {
+          // Pre-fill overall notes if local is empty
+          if (!overallNotes && latestSubmission?.notes) {
             setOverallNotes(latestSubmission.notes);
           }
         }

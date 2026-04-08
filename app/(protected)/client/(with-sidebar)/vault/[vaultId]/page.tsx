@@ -643,7 +643,9 @@ export default function ClientVaultDetailPage() {
                   <div
                     className={cn(
                       "w-1.5 h-1.5 rounded-full shadow-sm",
-                      vault.status === VaultStatus.FUNDED
+                      (vault.status === VaultStatus.FUNDED || 
+                       vault.status === VaultStatus.CHANGES_REQUESTED || 
+                       vault.status === VaultStatus.RELEASE_REQUESTED)
                         ? "bg-emerald-500 animate-pulse shadow-emerald-500/50"
                       : vault.status === VaultStatus.DISPUTED
                         ? "bg-amber-500 animate-pulse shadow-amber-500/50"
@@ -659,7 +661,9 @@ export default function ClientVaultDetailPage() {
                   <p
                     className={cn(
                       "text-[10px] sm:text-xs font-bold",
-                      vault.status === VaultStatus.FUNDED
+                      (vault.status === VaultStatus.FUNDED || 
+                       vault.status === VaultStatus.CHANGES_REQUESTED || 
+                       vault.status === VaultStatus.RELEASE_REQUESTED)
                         ? "text-emerald-600"
                       : vault.status === VaultStatus.DISPUTED
                         ? "text-amber-600"
@@ -672,7 +676,9 @@ export default function ClientVaultDetailPage() {
                       : "text-slate-400",
                     )}
                   >
-                    {vault.status === VaultStatus.FUNDED
+                    {(vault.status === VaultStatus.FUNDED || 
+                      vault.status === VaultStatus.CHANGES_REQUESTED || 
+                      vault.status === VaultStatus.RELEASE_REQUESTED)
                       ? "Funds secured in vault"
                     : vault.status === VaultStatus.DISPUTED
                       ? "Funds locked in resolution"
@@ -694,7 +700,10 @@ export default function ClientVaultDetailPage() {
           </header>
 
           {/* SECTION: FEE BREAKDOWN (ONLY IF FUNDED OR RELEASED) */}
-          {(vault.status === VaultStatus.FUNDED || vault.status === VaultStatus.RELEASED) && (
+          {(vault.status === VaultStatus.FUNDED || 
+            vault.status === VaultStatus.CHANGES_REQUESTED || 
+            vault.status === VaultStatus.RELEASE_REQUESTED || 
+            vault.status === VaultStatus.RELEASED) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card className="lg:col-span-2 bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
                 <CardContent className="p-4 sm:p-6">
