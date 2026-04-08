@@ -71,6 +71,9 @@ export default function FreelancerDashboard() {
       VaultStatus.AWAITING_PAYMENT,
       VaultStatus.PROCESSING_PAYMENT,
       VaultStatus.CHANGES_REQUESTED,
+      VaultStatus.RELEASE_REQUESTED,
+      VaultStatus.RELEASING,
+      VaultStatus.REFUNDING,
     ].includes(v.status),
   );
   const completedVaults = vaults.filter(
@@ -157,7 +160,7 @@ export default function FreelancerDashboard() {
               className="text-slate-900"
             />
             <p className="text-blue-400 text-xs font-bold tracking-wide">
-              {activeVaults.length} active assignments
+              {activeVaults.length} {activeVaults.length === 1 ? "active assignment" : "active assignments"}
             </p>
           </div>
         </motion.div>

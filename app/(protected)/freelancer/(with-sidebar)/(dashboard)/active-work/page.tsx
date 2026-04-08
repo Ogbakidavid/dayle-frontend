@@ -49,7 +49,14 @@ export default function AssignmentsPage() {
   // Filtered based on tab
   const filteredVaults = allAssignments.filter((v: any) => {
     if (statusFilter === "ACTIVE") {
-      return [VaultStatus.FUNDED, VaultStatus.DISPUTED].includes(v.status);
+      return [
+        VaultStatus.FUNDED, 
+        VaultStatus.DISPUTED, 
+        VaultStatus.CHANGES_REQUESTED, 
+        VaultStatus.RELEASE_REQUESTED,
+        VaultStatus.RELEASING,
+        VaultStatus.REFUNDING
+      ].includes(v.status);
     }
     if (statusFilter === "COMPLETED") {
       return [VaultStatus.RELEASED, VaultStatus.REFUNDED].includes(v.status);
@@ -71,7 +78,14 @@ export default function AssignmentsPage() {
     .reduce((acc, v: any) => acc + (Number(v.formattedTotalAmount) || 0), 0);
 
   const activeCount = allAssignments.filter((v: any) => 
-    [VaultStatus.FUNDED, VaultStatus.DISPUTED].includes(v.status)
+    [
+      VaultStatus.FUNDED, 
+      VaultStatus.DISPUTED, 
+      VaultStatus.CHANGES_REQUESTED, 
+      VaultStatus.RELEASE_REQUESTED,
+      VaultStatus.RELEASING,
+      VaultStatus.REFUNDING
+    ].includes(v.status)
   ).length;
 
   return (
@@ -179,12 +193,21 @@ export default function AssignmentsPage() {
                               <Badge className={cn(
                                 "text-[9px] font-bold px-3 py-0.5 rounded-full uppercase tracking-widest",
                                 vault.status === VaultStatus.RELEASED ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
-                                [VaultStatus.FUNDED, VaultStatus.DISPUTED].includes(vault.status) ? "bg-amber-50 text-amber-700 border-amber-100" :
+                                [
+                                  VaultStatus.FUNDED, 
+                                  VaultStatus.DISPUTED, 
+                                  VaultStatus.CHANGES_REQUESTED, 
+                                  VaultStatus.RELEASE_REQUESTED,
+                                  VaultStatus.RELEASING,
+                                  VaultStatus.REFUNDING
+                                ].includes(vault.status) ? "bg-amber-50 text-amber-700 border-amber-100" :
                                 "bg-slate-50 text-slate-600 border-slate-100"
                               )}>
                                 {
                                   vault.status === VaultStatus.RELEASED ? "Paid" : 
                                   vault.status === VaultStatus.FUNDED ? "In Progress" : 
+                                  vault.status === VaultStatus.CHANGES_REQUESTED ? "Changes Requested" :
+                                  vault.status === VaultStatus.RELEASE_REQUESTED ? "Awaiting Release" :
                                   vault.status
                                 }
                               </Badge>
