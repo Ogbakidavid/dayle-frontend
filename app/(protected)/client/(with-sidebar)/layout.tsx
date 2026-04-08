@@ -219,17 +219,48 @@ export default function ClientLayout({
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header */}
-        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 p-3 sm:p-4 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSidebarOpen(true)}
-            className="text-slate-900 hover:bg-slate-100 h-9 w-9 p-0"
-          >
-            <Menu className="w-5 h-5" />
-          </Button>
-          <h1 className="text-lg font-bold font-primary tracking-tight">Dayle</h1>
-          <div className="w-9" /> {/* Spacer for centering with menu button */}
+        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 p-2 sm:p-4 flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(true)}
+              className="text-slate-900 hover:bg-slate-100 h-9 w-9 p-0"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+            <Link href="/client">
+              <DayleLogo className="w-8 h-8 text-slate-900" />
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <Link href="/client/settings">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 w-9 p-0 text-slate-700 hover:bg-slate-100 relative"
+              >
+                <Settings className="w-5 h-5" />
+                {(hasUnread ||
+                  ((user?.kycStatus === "NONE" || user?.kycStatus === "REJECTED") &&
+                  process.env.NEXT_PUBLIC_TESTNET_MODE !== "true")) && (
+                  <span className="absolute top-2 right-2 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  </span>
+                )}
+              </Button>
+            </Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={logout}
+              className="h-9 w-9 p-0 text-slate-700 hover:bg-red-50 hover:text-red-600"
+            >
+              <LogOut className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Content Area */}
