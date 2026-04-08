@@ -37,6 +37,7 @@ export enum VaultStatus {
   REFUND_FAILED = "REFUND_FAILED",
   WITHDRAWAL_FAILED = "WITHDRAWAL_FAILED",
   CHANGES_REQUESTED = "CHANGES_REQUESTED",
+  RELEASE_REQUESTED = "RELEASE_REQUESTED",
 }
 
 // ============================================================================
@@ -236,6 +237,8 @@ export const getVaultDerivedLabel = (status: string | undefined): string => {
       return "PROCESSING PAYMENT";
     case VaultStatus.CHANGES_REQUESTED:
       return "CHANGES REQUESTED";
+    case VaultStatus.RELEASE_REQUESTED:
+      return "RELEASE REQUESTED";
     default:
       return status || "UNKNOWN";
   }
@@ -270,6 +273,8 @@ export const getVaultStatusDisplay = (vault: any): { label: string; color: strin
       return { label: "PROCESSING", color: "text-amber-500" };
     case VaultStatus.CHANGES_REQUESTED:
       return { label: "CHANGES REQUESTED", color: "text-orange-500" };
+    case VaultStatus.RELEASE_REQUESTED:
+      return { label: "AWAITING RELEASE", color: "text-amber-500" };
     case VaultStatus.DRAFT:
     default:
       return { label: "DRAFT", color: "text-gray-400" };
