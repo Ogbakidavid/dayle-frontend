@@ -766,7 +766,7 @@ export default function FreelancerVaultDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-col gap-3">
-                  {vault.status === VaultStatus.FUNDED && (
+                  {(vault.status === VaultStatus.FUNDED || vault.status === VaultStatus.CHANGES_REQUESTED) && (
                     <>
                       <Link href={`/freelancer/vault/${vaultId}/submit`}>
                         <Button className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold h-10 sm:h-12 rounded-xl shadow-md shadow-emerald-500/20 active:scale-95 transition-all text-xs sm:text-sm mb-3">

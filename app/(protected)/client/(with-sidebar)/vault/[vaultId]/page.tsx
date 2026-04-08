@@ -1143,8 +1143,10 @@ export default function ClientVaultDetailPage() {
                             </Button>
                           )}
 
-                          {/* Approve & Release — only show when FUNDED */}
-                          {vault.status === VaultStatus.FUNDED && (
+                          {/* Approve & Release — show when FUNDED, CHANGES_REQUESTED, or RELEASE_REQUESTED */}
+                          {(vault.status === VaultStatus.FUNDED || 
+                            vault.status === VaultStatus.CHANGES_REQUESTED || 
+                            vault.status === VaultStatus.RELEASE_REQUESTED) && (
                             <Button
                               onClick={() => setShowApproveDialog(true)}
                               className="w-full bg-slate-900 text-white hover:bg-slate-800 font-bold h-10 sm:h-12 rounded-xl shadow-xl active:scale-95 transition-all text-xs sm:text-sm "
@@ -1158,8 +1160,10 @@ export default function ClientVaultDetailPage() {
                             </Button>
                           )}
 
-                          {/* Request Changes — only show when FUNDED */}
-                          {vault.status === VaultStatus.FUNDED && (
+                          {/* Request Changes — show when FUNDED, RELEASE_REQUESTED, or CHANGES_REQUESTED */}
+                          {(vault.status === VaultStatus.FUNDED || 
+                            vault.status === VaultStatus.RELEASE_REQUESTED ||
+                            vault.status === VaultStatus.CHANGES_REQUESTED) && (
                             <Button
                               variant="outline"
                               className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-10 sm:h-12 rounded-xl active:scale-95 transition-all text-xs sm:text-sm shadow-sm"
@@ -1170,8 +1174,10 @@ export default function ClientVaultDetailPage() {
                             </Button>
                           )}
 
-                          {/* Dispute — only available when FUNDED */}
-                          {vault.status === VaultStatus.FUNDED && (
+                          {/* Dispute — available when FUNDED, CHANGES_REQUESTED, or RELEASE_REQUESTED */}
+                          {(vault.status === VaultStatus.FUNDED || 
+                            vault.status === VaultStatus.CHANGES_REQUESTED || 
+                            vault.status === VaultStatus.RELEASE_REQUESTED) && (
                             <Link
                               href={`/client/disputes/create?vaultId=${vaultId}`}
                               className="w-full"
