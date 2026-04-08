@@ -184,7 +184,7 @@ export default function ClientLayout({
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-2 mt-4">
+          <div className="hidden lg:grid grid-cols-2 gap-2 mt-4">
             <Link href="/client/settings" className="relative group" onClick={() => setSidebarOpen(false)}>
               <Button
                 variant="outline"
@@ -220,19 +220,14 @@ export default function ClientLayout({
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header */}
         <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 p-2 sm:p-4 flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(true)}
-              className="text-slate-900 hover:bg-slate-100 h-9 w-9 p-0"
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
-            <Link href="/client">
-              <DayleLogo className="w-8 h-8 text-slate-900" />
-            </Link>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(true)}
+            className="text-slate-900 hover:bg-slate-100 h-9 w-9 p-0"
+          >
+            <Menu className="w-5 h-5" />
+          </Button>
 
           <div className="flex items-center gap-1">
             <Link href="/client/settings">
