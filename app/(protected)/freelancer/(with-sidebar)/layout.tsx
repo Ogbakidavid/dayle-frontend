@@ -88,7 +88,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
         animate="visible"
         variants={sidebarVariants}
         className={cn(
-          "w-[280px] border-r border-white/10 bg-emerald-950 flex flex-col h-screen transition-transform duration-300 ease-in-out shadow-2xl shadow-emerald-950/20",
+          "w-[300px] border-r border-white/10 bg-emerald-950 flex flex-col h-screen transition-transform duration-300 ease-in-out shadow-2xl shadow-emerald-950/20",
           "fixed lg:sticky top-0 z-50 lg:z-auto",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
