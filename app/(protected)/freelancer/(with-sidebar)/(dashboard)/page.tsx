@@ -127,64 +127,73 @@ export default function FreelancerDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+          className="relative bg-emerald-950 border border-emerald-900/50 p-6 sm:p-8 rounded-4xl shadow-xl overflow-hidden"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-sm font-bold  text-slate-900">
-              Available to withdraw
-            </span>
-          </div>
-          <div className="space-y-2">
-            <CurrencyEstimate
-              usdAmount={Number(balance?.formattedAvailable) || 0}
-              className="text-slate-900"
-            />
-            <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
-              <Zap className="w-3.5 h-3.5" />
-              Funds liquid
+          <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-sm font-bold text-emerald-50">
+                Available to withdraw
+              </span>
+            </div>
+            <div className="space-y-2">
+              <CurrencyEstimate
+                usdAmount={Number(balance?.formattedAvailable) || 0}
+                className="text-white text-3xl sm:text-4xl"
+              />
+              <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                <Zap className="w-3.5 h-3.5" />
+                Funds liquid
+              </div>
             </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+          className="relative bg-emerald-950 border border-emerald-900/50 p-6 sm:p-8 rounded-4xl shadow-xl overflow-hidden"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-sm font-bold  text-slate-900">
-              Pending in projects
-            </span>
-          </div>
-          <div className="space-y-2">
-            <CurrencyEstimate
-              usdAmount={totalPending}
-              className="text-slate-900"
-            />
-            <p className="text-blue-400 text-xs font-bold tracking-wide">
-              {activeVaults.length} {activeVaults.length === 1 ? "active assignment" : "active assignments"}
-            </p>
+          <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-sm font-bold text-emerald-50">
+                Pending in projects
+              </span>
+            </div>
+            <div className="space-y-2">
+              <CurrencyEstimate
+                usdAmount={totalPending}
+                className="text-white text-3xl sm:text-4xl"
+              />
+              <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                {activeVaults.length} {activeVaults.length === 1 ? "active assignment" : "active assignments"}
+              </p>
+            </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+          className="relative bg-emerald-950 border border-emerald-900/50 p-6 sm:p-8 rounded-4xl shadow-xl overflow-hidden"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-sm font-bold  text-slate-900">
-              Completed projects
-            </span>
-          </div>
-          <div className="space-y-2">
-            <h2 className="font-bold text-slate-900 tracking-tighter">
-              {completedVaults.length}
-            </h2>
-            <div className="flex flex-wrap items-center gap-1.5 text-slate-900 text-[10px] font-bold uppercase tracking-wider">
-              <span>Total earned:</span>
-              <CurrencyEstimate
-                usdAmount={totalEarnings}
-                className="text-slate-900"
-              />
+          <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-sm font-bold text-emerald-50">
+                Completed projects
+              </span>
+            </div>
+            <div className="space-y-2">
+              <h2 className="font-bold text-white text-3xl sm:text-4xl tracking-tighter">
+                {completedVaults.length}
+              </h2>
+              <div className="flex flex-wrap items-center gap-1.5 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                <span>Total earned:</span>
+                <CurrencyEstimate
+                  usdAmount={totalEarnings}
+                  className="text-emerald-400 text-[10px]"
+                />
+              </div>
             </div>
           </div>
         </motion.div>

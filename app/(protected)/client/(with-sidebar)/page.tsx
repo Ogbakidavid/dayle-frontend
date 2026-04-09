@@ -105,66 +105,75 @@ export default function ClientDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+          className="relative bg-emerald-950 border border-emerald-900/50 p-6 sm:p-8 rounded-4xl shadow-xl overflow-hidden"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-sm font-bold  text-slate-900">
-              Total investment
-            </span>
-          </div>
-          <div className="space-y-2">
-            <CurrencyEstimate
-              usdAmount={totalInvestment}
-              className="text-slate-900"
-            />
-            <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
-              <Activity className="w-3.5 h-3.5" />
-              All-time invested value
+          <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-sm font-bold text-emerald-50">
+                Total investment
+              </span>
+            </div>
+            <div className="space-y-2">
+              <CurrencyEstimate
+                usdAmount={totalInvestment}
+                className="text-white text-3xl sm:text-4xl"
+              />
+              <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                <Activity className="w-3.5 h-3.5" />
+                All-time invested value
+              </div>
             </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+          className="relative bg-emerald-950 border border-emerald-900/50 p-6 sm:p-8 rounded-4xl shadow-xl overflow-hidden"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-sm font-bold  text-slate-900">
-              Available balance
-            </span>
-          </div>
-          <div className="space-y-2">
-            <CurrencyEstimate
-              usdAmount={Number(balance?.formattedAvailable) || 0}
-              className="text-emerald-600"
-            />
-            <Link
-              href="/client/settings?tab=payment"
-              className="flex items-center gap-2 text-blue-600 text-sm font-bold hover:underline"
-            >
-              Withdraw funds
-              <ArrowUpRight className="w-4 h-4" />
-            </Link>
+          <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-sm font-bold text-emerald-50">
+                Available balance
+              </span>
+            </div>
+            <div className="space-y-2">
+              <CurrencyEstimate
+                usdAmount={Number(balance?.formattedAvailable) || 0}
+                className="text-emerald-400 text-3xl sm:text-4xl"
+              />
+              <Link
+                href="/client/settings?tab=payment"
+                className="flex items-center gap-2 text-white/80 hover:text-white text-xs font-bold transition-colors"
+              >
+                Withdraw funds
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
         </motion.div>
 
         <motion.div
           variants={itemVariants}
-          className="bg-white border border-slate-200 p-4 sm:p-6 rounded-sm hover:border-slate-300 transition-colors shadow-sm"
+          className="relative bg-emerald-950 border border-emerald-900/50 p-6 sm:p-8 rounded-4xl shadow-xl overflow-hidden"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-sm font-bold  text-slate-900">
-              Secured in projects
-            </span>
-          </div>
-          <div className="space-y-2">
-            <CurrencyEstimate
-              usdAmount={totalLocked}
-              className="text-slate-900"
-            />
-            <p className="text-emerald-600 text-[10px] font-bold uppercase tracking-wider">
-              {securedVaults.length} active contracts
-            </p>
+          <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-sm font-bold text-emerald-50">
+                Secured in projects
+              </span>
+            </div>
+            <div className="space-y-2">
+              <CurrencyEstimate
+                usdAmount={totalLocked}
+                className="text-white text-3xl sm:text-4xl"
+              />
+              <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                {securedVaults.length} active contracts
+              </p>
+            </div>
           </div>
         </motion.div>
       </div>
