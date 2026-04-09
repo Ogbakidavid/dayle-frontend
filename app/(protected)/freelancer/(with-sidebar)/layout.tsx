@@ -88,7 +88,7 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
         animate="visible"
         variants={sidebarVariants}
         className={cn(
-          "w-[280px] border-r border-slate-200 bg-white flex flex-col h-screen transition-all duration-300 ease-in-out shadow-sm",
+          "w-[280px] border-r border-white/10 bg-emerald-950 flex flex-col h-screen transition-transform duration-300 ease-in-out shadow-2xl shadow-emerald-950/20",
           "fixed lg:sticky top-0 z-50 lg:z-auto",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
@@ -96,9 +96,9 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
         {/* Logo & Brand */}
         <div className="p-4 sm:p-6 pb-4">
           <Link href="/freelancer" className="flex items-center gap-0 group">
-            <DayleLogo className="w-10 h-10 text-slate-900 transition-transform group-hover:scale-110" />
+            <DayleLogo className="w-10 h-10 text-white transition-transform group-hover:scale-110" />
             <div>
-              <h1 className="text-2xl text-slate-900 tracking-tight font-bold">
+              <h1 className="text-2xl text-white tracking-tight font-black">
                 Dayle
               </h1>
             </div>
@@ -114,10 +114,10 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                 <motion.div
                   variants={itemVariants}
                   className={cn(
-                    "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
+                    "flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-black transition-all group",
                     isActive
-                      ? "bg-[#F8F9FA] text-slate-900 border border-emerald-500/20 font-bold  shadow-lg shadow-emerald-500/5"
-                      : "text-slate-900 hover:bg-slate-100 hover:text-slate-900 font-bold ",
+                      ? "bg-white/10 text-white border border-white/20 shadow-lg shadow-black/5"
+                      : "text-white/70 hover:bg-white/5 hover:text-white font-bold",
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -125,8 +125,8 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                       className={cn(
                         "w-4 h-4 transition-all",
                         isActive
-                          ? "text-slate-900"
-                          : "text-slate-900 group-hover:text-slate-900",
+                          ? "text-white"
+                          : "text-white/70 group-hover:text-white",
                       )}
                     />
                     <span>{item.name}</span>
@@ -134,10 +134,10 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                   {item.badge && (
                     <span
                       className={cn(
-                        "text-sm px-2 py-0.5 rounded-full font-bold",
+                        "text-[10px] px-2 py-0.5 rounded-lg font-black uppercase tracking-widest",
                         isActive
-                          ? "bg-emerald-500/20 text-emerald-600"
-                          : "bg-slate-100 text-slate-600 font-bold",
+                          ? "bg-white text-emerald-600"
+                          : "bg-white/10 text-white",
                       )}
                     >
                       {item.badge}
@@ -149,56 +149,48 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-200 mt-auto">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+        <div className="p-4 border-t border-white/10 mt-auto">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
             <div className="relative group">
               <UserAvatar
                 identifier={user?.id || user?.email || "guest"}
                 src={user?.profileImage}
                 size={36}
-                className="font-bold text-sm border-2 border-white/10 group-hover:border-emerald-500/50 transition-colors"
+                className="font-bold text-sm border-2 border-white/20 group-hover:border-white/50 transition-colors"
               />
               {user?.kycStatus === "VERIFIED" && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-muted flex items-center justify-center shadow-lg">
-                  <Check className="w-2.5 h-2.5 text-white" />
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full border-2 border-emerald-950 flex items-center justify-center shadow-lg">
+                  <Check className="w-2.5 h-2.5 text-emerald-950" />
                 </div>
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-bold  text-slate-900 truncate">
+              <p className="text-sm font-black text-white truncate">
                 {user?.name || "Freelancer"}
               </p>
-              <p className="text-sm font-bold text-slate-600 truncate">
+              <p className="text-[10px] font-bold text-white/50 truncate uppercase tracking-widest">
                 {user?.email}
               </p>
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="hidden lg:grid grid-cols-2 gap-2 mt-4">
+          <div className="lg:grid grid-cols-2 gap-2 mt-4 hidden">
             <Link href="/freelancer/settings" className="relative group" onClick={() => setSidebarOpen(false)}>
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 w-full text-sm font-bold  border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all font-primary shadow-sm"
+                className="h-9 w-full text-[10px] font-black uppercase tracking-widest border-white/20 bg-white/10 hover:bg-white/20 text-white transition-all shadow-sm"
               >
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Settings
               </Button>
-              {(hasUnread ||
-                ((user?.kycStatus === "NONE" || user?.kycStatus === "REJECTED") &&
-                process.env.NEXT_PUBLIC_TESTNET_MODE !== "true")) && (
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-muted"></span>
-                </span>
-              )}
             </Link>
             <Button
               variant="outline"
               size="sm"
               onClick={logout}
-              className="h-9 text-sm font-bold  border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all font-primary shadow-sm"
+              className="h-9 text-[10px] font-black uppercase tracking-widest border-white/20 bg-white/10 hover:bg-white/20 text-white transition-all shadow-sm"
             >
               <LogOut className="w-3.5 h-3.5 mr-2" />
               Sign out

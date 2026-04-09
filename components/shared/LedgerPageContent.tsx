@@ -18,6 +18,7 @@ import { TransactionStatus, KycStatus, VaultStatus } from "@/lib/domain/enums";
 import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 import { CurrencyEstimate } from "./currency-estimate";
+import { calculateDayleFee } from "@/lib/utils/fee";
 import { useUser } from "@/lib/store/user-context";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";

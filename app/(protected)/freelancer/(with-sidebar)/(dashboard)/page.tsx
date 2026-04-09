@@ -23,6 +23,7 @@ import { getVaultDerivedLabel } from "@/lib/domain/enums";
 import { api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
+import { calculateDayleFee } from "@/lib/utils/fee";
 
 const containerVariants = {
   hidden: { opacity: 0 },

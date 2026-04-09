@@ -3,40 +3,40 @@
 import * as React from "react";
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import {
   AlertCircle,
+  Activity,
   CheckCircle2,
   Clock,
   XCircle,
-  Activity,
   Plus,
   Search,
-  Filter,
   ArrowDownUp,
-  MoreVertical,
-  Check,
-  ChevronRight,
   Gavel,
+  ShieldCheck,
+  Shapes,
+  MessageSquareQuote,
+  Scale,
   ArrowUpRight,
-  X,
-  Handshake,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, AnimatePresence } from "framer-motion";
 import type { Vault } from "@/lib/store/vault-context";
+import { DotLoader } from "@/components/ui/dot-loader";
 
 interface Dispute {
   id: string;
   vaultId: string;
-  status: "open" | "resolved" | "investigating" | "closed" | string;
+  status: string;
   createdAt: string;
   openedBy: string;
   requirementRef?: string;
   description?: string;
+  openedByRole?: string;
   [key: string]: any;
 }
 
@@ -56,63 +56,46 @@ const itemVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
-interface StatusConfigItem {
-  label: string;
-  pill: string;
-  iconWrap: string;
-  icon: LucideIcon;
-  iconColor: string;
-}
-
-const statusConfig: Record<string, StatusConfigItem> = {
+const statusConfig: Record<string, { label: string; bg: string; text: string; border: string; icon: LucideIcon; description: string }> = {
   OPEN: {
-    label: "Open",
-    pill: "bg-amber-50 text-amber-700 border-amber-200",
-    iconWrap: "bg-amber-50 border-amber-100",
+    label: "Opened",
+    bg: "bg-amber-50",
+    text: "text-amber-600",
+    border: "border-amber-100",
     icon: AlertCircle,
-    iconColor: "text-amber-700",
+    description: "Initial report received",
   },
   MUTUAL_RESOLUTION: {
     label: "Mediation",
-    pill: "bg-amber-50 text-amber-900 border-amber-200 font-black",
-    iconWrap: "bg-amber-100 border-amber-200",
-    icon: Handshake,
-    iconColor: "text-amber-600",
-  },
-  RESOLVED: {
-    label: "Resolved",
-    pill: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    iconWrap: "bg-emerald-50 border-emerald-100",
-    icon: CheckCircle2,
-    iconColor: "text-emerald-700",
-  },
-  REJECTED: {
-    label: "Rejected",
-    pill: "bg-slate-50 text-slate-600 border-slate-200",
-    iconWrap: "bg-slate-50 border-slate-100",
-    icon: XCircle,
-    iconColor: "text-slate-600",
+    bg: "bg-blue-50",
+    text: "text-blue-600",
+    border: "border-blue-100",
+    icon: MessageSquareQuote,
+    description: "Negotiating a fair split",
   },
   UNDER_REVIEW: {
-    label: "In Review",
-    pill: "bg-sky-50 text-sky-700 border-sky-200",
-    iconWrap: "bg-sky-50 border-sky-100",
-    icon: Clock,
-    iconColor: "text-sky-700",
+    label: "Dayle Review",
+    bg: "bg-sky-50",
+    text: "text-sky-600",
+    border: "border-sky-100",
+    icon: Scale,
+    description: "Admin reviewing evidence",
   },
-  investigating: { // For backward compatibility if any old data exists
-    label: "In Review",
-    pill: "bg-sky-50 text-sky-700 border-sky-200",
-    iconWrap: "bg-sky-50 border-sky-100",
-    icon: Clock,
-    iconColor: "text-sky-700",
+  RESOLVED: {
+    label: "Settled",
+    bg: "bg-emerald-50",
+    text: "text-emerald-600",
+    border: "border-emerald-100",
+    icon: CheckCircle2,
+    description: "Funds released accordingly",
   },
-  open: { // For backward compatibility
-    label: "Open",
-    pill: "bg-amber-50 text-amber-700 border-amber-200",
-    iconWrap: "bg-amber-50 border-amber-100",
-    icon: AlertCircle,
-    iconColor: "text-amber-700",
+  REJECTED: {
+    label: "Closed",
+    bg: "bg-slate-50",
+    text: "text-slate-600",
+    border: "border-slate-100",
+    icon: XCircle,
+    description: "Resolved without payout",
   },
 };
 
@@ -128,107 +111,15 @@ function formatDate(date: string) {
   }
 }
 
-interface StatusPillProps {
-  status: string;
-}
-
-function StatusPill({ status }: StatusPillProps) {
-  const cfg = statusConfig[status] || statusConfig.open;
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-2.5 py-1  font-bold  uppercase ",
-        cfg.pill,
-      )}
-    >
-      {cfg.label}
-    </span>
-  );
-}
-
-interface IconBadgeProps {
-  status: string;
-}
-
-function IconBadge({ status }: IconBadgeProps) {
-  const cfg = statusConfig[status] || statusConfig.open;
-  const Icon = cfg.icon;
-  return (
-    <div
-      className={cn(
-        "flex h-9 w-9 items-center justify-center rounded-xl border",
-        cfg.iconWrap,
-      )}
-    >
-      <Icon className={cn("h-4 w-4", cfg.iconColor)} />
-    </div>
-  );
-}
-
-interface StatCardProps {
-  title: string;
-  value: string | number;
-  hint?: string;
-  icon: LucideIcon;
-  tone?: "neutral" | "amber" | "emerald" | "sky";
-}
-
-function StatCard({
-  title,
-  value,
-  hint,
-  icon: Icon,
-  tone = "neutral",
-}: StatCardProps) {
-  const toneMap = {
-    neutral: "border-slate-200 bg-white hover:bg-slate-50",
-    amber: "border-amber-200 bg-amber-50/50 hover:bg-amber-50",
-    emerald: "border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50",
-    sky: "border-sky-200 bg-sky-50/50 hover:bg-sky-50",
-  };
-
-  return (
-    <motion.div variants={itemVariants}>
-      <Card
-        className={cn("transition-colors", toneMap[tone] || toneMap.neutral)}
-      >
-        <CardContent className="p-4 sm:p-5">
-          <div className="flex items-start justify-between gap-3 sm:gap-4">
-            <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600 mb-1 sm:mb-2 ">{title}</p>
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tighter ">
-                {value}
-              </p>
-              {hint ? (
-                <p className="mt-1  text-slate-600 font-bold">
-                  {hint}
-                </p>
-              ) : null}
-            </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50">
-              <Icon className="h-5 w-5 text-slate-600" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-}
-
-export interface DisputeListViewProps {
-  role: "client" | "freelancer";
-}
-
-export function DisputeListView({ role }: DisputeListViewProps) {
+export function DisputeListView({ role }: { role: "client" | "freelancer" }) {
   const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); // all | open | investigating | resolved | closed
-  const [sortKey, setSortKey] = useState("newest"); // newest | oldest
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortKey, setSortKey] = useState("newest");
 
   const [disputesData, setDisputesData] = useState<Dispute[]>([]);
   const [vaultsData, setVaultsData] = useState<Vault[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch data
   useEffect(() => {
     async function load() {
       try {
@@ -248,30 +139,21 @@ export function DisputeListView({ role }: DisputeListViewProps) {
   }, [role]);
 
   const counts = useMemo(() => {
-    const open = disputesData.filter((d) => d.status === "OPEN" || d.status === "open" || d.status === "MUTUAL_RESOLUTION").length;
-    const review = disputesData.filter(
-      (d) => d.status === "UNDER_REVIEW" || d.status === "investigating",
-    ).length;
-    const resolved = disputesData.filter((d) => d.status === "RESOLVED" || d.status === "resolved").length;
-    const rejected = disputesData.filter((d) => d.status === "REJECTED" || d.status === "rejected").length;
+    const open = disputesData.filter((d) => ["OPEN", "MUTUAL_RESOLUTION", "open"].includes(d.status)).length;
+    const review = disputesData.filter((d) => ["UNDER_REVIEW", "investigating"].includes(d.status)).length;
+    const resolved = disputesData.filter((d) => ["RESOLVED", "resolved"].includes(d.status)).length;
+    const total = disputesData.length;
     
-    return {
-      open,
-      review,
-      resolved,
-      rejected,
-      total: disputesData.length,
-    };
+    return { open, review, resolved, total };
   }, [disputesData]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-
     let list = disputesData.map((d) => {
       const vault = vaultsData.find((v) => v.id === d.vaultId);
       return {
         ...d,
-        vaultTitle: vault?.title || "Unknown Vault",
+        vaultTitle: vault?.title || "Project Vault",
       };
     });
 
@@ -281,15 +163,7 @@ export function DisputeListView({ role }: DisputeListViewProps) {
 
     if (q) {
       list = list.filter((d) => {
-        const hay = [
-          d.id,
-          d.vaultTitle,
-          d.requirementRef || "",
-          d.description || "",
-          d.status,
-        ]
-          .join(" ")
-          .toLowerCase();
+        const hay = [d.id, d.vaultTitle, d.description || "", d.status].join(" ").toLowerCase();
         return hay.includes(q);
       });
     }
@@ -304,15 +178,10 @@ export function DisputeListView({ role }: DisputeListViewProps) {
   }, [query, statusFilter, sortKey, disputesData, vaultsData]);
 
   const statusTabs = [
-    { key: "all", label: "All", count: counts.total },
-    { key: "OPEN", label: "Open", count: counts.open },
-    {
-      key: "UNDER_REVIEW",
-      label: "In Review",
-      count: counts.review,
-    },
+    { key: "all", label: "All Cases", count: counts.total },
+    { key: "OPEN", label: "Needs Action", count: counts.open },
+    { key: "UNDER_REVIEW", label: "Under Review", count: counts.review },
     { key: "RESOLVED", label: "Resolved", count: counts.resolved },
-    { key: "REJECTED", label: "Closed", count: counts.rejected },
   ];
 
   return (
@@ -320,290 +189,212 @@ export function DisputeListView({ role }: DisputeListViewProps) {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-7"
+      className="space-y-8 max-w-6xl mx-auto"
     >
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <motion.div variants={itemVariants} className="space-y-1">
-          <div className="flex items-center gap-3">
-            <div className="hidden xs:flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-100 bg-amber-50 shrink-0">
-              <Gavel className="h-5 w-5 text-amber-600" />
+      <section className="relative overflow-hidden bg-emerald-950 rounded-4xl p-8 md:p-12 text-white shadow-2xl">
+        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
+          <Shapes className="w-full h-full text-white" strokeWidth={0.5} />
+        </div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-64 h-64 bg-emerald-500/20 blur-[120px] rounded-full" />
+        
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="space-y-4 max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/90">Resolution Center</span>
             </div>
-            <div className="space-y-1 sm:space-y-3">
-              <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
-                Disputes
-              </h1>
-              <p className="text-xs sm:text-sm font-bold text-slate-600 max-w-2xl leading-relaxed">
-                {role === "client"
-                  ? "Review and manage disputes tied to your vaults."
-                  : "Open and track disputes for fair vault resolution."}
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">
+              Fairness by <span className="text-emerald-400">Design.</span>
+            </h1>
+            <p className="text-sm md:text-base text-emerald-100/80 font-medium leading-relaxed">
+              Disputes are handled in two stages: first via mutual settlement, then through expert arbitration if no agreement is reached.
+            </p>
+          </div>
+          <div className="shrink-0">
+            <Link href={`/${role}/disputes/create`}>
+              <Button size="lg" className="bg-white hover:bg-emerald-50 text-emerald-900 font-black h-14 px-8 rounded-2xl shadow-xl shadow-emerald-950/20 active:scale-95 transition-all text-sm uppercase tracking-wider">
+                <Plus className="mr-2 h-5 w-5" strokeWidth={3} />
+                New Dispute
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 border-t border-white/10 pt-8">
+          {[
+            { label: "Active Cases", val: counts.open + counts.review, icon: Activity },
+            { label: "Resolved", val: counts.resolved, icon: CheckCircle2 },
+            { label: "Mutual Settlement", val: counts.open, icon: MessageSquareQuote },
+            { label: "Arbiter Review", val: counts.review, icon: Scale },
+          ].map((s, i) => (
+            <div key={i} className="space-y-1">
+              <div className="flex items-center gap-2 text-emerald-300/60">
+                <s.icon className="w-3.5 h-3.5" />
+                <span className="text-[9px] font-black uppercase tracking-widest">{s.label}</span>
+              </div>
+              <p className="text-xl md:text-2xl font-bold text-white">{s.val}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          {statusTabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setStatusFilter(t.key)}
+              className={cn(
+                "px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all border",
+                statusFilter === t.key
+                  ? "bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-900/10"
+                  : "bg-transparent text-slate-500 border-slate-100 hover:border-slate-200 hover:bg-slate-50"
+              )}
+            >
+              {t.label} 
+              <span className={cn("ml-2 opacity-50", statusFilter === t.key ? "text-white" : "text-slate-400")}>
+                {t.count}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-3 w-full lg:w-96">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input 
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search cases..."
+              className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-4 h-12 text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/5 transition-all"
+            />
+          </div>
+          <Button 
+            variant="outline" 
+            className="h-12 w-12 rounded-2xl border-slate-100 bg-slate-50 text-slate-400 p-0"
+            onClick={() => setSortKey(s => s === "newest" ? "oldest" : "newest")}
+          >
+            <ArrowDownUp className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={statusFilter + query}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="grid grid-cols-1 gap-4"
+        >
+          {loading ? (
+            <div className="py-32 text-center space-y-8 bg-white rounded-4xl border border-slate-100 shadow-sm">
+                <DotLoader color="primary" size="lg" />
+                <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Opening Legal Docket...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-32 text-center bg-white rounded-4xl border border-slate-100 shadow-sm border-dashed">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <ShieldCheck className="w-10 h-10 text-slate-200" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">All clear here.</h3>
+              <p className="text-sm text-slate-400 mt-2 max-w-xs mx-auto">
+                No disputes found. Your projects are currently running smoothly.
               </p>
             </div>
-          </div>
-        </motion.div>
+          ) : (
+            filtered.map((dispute) => {
+              const cfg = statusConfig[dispute.status.toUpperCase()] || statusConfig.OPEN;
+              const StatusIcon = cfg.icon;
 
-        <motion.div variants={itemVariants}>
-          <Link href={`/${role}/disputes/create`} className="w-full sm:w-auto">
-            <Button className="h-10 sm:h-11 w-full sm:w-auto bg-amber-500 px-4 sm:px-6 font-bold text-white hover:bg-amber-600 shadow-md shadow-amber-500/20 rounded-xl transition-all text-xs sm:text-sm">
-              <Plus className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={3} />
-              Open dispute
-            </Button>
-          </Link>
-        </motion.div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Open"
-          value={counts.open}
-          hint="Needs attention"
-          icon={AlertCircle}
-          tone="neutral"
-        />
-        <StatCard
-          title="In Review"
-          value={counts.review}
-          hint="In review"
-          icon={Clock}
-          tone="neutral"
-        />
-        <StatCard
-          title="Resolved"
-          value={counts.resolved}
-          hint="Completed cases"
-          icon={CheckCircle2}
-          tone="neutral"
-        />
-        <StatCard
-          title="Total"
-          value={counts.total}
-          hint="All disputes"
-          icon={Gavel}
-          tone="neutral"
-        />
-      </div>
-
-      {/* Controls */}
-      <motion.div variants={itemVariants}>
-        <Card className="border-slate-200 bg-white shadow-sm overflow-hidden">
-          <CardContent className="p-4 md:p-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              {/* Search */}
-              <div className="relative w-full sm:max-w-md">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-900 group-focus-within:text-emerald-600 transition-colors" />
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="
-                  h-10 sm:h-12 w-full rounded-xl sm:rounded-2xl border border-slate-200 bg-white
-                  pl-10 sm:pl-12 pr-10 sm:pr-12 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400
-                  outline-none transition-all font-bold 
-                  focus:border-emerald-500/30 focus:ring-4 focus:ring-emerald-500/5 shadow-sm
-                "
-                />
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-600 hover:bg-slate-100 hover:text-slate-600"
-                    aria-label="Clear search"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-              </div>
-
-              {/* Sort */}
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-10 sm:h-11 w-full sm:w-auto border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold transition-all shadow-sm rounded-xl text-xs sm:text-sm"
-                  onClick={() =>
-                    setSortKey((s) => (s === "newest" ? "oldest" : "newest"))
-                  }
-                >
-                  <ArrowDownUp className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  {sortKey === "newest" ? "Newest" : "Oldest"}
-                </Button>
-              </div>
-            </div>
-
-            {/* Status tabs */}
-            <div className="mt-5 flex flex-wrap gap-2">
-              {statusTabs.map((t) => {
-                const active = statusFilter === t.key;
-                return (
-                  <button
-                    key={t.key}
-                    type="button"
-                    onClick={() => setStatusFilter(t.key)}
-                    className={cn(
-                      "inline-flex items-center gap-1.5 sm:gap-2 rounded-full border px-2.5 sm:px-3 py-1 sm:py-1.5 font-bold transition-all text-[10px] sm:text-xs",
-                      active
-                        ? "border-amber-200 bg-amber-50 text-amber-700 shadow-sm"
-                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900",
-                    )}
-                  >
-                    <Filter
-                      className={cn(
-                        "h-3 w-3",
-                        active ? "text-amber-300" : "text-slate-300",
-                      )}
-                    />
-                    {t.label}
-                    <span
-                      className={cn(
-                        "ml-1 rounded-full px-2 py-0.5  font-bold ",
-                        active
-                          ? "bg-amber-100 text-amber-700"
-                          : "bg-slate-100 text-slate-600",
-                      )}
-                    >
-                      {t.count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* List */}
-      <motion.div variants={itemVariants}>
-        <Card className="border-slate-200 bg-white shadow-sm overflow-hidden">
-          <CardHeader className="border-b border-slate-100 bg-slate-50">
-            <CardTitle className="flex items-center justify-between gap-3 text-slate-900">
-              <div className="flex items-center gap-2">
-                <Gavel className="h-5 w-5 text-slate-900" />
-                <span className="text-lg font-bold  ">Cases</span>
-                <span className="text-[11px] font-bold text-slate-600 font-mono st mt-0.5">
-                  ({filtered.length})
-                </span>
-              </div>
-            </CardTitle>
-          </CardHeader>
-
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="p-20 text-center">
-                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-amber-500/20 border-t-amber-500" />
-                <p className="mt-4 text-sm font-bold  text-slate-600">
-                  Syncing ledger...
-                </p>
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="p-10 md:p-14">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-12 text-center shadow-sm">
-                  <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white shadow-sm">
-                    <Gavel className="h-7 w-7 text-slate-200" />
-                  </div>
-                  <p className="text-lg font-bold  text-slate-900">
-                    No records found
-                  </p>
-                  <p className="mt-2 text-sm  text-slate-600 max-w-xs mx-auto leading-relaxed">
-                    Try adjusting filters or open a new dispute for resolution.
-                  </p>
-                  <div className="mt-8 flex justify-center">
-                    <Link href={`/${role}/disputes/create`}>
-                      <Button className="h-11 bg-amber-500 px-8 font-bold text-white hover:bg-amber-600  shadow-md shadow-amber-500/20 rounded-xl transition-all">
-                        <Plus className="mr-2 h-4 w-4" strokeWidth={3} />
-                        Open dispute
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="divide-y divide-slate-100">
-                {filtered.map((dispute) => {
-                  return (
-                    <div
-                      key={dispute.id}
-                      className="group px-4 py-6 transition-all hover:bg-slate-50 md:px-8 border-l-2 border-l-transparent hover:border-l-amber-500/40"
-                    >
-                      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                        {/* Left */}
-                        <div className="flex items-start gap-5 min-w-0">
-                          <IconBadge status={dispute.status} />
-
-                          <div className="min-w-0 space-y-2">
-                            {/* Primary line: Vault title */}
-                            <p className="truncate text-sm sm:text-lg font-bold tracking-tighter leading-none text-slate-900 group-hover:text-slate-700 transition-colors ">
-                              {dispute.vaultTitle}
+              return (
+                <Link key={dispute.id} href={`/${role}/disputes/${dispute.id}`}>
+                  <Card className="group border-slate-100 bg-white hover:border-amber-400/50 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300 rounded-4xl overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="flex flex-col lg:flex-row lg:items-center">
+                        <div className={cn(
+                          "lg:w-64 p-8 flex flex-col justify-center items-center gap-4 text-center border-b lg:border-b-0 lg:border-r border-slate-50 transition-colors group-hover:bg-slate-50/50",
+                        )}>
+                          <div className={cn(
+                            "w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110",
+                            cfg.bg, cfg.text, "border", cfg.border
+                          )}>
+                            <StatusIcon className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <p className={cn("text-sm font-black uppercase tracking-widest", cfg.text)}>
+                              {cfg.label}
                             </p>
-
-                            {/* Meta line: ID + status */}
-                            <div className="flex flex-wrap items-center gap-3">
-                              <span className="text-sm font-mono font-bold text-slate-600 r ">
-                                #{dispute.id.slice(0, 8)}
-                              </span>
-                              <StatusPill status={dispute.status} />
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1  md:text-sm font-bold  text-slate-600 uppercase ">
-                              <span className="text-slate-600">
-                                {dispute.vaultId.slice(0, 8)}
-                              </span>
-                              <span className="w-1 h-1 rounded-full bg-slate-200" />
-                              {dispute.requirementRef ? (
-                                <>
-                                  <span className="text-emerald-600">
-                                    {dispute.requirementRef}
-                                  </span>
-                                  <span className="w-1 h-1 rounded-full bg-slate-200" />
-                                </>
-                              ) : null}
-                              <span className="text-slate-600">
-                                {formatDate(dispute.createdAt)}
-                              </span>
-                            </div>
-
-                            {/* Summary */}
-                            {dispute.description ? (
-                              <p className="line-clamp-3 max-w-2xl text-[12px] sm:text-[13px] leading-relaxed text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-sm mt-3 sm:mt-4">
-                                {dispute.description}
-                              </p>
-                            ) : (
-                              <div className="mt-4 inline-block px-3 py-1 rounded-full border border-slate-100 bg-slate-50">
-                                <span className=" text-slate-600 font-bold ">
-                                  No description file
-                                </span>
-                              </div>
-                            )}
+                            <p className="text-[10px] font-bold text-slate-400 mt-0.5">
+                              {cfg.description}
+                            </p>
                           </div>
                         </div>
 
-                        {/* Right */}
-                        <div className="flex items-center gap-3 lg:justify-end shrink-0">
-                          <Link
-                            href={`/${role}/disputes/${dispute.id}`}
-                            className="w-full lg:w-auto"
-                          >
-                            <Button
-                              variant="outline"
-                              className="
-                                h-10 sm:h-11 w-full lg:w-auto border-slate-200 bg-white
-                                text-slate-600 font-bold transition-all
-                                hover:bg-slate-50 hover:text-slate-900
-                                px-4 sm:px-6 text-[10px] sm:text-[11px] shadow-sm rounded-xl uppercase 
-                              "
-                            >
-                              View docket
-                              <ArrowUpRight
-                                className="ml-2 h-4 w-4"
-                                strokeWidth={3}
-                              />
-                            </Button>
-                          </Link>
+                        <div className="flex-1 p-8 min-w-0 space-y-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="min-w-0">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                                Case ID: <span className="text-slate-900">#{dispute.id.slice(0, 8)}</span>
+                                <span className="w-1 h-1 rounded-full bg-slate-200" />
+                                Filed: {formatDate(dispute.createdAt)}
+                              </p>
+                              <h3 className="text-xl md:text-2xl font-bold text-slate-900 truncate">
+                                {dispute.vaultTitle}
+                              </h3>
+                            </div>
+                            <div className="shrink-0 flex items-center gap-2">
+                               <Button variant="ghost" className="rounded-xl px-4 py-6 font-bold text-slate-400 hover:text-slate-900 hover:bg-slate-50 group-hover:bg-amber-50 group-hover:text-amber-600 transition-all">
+                                 Manage Case
+                                 <ArrowUpRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                               </Button>
+                            </div>
+                          </div>
+
+                          {dispute.description && (
+                            <p className="text-sm text-slate-500 font-medium line-clamp-2 leading-relaxed bg-slate-50/50 p-4 rounded-2xl border border-slate-50">
+                              &quot;{dispute.description}&quot;
+                            </p>
+                          )}
+                          
+                          <div className="flex flex-wrap items-center gap-6 pt-2">
+                            <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-tight">
+                              <span className="w-2 h-2 rounded-full bg-slate-200" />
+                              Requirement: <span className="text-slate-900">{dispute.requirementRef || "Whole Vault"}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-tight">
+                              <span className="w-2 h-2 rounded-full bg-slate-200" />
+                              Origin: <span className="text-slate-900">{dispute.openedByRole === 'CLIENT' ? 'Client' : 'Freelancer'}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      <motion.div variants={itemVariants} className="pt-8">
+        <Card className="bg-emerald-50 border-emerald-100 rounded-4xl overflow-hidden">
+          <CardContent className="p-8 flex flex-col md:flex-row items-center gap-8">
+            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-200/50">
+              <Scale className="w-8 h-8 text-emerald-500" />
+            </div>
+            <div className="space-y-2 flex-1 text-center md:text-left">
+              <h4 className="text-lg font-bold text-emerald-900">How do we solve disputes?</h4>
+              <p className="text-sm text-emerald-900/70 font-medium leading-relaxed max-w-2xl">
+                First, we provide a **Mediation Room** where you can chat and reach a mutual agreement. If that fails, our **Adjudication Team** reviews all evidence (files, screenshots, contracts) and makes a final, binding decision.
+              </p>
+            </div>
+            <Link href="https://docs.dayle.finance/disputes" target="_blank">
+               <Button variant="outline" className="border-emerald-200 bg-white text-emerald-600 font-bold hover:bg-emerald-100 transition-all rounded-xl h-11 px-6">
+                 Read Protocol
+               </Button>
+            </Link>
           </CardContent>
         </Card>
       </motion.div>

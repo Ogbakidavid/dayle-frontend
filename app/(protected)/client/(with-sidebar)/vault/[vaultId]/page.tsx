@@ -704,8 +704,8 @@ export default function ClientVaultDetailPage() {
             vault.status === VaultStatus.CHANGES_REQUESTED || 
             vault.status === VaultStatus.RELEASE_REQUESTED || 
             vault.status === VaultStatus.RELEASED) && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card className="lg:col-span-2 bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
+            <div className="grid grid-cols-1 gap-6">
+              <Card className="bg-emerald-50/30 border-emerald-100 shadow-sm overflow-hidden">
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                     <div className="flex items-center gap-3 text-left">
@@ -721,46 +721,18 @@ export default function ClientVaultDetailPage() {
                         <div className="text-left sm:text-right">
                           <p className="text-[8px] sm:text-[10px] text-slate-500 font-bold">Settlement ({calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent}%)</p>
                           <CurrencyEstimate 
-                            usdAmount={vault.settlementFeeUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
-                            manualLocalAmount={vault.localSettlementFee}
+                            usdAmount={(parseFloat(vault.formattedTotalAmount) * calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent) / 100} 
                             className="text-slate-900 text-xs sm:text-sm font-bold"
                           />
                         </div>
-                        <div className="text-left sm:text-right">
-                          <p className="text-[8px] sm:text-[10px] text-blue-500 font-bold">Deposit (0.5%)</p>
-                          <CurrencyEstimate 
-                            usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).depositFeeUSD} 
-                            manualLocalAmount={vault.localProcessingFee}
-                            className="text-blue-600 text-xs sm:text-sm font-bold"
-                          />
-                        </div>
                         <div className="text-left sm:text-right border-l border-emerald-200 pl-4 sm:pl-6 ml-auto sm:ml-0">
-                          <p className="text-[8px] sm:text-[10px] text-emerald-600 font-bold">Total paid</p>
+                          <p className="text-[8px] sm:text-[10px] font-bold text-transparent bg-clip-text bg-linear-to-r from-emerald-600 to-emerald-500">Total Secured</p>
                           <CurrencyEstimate 
-                            usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).totalClientPaysUSD} 
-                            manualLocalAmount={vault.localAmount}
+                            usdAmount={parseFloat(vault.formattedTotalAmount)} 
                             className="text-emerald-700 text-base sm:text-lg font-black"
                           />
                         </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-slate-900 text-white border-none shadow-xl overflow-hidden relative">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <ShieldCheck className="w-16 h-16" />
-                </div>
-                <CardContent className="p-4 sm:p-6">
-                  <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-1">Freelancer receives</p>
-                  <CurrencyEstimate 
-                    usdAmount={vault.freelancerReceivesUSD || calculateDayleFee(parseFloat(vault.formattedTotalAmount)).freelancerReceivesUSD} 
-                    manualLocalAmount={vault.localFreelancerReceives}
-                    className="text-white text-2xl sm:text-3xl font-black"
-                  />
-                  <div className="mt-2 flex items-center gap-1.5">
-                    <CheckCircle className="w-3 h-3 text-emerald-400" />
-                    <p className="text-[9px] sm:text-[10px] font-bold text-emerald-400/80">Net after settlement & withdrawal fees</p>
                   </div>
                 </CardContent>
               </Card>
@@ -1034,6 +1006,21 @@ export default function ClientVaultDetailPage() {
                               </p>
                             )}
 
+                            {sub.fileUrl && (
+                              <div className="mb-4">
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDownload({ url: sub.fileUrl, key: sub.fileKey, filename: sub.filename || "Submission Attachment" });
+                                  }}
+                                  className="inline-flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg hover:bg-slate-800 transition-all active:scale-95"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                  Download Main Attachment
+                                </button>
+                              </div>
+                            )}
+
                             <AnimatePresence>
                               {isExpanded && (
                                 <motion.div
@@ -1072,6 +1059,36 @@ export default function ClientVaultDetailPage() {
                                               <p className=" text-slate-600  ml-5 font-bold">
                                                 - {d.notes}
                                               </p>
+                                            )}
+
+                                            {d.included && (d.link || (d.files && d.files.length > 0)) && (
+                                              <div className="flex flex-wrap gap-2 ml-5 mt-1">
+                                                {d.link && (
+                                                  <a 
+                                                    href={d.link.startsWith('http') ? d.link : `https://${d.link}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 px-2 py-1 rounded-[6px] text-[10px] font-bold transition-all shadow-sm"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                  >
+                                                    <LinkIcon className="w-2.5 h-2.5" />
+                                                    View Link
+                                                  </a>
+                                                )}
+                                                {d.files?.map((file: any, fileIdx: number) => (
+                                                  <button
+                                                    key={fileIdx}
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      handleDownload(file);
+                                                    }}
+                                                    className="inline-flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 px-2 py-1 rounded-[6px] text-[10px] font-bold transition-all shadow-sm cursor-pointer"
+                                                  >
+                                                    <Download className="w-2.5 h-2.5" />
+                                                    {file.filename || `File ${fileIdx + 1}`}
+                                                  </button>
+                                                ))}
+                                              </div>
                                             )}
                                           </div>
                                         ),
@@ -1310,7 +1327,7 @@ export default function ClientVaultDetailPage() {
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-500 font-bold uppercase">Settlement fee ({calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent}%)</span>
                   <CurrencyEstimate 
-                    usdAmount={calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
+                    usdAmount={(parseFloat(vault.formattedTotalAmount) * calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent) / 100} 
                     className="text-slate-900 text-sm font-bold"
                   />
                 </div>
@@ -1321,12 +1338,12 @@ export default function ClientVaultDetailPage() {
                   <div>
                     <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1">Freelancer receives</p>
                     <CurrencyEstimate 
-                      usdAmount={parseFloat(vault.formattedTotalAmount) - calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeeUSD} 
+                      usdAmount={parseFloat(vault.formattedTotalAmount) - ((parseFloat(vault.formattedTotalAmount) * calculateDayleFee(parseFloat(vault.formattedTotalAmount)).settlementFeePercent) / 100)} 
                       className="text-emerald-900 text-xl sm:text-2xl font-black"
                     />
                   </div>
                   <div className="w-10 h-10 rounded-full bg-white border border-emerald-200 flex items-center justify-center shadow-sm">
-                    <ArrowLeft className="w-5 h-5 text-emerald-600 rotate-180" />
+                    <CheckCircle className="w-5 h-5 text-emerald-600" />
                   </div>
                 </div>
               </div>

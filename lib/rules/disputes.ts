@@ -50,8 +50,16 @@ export function getDisputeEligibility(vault: any, deliverableTitle?: string | nu
 
   let allowedCodes = [];
 
-  // Simplified logic: If FUNDED or DISPUTED, it's generally eligible for specific codes
-  if (status === VaultStatus.FUNDED || status === VaultStatus.DISPUTED) {
+  const eligibleStatuses = [
+    VaultStatus.FUNDED,
+    VaultStatus.DISPUTED,
+    "RELEASE_REQUESTED",
+    "CHANGES_REQUESTED",
+    "RELEASING"
+  ] as string[];
+
+  // Simplified logic: If in an active/funded state, it's generally eligible for specific codes
+  if (eligibleStatuses.includes(status)) {
     if (verificationResult === "FAIL" || verificationResult === "FLAGGED") {
       // System flagged it? Allow quality/integrity or technical error disputes
       allowedCodes = DISPUTE_REASON_CODES.filter((rc) =>
