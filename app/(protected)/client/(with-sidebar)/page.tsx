@@ -46,7 +46,10 @@ export default function ClientDashboard() {
 
   const securedVaults = vaults.filter(
     (v: any) =>
-      v.status === VaultStatus.FUNDED || v.status === VaultStatus.DISPUTED,
+      v.status === VaultStatus.FUNDED ||
+      v.status === VaultStatus.DISPUTED ||
+      v.status === VaultStatus.CHANGES_REQUESTED ||
+      v.status === VaultStatus.RELEASE_REQUESTED,
   );
 
   const totalLocked = securedVaults.reduce(
@@ -70,7 +73,9 @@ export default function ClientDashboard() {
     (v: any) =>
       v.status === VaultStatus.FUNDED ||
       v.status === VaultStatus.RELEASED ||
-      v.status === VaultStatus.DISPUTED,
+      v.status === VaultStatus.DISPUTED ||
+      v.status === VaultStatus.CHANGES_REQUESTED ||
+      v.status === VaultStatus.RELEASE_REQUESTED,
   );
 
   const totalInvestment = investedVaults.reduce(

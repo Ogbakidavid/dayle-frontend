@@ -60,6 +60,14 @@ const statusConfig: Record<string, { label: string; classes: string }> = {
     label: "Draft",
     classes: "bg-slate-50 border-slate-100 text-slate-500",
   },
+  CHANGES_REQUESTED: {
+    label: "Changes Requested",
+    classes: "bg-orange-50 border-orange-100 text-orange-700",
+  },
+  RELEASE_REQUESTED: {
+    label: "Awaiting Release",
+    classes: "bg-blue-50 border-blue-100 text-blue-700",
+  },
   // Backward compatibility
   active: {
     label: "Funded",
@@ -86,6 +94,8 @@ export default function VaultsPage() {
         return (
           vault.status === "FUNDED" ||
           vault.status === "DISPUTED" ||
+          vault.status === "CHANGES_REQUESTED" ||
+          vault.status === "RELEASE_REQUESTED" ||
           vault.status === "active"
         );
       }
@@ -143,7 +153,11 @@ export default function VaultsPage() {
   // Active Projects
   const activeCount = currentVaults.filter(
     (v: any) =>
-      v.status === "FUNDED" || v.status === "DISPUTED" || v.status === "active",
+      v.status === "FUNDED" ||
+      v.status === "DISPUTED" ||
+      v.status === "CHANGES_REQUESTED" ||
+      v.status === "RELEASE_REQUESTED" ||
+      v.status === "active",
   ).length;
   const prevActiveCount = previousVaults.filter(
     (v: any) =>
