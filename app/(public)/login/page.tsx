@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,9 @@ import { api, UserRole } from "@/lib/api-client";
 import { useUser } from "@/lib/store/user-context";
 import { usePrivy, useLoginWithEmail } from "@privy-io/react-auth";
 import { DotLoader } from "@/components/ui/dot-loader";
+import { LogoLoader } from "@/components/ui/logo-loader";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const { refreshUser } = useUser();
   const searchParams = useSearchParams();
@@ -436,5 +437,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LogoLoader fullPage size="lg" />}>
+      <LoginForm />
+    </Suspense>
   );
 }
