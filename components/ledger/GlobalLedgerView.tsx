@@ -67,12 +67,25 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
 
   const processingTotal = useMemo(
     () =>
-      (entries || [])
-        .filter((entry: any) =>
-          ["PROCESSING", "PENDING"].includes(entry.status),
-        )
-        .reduce((sum: number, entry: any) => sum + Math.abs(formatAmount(entry.amount)), 0),
-    [entries],
+      (entries || []).reduce((sum: number, entry: any) => {
+        // 1. Pending/Processing transactions are always in transit
+        if (["PROCESSING", "PENDING"].includes(entry.status)) {
+          return sum + Math.abs(formatAmount(entry.amount));
+        }
+        
+        // 2. Confirmed deposits/locks are "In Transit" as long as the vault is not yet finalized
+        if (entry.status === "CONFIRMED" && (entry.type === "LOCK" || entry.type === "DEPOSIT")) {
+          const vault = (vaults || []).find((v: any) => v.id === entry.vaultId);
+          const activeStatuses = ["FUNDED", "DISPUTED", "RELEASE_REQUESTED", "CHANGES_REQUESTED", "AWAITING_PAYMENT"];
+          
+          if (vault && activeStatuses.includes(vault.status)) {
+            return sum + Math.abs(formatAmount(entry.amount));
+          }
+        }
+        
+        return sum;
+      }, 0),
+    [entries, vaults],
   );
 
   const completedTotal = useMemo(
