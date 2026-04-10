@@ -842,7 +842,7 @@ export default function CreateVaultPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-12 flex items-center justify-center gap-3 text-slate-400">
+        <div className="mt-12 flex items-center justify-center gap-3 text-slate-700">
           <DayleLogo className="w-4 h-4 opacity-50" />
           <span className="text-sm tracking-wide font-bold">
             Secured by Dayle settlement protocol
