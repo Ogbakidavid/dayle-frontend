@@ -78,7 +78,10 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
   const completedTotal = useMemo(
     () =>
       (entries || [])
-        .filter((entry: any) => entry.status === "CONFIRMED")
+        .filter((entry: any) => 
+          entry.status === "CONFIRMED" && 
+          entry.type !== "LOCK" // Exclude escrow lock records from totals
+        )
         .reduce((sum: number, entry: any) => sum + Math.abs(formatAmount(entry.amount)), 0),
     [entries],
   );
