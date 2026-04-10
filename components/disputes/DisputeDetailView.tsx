@@ -340,7 +340,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
           ) && (
             <Button
               onClick={() => setShowModal(true)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-black h-12 px-6 rounded-2xl shadow-lg shadow-emerald-600/20"
+              className="bg-emerald-950 border border-white/10 hover:bg-emerald-700 text-white font-black h-12 px-6 rounded-2xl shadow-lg shadow-emerald-600/20"
             >
               + Add Evidence
             </Button>
@@ -359,7 +359,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
               Active Arbitration
             </div>
             <h1 className="text-3xl md:text-5xl text-white font-black tracking-tight leading-none">
-              Case <span className="text-white/30 text-2xl md:text-4xl">#</span>
+              Case <span className="text-emerald-700 text-2xl md:text-4xl">#</span>
               {dispute.id.slice(0, 12).toUpperCase()}
             </h1>
           </div>
