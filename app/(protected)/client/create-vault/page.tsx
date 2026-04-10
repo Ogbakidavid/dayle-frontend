@@ -558,6 +558,21 @@ export default function CreateVaultPage() {
                                         </div>
                                       </div>
 
+                                      {isEditing && (
+                                        <div className="space-y-1 px-1">
+                                          {deliverable.title.length > 0 && deliverable.title.length < 10 && (
+                                            <p className="text-[10px] text-amber-600 font-bold animate-pulse flex items-center gap-1">
+                                              <AlertCircle className="w-3 h-3" /> Too vague. Use at least 10 characters for the title to protect yourself.
+                                            </p>
+                                          )}
+                                          {deliverable.description.length > 0 && deliverable.description.length < 20 && (
+                                            <p className="text-[10px] text-amber-600 font-bold animate-pulse flex items-center gap-1">
+                                              <AlertCircle className="w-3 h-3" /> Short description detected. Detailed requirements help prevent disputes.
+                                            </p>
+                                          )}
+                                        </div>
+                                      )}
+
                                       <div className="flex flex-wrap items-center gap-2 pt-1">
                                         {[
                                           { id: SubmissionType.FILE, label: "FILE UPLOAD" },
