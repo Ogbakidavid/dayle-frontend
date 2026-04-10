@@ -93,7 +93,7 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
       (entries || [])
         .filter((entry: any) => 
           entry.status === "CONFIRMED" && 
-          entry.type !== "LOCK" // Exclude escrow lock records from totals
+          !["LOCK", "DEPOSIT"].includes(entry.type) // Exclude initial funding/lock from payout totals
         )
         .reduce((sum: number, entry: any) => sum + Math.abs(formatAmount(entry.amount)), 0),
     [entries],
