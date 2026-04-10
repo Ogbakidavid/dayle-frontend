@@ -150,6 +150,7 @@ export interface ApiClient {
     acceptSettlement: (id: string) => Promise<any>;
     requestTotalRefund: (id: string, data: { notes: string }) => Promise<any>;
     requestTotalRelease: (id: string, data: { notes: string }) => Promise<any>;
+    escalate: (id: string) => Promise<any>;
   };
   invites: {
     getByToken: (token: string) => Promise<any>;
@@ -455,6 +456,10 @@ export const api: ApiClient = {
         method: "POST",
         body: data,
       });
+    },
+
+    escalate: async (id: string): Promise<any> => {
+      return await request(`/disputes/${id}/escalate`, { method: "POST" });
     },
   },
 

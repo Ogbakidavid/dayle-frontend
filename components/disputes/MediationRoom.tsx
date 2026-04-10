@@ -121,6 +121,21 @@ export function MediationRoom({ dispute, vault, role, onUpdate }: MediationRoomP
     }
   };
 
+  const handleEscalate = async () => {
+    if (!confirm("Are you sure you want to escalate this dispute? This will move the case to platform arbitration for final adjudication by a Dayle expert. This process is final and cannot be undone.")) return;
+    
+    setIsSubmitting(true);
+    try {
+      await api.disputes.escalate(dispute.id);
+      toast.success("Dispute escalated to platform review.");
+      onUpdate();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to escalate dispute");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Card className="bg-amber-50/50 border-amber-200 border-2 overflow-hidden shadow-lg shadow-amber-600/5">
       <CardHeader className="bg-amber-100/50 border-b border-amber-200 px-6 py-4">
@@ -134,11 +149,22 @@ export function MediationRoom({ dispute, vault, role, onUpdate }: MediationRoomP
               <p className="text-[10px] text-amber-700 font-bold uppercase tracking-widest">Mutual Resolution Phase</p>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-2">
-            <Timer className="w-3.5 h-3.5 text-amber-600" />
-            <span className="text-xs font-black text-amber-900 tabular-nums uppercase">
-              Expires {timeLeft}
-            </span>
+          <div className="flex items-center gap-3">
+            <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleEscalate}
+                disabled={isSubmitting}
+                className="h-8 text-[10px] font-black text-amber-700 hover:bg-amber-100 hover:text-amber-900 uppercase tracking-tighter"
+              >
+                Escalate to Arbitration
+              </Button>
+            <div className="bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-2">
+              <Timer className="w-3.5 h-3.5 text-amber-600" />
+              <span className="text-xs font-black text-amber-900 tabular-nums uppercase">
+                Expires {timeLeft}
+              </span>
+            </div>
           </div>
         </div>
       </CardHeader>
