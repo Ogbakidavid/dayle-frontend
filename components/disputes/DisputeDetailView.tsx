@@ -358,8 +358,8 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
               <Scale className="w-4 h-4" />
               Active Arbitration
             </div>
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-none">
-              Case <span className="text-white text-2xl md:text-4xl">#</span>
+            <h1 className="text-3xl md:text-5xl text-white font-black tracking-tight leading-none">
+              Case <span className="text-white/30 text-2xl md:text-4xl">#</span>
               {dispute.id.slice(0, 12).toUpperCase()}
             </h1>
           </div>
