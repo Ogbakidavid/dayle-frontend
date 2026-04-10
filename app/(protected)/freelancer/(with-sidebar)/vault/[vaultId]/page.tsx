@@ -75,6 +75,25 @@ export default function FreelancerVaultDetailPage() {
     }
   }, [vaultId]);
 
+  // Fetch active dispute if status is DISPUTED
+  const [activeDisputeId, setActiveDisputeId] = useState<string | null>(null);
+  useEffect(() => {
+    async function fetchActiveDispute() {
+      if (!vault || vault.status !== VaultStatus.DISPUTED) return;
+      try {
+        const disputes = await api.disputes.listForVault(vault.id);
+        if (disputes && disputes.length > 0) {
+          // Find active or use first available
+          const active = disputes.find((d: any) => d.status !== "RESOLVED" && d.status !== "CLOSED");
+          setActiveDisputeId(active ? active.id : disputes[0].id);
+        }
+      } catch (err) {
+        console.error("Failed to fetch active dispute:", err);
+      }
+    }
+    fetchActiveDispute();
+  }, [vault]);
+
   if (vaultsLoading) {
     return (
       <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
@@ -777,18 +796,34 @@ export default function FreelancerVaultDetailPage() {
                     </>
                   )}
 
-                  <Link
-                    href={`/freelancer/disputes/create?vaultId=${vaultId}`}
-                    className="w-full"
-                  >
-                    <Button
-                      variant="outline"
-                      className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold  h-10 sm:h-12 rounded-xl transition-all shadow-sm active:scale-95 text-xs sm:text-sm"
+                  {vault.status !== VaultStatus.DISPUTED && (
+                    <Link
+                      href={`/freelancer/disputes/create?vaultId=${vaultId}`}
+                      className="w-full"
                     >
-                      <Gavel className="w-4 h-4 mr-2 text-amber-600" />
-                      Initiate resolution
-                    </Button>
-                  </Link>
+                      <Button
+                        variant="outline"
+                        className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold  h-10 sm:h-12 rounded-xl transition-all shadow-sm active:scale-95 text-xs sm:text-sm"
+                      >
+                        <Gavel className="w-4 h-4 mr-2 text-amber-600" />
+                        Initiate resolution
+                      </Button>
+                    </Link>
+                  )}
+
+                  {vault.status === VaultStatus.DISPUTED && activeDisputeId && (
+                    <Link
+                      href={`/freelancer/disputes/${activeDisputeId}`}
+                      className="w-full"
+                    >
+                      <Button
+                        className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold h-10 sm:h-12 rounded-xl transition-all shadow-lg shadow-amber-600/20 active:scale-95 text-xs sm:text-sm"
+                      >
+                        <Gavel className="w-4 h-4 mr-2" />
+                        Enter Mediation Room
+                      </Button>
+                    </Link>
+                  )}
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 mt-4 text-center">
@@ -817,12 +852,21 @@ export default function FreelancerVaultDetailPage() {
               </CardHeader>
               <CardContent className="pt-2">
                 <Button
-                  variant="outline"
-                  className="w-full border-slate-200 bg-white text-slate-600 hover:text-slate-900 font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95"
-                  disabled={!isEligibleForDispute}
-                  asChild={isEligibleForDispute}
+                  variant={vault.status === VaultStatus.DISPUTED ? "default" : "outline"}
+                  className={cn(
+                    "w-full font-bold h-12 rounded-xl transition-all shadow-sm active:scale-95",
+                    vault.status === VaultStatus.DISPUTED 
+                      ? "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/20"
+                      : "border-slate-200 bg-white text-slate-600 hover:text-slate-900",
+                  )}
+                  disabled={!isEligibleForDispute && vault.status !== VaultStatus.DISPUTED}
+                  asChild={isEligibleForDispute || vault.status === VaultStatus.DISPUTED}
                 >
-                  {isEligibleForDispute ? (
+                  {vault.status === VaultStatus.DISPUTED && activeDisputeId ? (
+                    <Link href={`/freelancer/disputes/${activeDisputeId}`}>
+                      Enter Mediation Room
+                    </Link>
+                  ) : isEligibleForDispute ? (
                     <Link
                       href={`/freelancer/disputes/create?vaultId=${vaultId}`}
                     >

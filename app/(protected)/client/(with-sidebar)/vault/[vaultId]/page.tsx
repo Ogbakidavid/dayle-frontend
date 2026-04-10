@@ -216,6 +216,25 @@ export default function ClientVaultDetailPage() {
     fetchInviteStatus();
   }, [vault]);
 
+  // Fetch active dispute if status is DISPUTED
+  const [activeDisputeId, setActiveDisputeId] = useState<string | null>(null);
+  useEffect(() => {
+    async function fetchActiveDispute() {
+      if (!vault || vault.status !== VaultStatus.DISPUTED) return;
+      try {
+        const disputes = await api.disputes.listForVault(vault.id);
+        if (disputes && disputes.length > 0) {
+          // Find active or use first available
+          const active = disputes.find((d: any) => d.status !== "RESOLVED" && d.status !== "CLOSED");
+          setActiveDisputeId(active ? active.id : disputes[0].id);
+        }
+      } catch (err) {
+        console.error("Failed to fetch active dispute:", err);
+      }
+    }
+    fetchActiveDispute();
+  }, [vault]);
+
   // Poll for status update after returning from checkout or while in AWAITING_PAYMENT
   useEffect(() => {
     const isProcessing = vault?.status === VaultStatus.PROCESSING_PAYMENT;
@@ -1214,6 +1233,21 @@ export default function ClientVaultDetailPage() {
                               >
                                 <Gavel className="w-4 h-4 mr-2 text-amber-600" />
                                 Initiate dispute
+                              </Button>
+                            </Link>
+                          )}
+
+                          {/* Enter Mediation — available when DISPUTED */}
+                          {vault.status === VaultStatus.DISPUTED && activeDisputeId && (
+                            <Link
+                              href={`/client/disputes/${activeDisputeId}`}
+                              className="w-full"
+                            >
+                              <Button
+                                className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold h-10 sm:h-12 rounded-xl transition-all shadow-lg shadow-amber-600/20 active:scale-95 text-xs sm:text-sm"
+                              >
+                                <Gavel className="w-4 h-4 mr-2" />
+                                Enter Mediation Room
                               </Button>
                             </Link>
                           )}
