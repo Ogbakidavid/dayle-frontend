@@ -31,6 +31,8 @@ import { DisputeStatus } from "@/lib/domain/enums";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { LogoLoader } from "@/components/ui/logo-loader";
+import { useSocket } from "@/lib/contexts/socket-context";
+
 
 interface DisputeEvent {
   type: string;
@@ -109,9 +111,26 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
     }
   }
 
+  const { socket } = useSocket();
+
   useEffect(() => {
     load();
   }, [disputeId]);
+
+  useEffect(() => {
+    if (!socket || !dispute?.vaultId) return;
+
+    const handler = (data: any) => {
+      if (data.vaultId === dispute.vaultId) {
+        load();
+      }
+    };
+
+    socket.on("vault_updated", handler);
+    return () => {
+      socket.off("vault_updated", handler);
+    };
+  }, [socket, dispute?.vaultId]);
 
   const handleSubmitEvidence = async () => {
     if (!evidenceValue.trim() && evidenceType !== "note") {

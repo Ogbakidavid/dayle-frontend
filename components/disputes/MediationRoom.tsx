@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { Timer, Handshake, ChevronRight, Calculator, AlertCircle, CheckCircle2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
+import { DotLoader } from "@/components/ui/dot-loader";
+
 
 interface MediationRoomProps {
   dispute: any;
@@ -200,8 +202,14 @@ export function MediationRoom({ dispute, vault, role, onUpdate }: MediationRoomP
                       disabled={isSubmitting}
                       className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 rounded-xl"
                     >
-                      <CheckCircle2 className="w-4 h-4 mr-2" />
-                      Approve & Settle
+                      {isSubmitting ? (
+                        <DotLoader size="sm" color="white" />
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          Approve & Settle
+                        </>
+                      )}
                     </Button>
                   ) : (
                     <div className="flex-1 text-center py-2 text-xs font-bold text-slate-400 italic">
