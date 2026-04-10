@@ -109,22 +109,24 @@ export default function AssignmentsPage() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm min-w-[140px]">
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Earnings</p>
-                <CurrencyEstimate usdAmount={totalEarnings} showNote={false} className="text-xl font-bold text-slate-900" />
+              <div className="bg-emerald-950 border border-emerald-900/50 p-4 sm:p-5 rounded-2xl shadow-xl min-w-[150px] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none" />
+                <p className="text-[9px] font-bold text-emerald-50 uppercase tracking-widest mb-1 relative z-10">Total Earnings</p>
+                <CurrencyEstimate usdAmount={totalEarnings} showNote={false} className="text-xl md:text-2xl font-bold text-white relative z-10" />
               </div>
-              <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm min-w-[140px]">
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Active Nodes</p>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <p className="text-xl font-bold text-slate-900">{activeCount}</p>
+              <div className="bg-emerald-950 border border-emerald-900/50 p-4 sm:p-5 rounded-2xl shadow-xl min-w-[150px] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none" />
+                <p className="text-[9px] font-bold text-emerald-50 uppercase tracking-widest mb-1 relative z-10">Active Nodes</p>
+                <div className="flex items-center gap-2 relative z-10">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <p className="text-xl md:text-2xl font-bold text-white">{activeCount}</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex items-center gap-2 p-1 bg-slate-100/50 rounded-xl w-fit border border-slate-200/50">
+          <div className="flex items-center gap-2 p-1.5 bg-emerald-950 rounded-xl w-fit shadow-lg border border-emerald-900/50">
             {(["ACTIVE", "COMPLETED", "ALL"] as const).map((tab) => (
               <button
                 key={tab}
@@ -133,10 +135,10 @@ export default function AssignmentsPage() {
                    setCurrentPage(1);
                 }}
                 className={cn(
-                  "px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                  "px-6 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border-t border-white/10",
                   statusFilter === tab
-                    ? "bg-white text-slate-900 shadow-sm border border-slate-200/50"
-                    : "text-slate-400 hover:text-slate-600"
+                    ? "bg-white/5 border border-white/10 text-white shadow-sm"
+                    : "text-emerald-50/70 hover:text-white hover:bg-white/5"
                 )}
               >
                 {tab}

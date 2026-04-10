@@ -117,59 +117,34 @@ export function GlobalLedgerView({ role }: GlobalLedgerViewProps) {
             label: "In Transit",
             value: processingTotal,
             isAmount: true,
-            color: "text-slate-900",
-            bg: "bg-amber-50",
-            border: "border-amber-100",
           },
           {
             label: "Distributed",
             value: completedTotal,
             isAmount: true,
-            color: "text-slate-900",
-            bg: "bg-emerald-50",
-            border: "border-emerald-100",
           },
           {
             label: "Total Events",
             value: (entries || []).length,
             isAmount: false,
-            color: "text-slate-900",
-            bg: "bg-blue-50",
-            border: "border-blue-100",
           },
         ].map((stat) => (
           <motion.div
             variants={itemVariants}
             key={stat.label}
-            className="group"
+            className="relative group bg-emerald-950 border border-emerald-900/50 p-6 sm:p-8 rounded-4xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-xl"
           >
-            <Card
-              className={cn(
-                "bg-white border border-slate-200 shadow-sm transition-all group-hover:border-slate-300 overflow-hidden relative",
-              )}
-            >
-              <div
-                className={cn(
-                  "absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 blur-2xl opacity-10 transition-all group-hover:opacity-20",
-                  stat.bg,
-                )}
-              />
-              <CardContent className="p-4 sm:py-8 relative z-10">
-                <p className="text-sm font-bold  text-slate-600 mb-2 group-hover:text-slate-600 transition-colors ">
-                  {stat.label}
-                </p>
-                <div
-                  className={cn(
-                    "text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ",
-                    stat.color,
-                  )}
-                >
-                  {stat.isAmount ? (
-                    <CurrencyEstimate usdAmount={stat.value as number} showNote={false} />
-                  ) : stat.value}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none transition-all group-hover:from-white/10" />
+            <div className="relative z-10">
+              <p className="text-sm font-bold text-emerald-50 mb-2">
+                {stat.label}
+              </p>
+              <div className="text-3xl sm:text-4xl font-bold tracking-tighter text-white">
+                {stat.isAmount ? (
+                  <CurrencyEstimate usdAmount={stat.value as number} showNote={false} />
+                ) : stat.value}
+              </div>
+            </div>
           </motion.div>
         ))}
       </div>

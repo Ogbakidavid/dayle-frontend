@@ -116,7 +116,7 @@ export default function FreelancerDashboard() {
         </motion.div>
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Link href="/freelancer/balance" className="w-full sm:w-auto">
-            <Button className="w-full sm:w-auto bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 font-bold text-xs h-10 sm:h-11 px-4 sm:px-6 transition-all shadow-sm">
+            <Button className="w-full sm:w-auto bg-emerald-950 text-white hover:bg-emerald-900 h-10 sm:h-11 px-4 sm:px-6 rounded-xl font-bold shadow-md shadow-emerald-950/20 transition-all text-xs sm:text-base border border-emerald-900/50">
               Withdraw funds
             </Button>
           </Link>

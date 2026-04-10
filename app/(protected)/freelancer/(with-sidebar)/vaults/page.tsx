@@ -127,13 +127,12 @@ export default function FreelancerVaultsPage() {
 
           <motion.div
             variants={itemVariants}
-            className="flex items-center gap-3"
+            className="flex items-center gap-3 w-full sm:w-auto"
           >
             <Button
-              variant="outline"
-              className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 h-11 px-5 rounded-xl transition-all font-bold"
+              className="w-full sm:w-auto bg-emerald-950 text-white hover:bg-emerald-900 h-10 sm:h-11 px-4 sm:px-6 rounded-xl font-bold shadow-md shadow-emerald-950/20 transition-all text-xs sm:text-base"
             >
-              <Filter className="w-4 h-4 mr-2 text-emerald-500" />
+              <Filter className="w-4 h-4 mr-2 text-emerald-400" />
               Filters
             </Button>
           </motion.div>
@@ -145,27 +144,26 @@ export default function FreelancerVaultsPage() {
             <motion.div
               variants={itemVariants}
               key={i}
-              className="relative group bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-sm"
+              className="relative group bg-emerald-950 border border-emerald-900/50 p-6 sm:p-8 rounded-4xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-xl"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-0 group-hover:opacity-100 transition-all" />
+              <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none transition-all group-hover:from-white/10" />
 
-              <div className="flex justify-between items-start mb-6">
+              <div className="flex justify-between items-start mb-6 relative z-10">
                 <div
                   className={cn(
-                    "p-2.5 rounded-xl bg-slate-50 border border-slate-100 transition-colors",
-                    stat.color,
+                    "p-2.5 rounded-xl bg-white/5 border border-white/10 transition-colors text-white",
                   )}
                 >
-                  <stat.icon className="w-5 h-5" />
+                  <stat.icon className="w-5 h-5 text-emerald-400" />
                 </div>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
                   {stat.change}
                 </span>
               </div>
-              <p className="text-sm font-bold text-slate-400 mb-2 group-hover:text-slate-500 transition-colors uppercase tracking-wider">
+              <p className="text-sm font-bold text-emerald-50 mb-2 relative z-10 uppercase tracking-wider">
                 {stat.label}
               </p>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tighter relative z-10">
                 {(stat as any).isAmount ? (
                   <CurrencyEstimate
                     usdAmount={stat.value as number}

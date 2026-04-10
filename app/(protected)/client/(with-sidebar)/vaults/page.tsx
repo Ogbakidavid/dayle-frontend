@@ -236,7 +236,7 @@ export default function VaultsPage() {
             className="flex items-start gap-3 sm:flex-row flex-col sm:items-center"
           >
             <Link href="/client/create-vault" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 h-10 sm:h-11 px-4 sm:px-6 rounded-xl font-bold shadow-md shadow-emerald-500/20 transition-all text-xs sm:text-base">
+              <Button className="w-full sm:w-auto bg-emerald-950 text-white hover:bg-emerald-900 h-10 sm:h-11 px-4 sm:px-6 rounded-xl font-bold shadow-md shadow-emerald-950/20 transition-all text-xs sm:text-base">
                 <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" strokeWidth={3} />
                 New project
               </Button>
@@ -281,25 +281,25 @@ export default function VaultsPage() {
             <motion.div
               variants={itemVariants}
               key={i}
-              className="relative group bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-sm"
+              className="relative group bg-emerald-950 border border-emerald-900/50 p-6 sm:p-8 rounded-4xl overflow-hidden hover:border-emerald-500/20 transition-all shadow-xl"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-100 transition-all" />
-              <div className="flex justify-end items-start mb-4">
+              <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none transition-all group-hover:from-white/10" />
+              <div className="flex justify-end items-start mb-4 relative z-10">
                 <span
                   className={cn(
-                    "text-sm font-bold px-2 py-1 rounded-full transition-colors",
+                    "text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full transition-colors",
                     stat.trend === "up"
-                      ? "text-emerald-600 bg-emerald-50"
-                      : "text-amber-600 bg-amber-50",
+                      ? "text-emerald-400 bg-emerald-500/10"
+                      : "text-amber-400 bg-amber-500/10",
                   )}
                 >
                   {stat.change}
                 </span>
               </div>
-              <p className="text-sm font-bold  text-slate-600 mb-2">
+              <p className="text-sm font-bold text-emerald-50 mb-2 relative z-10">
                 {stat.label}
               </p>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tighter">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tighter relative z-10">
                 {typeof stat.value === "number" ? (
                   <CurrencyEstimate usdAmount={stat.value} showNote={false} />
                 ) : (
