@@ -220,7 +220,7 @@ export function DisputeListView({ role }: { role: "client" | "freelancer" }) {
           </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 border-t border-white/10 pt-8">
+        <div className="mt-12 grid grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8 border-t border-white/10 pt-8">
           {[
             { label: "Active Cases", val: counts.open + counts.review, icon: Activity },
             { label: "Resolved", val: counts.resolved, icon: CheckCircle2 },
@@ -238,8 +238,8 @@ export function DisputeListView({ role }: { role: "client" | "freelancer" }) {
         </div>
       </section>
 
-      <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+      <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm flex flex-col xl:flex-row items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 w-full xl:w-auto">
           {statusTabs.map((t) => (
             <button
               key={t.key}
@@ -259,7 +259,7 @@ export function DisputeListView({ role }: { role: "client" | "freelancer" }) {
           ))}
         </div>
 
-        <div className="flex items-center gap-3 w-full lg:w-96">
+        <div className="flex items-center gap-3 w-full xl:w-96">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input 
@@ -311,9 +311,9 @@ export function DisputeListView({ role }: { role: "client" | "freelancer" }) {
                 <Link key={dispute.id} href={`/${role}/disputes/${dispute.id}`}>
                   <Card className="group border-slate-100 bg-white hover:border-amber-400/50 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300 rounded-4xl overflow-hidden">
                     <CardContent className="p-0">
-                      <div className="flex flex-col lg:flex-row lg:items-center">
+                      <div className="flex flex-col xl:flex-row xl:items-center">
                         <div className={cn(
-                          "lg:w-64 p-8 flex flex-col justify-center items-center gap-4 text-center border-b lg:border-b-0 lg:border-r border-slate-50 transition-colors group-hover:bg-slate-50/50",
+                          "xl:w-64 p-8 flex flex-col justify-center items-center gap-4 text-center border-b xl:border-b-0 xl:border-r border-slate-50 transition-colors group-hover:bg-slate-50/50",
                         )}>
                           <div className={cn(
                             "w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110",

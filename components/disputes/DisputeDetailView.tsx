@@ -432,7 +432,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
         />
       )}
 
-      <div className="grid lg:grid-cols-[1fr_340px] gap-8">
+      <div className="grid xl:grid-cols-[1fr_340px] gap-8">
         <main className="space-y-8">
           {/* Description Card */}
           <Card className="border-none bg-white shadow-xl shadow-slate-200/50 rounded-[2.5rem] overflow-hidden">

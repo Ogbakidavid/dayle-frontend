@@ -7,6 +7,7 @@ import { api } from "@/lib/api-client";
 import { toast } from "sonner";
 import { Timer, Handshake, ChevronRight, Calculator, AlertCircle, CheckCircle2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 interface MediationRoomProps {
   dispute: any;
@@ -239,11 +240,15 @@ export function MediationRoom({ dispute, vault, role, onUpdate }: MediationRoomP
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
                       <p className="text-[9px] font-black text-emerald-600 uppercase">To Freelancer</p>
-                      <p className="text-lg font-black text-emerald-700">{freelancerSplit.toFixed(4)} <span className="text-xs font-normal">{vault?.tokenSymbol}</span></p>
+                      <p className="text-lg font-black text-emerald-700">
+                        <CurrencyEstimate usdAmount={freelancerSplit} showNote={false} />
+                      </p>
                     </div>
                     <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
                       <p className="text-[9px] font-black text-blue-600 uppercase">To Client</p>
-                      <p className="text-lg font-black text-blue-700">{clientSplit.toFixed(4)} <span className="text-xs font-normal">{vault?.tokenSymbol}</span></p>
+                      <p className="text-lg font-black text-blue-700">
+                        <CurrencyEstimate usdAmount={clientSplit} showNote={false} />
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -259,23 +264,26 @@ export function MediationRoom({ dispute, vault, role, onUpdate }: MediationRoomP
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    variant="outline"
-                    onClick={handleRequestTotalRefund}
-                    disabled={isSubmitting}
-                    className="border-red-200 text-red-700 hover:bg-red-50 font-bold h-11 rounded-xl"
-                  >
-                    Request Full Refund
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={handleRequestTotalRelease}
-                    disabled={isSubmitting}
-                    className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 font-bold h-11 rounded-xl"
-                  >
-                    Request Full Release
-                  </Button>
+                <div className="grid grid-cols-1 gap-3">
+                  {role === "client" ? (
+                    <Button 
+                      variant="outline"
+                      onClick={handleRequestTotalRefund}
+                      disabled={isSubmitting}
+                      className="border-red-200 text-red-700 hover:bg-red-50 font-bold h-11 rounded-xl w-full"
+                    >
+                      Request Full Refund
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="outline"
+                      onClick={handleRequestTotalRelease}
+                      disabled={isSubmitting}
+                      className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 font-bold h-11 rounded-xl w-full"
+                    >
+                      Request Full Release
+                    </Button>
+                  )}
                 </div>
 
                 <Button 
