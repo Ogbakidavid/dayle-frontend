@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,9 +46,16 @@ import {
 
 export default function SettingsPageContent({ role = "client" }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get("tab");
   const { user, logout, refreshUser } = useUser();
   const { balance } = useLedger();
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState(tabParam || "profile");
+
+  useEffect(() => {
+    if (tabParam) setActiveTab(tabParam);
+  }, [tabParam]);
+
   const [isAddingBillingMethod, setIsAddingBillingMethod] = useState(false);
   const [selectedBillingMethod, setSelectedBillingMethod] = useState<string | null>(null);
   const [billingStep, setBillingStep] = useState<"SELECTION" | "BANK">("SELECTION");
@@ -219,27 +226,46 @@ export default function SettingsPageContent({ role = "client" }) {
     }
   };
 
+  const [exchangeRate, setExchangeRate] = useState(1);
+  const isKenya = user?.country === "Kenya" || user?.country === "KE";
+  const preferredCurrency = isKenya ? "KES" : "NGN";
+  const currencySymbol = preferredCurrency === "NGN" ? "₦" : preferredCurrency === "KES" ? "KSh" : "$";
+
+  useEffect(() => {
+    if (showWithdrawAmountDialog) {
+      api.rates.getDisplayRate(preferredCurrency, 100)
+        .then((res) => { if (res?.rate) setExchangeRate(res.rate); })
+        .catch(console.error);
+    }
+  }, [showWithdrawAmountDialog, preferredCurrency]);
+
   const setPercentage = (percent: number) => {
-    const available = Number(balance?.formattedAvailable) || 0;
-    const amount = (available * percent).toFixed(2);
+    const availableUsd = Number(balance?.formattedAvailable) || 0;
+    // backend sends rate as USD per local (e.g. 1 NGN = 0.00066 USD)
+    // so availableLocal = usd / rate
+    const availableLocal = availableUsd / (exchangeRate || 1);
+    const amount = (availableLocal * percent).toFixed(0);
     setWithdrawAmount(amount);
     setWithdrawError("");
   };
 
   const handleProceedToWithdrawal = () => {
-    const amountNum = parseFloat(withdrawAmount);
-    const available = Number(balance?.formattedAvailable) || 0;
+    const localAmountNum = parseFloat(withdrawAmount);
+    const availableUsd = Number(balance?.formattedAvailable) || 0;
+    const availableLocal = availableUsd / (exchangeRate || 1);
 
-    if (isNaN(amountNum) || amountNum <= 0) {
+    if (isNaN(localAmountNum) || localAmountNum <= 0) {
       setWithdrawError("Please enter a valid amount");
       return;
     }
-    if (amountNum > available) {
+    if (localAmountNum > availableLocal) {
       setWithdrawError("Amount exceeds available balance");
       return;
     }
 
-    router.push(`/withdraw?amount=${withdrawAmount}`);
+    // multiply back to get USD
+    const usdAmountToWithdraw = localAmountNum * (exchangeRate || 1);
+    router.push(`/withdraw?amount=${usdAmountToWithdraw}`);
   };
 
   const isClient = role === "client";
@@ -1068,7 +1094,10 @@ export default function SettingsPageContent({ role = "client" }) {
                     Available Balance
                   </label>
                   <p className="text-2xl font-bold text-slate-900">
-                    ${(Number(balance?.formattedAvailable) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    <CurrencyEstimate
+                      usdAmount={Number(balance?.formattedAvailable) || 0}
+                      showNote={false}
+                    />
                   </p>
                 </div>
               </div>
@@ -1077,7 +1106,7 @@ export default function SettingsPageContent({ role = "client" }) {
                   Amount to Withdraw
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-slate-400">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-slate-400">{currencySymbol}</span>
                   <input
                     type="number"
                     value={withdrawAmount}
@@ -1095,8 +1124,13 @@ export default function SettingsPageContent({ role = "client" }) {
               </div>
               
               <div className="flex items-center justify-between px-1">
-                <p className="text-[11px] font-bold text-slate-500">
-                  AVAILABLE LIMIT: <span className="text-emerald-600 ml-1">${(Number(balance?.formattedAvailable) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <p className="text-[11px] font-bold text-slate-500 flex items-center">
+                  AVAILABLE LIMIT: <span className="text-emerald-600 ml-1">
+                    <CurrencyEstimate
+                      usdAmount={Number(balance?.formattedAvailable) || 0}
+                      showNote={false}
+                    />
+                  </span>
                 </p>
                 {withdrawError && (
                   <p className="text-[10px] font-bold text-red-500 uppercase tracking-tight">
@@ -1130,7 +1164,7 @@ export default function SettingsPageContent({ role = "client" }) {
             </Button>
             <Button
               onClick={handleProceedToWithdrawal}
-              disabled={!withdrawAmount || Number(withdrawAmount) <= 0 || Number(withdrawAmount) > Number(balance?.formattedAvailable)}
+              disabled={!withdrawAmount || Number(withdrawAmount) <= 0 || Number(withdrawAmount) > (Number(balance?.formattedAvailable) / (exchangeRate || 1))}
               className="w-full sm:flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/10 active:scale-95 transition-all"
             >
               Proceed to Payout

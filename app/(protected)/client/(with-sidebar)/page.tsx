@@ -41,7 +41,7 @@ export default function ClientDashboard() {
 
   const activeVaults = vaults.filter(
     (v: any) =>
-      v.status !== VaultStatus.RELEASED && v.status !== VaultStatus.CANCELLED,
+      v.status !== VaultStatus.RELEASED && v.status !== VaultStatus.CANCELLED && v.status !== VaultStatus.REFUNDED,
   );
 
   const securedVaults = vaults.filter(
