@@ -72,10 +72,10 @@ export default function AssignmentsPage() {
     currentPage * itemsPerPage,
   );
 
-  // Stats
+  // Stats - use formattedPaidAmount which reflects actual release (e.g. 50% split)
   const totalEarnings = allAssignments
     .filter((v: any) => v.status === VaultStatus.RELEASED)
-    .reduce((acc, v: any) => acc + (Number(v.formattedTotalAmount) || 0), 0);
+    .reduce((acc, v: any) => acc + (Number(v.formattedPaidAmount) || 0), 0);
 
   const activeCount = allAssignments.filter((v: any) => 
     [
