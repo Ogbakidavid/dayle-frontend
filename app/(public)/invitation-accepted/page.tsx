@@ -22,7 +22,7 @@ interface Vault {
   formattedTotalAmount?: string;
 }
 
-export default function InvitationAcceptedPage() {
+function InvitationAcceptedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const vaultId = searchParams.get("vaultId");
@@ -134,4 +134,12 @@ export default function InvitationAcceptedPage() {
       </div>
     </div>
   );
+}
+
+export default function InvitationAcceptedPage() {
+    return (
+        <React.Suspense fallback={null}>
+            <InvitationAcceptedContent />
+        </React.Suspense>
+    );
 }

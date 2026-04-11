@@ -14,7 +14,7 @@ import { useUser } from "@/lib/store/user-context";
 import { usePrivy, useLoginWithEmail } from "@privy-io/react-auth";
 import { DotLoader } from "@/components/ui/dot-loader";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const { refreshUser } = useUser();
   const searchParams = useSearchParams();
@@ -121,9 +121,6 @@ export default function LoginPage() {
         setLoginFailed(true);
         loginInProgressRef.current = false;
         await logout();
-        router.push("/login");
-        router.refresh();
-        window.location.reload();
       }
     };
 
@@ -449,4 +446,12 @@ export default function LoginPage() {
       </div>
     </div>
   );
+}
+
+export default function LoginPage() {
+    return (
+        <React.Suspense fallback={null}>
+            <LoginContent />
+        </React.Suspense>
+    );
 }
