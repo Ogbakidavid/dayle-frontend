@@ -19,6 +19,7 @@ export default function LoginPage() {
   const { refreshUser } = useUser();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo");
+  const errorParam = searchParams.get("error");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -53,11 +54,18 @@ export default function LoginPage() {
   // Watch for successful authentication to trigger backend sync
   useEffect(() => {
     if (!ready || !authenticated || !privyUser) return;
+
+    // If we're coming from a session mismatch error, don't auto-login
+    if (errorParam === "session_mismatch" && !loginInProgressRef.current) {
+      console.warn("Session mismatch detected, preventing auto-login with stale Privy session.");
+      return;
+    }
+
     // Prevent firing multiple times (privyUser updates as wallet is added etc.)
     if (loginInProgressRef.current) return;
 
     const handleSocialLoginSuccess = async () => {
-      console.log("handleSocialLoginSuccess called");
+      console.log("handleSocialLoginSuccess called for:", privyUser.email || privyUser.id);
       loginInProgressRef.current = true;
       try {
         const accessToken = await getAccessToken();

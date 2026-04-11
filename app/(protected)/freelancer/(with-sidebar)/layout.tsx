@@ -230,14 +230,6 @@ export default function FreelancerLayout({ children }: FreelancerLayoutProps) {
                 )}
               </Button>
             </Link>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={logout}
-              className="h-9 w-9 p-0 text-slate-700 hover:bg-red-50 hover:text-red-600"
-            >
-              <LogOut className="w-5 h-5" />
-            </Button>
           </div>
         </div>
 

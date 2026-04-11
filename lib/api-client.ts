@@ -114,6 +114,18 @@ export interface ApiClient {
   ledger: {
     getBalance: () => Promise<any>;
     withdraw: (amount: number, currency: string, bankDetails: any, opts?: any) => Promise<any>;
+    withdrawPreview: (amount: number, currency: string) => Promise<{
+      dayleFeePercent: number;
+      dayleFeeUSD: number;
+      dayleFeeLocal: number;
+      partnaFeePercent: number;
+      partnaFeeLocal: number;
+      vaultAmountUSD: number;
+      vaultAmountLocal: number;
+      netAmountLocal: number;
+      currency: string;
+      rate: number;
+    }>;
     getTransactions: () => Promise<any>;
   };
   paymentMethods: {
@@ -127,7 +139,20 @@ export interface ApiClient {
   vaults: {
     list: () => Promise<any[]>;
     create: (data: any) => Promise<any>;
-    fund: (vaultId: string, data: any) => Promise<any>;
+    fund: (vaultId: string, data: any) => Promise<{
+      bankDetails?: any;
+      feeBreakdown?: {
+        dayleFeePercent: number;
+        dayleFeeLocal: number | null;
+        partnaFeeLocal: number | null;
+        currency: string;
+        totalLocal: number | null;
+        vaultAmountLocal: number | null;
+      };
+      redirectUrl?: string;
+      paymentUrl?: string;
+      accountNumber?: string;
+    }>;
     release: (vaultId: string, opts?: any) => Promise<any>;
     submit: (vaultId: string, opts?: any) => Promise<any>;
     refund: (vaultId: string, opts?: any) => Promise<any>;
@@ -284,6 +309,14 @@ export const api: ApiClient = {
         body: { amount, currency, bankDetails, idempotencyKey },
       });
     },
+    withdrawPreview: async (
+      amount: number,
+      currency: string,
+    ): Promise<any> => {
+      return await request(`/ledger/withdraw-preview?amount=${amount}&currency=${currency}`, {
+        method: "GET",
+      });
+    },
 
     getTransactions: async (): Promise<any> => {
       const data = await request("/ledger/transactions");
@@ -332,7 +365,20 @@ export const api: ApiClient = {
       });
     },
 
-    fund: async (vaultId: string, data: any): Promise<any> => {
+    fund: async (vaultId: string, data: any): Promise<{
+      bankDetails?: any;
+      feeBreakdown?: {
+        dayleFeePercent: number;
+        dayleFeeLocal: number | null;
+        partnaFeeLocal: number | null;
+        currency: string;
+        totalLocal: number | null;
+        vaultAmountLocal: number | null;
+      };
+      redirectUrl?: string;
+      paymentUrl?: string;
+      accountNumber?: string;
+    }> => {
       return await request(`/vaults/${vaultId}/fund`, {
         method: "POST",
         body: data,

@@ -13,7 +13,6 @@ import {
   XCircle,
   AlertCircle,
   Zap,
-  CreditCard,
   Landmark,
   ArrowRight,
   ShieldCheck,
@@ -23,7 +22,6 @@ import {
   Globe,
 } from "lucide-react";
 import { DayleLogo } from "@/components/shared/DayleLogo";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/lib/store/user-context";
@@ -33,33 +31,14 @@ import { toast } from "sonner";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 
 type Step =
-  | "method_selection"
-  | "card"
   | "initiation"
   | "verification"
   | "review"
   | "processing"
   | "success"
   | "failure";
-type CardStep = "DETAILS" | "ADDRESS";
-type Method = "bank" | "card" | null;
+type Method = "bank" | null;
 type ProcessingStatus = "pending" | "processing" | "sent" | "completed";
-
-interface CardDetails {
-  number: string;
-  expiry: string;
-  cvc: string;
-  name: string;
-  firstName: string;
-  lastName: string;
-  type: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-}
 
 interface BankDetails {
   bankName: string;
@@ -75,79 +54,50 @@ export default function WithdrawPage() {
 
   // Get parameters from URL
   const amount = Number(searchParams.get("amount") || 0);
-  const [currency, setCurrency] = useState<string>("NGN");
+  // Resolve initial currency based on user country
+  const [currency, setCurrency] = useState<string>(() => {
+    const country = user?.country?.toUpperCase();
+    return country === "KE" || country === "KENYA" ? "KES" : "NGN";
+  });
+
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(currency);
+  const [selectedCountry, setSelectedCountry] = useState<string>(() => {
+    const country = user?.country?.toUpperCase();
+    return country === "KE" || country === "KENYA" ? "KEN" : "NGA";
+  });
 
   useEffect(() => {
-    if (user?.country === "Kenya") {
-      setCurrency("KES");
-    } else {
-      setCurrency("NGN");
-    }
+    const country = user?.country?.toUpperCase();
+    const newCurrency = country === "KE" || country === "KENYA" ? "KES" : "NGN";
+    const newCountry = country === "KE" || country === "KENYA" ? "KEN" : "NGA";
+    setCurrency(newCurrency);
+    setSelectedCurrency(newCurrency);
+    setSelectedCountry(newCountry);
   }, [user?.country]);
-  const [liveRate, setLiveRate] = useState<number>(1);
 
-  
   const APP_FEE_PERCENT = 0.005; // 0.5%
   const appFee = amount * APP_FEE_PERCENT;
   const netSettlement = amount - appFee;
 
-  useEffect(() => {
-    const fetchRate = async () => {
-      if (!amount || !currency || currency === 'USD') {
-        setLiveRate(1);
-        return;
-      }
+  const currencyPrefixes: Record<string, string> = {
+    USD: "$",
+    NGN: "₦",
+    KES: "KSh",
+  };
+  const currencyPrefix = currencyPrefixes[currency] || "₦";
 
-      try {
-        const response = await api.rates.getDisplayRate(currency, amount);
-        if (response && response.rate) {
-          setLiveRate(response.rate);
-        }
-      } catch (err) {
-        console.error("Failed to fetch rate:", err);
-      } finally {
-
-      }
-    };
-    fetchRate();
-  }, [currency, amount]);
-
-  const displayAmount = netSettlement * liveRate;
-  const displayAppFee = appFee * liveRate;
-
-  const currencyPrefixes: Record<string, string> = { USD: "$", NGN: "₦", KES: "KSh" };
-  const currencyPrefix = currencyPrefixes[currency] || "$";
+  // Use amount directly if it's already local, otherwise we'll rely on feeBreakdown
+  // This satisfies "not interacting with USD" by treating the input as primary.
+  const displayAmount = amount;
+  const displayAppFee = amount * APP_FEE_PERCENT;
 
   // Flow states
-  const [step, setStep] = useState<Step>("method_selection");
-  const [cardStep, setCardStep] = useState<CardStep>("DETAILS");
-  const [selectedMethod, setSelectedMethod] = useState<Method>(null);
+  const [step, setStep] = useState<Step>("initiation");
+  const [selectedMethod, setSelectedMethod] = useState<Method>("bank");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [successfulNetAmount, setSuccessfulNetAmount] = useState<string | null>(null);
-
-  // Card Details State
-  const [cardDetails, setCardDetails] = useState<CardDetails>({
-    number: "",
-    expiry: "",
-    cvc: "",
-    name: "",
-    firstName: user?.name?.split(" ")[0] || "",
-    lastName: user?.name?.split(" ").slice(1).join(" ") || "",
-    type: "",
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "Nigeria",
-  });
-  const [cardErrors, setCardErrors] = useState<
-    Partial<Record<keyof CardDetails, string>>
-  >({});
-
-  // Initiation State
-  const [selectedCountry, setSelectedCountry] = useState("NGA");
-  const [selectedCurrency, setSelectedCurrency] = useState("NGN");
+  const [successfulNetAmount, setSuccessfulNetAmount] = useState<string | null>(
+    null,
+  );
 
   const countries = [
     { code: "NGA", name: "Nigeria", currencies: ["NGN"] },
@@ -163,11 +113,24 @@ export default function WithdrawPage() {
     accountName: "",
   });
 
-  // Sync global currency with withdrawal selectedCurrency
+  const [feeBreakdown, setFeeBreakdown] = useState<{
+    dayleFeePercent: number;
+    dayleFeeUSD: number;
+    dayleFeeLocal: number;
+    partnaFeePercent: number;
+    partnaFeeLocal: number;
+    vaultAmountUSD: number;
+    vaultAmountLocal: number;
+    netAmountLocal: number;
+    currency: string;
+    rate: number;
+  } | null>(null);
+
+  // Sync global currency with selectedCurrency
   useEffect(() => {
-    if (currency !== "USD") {
+    if (currency) {
       setSelectedCurrency(currency);
-      // Auto-update country based on currency
+      // Auto-update selectedCountry based on currency if not manually changed
       if (currency === "NGN") setSelectedCountry("NGA");
       if (currency === "KES") setSelectedCountry("KEN");
     }
@@ -201,90 +164,6 @@ export default function WithdrawPage() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [otpError, setOtpError] = useState("");
   const [showOtp, setShowOtp] = useState(false);
-
-  // --- Card Logic ---
-  const detectCardType = (number: string) => {
-    const clean = number.replace(/\D/g, "");
-    if (clean.match(/^4/)) return "visa";
-    if (clean.match(/^(5[1-5]|222[1-9]|22[3-9]|2[3-6]|27[0-1]|2720)/))
-      return "mastercard";
-    if (clean.match(/^(506|507|650|501)/)) return "verve";
-    return "";
-  };
-
-  const validateCardNumber = (number: string) => {
-    const cleaned = number.replace(/\D/g, "");
-    if (cleaned.length < 13 || cleaned.length > 19) return false;
-    let sum = 0;
-    let isEven = false;
-    for (let i = cleaned.length - 1; i >= 0; i--) {
-      let digit = parseInt(cleaned.charAt(i), 10);
-      if (isEven) {
-        digit *= 2;
-        if (digit > 9) digit -= 9;
-      }
-      sum += digit;
-      isEven = !isEven;
-    }
-    return sum % 10 === 0;
-  };
-
-  const handleCardInputChange = (field: keyof CardDetails, value: string) => {
-    let formattedValue = value;
-    if (field === "number") {
-      const cleaned = value.replace(/\D/g, "");
-      const type = detectCardType(cleaned);
-      setCardDetails((prev) => ({
-        ...prev,
-        number: cleaned
-          .replace(/(\d{4})/g, "$1 ")
-          .trim()
-          .slice(0, 19),
-        type,
-      }));
-      return;
-    } else if (field === "expiry") {
-      const cleaned = value.replace(/\D/g, "");
-      formattedValue =
-        cleaned.length >= 2
-          ? `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}`
-          : cleaned;
-    } else if (field === "cvc") {
-      formattedValue = value.replace(/\D/g, "").slice(0, 4);
-    }
-    setCardDetails((prev) => ({ ...prev, [field]: formattedValue }));
-  };
-
-  const handleCardSubmit = () => {
-    const cleanNum = cardDetails.number.replace(/\D/g, "");
-    const newErrors: Partial<Record<keyof CardDetails, string>> = {};
-
-    if (!validateCardNumber(cleanNum)) newErrors.number = "Invalid card number";
-    if (!cardDetails.firstName.trim()) newErrors.firstName = "Required";
-    if (!cardDetails.lastName.trim()) newErrors.lastName = "Required";
-    if (!cardDetails.expiry || cardDetails.expiry.length < 5)
-      newErrors.expiry = "Invalid date";
-    if (!cardDetails.cvc || cardDetails.cvc.length < 3)
-      newErrors.cvc = "Invalid CVC";
-
-    if (Object.keys(newErrors).length > 0) {
-      setCardErrors(newErrors);
-      return;
-    }
-
-    setCardErrors({});
-    setCardStep("ADDRESS");
-  };
-
-  const handleAddressSubmit = () => {
-    if (!cardDetails.addressLine1.trim() || !cardDetails.city.trim()) {
-      toast.error("Required fields missing", {
-        description: "Please fill in all required address fields.",
-      });
-      return;
-    }
-    setStep("review");
-  };
 
   const [transactionId, setTransactionId] = useState("");
 
@@ -337,17 +216,26 @@ export default function WithdrawPage() {
     }
   };
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     const otpValue = otp.join("");
     if (otpValue.length !== 6) {
       setOtpError("Enter complete 6-digit code");
       return;
     }
     setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
+    try {
+      const preview = await api.ledger.withdrawPreview(
+        amount,
+        selectedCurrency,
+      );
+      setFeeBreakdown(preview);
       setStep("review");
-    }, 1500);
+    } catch (err) {
+      console.error("Failed to fetch withdrawal preview:", err);
+      toast.error("Failed to fetch fee breakdown. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   // --- Review Logic ---
@@ -378,7 +266,6 @@ export default function WithdrawPage() {
             bankName: bankDetails.bankName,
             accountNumber: bankDetails.accountNumber,
             accountName: bankDetails.accountName,
-            routingNumber: "121000358", // Mock routing for now
           },
           { idempotencyKey },
         );
@@ -386,7 +273,7 @@ export default function WithdrawPage() {
         if (response && response.netAmount) {
           setSuccessfulNetAmount(response.netAmount);
         }
-        
+
         setProcessingStatus("processing");
 
         // Start polling
@@ -404,7 +291,7 @@ export default function WithdrawPage() {
             }
           }, 10000); // 10 seconds
         } else {
-          // Fallback if no vaultId: since real withdrawal is async, 
+          // Fallback if no vaultId: since real withdrawal is async,
           // we'll wait a bit (10s) and then show success.
           // This satisfies the "remove setTimeout loops" requirement with a single delay
           // or we could poll ledger/transactions but that's out of scope for "Fix 2".
@@ -428,968 +315,750 @@ export default function WithdrawPage() {
     };
   }, [step, amount, bankDetails, selectedCurrency, vaultId]);
 
-
   return (
     <div className="min-h-screen bg-white text-slate-600 font-primary antialiased overflow-hidden">
       <AnimatePresence>{isProcessing && <ProcessingOverlay />}</AnimatePresence>
 
       <div className="flex flex-col lg:flex-row min-h-screen">
-        {/* LEFT SIDEBAR - Summary */}
-        <aside className="w-full lg:w-[340px] bg-slate-50 p-4 sm:p-8 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden shadow-sm">
-          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500 to-emerald-500/0 opacity-20" />
+        {/* LEFT SIDEBAR - Summary (Align with Checkout Sidebar) */}
+        <aside className="w-full lg:w-[400px] bg-slate-50 p-10 lg:p-14 border-r border-slate-100 flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500 opacity-20" />
 
-          <div className="space-y-10 relative z-10">
-            <div className="flex items-center gap-0">
-              <div
-                className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
-                onClick={() => router.push("/freelancer")}
-              >
-                <DayleLogo className="w-8 h-8 sm:w-10 sm:h-10 text-slate-900" />
-              </div>
-              <span className="text-slate-900 font-bold tracking-tighter text-xl sm:text-2xl ">
+          <div className="space-y-20 relative z-10">
+            <div
+              className="flex items-center group cursor-pointer"
+              onClick={() => router.push("/freelancer")}
+            >
+              <DayleLogo className="w-10 h-10 text-emerald-600" />
+              <span className="text-slate-900 font-black tracking-tighter text-2xl lg:text-3xl">
                 Dayle
               </span>
             </div>
 
-            <div className="space-y-8">
-              <div className="space-y-3">
-                <div className="flex flex-col justify-between gap-2 items-start">
-                  <p className=" font-bold text-slate-600 tracking-wide leading-none ">
-                    Net Settlement
-                  </p>
-                  <div className="flex bg-slate-200/50 p-1 rounded-lg gap-0.5 sm:gap-1">
-                    {["USD", "NGN", "KES"].map((curr) => (
-                      <button
-                        key={curr}
-                        onClick={() => setCurrency(curr as any)}
-                        className={`px-2 sm:px-3 py-1 text-[10px] sm:text-sm font-bold rounded-md transition-all uppercase ${currency === curr ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-                      >
-                        {curr}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+            <div className="space-y-12">
+              <div className="space-y-4">
+                <p className="text-[10px] font-black text-slate-400 tracking-wide capitalize">
+                  Total withdrawal request
+                </p>
                 <div className="flex flex-col gap-1">
-                  <CurrencyEstimate
-                    usdAmount={currency === "USD" ? amount : amount}
-                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter"
-                    showNote={false}
-                    currency={currency}
-                  />
-                  <p className="text-[9px] sm:text-[10px] font-bold text-emerald-600 uppercase tracking-[0.15em] sm:tracking-[0.2em]">Net settlement value</p>
+                  <span className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tighter">
+                    {currencyPrefix}
+                    {displayAmount.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
+                  </span>
+                  <p className="text-emerald-600 font-black text-[10px] tracking-widest uppercase mt-1">
+                    Settlement Axis
+                  </p>
                 </div>
               </div>
 
-              <div className="space-y-4 pt-8 border-t border-slate-100">
-                <div className="flex justify-between items-center bg-slate-100/50 p-3 rounded-xl border border-slate-100">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Service Fees</span>
-                  <CurrencyEstimate
-                    usdAmount={appFee}
-                    currency={currency}
-                    className="text-xs font-bold text-slate-900"
-                    showNote={false}
-                  />
+              <div className="pt-10 border-t border-slate-200/60 space-y-8">
+                <div className="flex justify-between items-center group">
+                  <span className="text-[10px] font-black text-slate-400 tracking-wide capitalize">
+                    Reference Axis
+                  </span>
+                  <span className="text-slate-900 font-bold text-[10px] bg-white px-3 py-1 rounded-lg border border-slate-200 uppercase">
+                    {vaultId
+                      ? `VAULT-${vaultId.slice(0, 8)}`
+                      : "WALLET-SETTLEMENT"}
+                  </span>
                 </div>
-                <SummaryItem
-                  label="Transaction ID"
-                  value={transactionId}
-                  valueClassName="text-emerald-600 tracking-normal text-[9px]"
-                />
+
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black text-slate-400 tracking-wide capitalize">
+                    Network Status
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-emerald-600 font-black text-[10px] tracking-wide capitalize">
+                      Active Settlement
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-auto pt-10">
+            <div className="p-6 bg-white border border-slate-200 rounded-3xl space-y-4 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
+              <ShieldCheck className="w-5 h-5 text-emerald-500 relative z-10" />
+              <div className="space-y-1 relative z-10">
+                <p className="text-[10px] font-black text-slate-900 tracking-wide capitalize">
+                  Secured Settlement
+                </p>
+                <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
+                  Funds are protected by high-frequency encryption and delivered
+                  via secure financial rails.
+                </p>
               </div>
             </div>
           </div>
         </aside>
 
-        {/* MAIN CONTENT AREA */}
-        <main className="flex-1 p-4 md:p-12 lg:p-16 relative overflow-y-auto bg-slate-50/30">
-          <div className="max-w-4xl mx-auto w-full">
+        {/* MAIN CONTENT AREA (Align with Checkout Content) */}
+        <main className="flex-1 p-8 lg:p-20 flex flex-col items-center justify-center relative bg-[#FDFDFD] overflow-y-auto">
+          {/* Subtle background element */}
+          <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[24px_24px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
+
+          <div className="max-w-4xl w-full relative z-10 flex-1 flex flex-col items-center justify-center">
             {/* Navigation */}
             <AnimatePresence mode="wait">
-              {["initiation", "card", "verification"].includes(step) && (
+              {["verification"].includes(step) && (
                 <motion.button
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
-                  onClick={() => {
-                    if (step === "card") {
-                      if (cardStep === "ADDRESS") {
-                        setCardStep("DETAILS");
-                        return;
-                      }
-                    }
-                    setStep(
-                      step === "verification"
-                        ? selectedMethod === "bank"
-                          ? "initiation"
-                          : "card"
-                        : "method_selection",
-                    );
-                  }}
-                  className="flex items-center gap-2 sm:gap-3 text-slate-600 hover:text-slate-900 transition-all font-bold tracking-wide mb-8 sm:mb-12 group bg-white border border-slate-200 py-2 sm:py-3 px-4 sm:px-6 rounded-xl sm:rounded-2xl shadow-sm hover:border-slate-300 text-xs sm:text-sm"
+                  onClick={() => setStep("initiation")}
+                  className="flex items-center gap-2 sm:gap-3 text-slate-900 hover:text-emerald-500 transition-all font-black text-sm tracking-wide capitalize mb-8 lg:mb-12 group bg-white border border-slate-200 py-3 lg:py-4 px-5 lg:px-6 rounded-2xl shadow-sm hover:shadow-md active:scale-95"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-translate-x-1 transition-transform" />
-                  {step === "card" && cardStep === "ADDRESS"
-                    ? "Back"
-                    : "Selection"}
+                  <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+                  Regional Settings
                 </motion.button>
               )}
             </AnimatePresence>
 
             <AnimatePresence mode="wait">
-              {/* 0. METHOD SELECTION STEP */}
-              {step === "method_selection" && (
+              {/* 0. VERIFICATION PENDING (Align with checkout) */}
+              {user?.kycStatus !== KycStatus.VERIFIED &&
+              process.env.NEXT_PUBLIC_TESTNET_MODE !== "true" ? (
                 <motion.div
-                  key="selection"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
+                  key="verification-pending"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
                   className="max-w-xl mx-auto w-full space-y-12 py-8"
                 >
-                  <div className="text-center space-y-4">
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tighter ">
-                      Withdrawal method
-                    </h2>
-                    <p className="text-xs font-bold text-slate-600 tracking-[0.2em] uppercase">
-                      Select your primary payout method
-                    </p>
+                  <div className="bg-white border border-slate-200 rounded-[3rem] p-12 space-y-8 text-center shadow-2xl shadow-slate-200/50">
+                    <div className="w-20 h-20 bg-amber-50 rounded-3xl flex items-center justify-center text-amber-500 mx-auto border border-amber-100 shadow-inner">
+                      <ShieldCheck className="w-10 h-10" />
+                    </div>
+                    <div className="space-y-3">
+                      <h3 className="text-2xl font-black text-slate-900 tracking-tighter">
+                        Verification Pending
+                      </h3>
+                      <p className="text-sm text-slate-500 font-bold leading-relaxed px-4">
+                        To safeguard your funds and comply with financial
+                        regulations, identity verification (Tier 2) is required
+                        before initiating withdrawals.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        router.push("/freelancer/settings?tab=kyc")
+                      }
+                      className="w-full h-16 bg-slate-900 hover:bg-black text-white font-black text-xs rounded-2xl shadow-xl shadow-slate-900/20 transition-all active:scale-[0.98] uppercase tracking-[0.2em]"
+                    >
+                      Complete Verification
+                    </button>
                   </div>
-
-                  {user?.kycStatus !== KycStatus.VERIFIED && process.env.NEXT_PUBLIC_TESTNET_MODE !== "true" ? (
-                    <div className="bg-amber-50 border border-amber-200 rounded-3xl sm:rounded-[2.5rem] p-6 sm:p-10 space-y-6 text-center shadow-sm">
-                      <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 mx-auto">
-                        <ShieldCheck className="w-8 h-8" />
-                      </div>
-                      <div className="space-y-4">
-                        <h3 className="text-2xl font-bold text-slate-900  tracking-tighter">
-                          Tier 2 Identity Verification Required
-                        </h3>
-                        <p className="text-sm text-slate-600 font-bold   leading-relaxed px-4">
-                          To comply with security and regulatory standards, you need
-                          to complete full identity verification (Tier 2) before you 
-                          can withdraw funds from your balance.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => router.push("/onboarding/kyc?returnTo=" + encodeURIComponent(window.location.pathname + window.location.search))}
-                        className="w-full h-14 sm:h-16 bg-slate-900 hover:bg-black text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-lg transition-all active:scale-[0.98] uppercase tracking-wide"
-                      >
-                        Verify Identity Now
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid gap-6">
-                      <MethodBtn
-                        icon={<CreditCard />}
-                        title="Card Payout"
-                        desc="Direct to Visa or Mastercard"
-                        onClick={() => {
-                          setSelectedMethod("card");
-                          setStep("card");
-                        }}
-                      />
-                      <MethodBtn
-                        icon={<Building2 />}
-                        title="Bank Transfer"
-                        desc="High-speed local bank transfer"
-                        variant="blue"
-                        onClick={() => {
-                          setSelectedMethod("bank");
-                          setStep("initiation");
-                        }}
-                      />
-                    </div>
-                  )}
                 </motion.div>
-              )}
-
-              {/* 1. CARD WITHDRAWAL STEP */}
-              {step === "card" && (
-                <motion.div
-                  key="card"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="space-y-8"
-                >
-                  <div className="text-center space-y-2">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter">
-                      Card Authorization
-                    </h2>
-                    <p className="text-slate-400 font-bold tracking-[0.2em] uppercase text-xs">
-                      {cardStep === "ADDRESS"
-                        ? "Step 2 · Billing Address"
-                        : "Step 1 · Card Details"}
-                    </p>
-                    <div className="flex items-center justify-center gap-2 mt-2">
-                      <div
-                        className={`h-1.5 w-8 rounded-full transition-colors ${cardStep === "DETAILS" ? "bg-emerald-500" : "bg-slate-200"}`}
-                      />
-                      <div
-                        className={`h-1.5 w-8 rounded-full transition-colors ${cardStep === "ADDRESS" ? "bg-emerald-500" : "bg-slate-200"}`}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-8 lg:p-10 shadow-xl space-y-6 relative overflow-hidden max-w-2xl mx-auto w-full">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -mr-32 -mt-32" />
-
-                    {cardStep === "DETAILS" ? (
-                      <div className="space-y-6 relative z-10">
-                        <div className="grid grid-cols-2 gap-4">
-                          <WithdrawInputField
-                            label="First Name"
-                            placeholder="John"
-                            value={cardDetails.firstName}
-                            onChange={(e) =>
-                              handleCardInputChange("firstName", e.target.value)
-                            }
-                          />
-                          <WithdrawInputField
-                            label="Last Name"
-                            placeholder="Doe"
-                            value={cardDetails.lastName}
-                            onChange={(e) =>
-                              handleCardInputChange("lastName", e.target.value)
-                            }
-                          />
+              ) : (
+                <>
+                  {/* 2. INITIATION STEP (BANK) */}
+                  {step === "initiation" && (
+                    <motion.div
+                      key="initiation"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="space-y-16 flex flex-col items-center py-12"
+                    >
+                      <div className="space-y-5 flex flex-col items-center text-center">
+                        <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center border border-emerald-100 mb-4 shadow-sm group">
+                          <Globe className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
                         </div>
-
                         <div className="space-y-2">
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="font-bold text-slate-400 tracking-[0.3em] uppercase text-xs ml-1">
-                              Card Number
-                            </label>
-                            <div className="flex gap-2 h-5 items-center">
-                              {cardDetails.type === "visa" && (
-                                <Image
-                                  src="/visa.svg"
-                                  alt="Visa"
-                                  width={40}
-                                  height={14}
-                                  className="h-4 w-auto"
-                                />
-                              )}
-                              {cardDetails.type === "mastercard" && (
-                                <Image
-                                  src="/mastercard.svg"
-                                  alt="Mastercard"
-                                  width={34}
-                                  height={20}
-                                  className="h-5 w-auto"
-                                />
-                              )}
-                              {cardDetails.type === "verve" && (
-                                <Image
-                                  src="/verve.svg"
-                                  alt="Verve"
-                                  width={34}
-                                  height={20}
-                                  className="h-5 w-auto"
-                                />
-                              )}
-                              {!cardDetails.type && (
-                                <CreditCard className="w-5 h-5 text-slate-300" />
-                              )}
-                            </div>
-                          </div>
-                          <input
-                            type="text"
-                            placeholder="0000 0000 0000 0000"
-                            value={cardDetails.number}
-                            onChange={(e) =>
-                              handleCardInputChange("number", e.target.value)
-                            }
-                            className={`w-full h-14 bg-slate-50 border ${cardErrors.number ? "border-red-500" : "border-slate-100"} rounded-2xl px-5 text-slate-900 font-bold font-mono focus:border-emerald-500/30 outline-none transition-all`}
-                          />
-                          {cardErrors.number && (
-                            <p className="text-xs text-red-500 font-bold ml-1">
-                              {cardErrors.number}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <WithdrawInputField
-                            label="Expiry"
-                            placeholder="MM/YY"
-                            value={cardDetails.expiry}
-                            error={cardErrors.expiry}
-                            onChange={(e) =>
-                              handleCardInputChange("expiry", e.target.value)
-                            }
-                          />
-                          <WithdrawInputField
-                            label="CVC"
-                            placeholder="123"
-                            type="password"
-                            value={cardDetails.cvc}
-                            error={cardErrors.cvc}
-                            onChange={(e) =>
-                              handleCardInputChange("cvc", e.target.value)
-                            }
-                          />
-                        </div>
-
-                        <Button
-                          onClick={handleCardSubmit}
-                          className="w-full h-14 bg-slate-900 hover:bg-black text-white font-bold text-sm rounded-2xl shadow-xl shadow-slate-900/10 transition-all active:scale-[0.98] uppercase tracking-widest"
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                            Continue to Billing Address
-                            <ChevronRight className="w-4 h-4" />
-                          </div>
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-5 relative z-10">
-                        <div>
-                          <h3 className="font-bold text-slate-800">
-                            Billing Address
-                          </h3>
-                          <p className="text-xs text-slate-400 mt-0.5">
-                            Required for card verification and fraud prevention.
+                          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ">
+                            Regional settings
+                          </h2>
+                          <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">
+                            Configure your payout account and currency
                           </p>
                         </div>
+                      </div>
 
-                        <div className="space-y-4">
-                          <WithdrawInputField
-                            label="Address Line 1 *"
-                            placeholder="123 Main Street"
-                            value={cardDetails.addressLine1}
-                            onChange={(e) =>
-                              handleCardInputChange(
-                                "addressLine1",
-                                e.target.value,
-                              )
-                            }
-                          />
-                          <WithdrawInputField
-                            label="Address Line 2 (Optional)"
-                            placeholder="Apt, Suite, etc."
-                            value={cardDetails.addressLine2}
-                            onChange={(e) =>
-                              handleCardInputChange(
-                                "addressLine2",
-                                e.target.value,
-                              )
-                            }
-                          />
-                          <div className="grid grid-cols-2 gap-4">
-                            <WithdrawInputField
-                              label="City *"
-                              placeholder="Lagos"
-                              value={cardDetails.city}
-                              onChange={(e) =>
-                                handleCardInputChange("city", e.target.value)
-                              }
-                            />
-                            <WithdrawInputField
-                              label="State"
-                              placeholder="Lagos"
-                              value={cardDetails.state}
-                              onChange={(e) =>
-                                handleCardInputChange("state", e.target.value)
-                              }
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <WithdrawInputField
-                              label="Postal Code"
-                              placeholder="100001"
-                              value={cardDetails.postalCode}
-                              onChange={(e) =>
-                                handleCardInputChange(
-                                  "postalCode",
-                                  e.target.value,
-                                )
-                              }
-                            />
-                            <div className="space-y-2">
-                              <label className="font-bold text-slate-400 tracking-[0.3em] uppercase text-xs ml-1">
-                                Country *
-                              </label>
+                      <div className="w-full max-w-lg space-y-6 sm:space-y-8 bg-white border border-slate-200 p-4 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-xl relative">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
+
+                        <div className="space-y-8 relative z-10">
+                          <div className="space-y-3">
+                            <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
+                              Payout country
+                            </label>
+                            <div className="relative">
                               <select
-                                value={cardDetails.country}
-                                onChange={(e) =>
-                                  handleCardInputChange(
-                                    "country",
-                                    e.target.value,
-                                  )
-                                }
-                                className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 text-slate-900 font-bold focus:border-emerald-500/30 outline-none transition-all"
+                                value={selectedCountry}
+                                onChange={(e) => {
+                                  const newCountry = e.target.value;
+                                  setSelectedCountry(newCountry);
+                                  const countryObj = countries.find(
+                                    (c) => c.code === newCountry,
+                                  );
+                                  if (
+                                    countryObj &&
+                                    !countryObj.currencies.includes(
+                                      selectedCurrency,
+                                    )
+                                  ) {
+                                    setSelectedCurrency(
+                                      countryObj.currencies[0],
+                                    );
+                                  }
+                                }}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all appearance-none cursor-pointer text-sm shadow-sm "
                               >
-                                <option>Nigeria</option>
-                                <option>Kenya</option>
-                                <option>United States</option>
-                                <option>United Kingdom</option>
-                                <option>Canada</option>
-                                <option>Other</option>
+                                {countries.map((c) => (
+                                  <option
+                                    key={c.code}
+                                    value={c.code}
+                                    className="bg-white font-sans text-slate-900"
+                                  >
+                                    {c.name}
+                                  </option>
+                                ))}
                               </select>
+                              <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none" />
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
+                              Asset type
+                            </label>
+                            <div className="relative">
+                              <select
+                                value={selectedCurrency}
+                                onChange={(e) =>
+                                  setSelectedCurrency(e.target.value)
+                                }
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all appearance-none cursor-pointer text-sm shadow-sm "
+                              >
+                                {currentCountryObj?.currencies.map((curr) => (
+                                  <option
+                                    key={curr}
+                                    value={curr}
+                                    className="bg-white font-sans text-slate-900"
+                                  >
+                                    {curr}
+                                  </option>
+                                ))}
+                              </select>
+                              <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none" />
                             </div>
                           </div>
                         </div>
 
                         <Button
-                          onClick={handleAddressSubmit}
-                          className="w-full h-14 sm:h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-3xl shadow-xl shadow-emerald-600/10 transition-all active:scale-[0.98] uppercase tracking-wide"
+                          onClick={() => setStep("verification")}
+                          className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 "
                         >
-                          <div className="flex items-center justify-center gap-2">
-                            <ShieldCheck className="w-4 h-4" />
-                            Confirm settlement
-                          </div>
+                          Continue{" "}
+                          <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
                         </Button>
                       </div>
-                    )}
+                    </motion.div>
+                  )}
 
-                    <div className="flex items-center justify-center gap-4 text-[9px] font-bold text-slate-400 tracking-[0.3em] uppercase">
-                      <DayleLogo className="w-4 h-4 text-emerald-500" /> Level 1 PCI
-                      Compliance
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* 2. INITIATION STEP (BANK) */}
-              {step === "initiation" && (
-                <motion.div
-                  key="initiation"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-16 flex flex-col items-center py-12"
-                >
-                  <div className="space-y-5 flex flex-col items-center text-center">
-                    <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center border border-emerald-100 mb-4 shadow-sm group">
-                      <Globe className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
-                    </div>
-                    <div className="space-y-2">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ">
-                        Regional settings
-                      </h2>
-                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">
-                        Configure your payout account and currency
-                      </p>
-                    </div>
-                  </div>
-
-                   <div className="w-full max-w-lg space-y-6 sm:space-y-8 bg-white border border-slate-200 p-4 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-xl relative">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
-
-                    <div className="space-y-8 relative z-10">
-                      <div className="space-y-3">
-                        <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
-                          Payout country
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={selectedCountry}
-                            onChange={(e) => {
-                              const newCountry = e.target.value;
-                              setSelectedCountry(newCountry);
-                              const countryObj = countries.find(
-                                (c) => c.code === newCountry,
-                              );
-                              if (
-                                countryObj &&
-                                !countryObj.currencies.includes(
-                                  selectedCurrency,
-                                )
-                              ) {
-                                setSelectedCurrency(countryObj.currencies[0]);
-                              }
-                            }}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all appearance-none cursor-pointer text-sm shadow-sm "
-                          >
-                            {countries.map((c) => (
-                              <option
-                                key={c.code}
-                                value={c.code}
-                                className="bg-white font-sans text-slate-900"
-                              >
-                                {c.name}
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none" />
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
-                          Asset type
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={selectedCurrency}
-                            onChange={(e) =>
-                              setSelectedCurrency(e.target.value)
-                            }
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all appearance-none cursor-pointer text-sm shadow-sm "
-                          >
-                            {currentCountryObj?.currencies.map((curr) => (
-                              <option
-                                key={curr}
-                                value={curr}
-                                className="bg-white font-sans text-slate-900"
-                              >
-                                {curr}
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <Button
-                      onClick={() => setStep("verification")}
-                      className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm tracking-widest rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 "
+                  {/* 1. BANK VERIFICATION STEP */}
+                  {step === "verification" && (
+                    <motion.div
+                      key="verification"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="space-y-16 flex flex-col items-center py-12"
                     >
-                      Continue{" "}
-                      <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
+                      <div className="space-y-5 flex flex-col items-center text-center">
+                        <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center border border-emerald-100 mb-4 shadow-sm group">
+                          <Landmark className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
+                        </div>
+                        <div className="space-y-2">
+                          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ">
+                            Recipient details
+                          </h2>
+                          <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase text-center">
+                            Configure final destination for this transfer
+                          </p>
+                        </div>
+                      </div>
 
-              {/* 1. BANK VERIFICATION STEP */}
-              {step === "verification" && (
-                <motion.div
-                  key="verification"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-16 flex flex-col items-center py-12"
-                >
-                  <div className="space-y-5 flex flex-col items-center text-center">
-                    <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center border border-emerald-100 mb-4 shadow-sm group">
-                      <Landmark className="text-emerald-600 w-8 h-8 group-hover:scale-110 transition-transform" />
-                    </div>
-                    <div className="space-y-2">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ">
-                        Recipient details
-                      </h2>
-                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase text-center">
-                        Configure final destination for this transfer
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid lg:grid-cols-2 gap-8 w-full max-w-5xl">
-                    <div className="space-y-6 sm:space-y-8 bg-white border border-slate-200 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl relative">
-                      <div className="space-y-8 relative z-10">
-                        <div className="space-y-3">
-                          <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
-                            Bank name
-                          </label>
-                          <div className="relative">
-                            <select
-                              value={bankDetails.bankName}
-                              onChange={(e) =>
-                                setBankDetails({
-                                  ...bankDetails,
-                                  bankName: e.target.value,
-                                })
-                              }
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-4 sm:py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all appearance-none cursor-pointer text-xs sm:text-sm shadow-sm mt-1 sm:mt-2 "
-                            >
-                                <option
-                                  value=""
-                                  disabled
-                                  className="bg-white text-slate-400"
+                      <div className="grid lg:grid-cols-2 gap-8 w-full max-w-5xl">
+                        <div className="space-y-6 sm:space-y-8 bg-white border border-slate-200 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl relative">
+                          <div className="space-y-8 relative z-10">
+                            <div className="space-y-3">
+                              <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
+                                Bank name
+                              </label>
+                              <div className="relative">
+                                <select
+                                  value={bankDetails.bankName}
+                                  onChange={(e) =>
+                                    setBankDetails({
+                                      ...bankDetails,
+                                      bankName: e.target.value,
+                                    })
+                                  }
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-4 sm:py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all appearance-none cursor-pointer text-xs sm:text-sm shadow-sm mt-1 sm:mt-2 "
                                 >
-                                  {isLoadingBanks ? "Loading Providers..." : "Select Provider"}
-                                </option>
-                              {banks?.length > 0 ? (
-                                banks
-                                  .sort((a, b) => a.name.localeCompare(b.name))
-                                  .map((bank) => (
-                                    <option
-                                      key={`${bank.code}-${bank.name}`}
-                                      value={bank.name}
-                                      className="bg-white font-sans text-slate-900"
-                                    >
-                                      {bank.name}
-                                    </option>
-                                  ))
-                              ) : (
-                                <option disabled>No banks found</option>
-                              )}
-                            </select>
-                            <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 pointer-events-none" />
+                                  <option
+                                    value=""
+                                    disabled
+                                    className="bg-white text-slate-400"
+                                  >
+                                    {isLoadingBanks
+                                      ? "Loading Providers..."
+                                      : "Select Provider"}
+                                  </option>
+                                  {banks?.length > 0 ? (
+                                    banks
+                                      .sort((a, b) =>
+                                        a.name.localeCompare(b.name),
+                                      )
+                                      .map((bank) => (
+                                        <option
+                                          key={`${bank.code}-${bank.name}`}
+                                          value={bank.name}
+                                          className="bg-white font-sans text-slate-900"
+                                        >
+                                          {bank.name}
+                                        </option>
+                                      ))
+                                  ) : (
+                                    <option disabled>No banks found</option>
+                                  )}
+                                </select>
+                                <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 pointer-events-none" />
+                              </div>
+                            </div>
+                            <div className="space-y-3">
+                              <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
+                                Bank Account Number
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="0000000000"
+                                value={bankDetails.accountNumber}
+                                onChange={(e) =>
+                                  setBankDetails({
+                                    ...bankDetails,
+                                    accountNumber: e.target.value,
+                                  })
+                                }
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-4 sm:py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all text-xs sm:text-sm shadow-sm mt-1 sm:mt-2 placeholder:text-slate-300 "
+                              />
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={handleResolveAccount}
+                            disabled={
+                              !bankDetails.accountNumber ||
+                              !bankDetails.bankName ||
+                              isResolving ||
+                              showOtp
+                            }
+                            className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm st rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 "
+                          >
+                            {isResolving ? (
+                              <div className="flex items-center gap-3">
+                                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                Verifying Account...
+                              </div>
+                            ) : showOtp ? (
+                              "Account Verified"
+                            ) : (
+                              "Verify Account"
+                            )}
+                          </Button>
+                        </div>
+
+                        <div className="relative">
+                          <AnimatePresence mode="wait">
+                            {showOtp ? (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                className="space-y-6 bg-white border border-slate-200 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl h-full flex flex-col justify-center"
+                              >
+                                <div className="space-y-3">
+                                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight ">
+                                    Account verification
+                                  </h3>
+                                  <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 shadow-sm">
+                                    <p className=" text-slate-600 font-bold st mb-1  uppercase">
+                                      Account owner
+                                    </p>
+                                    <p className="text-sm text-emerald-700 font-bold  ">
+                                      {bankDetails.accountName}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-6 gap-2 sm:gap-3">
+                                  {otp.map((digit, index) => (
+                                    <input
+                                      key={index}
+                                      id={`otp-${index}`}
+                                      type="text"
+                                      maxLength={1}
+                                      value={digit}
+                                      onChange={(e) =>
+                                        handleOtpChange(index, e.target.value)
+                                      }
+                                      className="aspect-square bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-center text-sm sm:text-xl font-bold text-slate-900 focus:border-emerald-500/30 focus:bg-emerald-50 outline-none transition-all shadow-sm w-full"
+                                    />
+                                  ))}
+                                </div>
+
+                                <div className="p-5 bg-blue-50 border border-blue-100 rounded-2xl shadow-sm">
+                                  <div className="flex items-center gap-2 text-blue-600  font-bold st mb-2  uppercase">
+                                    <Info className="w-3.5 h-3.5" /> Demo helper
+                                  </div>
+                                  <p className=" text-blue-500/60 font-bold st leading-relaxed ">
+                                    Identity Check: Use code{" "}
+                                    <span className="text-slate-900">
+                                      123456
+                                    </span>{" "}
+                                    for demo mode.
+                                  </p>
+                                </div>
+
+                                <Button
+                                  onClick={handleVerifyOtp}
+                                  className="w-full h-14 bg-slate-900 text-white font-bold st rounded-2xl hover:bg-slate-800 transition-all shadow-xl active:scale-95 "
+                                >
+                                  Confirm Account
+                                </Button>
+                              </motion.div>
+                            ) : (
+                              <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-slate-50 border border-dashed border-slate-200 rounded-[32px] group hover:border-slate-300 transition-colors">
+                                <div className="w-20 h-20 bg-white rounded-[2.5rem] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
+                                  <Fingerprint className="w-10 h-10 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                                </div>
+                                <p className=" font-bold text-slate-600 tracking-[0.4em]  group-hover:text-slate-600 transition-colors uppercase">
+                                  Awaiting bio-auth
+                                </p>
+                              </div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* 2. REVIEW STEP */}
+                  {step === "review" && (
+                    <motion.div
+                      key="review"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="max-w-2xl mx-auto space-y-10 py-8"
+                    >
+                      <div className="text-center space-y-5">
+                        <div className="w-20 h-20 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center mx-auto border border-emerald-100 shadow-sm">
+                          <Info className="w-10 h-10 text-emerald-600" />
+                        </div>
+                        <div className="space-y-2">
+                          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ">
+                            Review Settlement
+                          </h2>
+                          <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] px-10 leading-relaxed uppercase text-center">
+                            Confirm the recipient details and final payout
+                            amount.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-2xl relative">
+                        <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
+                          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-32 -mt-32 blur-3xl" />
+                          <div className="flex justify-between items-start relative z-10">
+                            <div className="space-y-1">
+                              <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">
+                                Recipient Node
+                              </p>
+                              <h3 className="text-xl font-bold tracking-tight">
+                                {bankDetails.accountName}
+                              </h3>
+                              <div className="flex items-center gap-2 text-slate-400 text-xs mt-2">
+                                <Landmark className="w-3.5 h-3.5" />
+                                <span>{bankDetails.bankName}</span>
+                                <span className="opacity-30">|</span>
+                                <span>{bankDetails.accountNumber}</span>
+                              </div>
+                            </div>
+                            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center border border-white/10 backdrop-blur-md">
+                              <ArrowRight className="w-6 h-6 text-emerald-400" />
+                            </div>
                           </div>
                         </div>
-                        <div className="space-y-3">
-                          <label className=" font-bold text-slate-600 tracking-[0.3em] block ml-1  uppercase">
-                            Bank Account Number
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="0000000000"
-                            value={bankDetails.accountNumber}
-                            onChange={(e) =>
-                              setBankDetails({
-                                ...bankDetails,
-                                accountNumber: e.target.value,
-                              })
-                            }
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-4 sm:py-5 focus:border-emerald-500/30 outline-none text-slate-900 font-bold st transition-all text-xs sm:text-sm shadow-sm mt-1 sm:mt-2 placeholder:text-slate-300 "
-                          />
+
+                        <div className="p-8 space-y-8">
+                          <div className="space-y-6">
+                            <div className="flex justify-between items-center group">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all">
+                                  <Building2 className="w-4 h-4" />
+                                </div>
+                                <span className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px]">
+                                  Net Withdrawal
+                                </span>
+                              </div>
+                              <span className="text-slate-900 font-bold text-sm">
+                                {currencyPrefix}
+                                {(
+                                  feeBreakdown?.vaultAmountLocal ||
+                                  displayAmount
+                                ).toLocaleString(undefined, {
+                                  minimumFractionDigits: 2,
+                                })}
+                              </span>
+                            </div>
+
+                            <div className="flex justify-between items-center group">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                  <DayleLogo className="w-4 h-4" />
+                                </div>
+                                <span className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px]">
+                                  Dayle Fee (
+                                  {feeBreakdown?.dayleFeePercent || 0.5}%)
+                                </span>
+                              </div>
+                              <span className="text-red-500 font-bold text-sm">
+                                -{currencyPrefix}
+                                {(
+                                  feeBreakdown?.dayleFeeLocal || displayAppFee
+                                ).toLocaleString(undefined, {
+                                  minimumFractionDigits: 2,
+                                })}
+                              </span>
+                            </div>
+
+                            {feeBreakdown?.partnaFeeLocal && (
+                              <div className="flex justify-between items-center group">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                                    <Zap className="w-4 h-4" />
+                                  </div>
+                                  <span className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px]">
+                                    Processing Fee (
+                                    {feeBreakdown?.partnaFeePercent || 1}%)
+                                  </span>
+                                </div>
+                                <span className="text-red-500 font-bold text-sm">
+                                  -{currencyPrefix}
+                                  {feeBreakdown.partnaFeeLocal.toLocaleString(
+                                    undefined,
+                                    { minimumFractionDigits: 2 },
+                                  )}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="pt-8 border-t border-slate-100">
+                            <div className="flex justify-between items-center bg-emerald-50 p-6 rounded-3xl border border-emerald-100 shadow-sm group hover:border-emerald-200 transition-all">
+                              <div className="space-y-1">
+                                <span className="text-emerald-600 font-bold uppercase tracking-[0.2em] text-[10px]">
+                                  You will receive
+                                </span>
+                                <p className="text-xs text-emerald-800/60 font-medium">
+                                  Final settlement value
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-3xl font-bold text-emerald-700 tracking-tighter">
+                                  {currencyPrefix}
+                                  {(
+                                    feeBreakdown?.netAmountLocal ||
+                                    displayAmount - displayAppFee
+                                  ).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                </span>
+                                <p className="text-[10px] font-black text-emerald-600/40 tracking-widest uppercase mt-1">
+                                  {selectedCurrency}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-6 rounded-4xl bg-amber-500/5 border border-amber-500/10 flex gap-5 items-start">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                          <AlertCircle className="w-5 h-5 text-amber-500" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className=" font-bold tracking-[0.2em] text-amber-500 mb-1 ">
+                            Risk advisory
+                          </p>
+                          <p className="text-[11px] text-amber-500/70 leading-relaxed font-bold st ">
+                            By confirming this transfer, you authorize Dayle to
+                            execute the transfer. Funds typically arrive at your
+                            account in 5-8 minutes.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-6 pt-4">
+                        <Button
+                          variant="ghost"
+                          onClick={() => setStep("verification")}
+                          className="h-12 sm:h-14 font-black tracking-widest text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl sm:rounded-2xl transition-all uppercase text-xs sm:text-sm"
+                        >
+                          Go back
+                        </Button>
+                        <Button
+                          onClick={handleConfirmWithdrawal}
+                          className="h-12 sm:h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm tracking-widest rounded-xl sm:rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 uppercase"
+                        >
+                          Confirm & execute
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* 3. PROCESSING STATUS SCREEN */}
+                  {step === "processing" && (
+                    <motion.div
+                      key="processing"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="max-w-2xl mx-auto py-12"
+                    >
+                      <ProcessingStatusScreen
+                        status={processingStatus}
+                        transactionId={transactionId}
+                      />
+                    </motion.div>
+                  )}
+
+                  {/* 4. SUCCESS SCREEN */}
+                  {step === "success" && (
+                    <motion.div
+                      key="success"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="max-w-xl mx-auto text-center space-y-12 py-12"
+                    >
+                      <div className="w-32 h-32 bg-emerald-600 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(5,150,105,0.3)] animate-in zoom-in-0 duration-700">
+                        <CheckCircle2
+                          className="w-16 h-16 text-white"
+                          strokeWidth={3}
+                        />
+                      </div>
+                      <div className="space-y-4">
+                        <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter  leading-none">
+                          Broadcasting!
+                        </h2>
+                        <p className="text-sm font-bold text-slate-600 tracking-[0.4em] leading-relaxed uppercase">
+                          Your settlement event has been authorized and
+                          dispatched.
+                        </p>
+                      </div>
+
+                      <div className="bg-white border border-slate-200 rounded-3xl p-8 space-y-6 relative overflow-hidden group shadow-xl">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
+                        <div className="flex justify-between items-center">
+                          <span className=" font-bold tracking-[0.3em] text-slate-600 uppercase ">
+                            Asset released
+                          </span>
+                          <span className="text-3xl font-bold text-emerald-600  tracking-tighter">
+                            {currencyPrefix}
+                            {Number(
+                              successfulNetAmount ||
+                                displayAmount - displayAppFee,
+                            ).toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </span>
+                        </div>
+                        <div className="pt-8 border-t border-slate-100 flex justify-between items-center">
+                          <span className=" font-bold tracking-[0.3em] text-slate-600 uppercase ">
+                            Event signature
+                          </span>
+                          <span className="text-sm text-slate-900  st">
+                            {transactionId}
+                          </span>
                         </div>
                       </div>
 
                       <Button
-                        onClick={handleResolveAccount}
-                        disabled={
-                          !bankDetails.accountNumber ||
-                          !bankDetails.bankName ||
-                          isResolving ||
-                          showOtp
-                        }
-                        className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm st rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 group relative z-10 "
+                        onClick={() => router.replace("/freelancer/balance")}
+                        className="w-full h-14 bg-slate-900 text-white font-bold text-sm tracking-widest rounded-3xl hover:bg-slate-800 transition-all shadow-xl active:scale-95  uppercase"
                       >
-                        {isResolving ? (
-                          <div className="flex items-center gap-3">
-                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                            Verifying Account...
-                          </div>
-                        ) : showOtp ? (
-                          "Account Verified"
-                        ) : (
-                          "Verify Account"
-                        )}
+                        Exit to overview
                       </Button>
-                    </div>
+                    </motion.div>
+                  )}
 
-                    <div className="relative">
-                      <AnimatePresence mode="wait">
-                        {showOtp ? (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            className="space-y-6 bg-white border border-slate-200 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl h-full flex flex-col justify-center"
-                          >
-                            <div className="space-y-3">
-                              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight ">
-                                Account verification
-                              </h3>
-                              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 shadow-sm">
-                                <p className=" text-slate-600 font-bold st mb-1  uppercase">
-                                  Account owner
-                                </p>
-                                <p className="text-sm text-emerald-700 font-bold  ">
-                                  {bankDetails.accountName}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-6 gap-2 sm:gap-3">
-                              {otp.map((digit, index) => (
-                                <input
-                                  key={index}
-                                  id={`otp-${index}`}
-                                  type="text"
-                                  maxLength={1}
-                                  value={digit}
-                                  onChange={(e) =>
-                                    handleOtpChange(index, e.target.value)
-                                  }
-                                  className="aspect-square bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-center text-sm sm:text-xl font-bold text-slate-900 focus:border-emerald-500/30 focus:bg-emerald-50 outline-none transition-all shadow-sm w-full"
-                                />
-                              ))}
-                            </div>
-
-                            <div className="p-5 bg-blue-50 border border-blue-100 rounded-2xl shadow-sm">
-                              <div className="flex items-center gap-2 text-blue-600  font-bold st mb-2  uppercase">
-                                <Info className="w-3.5 h-3.5" /> Demo helper
-                              </div>
-                              <p className=" text-blue-500/60 font-bold st leading-relaxed ">
-                                Identity Check: Use code{" "}
-                                <span className="text-slate-900">123456</span>{" "}
-                                for demo mode.
-                              </p>
-                            </div>
-
-                            <Button
-                              onClick={handleVerifyOtp}
-                              className="w-full h-14 bg-slate-900 text-white font-bold st rounded-2xl hover:bg-slate-800 transition-all shadow-xl active:scale-95 "
-                            >
-                              Confirm Account
-                            </Button>
-                          </motion.div>
-                        ) : (
-                          <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-slate-50 border border-dashed border-slate-200 rounded-[32px] group hover:border-slate-300 transition-colors">
-                            <div className="w-20 h-20 bg-white rounded-[2.5rem] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
-                              <Fingerprint className="w-10 h-10 text-slate-300 group-hover:text-slate-600 transition-colors" />
-                            </div>
-                            <p className=" font-bold text-slate-600 tracking-[0.4em]  group-hover:text-slate-600 transition-colors uppercase">
-                              Awaiting bio-auth
-                            </p>
-                          </div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* 2. REVIEW STEP */}
-              {step === "review" && (
-                <motion.div
-                  key="review"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="max-w-2xl mx-auto space-y-10 py-8"
-                >
-                  <div className="text-center space-y-5">
-                    <div className="w-20 h-20 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center mx-auto border border-emerald-100 shadow-sm">
-                      <Info className="w-10 h-10 text-emerald-600" />
-                    </div>
-                    <div className="space-y-2">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tighter ">
-                        Final manifest
-                      </h2>
-                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] px-10 leading-relaxed uppercase text-center">
-                        Confirm the settlement event below. Transactions are
-                        irreversible once broadcast to the network.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl relative">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-600 to-emerald-500/0 opacity-20" />
-                    <div className="divide-y divide-slate-100">
-                      {selectedMethod === "bank" ? (
-                        <>
-                          <ReviewItem
-                            label="Apex Destination"
-                            value={bankDetails.bankName}
-                            subValue={bankDetails.accountNumber}
-                          />
-                          <ReviewItem
-                            label="Beneficiary Node"
-                            value={bankDetails.accountName}
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <ReviewItem
-                            label="Payout Vector"
-                            value={`•••• •••• •••• ${cardDetails.number.slice(-4)}`}
-                            subValue={
-                              cardDetails.type?.toUpperCase() || "EXTERNAL CARD"
-                            }
-                          />
-                          <ReviewItem
-                            label="Registry Holder"
-                            value={`${cardDetails.firstName} ${cardDetails.lastName}`}
-                          />
-                          <ReviewItem
-                            label="Billing Node"
-                            value={`${cardDetails.city}, ${cardDetails.country}`}
-                            subValue={cardDetails.addressLine1}
-                          />
-                        </>
-                      )}
-                      <div className="space-y-4 px-6 pb-2">
-                        <div className="flex justify-between items-center py-4 border-b border-slate-100">
-                          <span className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">
-                            Gross Withdrawal
-                          </span>
-                          <span className="text-slate-900 font-bold text-sm">
-                            {currencyPrefix}{displayAmount.toFixed(2)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-4 border-b border-slate-100">
-                          <span className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">
-                            Dayle App Fee (0.5%)
-                          </span>
-                          <span className="text-emerald-600 font-bold text-sm">
-                            -{currencyPrefix}{displayAppFee.toFixed(2)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-8">
-                          <span className="text-slate-900 font-bold uppercase tracking-[0.2em] text-xs">
-                            Net Settlement
-                          </span>
-                          <div className="text-right">
-                            <span className="text-2xl sm:text-4xl font-bold text-slate-900 st ">
-                              <CurrencyEstimate
-                                usdAmount={netSettlement}
-                                currency={currency}
-                                className="text-2xl font-bold text-slate-900"
-                                showNote={false}
-                              />
-                            </span>
-                            <p className=" text-slate-400 font-black st mt-1 tracking-widest text-[10px] uppercase">
-                              {selectedCurrency}
-                            </p>
-                          </div>
-                        </div>
+                  {/* 5. FAILURE SCREEN */}
+                  {step === "failure" && (
+                    <motion.div
+                      key="failure"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="max-w-xl mx-auto text-center space-y-12 py-12"
+                    >
+                      <div className="w-32 h-32 bg-red-50 rounded-[2.5rem] flex items-center justify-center mx-auto border border-red-100 shadow-sm group">
+                        <XCircle
+                          className="w-16 h-16 text-red-500 group-hover:rotate-90 transition-transform duration-500"
+                          strokeWidth={3}
+                        />
                       </div>
-                    </div>
-                  </div>
+                      <div className="space-y-4">
+                        <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter  leading-none">
+                          Rejection
+                        </h2>
+                        <p className="text-xs font-bold text-slate-400 tracking-[0.2em] leading-relaxed uppercase">
+                          The bank network rejected the settlement or connection
+                          timed out.
+                        </p>
+                      </div>
 
-                  <div className="p-6 rounded-4xl bg-amber-500/5 border border-amber-500/10 flex gap-5 items-start">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
-                      <AlertCircle className="w-5 h-5 text-amber-500" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className=" font-bold tracking-[0.2em] text-amber-500 mb-1 ">
-                        Risk advisory
-                      </p>
-                      <p className="text-[11px] text-amber-500/70 leading-relaxed font-bold st ">
-                        By confirming this transfer, you authorize Dayle to
-                        execute the transfer. Funds typically arrive at your
-                        account in 5-8 minutes.
-                      </p>
-                    </div>
-                  </div>
+                      <div className="p-10 bg-red-50 border border-red-100 rounded-[40px] text-left space-y-4 relative overflow-hidden shadow-sm">
+                        <div className="absolute inset-0 bg-red-500/1 translate-x-10" />
+                        <p className="text-[11px] font-bold text-slate-900 tracking-[0.2em] relative z-10  uppercase">
+                          Reject code:{" "}
+                          <span className="text-red-600 ">
+                            SET_FAIL_BANK_COMM_ERR_V4
+                          </span>
+                        </p>
+                        <p className="text-sm text-red-500/70 font-bold st leading-relaxed relative z-10  uppercase">
+                          The bank terminal did not respond in time. Please
+                          verify endpoints or contact protocol support if error
+                          persists.
+                        </p>
+                      </div>
 
-                  <div className="grid grid-cols-2 gap-6 pt-4">
-                    <Button
-                      variant="ghost"
-                      onClick={() => setStep("verification")}
-                      className="h-12 sm:h-14 font-black tracking-widest text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl sm:rounded-2xl transition-all uppercase text-xs sm:text-sm"
-                    >
-                      Go back
-                    </Button>
-                    <Button
-                      onClick={handleConfirmWithdrawal}
-                      className="h-12 sm:h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm tracking-widest rounded-xl sm:rounded-2xl transition-all shadow-xl shadow-emerald-600/10 active:scale-95 uppercase"
-                    >
-                      Confirm & execute
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* 3. PROCESSING STATUS SCREEN */}
-              {step === "processing" && (
-                <motion.div
-                  key="processing"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="max-w-2xl mx-auto py-12"
-                >
-                  <ProcessingStatusScreen
-                    status={processingStatus}
-                    transactionId={transactionId}
-                  />
-                </motion.div>
-              )}
-
-              {/* 4. SUCCESS SCREEN */}
-              {step === "success" && (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="max-w-xl mx-auto text-center space-y-12 py-12"
-                >
-                  <div className="w-32 h-32 bg-emerald-600 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(5,150,105,0.3)] animate-in zoom-in-0 duration-700">
-                    <CheckCircle2
-                      className="w-16 h-16 text-white"
-                      strokeWidth={3}
-                    />
-                  </div>
-                  <div className="space-y-4">
-                    <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter  leading-none">
-                      Broadcasting!
-                    </h2>
-                    <p className="text-sm font-bold text-slate-600 tracking-[0.4em] leading-relaxed uppercase">
-                      Your settlement event has been authorized and dispatched.
-                    </p>
-                  </div>
-
-                  <div className="bg-white border border-slate-200 rounded-3xl p-8 space-y-6 relative overflow-hidden group shadow-xl">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
-                    <div className="flex justify-between items-center">
-                      <span className=" font-bold tracking-[0.3em] text-slate-600 uppercase ">
-                        Asset released
-                      </span>
-                      <span className="text-3xl font-bold text-emerald-600  tracking-tighter">
-                        {currencyPrefix}{Number(successfulNetAmount || netSettlement).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    <div className="pt-8 border-t border-slate-100 flex justify-between items-center">
-                      <span className=" font-bold tracking-[0.3em] text-slate-600 uppercase ">
-                        Event signature
-                      </span>
-                      <span className="text-sm text-slate-900  st">
-                        {transactionId}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => router.replace("/freelancer/balance")}
-                    className="w-full h-14 bg-slate-900 text-white font-bold text-sm tracking-widest rounded-3xl hover:bg-slate-800 transition-all shadow-xl active:scale-95  uppercase"
-                  >
-                    Exit to overview
-                  </Button>
-                </motion.div>
-              )}
-
-              {/* 5. FAILURE SCREEN */}
-              {step === "failure" && (
-                <motion.div
-                  key="failure"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="max-w-xl mx-auto text-center space-y-12 py-12"
-                >
-                  <div className="w-32 h-32 bg-red-50 rounded-[2.5rem] flex items-center justify-center mx-auto border border-red-100 shadow-sm group">
-                    <XCircle
-                      className="w-16 h-16 text-red-500 group-hover:rotate-90 transition-transform duration-500"
-                      strokeWidth={3}
-                    />
-                  </div>
-                  <div className="space-y-4">
-                    <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tighter  leading-none">
-                      Rejection
-                    </h2>
-                    <p className="text-xs font-bold text-slate-400 tracking-[0.2em] leading-relaxed uppercase">
-                      The bank network rejected the settlement or connection
-                      timed out.
-                    </p>
-                  </div>
-
-                  <div className="p-10 bg-red-50 border border-red-100 rounded-[40px] text-left space-y-4 relative overflow-hidden shadow-sm">
-                    <div className="absolute inset-0 bg-red-500/1 translate-x-10" />
-                    <p className="text-[11px] font-bold text-slate-900 tracking-[0.2em] relative z-10  uppercase">
-                      Reject code:{" "}
-                      <span className="text-red-600 ">
-                        SET_FAIL_BANK_COMM_ERR_V4
-                      </span>
-                    </p>
-                    <p className="text-sm text-red-500/70 font-bold st leading-relaxed relative z-10  uppercase">
-                      The bank terminal did not respond in time. Please verify
-                      endpoints or contact protocol support if error persists.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-6">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setStep("verification");
-                        setShowOtp(false);
-                        setOtp(["", "", "", "", "", ""]);
-                      }}
-                      className="h-14 font-bold  tracking-widest border-slate-200 bg-white hover:bg-slate-50 rounded-2xl transition-all  uppercase text-slate-600"
-                    >
-                      Try again
-                    </Button>
-                    <Button
-                      onClick={() => router.replace("/freelancer/balance")}
-                      className="h-14 bg-slate-900 text-white font-bold  tracking-widest rounded-2xl transition-all shadow-xl active:scale-95  text-sm uppercase"
-                    >
-                      Return to origin
-                    </Button>
-                  </div>
-                </motion.div>
+                      <div className="grid grid-cols-2 gap-6">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setStep("verification");
+                            setShowOtp(false);
+                            setOtp(["", "", "", "", "", ""]);
+                          }}
+                          className="h-14 font-bold  tracking-widest border-slate-200 bg-white hover:bg-slate-50 rounded-2xl transition-all  uppercase text-slate-600"
+                        >
+                          Try again
+                        </Button>
+                        <Button
+                          onClick={() => router.replace("/freelancer/balance")}
+                          className="h-14 bg-slate-900 text-white font-bold  tracking-widest rounded-2xl transition-all shadow-xl active:scale-95  text-sm uppercase"
+                        >
+                          Return to origin
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
+                </>
               )}
             </AnimatePresence>
           </div>
@@ -1400,123 +1069,6 @@ export default function WithdrawPage() {
 }
 
 // --- SUB-COMPONENTS ---
-
-function SummaryItem({
-  label,
-  value,
-  icon,
-  valueClassName,
-}: {
-  label: string;
-  value: string;
-  icon?: React.ReactNode;
-  valueClassName?: string;
-}) {
-  return (
-    <div className="flex justify-between items-center  font-bold tracking-wide text-slate-900">
-      <span className="text-slate-600 ">{label}</span>
-      <div className="flex items-center gap-2">
-        {icon}
-        <span className={cn("text-slate-900 ", valueClassName)}>
-          {value}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function MethodBtn({
-  icon,
-  title,
-  desc,
-  onClick,
-  variant = "emerald",
-}: {
-  icon: React.ReactElement;
-  title: string;
-  desc: string;
-  onClick: () => void;
-  variant?: "emerald" | "blue";
-}) {
-  const colors = {
-    emerald: {
-      hoverBorder: "hover:border-emerald-200",
-      hoverShadow: "hover:shadow-emerald-600/5",
-      bgCircle: "bg-emerald-50",
-      iconActive: "group-hover:bg-emerald-600",
-      iconBorder: "group-hover:border-emerald-500",
-      textActive: "group-hover:text-emerald-950",
-      subActive: "group-hover:text-emerald-600",
-      chevron: "group-hover:text-emerald-500",
-    },
-    blue: {
-      hoverBorder: "hover:border-blue-200",
-      hoverShadow: "hover:shadow-blue-600/5",
-      bgCircle: "bg-blue-50",
-      iconActive: "group-hover:bg-blue-600",
-      iconBorder: "group-hover:border-blue-500",
-      textActive: "group-hover:text-blue-950",
-      subActive: "group-hover:text-blue-600",
-      chevron: "group-hover:text-blue-500",
-    },
-  }[variant];
-
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "w-full p-6 bg-white border border-slate-200 rounded-2xl flex items-center gap-4 group transition-all relative overflow-hidden",
-        colors.hoverBorder,
-        colors.hoverShadow,
-      )}
-    >
-      <div
-        className={cn(
-          "absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity",
-          colors.bgCircle,
-        )}
-      />
-
-      <div
-        className={cn(
-          "w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 transition-all shrink-0",
-          colors.iconActive,
-          "group-hover:text-white",
-          colors.iconBorder,
-        )}
-      >
-        {React.cloneElement(icon, { className: "w-5 h-5" } as any)}
-      </div>
-
-      <div className="text-left relative z-10 flex-1">
-        <p
-          className={cn(
-            "text-slate-900 font-bold text-lg tracking-tight transition-colors",
-            colors.textActive,
-          )}
-        >
-          {title}
-        </p>
-        <p
-          className={cn(
-            "font-bold text-slate-400 st transition-colors uppercase mt-0.5 text-[10px]",
-            colors.subActive,
-          )}
-        >
-          {desc}
-        </p>
-      </div>
-
-      <ChevronRight
-        className={cn(
-          "w-5 h-5 ml-auto text-slate-300 transition-all group-hover:translate-x-1",
-          colors.chevron,
-        )}
-      />
-    </button>
-  );
-}
-
 
 function WithdrawInputField({
   label,
@@ -1564,7 +1116,12 @@ function ReviewItem({
         {label}
       </span>
       <div className="text-right max-w-[60%]">
-        <p className={cn("font-bold text-slate-900 text-sm st leading-snug ", highlight)}>
+        <p
+          className={cn(
+            "font-bold text-slate-900 text-sm st leading-snug ",
+            highlight,
+          )}
+        >
           {value}
         </p>
         {subValue && (

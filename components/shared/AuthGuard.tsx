@@ -48,24 +48,27 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     if (!user && !isRefreshingRef.current && !hasRedirectedRef.current) {
       isRefreshingRef.current = true;
       refreshUser()
-        .then((internalUser) => {
+        .then(async (internalUser) => {
           isRefreshingRef.current = false;
           if (!internalUser) {
             // Internal session check failed despite Privy auth
-            // This might happen if backend sync is pending or failed
+            // This usually means backend session is gone or account mismatch.
+            // We should logout of Privy to clear the inconsistent state.
             console.warn(
-              "Privy authenticated but internal session missing. Redirecting to login.",
+              "Privy authenticated but internal session missing. Clearing inconsistent state.",
             );
+            
             if (!hasRedirectedRef.current) {
               hasRedirectedRef.current = true;
-              router.push("/login");
+              // Redirect to login - the login page will handle clearing Privy if needed
+              // or allow them to re-authenticate properly.
+              router.push("/login?error=session_mismatch");
             }
           }
         })
         .catch((error) => {
           isRefreshingRef.current = false;
           console.error("Error refreshing user:", error);
-          // If we get a 401 or any auth error, redirect to login
           if (!hasRedirectedRef.current) {
             hasRedirectedRef.current = true;
             router.push("/login");
@@ -98,15 +101,15 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     refreshUser,
   ]);
 
-  // Show loading state while determining auth status or redirecting
+  // Show loading state while determining auth status or first-time redirecting
   if (
     !privyReady ||
     (authenticated && userLoading) ||
-    (authenticated && !user) ||
+    (authenticated && !user && !hasRedirectedRef.current) ||
     redirecting
   ) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-[#f8f9fa] flex flex-col items-center justify-center space-y-4">
         <LogoLoader size="lg" />
       </div>
     );

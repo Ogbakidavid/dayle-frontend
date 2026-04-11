@@ -44,6 +44,7 @@ export default function BankTransferPage() {
   const currencyCode = vault?.localCurrency || "USD";
 
   const [bankDetails, setBankDetails] = useState<any>(null);
+  const [feeBreakdown, setFeeBreakdown] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState("");
   const [step, setStep] = useState<"form" | "success">("form");
@@ -73,6 +74,7 @@ export default function BankTransferPage() {
 
         if (res.bankDetails) {
           setBankDetails(res.bankDetails);
+          if (res.feeBreakdown) setFeeBreakdown(res.feeBreakdown);
         } else {
           toast.error("Failed to generate bank details");
           router.push(`/checkout/${vaultId}`);
@@ -335,6 +337,41 @@ export default function BankTransferPage() {
                         highlight
                       />
                     </div>
+
+                    {feeBreakdown && (
+                      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fee Breakdown</p>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-bold text-slate-500">Vault amount</span>
+                            <span className="text-xs font-black text-slate-900">
+                              {currencySymbol}{feeBreakdown.vaultAmountLocal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} {feeBreakdown.currency}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-bold text-slate-500">Dayle deposit fee (0.5%)</span>
+                            <span className="text-xs font-black text-slate-900">
+                              {currencySymbol}{feeBreakdown.dayleFeeLocal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} {feeBreakdown.currency}
+                            </span>
+                          </div>
+                          {feeBreakdown.partnaFeeLocal != null && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-bold text-slate-500">Network processing fee</span>
+                              <span className="text-xs font-black text-slate-900">
+                                {currencySymbol}{feeBreakdown.partnaFeeLocal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} {feeBreakdown.currency}
+                              </span>
+                            </div>
+                          )}
+                          <div className="h-px bg-slate-200" />
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-black text-slate-700 uppercase">Total to send</span>
+                            <span className="text-sm font-black text-emerald-700">
+                              {currencySymbol}{feeBreakdown.totalLocal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} {feeBreakdown.currency}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="p-6 lg:p-8 bg-white border border-slate-200 rounded-3xl flex flex-col items-center gap-6 shadow-sm">
                       <div className="flex items-center gap-3">
