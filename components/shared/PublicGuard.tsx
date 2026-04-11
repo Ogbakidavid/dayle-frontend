@@ -62,7 +62,11 @@ export default function PublicGuard({ children }: PublicGuardProps) {
   // If we're on a public-only page and we KNOW they're authenticated, keep showing loader while redirecting
   const publicOnlyPages = ["/", "/login", "/signup"];
   const isPublicOnly = publicOnlyPages.includes(pathname);
-  const isStuckLoader = (loading || !shouldRender) && !(ready && !authenticated);
+  
+  // A loader is only "stuck" if we're still waiting for a definitive auth state.
+  // If we already know there's no backend user (!loading && !user), we should stop showing the loader
+  // so the login page can handle the mismatch.
+  const isStuckLoader = (loading || !shouldRender) && !(!loading && !user) && !(ready && !authenticated);
 
   if (isStuckLoader || (user && isPublicOnly)) {
     return (
