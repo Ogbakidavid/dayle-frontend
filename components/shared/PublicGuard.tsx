@@ -65,16 +65,13 @@ export default function PublicGuard({ children }: PublicGuardProps) {
     }
   }, [user, loading, authenticated, ready, router, pathname]);
 
-  // If we're on a public-only page and we KNOW they're authenticated, keep showing loader while redirecting
+  // Pages that are ONLY for non-authenticated users
   const publicOnlyPages = ["/", "/login", "/signup"];
   const isPublicOnly = publicOnlyPages.includes(pathname);
-  
-  // A loader is only "stuck" if we're still waiting for a definitive auth state.
-  // If we already know there's no backend user (!loading && !user), we should stop showing the loader
-  // so the login page can handle the mismatch.
-  const isStuckLoader = (loading || !shouldRender) && !(!loading && !user) && !(ready && !authenticated);
 
-  if (isStuckLoader || (user && isPublicOnly)) {
+  // 1. If we're on a public-only page (Login/Landing) and we HAVE a user, 
+  // show the loader while we redirect them to their dashboard.
+  if (isPublicOnly && user) {
     return (
       <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
         <LogoLoader size="lg" />
@@ -82,5 +79,16 @@ export default function PublicGuard({ children }: PublicGuardProps) {
     );
   }
 
+  // 2. For non-public pages (like shared invites) that use this guard,
+  // we wait for the initial render/check cycle, but NEVER on the Login page.
+  if (!shouldRender && !isPublicOnly) {
+    return (
+      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
+        <LogoLoader size="lg" />
+      </div>
+    );
+  }
+
+  // 3. Otherwise, render the page. On login/signup, this happens immediately.
   return <>{children}</>;
 }

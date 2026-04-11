@@ -121,6 +121,9 @@ export default function LoginPage() {
         setLoginFailed(true);
         loginInProgressRef.current = false;
         await logout();
+        router.push("/login");
+        router.refresh();
+        window.location.reload();
       }
     };
 
