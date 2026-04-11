@@ -26,15 +26,20 @@ export default function PublicGuard({ children }: PublicGuardProps) {
     const publicOnlyPages = ["/", "/login", "/signup"];
     const isPublicOnly = publicOnlyPages.includes(pathname);
 
-    // 2. If we're not loading, have a user, and are on a public-only page, REDIRECT them.
-    if (!loading && user && isPublicOnly) {
+    // 2. Only redirect if FULLY authenticated on both sides (Privy + Backend)
+    if (!loading && ready && authenticated && user && isPublicOnly) {
       // Safety: Don't redirect if the URL specifically says we just logged out
-      // or if we are in a 'session_mismatch' state handled by the LoginPage itself.
+      // or if we are in a 'session_mismatch' state.
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("logout") === "success" || urlParams.get("error") === "session_mismatch") {
+      if (
+        urlParams.get("logout") === "success" || 
+        urlParams.get("error") === "session_mismatch" ||
+        urlParams.get("error") === "refresh_failed"
+      ) {
         return;
       }
 
+      console.log("[PublicGuard] Fully authenticated, redirecting to dashboard...");
       const dashboardPath = user.role === UserRole.CLIENT ? "/client" : "/freelancer";
       
       // Handle missing roles
