@@ -249,13 +249,19 @@ export const api: ApiClient = {
     },
 
     logout: async (): Promise<any> => {
+      let token = null;
       if (typeof window !== "undefined") {
-        localStorage.removeItem("dayle_access_token");
+        token = localStorage.getItem("dayle_access_token");
       }
+      
       const result = await request("/auth/logout", {
         method: "POST",
+        body: { token },
+      }).finally(() => {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("dayle_access_token");
+        }
       });
-      // Backend clears cookies, no need to clear localStorage manually for cookies
       return result;
     },
 
