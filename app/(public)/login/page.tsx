@@ -57,7 +57,8 @@ export default function LoginPage() {
 
     // If we're coming from a session mismatch error, don't auto-login
     if (errorParam === "session_mismatch" && !loginInProgressRef.current) {
-      console.warn("Session mismatch detected, preventing auto-login with stale Privy session.");
+      console.warn("Session mismatch detected, clearing stale Privy session.");
+      logout(); // Force Privy logout to match our clear state
       return;
     }
 

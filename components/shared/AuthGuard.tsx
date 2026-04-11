@@ -48,20 +48,15 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     if (!user && !isRefreshingRef.current && !hasRedirectedRef.current) {
       isRefreshingRef.current = true;
       refreshUser()
-        .then(async (internalUser) => {
+        .then((internalUser) => {
           isRefreshingRef.current = false;
           if (!internalUser) {
-            // Internal session check failed despite Privy auth
-            // This usually means backend session is gone or account mismatch.
-            // We should logout of Privy to clear the inconsistent state.
             console.warn(
               "Privy authenticated but internal session missing. Clearing inconsistent state.",
             );
             
             if (!hasRedirectedRef.current) {
               hasRedirectedRef.current = true;
-              // Redirect to login - the login page will handle clearing Privy if needed
-              // or allow them to re-authenticate properly.
               router.push("/login?error=session_mismatch");
             }
           }
@@ -71,7 +66,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           console.error("Error refreshing user:", error);
           if (!hasRedirectedRef.current) {
             hasRedirectedRef.current = true;
-            router.push("/login");
+            router.push("/login?error=refresh_failed");
           }
         });
     }

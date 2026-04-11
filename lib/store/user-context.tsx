@@ -7,6 +7,8 @@ import {
   useEffect,
   ReactNode,
   useRef,
+  useCallback,
+  useMemo,
 } from "react";
 import { api, UserRole } from "@/lib/api-client";
 import { KycStatus } from "@/lib/domain/enums";
@@ -103,27 +105,28 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, authenticated, user, wallets, createWallet, getAccessToken]);
 
-  async function checkSession(token?: string): Promise<User | null> {
+  const checkSession = useCallback(async (token?: string): Promise<User | null> => {
     try {
       const userData = await api.auth.getCurrentUser(token);
       setUser(userData);
       return userData;
     } catch (err: any) {
-      // Silently handle auth errors (user not logged in)
-      if (err.statusCode === 401) {
+      if (err.statusCode === 401 || err.statusCode === 403) {
         setUser(null);
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("dayle_access_token");
+        }
         return null;
       }
-      // Log other errors
       console.error("Session check error:", err);
       return null;
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function logout() {
-    // Clear local state immediately to avoid stale session usage
+  const logout = useCallback(async () => {
+    setLoading(true);
     if (typeof window !== "undefined") {
       localStorage.removeItem("dayle_access_token");
     }
@@ -131,22 +134,22 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     try {
       await privyLogout();
-      // Try to notify backend, but don't block if it fails
       await api.auth.logout().catch(() => {});
     } finally {
-      router.push("/login");
+      setLoading(false);
+      router.push("/login?logout=success");
     }
-  }
+  }, [privyLogout, router]);
+
+  const contextValue = useMemo(() => ({
+    user,
+    loading,
+    logout,
+    refreshUser: checkSession,
+  }), [user, loading, logout, checkSession]);
 
   return (
-    <UserContext.Provider
-      value={{
-        user,
-        loading,
-        logout,
-        refreshUser: checkSession,
-      }}
-    >
+    <UserContext.Provider value={contextValue}>
       {children}
     </UserContext.Provider>
   );
