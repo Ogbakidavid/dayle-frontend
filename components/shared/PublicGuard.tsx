@@ -20,7 +20,6 @@ export default function PublicGuard({ children }: PublicGuardProps) {
   const { authenticated, ready } = usePrivy();
   const router = useRouter();
   const pathname = usePathname();
-
   useEffect(() => {
     // 1. Define public-only routes
     const publicOnlyPages = ["/", "/login", "/signup"];
@@ -39,10 +38,8 @@ export default function PublicGuard({ children }: PublicGuardProps) {
         return;
       }
 
-      console.log("[PublicGuard] Fully authenticated, redirecting to dashboard...");
       const dashboardPath = user.role === UserRole.CLIENT ? "/client" : "/freelancer";
       
-      // Handle missing roles
       if (!user.role || user.role === UserRole.NONE) {
         if (!pathname.startsWith("/onboarding/role")) {
           router.replace("/onboarding/role");
@@ -53,8 +50,30 @@ export default function PublicGuard({ children }: PublicGuardProps) {
     }
   }, [user, loading, pathname, router, ready, authenticated]);
 
-  // We NEVER return a full-screen loader here anymore.
-  // This ensures the Login/Signup pages are always accessible.
-  // Redirection happens in the background if a session is detected.
+  // --- SMART LOADING LOGIC ---
+  const publicOnlyPages = ["/", "/login", "/signup"];
+  const isPublicOnly = publicOnlyPages.includes(pathname);
+
+  if (isPublicOnly) {
+     const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+     // If we're coming from a logout or error, show the page IMMEDIATELY. No spinner.
+     const isTransitioning = 
+       urlParams.get("logout") === "success" || 
+       urlParams.get("error") !== null ||
+       urlParams.get("redirect") !== null;
+
+     if (!isTransitioning) {
+       // If we're still checking Privy, still checking Backend, 
+       // or we're ALREADY sure we have a user (masking the redirect), show the loader.
+       if (!ready || loading || (authenticated && user)) {
+         return (
+           <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center space-y-4">
+             <LogoLoader size="lg" />
+           </div>
+         );
+       }
+     }
+  }
+
   return <>{children}</>;
 }
