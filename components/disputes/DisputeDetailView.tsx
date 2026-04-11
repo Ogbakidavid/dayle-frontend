@@ -58,6 +58,14 @@ interface Dispute {
   reasonCodes?: string[];
   events?: DisputeEvent[];
   openedByRole?: string;
+  resolutionType?: string;
+  resolutionPayload?: {
+    outcome: string;
+    freelancerPercent: number;
+    clientPercent: number;
+    totalAmount: number;
+    splitAmount: number;
+  };
   [key: string]: any;
 }
 
@@ -449,6 +457,76 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
           role={role}
           onUpdate={load}
         />
+      )}
+
+      {/* Resolution Summary Card */}
+      {dispute.status === "RESOLVED" && dispute.resolutionPayload && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white border-2 border-emerald-100 rounded-[2.5rem] p-8 md:p-12 shadow-2xl shadow-emerald-500/10 overflow-hidden relative group"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full -mr-32 -mt-32 opacity-50 group-hover:scale-110 transition-transform duration-700" />
+          
+          <div className="relative z-10 grid lg:grid-cols-[1fr_2px_1fr] gap-12 items-center">
+            <div className="space-y-6">
+              <header className="space-y-2">
+                <div className="flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-[0.3em]">
+                  <Gavel className="w-4 h-4" />
+                  Resolution Result
+                </div>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+                  {dispute.resolutionPayload.outcome === "SPLIT" 
+                    ? "Mutual Split Authorized" 
+                    : dispute.resolutionPayload.outcome === "RELEASE" 
+                    ? "Full Asset Release" 
+                    : "Full Settlement Refund"}
+                </h2>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                  {dispute.resolutionType === "MEDIATION" ? "Mutual Agreement" : "Final Arbitration"}
+                </div>
+              </header>
+              
+              <p className="text-slate-600 font-bold leading-relaxed pr-8">
+                {dispute.resolution || "The parties have reached a consensus on the distribution of assets held in the secure vault."}
+              </p>
+            </div>
+
+            <div className="hidden lg:block h-full bg-slate-100" />
+
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div className="flex justify-between items-end">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Freelancer Share</span>
+                  <span className="text-2xl font-black text-slate-900">{dispute.resolutionPayload.freelancerPercent}%</span>
+                </div>
+                <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${dispute.resolutionPayload.freelancerPercent}%` }}
+                    transition={{ duration: 1, delay: 0.5 }}
+                    className="h-full bg-emerald-500" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex justify-between items-end">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Client Share</span>
+                  <span className="text-2xl font-black text-slate-900">{dispute.resolutionPayload.clientPercent}%</span>
+                </div>
+                <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                  <motion.div 
+                     initial={{ width: 0 }}
+                     animate={{ width: `${dispute.resolutionPayload.clientPercent}%` }}
+                     transition={{ duration: 1, delay: 0.5 }}
+                    className="h-full bg-slate-900" 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       )}
 
       <div className="grid xl:grid-cols-[1fr_340px] gap-8">
