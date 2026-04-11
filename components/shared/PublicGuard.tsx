@@ -23,6 +23,16 @@ export default function PublicGuard({ children }: PublicGuardProps) {
   const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
+    // Pages that are ONLY for non-authenticated users
+    const publicOnlyPages = ["/", "/login", "/signup"];
+    const isPublicOnly = publicOnlyPages.includes(pathname);
+
+    // If we are on a public-only page, let's allow rendering immediately to avoid spinner hangs.
+    // Redirection will still happen if we determine they are authenticated later.
+    if (isPublicOnly) {
+      setShouldRender(true);
+    }
+
     // If neither Privy nor Backend say we're logged in, we're definitely public
     if ((ready && !authenticated) || (!loading && !user)) {
       setShouldRender(true);
@@ -30,10 +40,6 @@ export default function PublicGuard({ children }: PublicGuardProps) {
     }
 
     if (loading) return;
-
-    // Define pages that are ONLY for non-authenticated users
-    const publicOnlyPages = ["/", "/login", "/signup"];
-    const isPublicOnly = publicOnlyPages.includes(pathname);
 
     if (user && isPublicOnly) {
       // User is authenticated and on a public-only page, redirect to their dashboard

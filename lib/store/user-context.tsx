@@ -126,7 +126,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    setLoading(true);
     if (typeof window !== "undefined") {
       localStorage.removeItem("dayle_access_token");
     }
@@ -136,7 +135,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
       await privyLogout();
       await api.auth.logout().catch(() => {});
     } finally {
-      setLoading(false);
       router.push("/login?logout=success");
     }
   }, [privyLogout, router]);
