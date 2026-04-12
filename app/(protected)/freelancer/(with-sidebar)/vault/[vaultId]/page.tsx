@@ -760,6 +760,18 @@ export default function FreelancerVaultDetailPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {vault.status === VaultStatus.CHANGES_REQUESTED && vault.requestedChanges && (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wider">
+                      <AlertCircle className="w-4 h-4" />
+                      Instructions from client
+                    </div>
+                    <p className="text-sm text-amber-900 leading-relaxed italic">
+                      &quot;{vault.requestedChanges}&quot;
+                    </p>
+                  </div>
+                )}
+                
                 <div className="flex flex-col gap-3">
                   {(vault.status === VaultStatus.FUNDED ||
                     vault.status === VaultStatus.CHANGES_REQUESTED) && (

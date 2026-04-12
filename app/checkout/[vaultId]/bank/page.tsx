@@ -345,23 +345,15 @@ export default function BankTransferPage() {
                           <div className="flex justify-between items-center">
                             <span className="text-xs font-bold text-slate-500">Vault amount</span>
                             <span className="text-xs font-black text-slate-900">
-                              {currencySymbol}{feeBreakdown.vaultAmountLocal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} {feeBreakdown.currency}
+                              {currencySymbol}{feeBreakdown.vaultAmountLocal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                             </span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-slate-500">Dayle deposit fee (0.5%)</span>
+                            <span className="text-xs font-bold text-slate-500">Depositing fee</span>
                             <span className="text-xs font-black text-slate-900">
-                              {currencySymbol}{feeBreakdown.dayleFeeLocal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} {feeBreakdown.currency}
+                              {currencySymbol}{( (feeBreakdown.dayleFeeLocal || 0) + (feeBreakdown.partnaFeeLocal || 0) ).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                             </span>
                           </div>
-                          {feeBreakdown.partnaFeeLocal != null && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs font-bold text-slate-500">Network processing fee</span>
-                              <span className="text-xs font-black text-slate-900">
-                                {currencySymbol}{feeBreakdown.partnaFeeLocal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} {feeBreakdown.currency}
-                              </span>
-                            </div>
-                          )}
                           <div className="h-px bg-slate-200" />
                           <div className="flex justify-between items-center">
                             <span className="text-xs font-black text-slate-700 uppercase">Total to send</span>
