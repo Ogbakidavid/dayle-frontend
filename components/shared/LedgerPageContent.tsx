@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ethers } from "ethers";
 import { Button } from "@/components/ui/button";
+import { DotLoader } from "@/components/ui/dot-loader";
 import {
   Card,
   CardContent,
@@ -10,19 +11,15 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { AmountDisplay } from "@/components/ui/amount-display";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { LedgerBalance } from "./LedgerBalance";
 import { Transaction, useLedger } from "@/lib/store/ledger-context";
 import { TransactionStatus, KycStatus, VaultStatus } from "@/lib/domain/enums";
 import { useVault } from "@/lib/store/vault-context";
 import { cn } from "@/lib/utils";
 import { CurrencyEstimate } from "./currency-estimate";
-import { calculateDayleFee } from "@/lib/utils/fee";
 import { useUser } from "@/lib/store/user-context";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { api } from "@/lib/api-client";
 import {
   Building2,
   ArrowUpRight,
@@ -83,6 +80,30 @@ export default function LedgerPageContent() {
   const itemsPerPage = 3;
 
   const { user } = useUser();
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+
+  // Determine currency and symbol
+  const isKenya = user?.country === "Kenya" || user?.country === "KE";
+  const currency = isKenya ? "KES" : "NGN";
+  const currencySymbol = currency === "NGN" ? "₦" : "KSh";
+
+  // Fetch exchange rate for local-to-usd conversion
+  useEffect(() => {
+    const fetchRate = async () => {
+      try {
+        const data = await api.rates.getDisplayRate(currency, 100);
+        setExchangeRate(data.rate);
+      } catch (err) {
+        console.error("Failed to fetch exchange rate", err);
+      }
+    };
+    if (user) fetchRate();
+  }, [user, currency]);
+
+  const usdEquivalent = useMemo(() => {
+    if (!withdrawAmount || !exchangeRate) return 0;
+    return parseFloat(withdrawAmount) * exchangeRate;
+  }, [withdrawAmount, exchangeRate]);
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!withdrawAmount || isWithdrawing) return;
@@ -192,27 +213,20 @@ export default function LedgerPageContent() {
                         Withdrawal amount
                       </label>
                       <div className="relative group">
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-bold text-white group-focus-within:text-emerald-400 transition-colors">
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 text-2xl font-bold text-emerald-400">
+                          {currencySymbol}
                         </span>
                         <input
                           type="number"
                           value={withdrawAmount}
                           onChange={(e) => setWithdrawAmount(e.target.value)}
                           placeholder="0.00"
-                          className="w-full text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tabular-nums bg-transparent border-b border-emerald-800 focus:border-emerald-400 outline-none py-2 md:py-4 pl-0 transition-all text-white placeholder:text-white/30"
+                          className="w-full text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tabular-nums bg-transparent border-b border-emerald-800 focus:border-emerald-400 outline-none py-2 md:py-4 pl-8 transition-all text-white placeholder:text-white/30"
                           min="1"
                           step="0.01"
                         />
                       </div>
-                      {parseFloat(withdrawAmount) > 0 && (
-                        <div className="mt-2 text-sm font-bold">
-                          <CurrencyEstimate 
-                            usdAmount={parseFloat(withdrawAmount)} 
-                            className="text-slate-900" 
-                            showNote={false}
-                          />
-                        </div>
-                      )}
+                      {parseFloat(withdrawAmount) > 0 && <div className="h-4" />}
                       <div className="mt-4 flex items-center justify-between text-sm font-bold ">
                         <span className="text-emerald-100/70">Available Limit</span>
                         <CurrencyEstimate 
@@ -244,10 +258,10 @@ export default function LedgerPageContent() {
                       disabled={
                         !withdrawAmount ||
                         isWithdrawing ||
-                        parseFloat(withdrawAmount) > parseFloat(balance?.formattedAvailable || balance?.available || "0")
+                        usdEquivalent > parseFloat(balance?.formattedAvailable || balance?.available || "0")
                       }
                     >
-                      {isWithdrawing ? "Processing..." : "Execute Settlement"}
+                      {isWithdrawing ? <DotLoader color="white" /> : "Execute Settlement"}
                     </Button>
                   </form>
                 </CardContent>
