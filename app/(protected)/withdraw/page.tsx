@@ -75,12 +75,11 @@ export default function WithdrawPage() {
     setSelectedCountry(newCountry);
   }, [user?.country]);
 
-  const APP_FEE_PERCENT = 0.005; // 0.5%
-  const appFee = amount * APP_FEE_PERCENT;
+  const TOTAL_FEE_PERCENT = 0.015; // 1.5% (0.5% Dayle + 1.0% Partna)
+  const appFee = amount * TOTAL_FEE_PERCENT;
   const netSettlement = amount - appFee;
 
   const currencyPrefixes: Record<string, string> = {
-    USD: "$",
     NGN: "₦",
     KES: "KSh",
   };
@@ -89,7 +88,7 @@ export default function WithdrawPage() {
   // Use amount directly if it's already local, otherwise we'll rely on feeBreakdown
   // This satisfies "not interacting with USD" by treating the input as primary.
   const displayAmount = amount;
-  const displayAppFee = amount * APP_FEE_PERCENT;
+  const displayAppFee = amount * TOTAL_FEE_PERCENT;
 
   // Flow states
   const [step, setStep] = useState<Step>("initiation");
@@ -114,12 +113,12 @@ export default function WithdrawPage() {
   });
 
   const [feeBreakdown, setFeeBreakdown] = useState<{
+    totalFeePercent: number;
+    totalFeeLocal: number;
     dayleFeePercent: number;
-    dayleFeeUSD: number;
     dayleFeeLocal: number;
     partnaFeePercent: number;
     partnaFeeLocal: number;
-    vaultAmountUSD: number;
     vaultAmountLocal: number;
     netAmountLocal: number;
     currency: string;
@@ -819,44 +818,23 @@ export default function WithdrawPage() {
 
                             <div className="flex justify-between items-center group">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                                  <DayleLogo className="w-4 h-4" />
+                                <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                                  <Zap className="w-4 h-4" />
                                 </div>
                                 <span className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px]">
-                                  Dayle Fee (
-                                  {feeBreakdown?.dayleFeePercent || 0.5}%)
+                                  Withdrawing Fee (
+                                  {feeBreakdown?.totalFeePercent || 1.5}%)
                                 </span>
                               </div>
                               <span className="text-red-500 font-bold text-sm">
                                 -{currencyPrefix}
                                 {(
-                                  feeBreakdown?.dayleFeeLocal || displayAppFee
+                                  feeBreakdown?.totalFeeLocal || 0
                                 ).toLocaleString(undefined, {
                                   minimumFractionDigits: 2,
                                 })}
                               </span>
                             </div>
-
-                            {feeBreakdown?.partnaFeeLocal && (
-                              <div className="flex justify-between items-center group">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                                    <Zap className="w-4 h-4" />
-                                  </div>
-                                  <span className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px]">
-                                    Processing Fee (
-                                    {feeBreakdown?.partnaFeePercent || 1}%)
-                                  </span>
-                                </div>
-                                <span className="text-red-500 font-bold text-sm">
-                                  -{currencyPrefix}
-                                  {feeBreakdown.partnaFeeLocal.toLocaleString(
-                                    undefined,
-                                    { minimumFractionDigits: 2 },
-                                  )}
-                                </span>
-                              </div>
-                            )}
                           </div>
 
                           <div className="pt-8 border-t border-slate-100">

@@ -201,7 +201,7 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
 
   if (loading)
     return (
-      <div className="py-32 flex flex-col items-center justify-center bg-white rounded-[2.5rem] border border-slate-100 shadow-sm">
+      <div className="py-32 h-screen flex flex-col items-center justify-center">
         <LogoLoader size="lg" />
       </div>
     );
@@ -628,7 +628,11 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
                                 </span>
                                 <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
                                   {roleLabel} ·{" "}
-                                  {new Date(ev.createdAt).toLocaleDateString()}
+                                  {new Date(ev.createdAt).toLocaleDateString()} ·{" "}
+                                  {new Date(ev.createdAt).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
                                 </span>
                               </div>
                               <p className="text-[10px] font-bold text-slate-300 font-mono">
@@ -642,8 +646,12 @@ export function DisputeDetailView({ disputeId, role }: DisputeDetailViewProps) {
 
                             <div className="text-sm font-bold text-slate-600 leading-relaxed">
                               {ev.payload?.note ||
+                                ev.payload?.reason ||
                                 ev.description ||
                                 ev.payload?.decision ||
+                                (type === "OPENED" && "Case officially opened and entered mutual mediation.") ||
+                                (type === "EVIDENCE" && "New evidence submitted for record.") ||
+                                (type === "ESCALATED" && "Case escalated to platform arbitration.") ||
                                 "System event logged."}
                             </div>
 

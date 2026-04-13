@@ -82,6 +82,7 @@ import {
   TransactionStatus,
   LedgerEntryType,
   getVaultDerivedLabel,
+  DisputeStatus,
 } from "@/lib/domain/enums";
 import { useUser } from "@/lib/store/user-context";
 import { motion, AnimatePresence } from "framer-motion";
@@ -218,6 +219,7 @@ export default function ClientVaultDetailPage() {
 
   // Fetch active dispute if status is DISPUTED
   const [activeDisputeId, setActiveDisputeId] = useState<string | null>(null);
+  const [activeDisputeStatus, setActiveDisputeStatus] = useState<string | null>(null);
   useEffect(() => {
     async function fetchActiveDispute() {
       if (!vault || vault.status !== VaultStatus.DISPUTED) return;
@@ -227,6 +229,7 @@ export default function ClientVaultDetailPage() {
           // Find active or use first available
           const active = disputes.find((d: any) => d.status !== "RESOLVED" && d.status !== "CLOSED");
           setActiveDisputeId(active ? active.id : disputes[0].id);
+          setActiveDisputeStatus(active ? active.status : disputes[0].status);
         }
       } catch (err) {
         console.error("Failed to fetch active dispute:", err);
@@ -1239,17 +1242,17 @@ export default function ClientVaultDetailPage() {
 
                           {/* Enter Mediation — available when DISPUTED */}
                           {vault.status === VaultStatus.DISPUTED && activeDisputeId && (
-                            <Link
-                              href={`/client/disputes/${activeDisputeId}`}
-                              className="w-full"
+                            <Button
+                              asChild
+                              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold h-10 sm:h-12 rounded-xl transition-all shadow-lg shadow-amber-600/20 active:scale-95 text-xs sm:text-sm"
                             >
-                              <Button
-                                className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold h-10 sm:h-12 rounded-xl transition-all shadow-lg shadow-amber-600/20 active:scale-95 text-xs sm:text-sm"
-                              >
+                              <Link href={`/client/disputes/${activeDisputeId}`}>
                                 <Gavel className="w-4 h-4 mr-2" />
-                                Enter Mediation Room
-                              </Button>
-                            </Link>
+                                {activeDisputeStatus === DisputeStatus.UNDER_REVIEW || activeDisputeStatus === DisputeStatus.NEEDS_INFO
+                                  ? "Manage Arbitration"
+                                  : "Enter Mediation Room"}
+                              </Link>
+                            </Button>
                           )}
 
                           {!vault.freelancerId && (

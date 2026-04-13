@@ -5,10 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api-client";
 import { toast } from "sonner";
-import { Timer, Handshake, ChevronRight, Calculator, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Timer, Handshake, ChevronRight, Calculator, AlertCircle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
 import { DotLoader } from "@/components/ui/dot-loader";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 
 interface MediationRoomProps {
@@ -23,6 +31,7 @@ export function MediationRoom({ dispute, vault, role, onUpdate }: MediationRoomP
   const [amountToFreelancer, setAmountToFreelancer] = useState<number>(0);
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEscalateConfirmOpen, setIsEscalateConfirmOpen] = useState(false);
 
   // Countdown timer logic
   const [timeLeft, setTimeLeft] = useState<string>("");
@@ -124,12 +133,15 @@ export function MediationRoom({ dispute, vault, role, onUpdate }: MediationRoomP
   };
 
   const handleEscalate = async () => {
-    if (!confirm("Are you sure you want to escalate this dispute? This will move the case to platform arbitration for final adjudication by a Dayle expert. This process is final and cannot be undone.")) return;
-    
+    setIsEscalateConfirmOpen(true);
+  };
+
+  const confirmEscalation = async () => {
     setIsSubmitting(true);
     try {
       await api.disputes.escalate(dispute.id);
       toast.success("Dispute escalated to platform review.");
+      setIsEscalateConfirmOpen(false);
       onUpdate();
     } catch (err: any) {
       toast.error(err.message || "Failed to escalate dispute");
@@ -157,13 +169,13 @@ export function MediationRoom({ dispute, vault, role, onUpdate }: MediationRoomP
                 size="sm"
                 onClick={handleEscalate}
                 disabled={isSubmitting}
-                className="h-8 text-[10px] font-black text-amber-700 hover:bg-amber-100 hover:text-amber-900 uppercase tracking-tighter"
+                className="h-8 text-sm font-black text-amber-700 hover:bg-amber-100 hover:text-amber-900 tracking-wide"
               >
                 Escalate to Arbitration
               </Button>
             <div className="bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-2">
               <Timer className="w-3.5 h-3.5 text-amber-600" />
-              <span className="text-xs font-black text-amber-900 tabular-nums uppercase">
+              <span className="text-sm font-black text-amber-900 tabular-nums">
                 Expires {timeLeft}
               </span>
             </div>
@@ -338,6 +350,44 @@ export function MediationRoom({ dispute, vault, role, onUpdate }: MediationRoomP
             Mediation is a collaborative phase. If no agreement is reached before the window expires, the case will escalate to platform arbitration which involves a longer review time.
           </p>
         </div>
+
+        {/* Escalation Confirmation Dialog */}
+        <Dialog open={isEscalateConfirmOpen} onOpenChange={setIsEscalateConfirmOpen}>
+          <DialogContent className="sm:max-w-md rounded-3xl border-none shadow-2xl">
+            <DialogHeader className="space-y-4 pt-4">
+              <div className="w-16 h-16 bg-amber-100 rounded-3xl flex items-center justify-center mx-auto">
+                <ShieldAlert className="w-8 h-8 text-amber-600" />
+              </div>
+              <div className="space-y-2 text-center">
+                <DialogTitle className="text-xl font-black text-slate-900 tracking-tight">Escalate to Arbitration?</DialogTitle>
+                <DialogDescription className="text-sm font-bold text-slate-500 leading-relaxed px-4">
+                  This will move the case to platform arbitration for final adjudication by a Dayle expert. 
+                  <span className="block mt-2 text-amber-700">This process is final and cannot be undone.</span>
+                </DialogDescription>
+              </div>
+            </DialogHeader>
+            <DialogFooter className="grid grid-cols-2 gap-3 p-6 pt-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEscalateConfirmOpen(false)}
+                className="h-11 rounded-xl font-bold border-slate-200 text-slate-600 hover:bg-slate-50"
+              >
+                No, cancel
+              </Button>
+              <Button 
+                onClick={confirmEscalation}
+                disabled={isSubmitting}
+                className="h-11 rounded-xl font-black bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-600/20"
+              >
+                {isSubmitting ? (
+                  <DotLoader size="sm" color="white" />
+                ) : (
+                  "Yes, Escalate"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

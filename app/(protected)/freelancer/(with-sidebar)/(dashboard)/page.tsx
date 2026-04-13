@@ -23,7 +23,6 @@ import { getVaultDerivedLabel } from "@/lib/domain/enums";
 import { api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { CurrencyEstimate } from "@/components/shared/currency-estimate";
-import { calculateDayleFee } from "@/lib/utils/fee";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -80,14 +79,12 @@ export default function FreelancerDashboard() {
   const completedVaults = vaults.filter(
     (v: any) => v.status === VaultStatus.RELEASED,
   );
-  const totalEarnings = completedVaults.reduce(
-    (acc: number, v: any) =>
-      acc + (Number(v.formattedTotalAmount) || Number(v.totalAmount) || 0),
+  const totalPending = activeVaults.reduce(
+    (acc: number, v: any) => acc + (Number(v.formattedTotalAmount) || 0),
     0,
   );
-  const totalPending = activeVaults.reduce(
-    (acc: number, v: any) =>
-      acc + (Number(v.formattedTotalAmount) || 0),
+  const totalEarnings = completedVaults.reduce(
+    (acc: number, v: any) => acc + (Number(v.formattedPaidAmount) || 0),
     0,
   );
 
@@ -395,11 +392,11 @@ export default function FreelancerDashboard() {
                     <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-8 border-t sm:border-t-0 border-slate-100 pt-4 sm:pt-0">
                       <div className="text-left sm:text-right">
                         <p className="text-[8px] sm:text-[9px] text-slate-600 font-bold tracking-wide mb-1">
-                          Project value
+                          Contract value
                         </p>
                         <CurrencyEstimate
                           usdAmount={Number(
-                            vault.formattedTotalAmount || "0.00",
+                            vault.formattedTotalAmount || vault.totalAmount,
                           )}
                           className="text-slate-900 text-xl sm:text-2xl font-bold"
                           align="right"

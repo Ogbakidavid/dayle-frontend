@@ -82,7 +82,7 @@ export function CurrencyEstimate({
   };
 
   // If we have a zero amount, show local currency zero directly (no rate needed)
-  if (usdAmount === 0) {
+  if (usdAmount === 0 && manualLocalAmount == null) {
     return (
       <span
         className={cn(

@@ -115,12 +115,12 @@ export interface ApiClient {
     getBalance: () => Promise<any>;
     withdraw: (amount: number, currency: string, bankDetails: any, opts?: any) => Promise<any>;
     withdrawPreview: (amount: number, currency: string) => Promise<{
+      totalFeePercent: number;
+      totalFeeLocal: number;
       dayleFeePercent: number;
-      dayleFeeUSD: number;
       dayleFeeLocal: number;
       partnaFeePercent: number;
       partnaFeeLocal: number;
-      vaultAmountUSD: number;
       vaultAmountLocal: number;
       netAmountLocal: number;
       currency: string;
