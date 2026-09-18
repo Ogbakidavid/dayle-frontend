@@ -30,7 +30,7 @@
 - **Animations**: Framer Motion
 - **UI Components**: Radix UI + Lucide Icons
 - **State Management**: React Context API (`UserContext`, `LedgerContext`, `VaultContext`)
-- **Data Fetching**: Mock API System (`lib/mock-api.js`)
+- **Data Fetching**: Production API Client (`lib/api-client.js`)
 
 ---
 
@@ -132,7 +132,7 @@
 - On login/signup: Stores user in state
 - On logout: Clears state and localStorage
 
-**Caching**: User data persisted in localStorage via mock API
+**Caching**: User data persisted via production session cookies (or localStorage fallback)
 
 ---
 
